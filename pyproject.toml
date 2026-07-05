@@ -1,12 +1,27 @@
 [project]
 name = "game-analysis-agent"
-version = "0.1.0"
-description = "Development-side local LLM agent pipeline for Godot balance simulation analysis."
+version = "0.2.0"
+description = "Development-side local LLM agent pipeline for Godot balance / boundary / bug / value analysis."
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "openai>=1.0.0",
+    "pydantic>=2.0.0",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-mock>=3.10",
+]
 
 [tool.ruff]
 line-length = 100
 
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["B007", "SIM108"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]

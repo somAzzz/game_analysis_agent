@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-
 DEFAULT_REPORT_FILES = [
     "summary.json",
     "ending_distribution.csv",

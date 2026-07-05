@@ -1,5 +1,6 @@
 agents:
   balance:
+    description: Diagnose ending distribution + attribute curves + dominant actions
     system_prompt: prompts/balance_agent_system.md
     user_prompt: prompts/balance_agent_user.md
     output_files:
@@ -7,14 +8,54 @@ agents:
       - tuning_proposal.md
     temperature: 0.2
   content_qa:
+    description: Review event text + choice structure + German context
     system_prompt: prompts/content_qa_agent_system.md
     user_prompt: prompts/content_qa_agent_user.md
     output_files:
       - content_issues.md
     temperature: 0.15
   event_graph:
+    description: Audit trigger graph for unreachable / broken / contradictory events
     system_prompt: prompts/event_graph_agent_system.md
     user_prompt: prompts/event_graph_agent_user.md
     output_files:
       - event_graph_report.md
     temperature: 0.1
+  bug_hunter:
+    description: Diagnose flagged anomalies + raw runs into top suspect bugs
+    system_prompt: prompts/bug_hunter_system.md
+    user_prompt: prompts/bug_hunter_user.md
+    output_files:
+      - bug_diagnosis.md
+    temperature: 0.2
+    extra_inputs:
+      - anomalies.jsonl
+      - bugs.jsonl
+      - bugs_summary.md
+  boundary_prober:
+    description: Review extreme-scenario boundary probe runs and propose hardening
+    system_prompt: prompts/boundary_prober_system.md
+    user_prompt: prompts/boundary_prober_user.md
+    output_files:
+      - boundary_report.md
+    temperature: 0.2
+    extra_inputs:
+      - boundary_runs.jsonl
+  value_reviewer:
+    description: Value / cost-benefit review of every action / event / choice / ending
+    system_prompt: prompts/value_reviewer_system.md
+    user_prompt: prompts/value_reviewer_user.md
+    output_files:
+      - value_review.md
+    temperature: 0.15
+    extra_inputs:
+      - value_report.json
+  interactive_player:
+    description: LLM-driven playthrough via tool calling
+    system_prompt: prompts/player_system.md
+    user_prompt: prompts/player_user.md
+    output_files:
+      - playthrough.jsonl
+      - playthrough_summary.md
+    temperature: 0.3
+    tool_calling: true
