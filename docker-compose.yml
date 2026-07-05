@@ -1,0 +1,121 @@
+# Orchestration for game_analysis_agent.
+#
+# Two services:
+#   - vllm   — local Qwen3.6 27B NVFP4 inference server (OpenAI-compatible).
+#   - agent  — Python CLI one-off container (use `docker compose run agent ...`).
+#
+# Notes (mirrored from fintext_llm/docker-compose.yml for consistency):
+#   * vLLM v0.24.0 is the latest stable image with NVFP4 + MTP support
+#     validated against Qwen3.6. vLLM_BIND_PORT defaults to 8000 so
+#     this stack does not collide with fintext_llm on 30000.
+#   * NVFP4 requires Blackwell (sm_100 / sm_120). Qwen3.6 ships with
+#     MTP weights; the speculative config is enabled by default and
+#     can be disabled with LLM_ENABLE_MTP=0.
+#   * The agent service does NOT need GPU access — the vLLM endpoint
+#     is plain HTTP. It also does not need the GPU driver / CUDA
+#     stack; it's a normal slim Python image.
+
+services:
+  vllm:
+    # Pinned 2026-07-XX: v0.24.0 is the latest stable tag with NVFP4 + MTP
+    # validated against Qwen3.6 27B NVFP4. Bump quarterly. See fintext_llm
+    # for the same pin rationale.
+    image: vllm/vllm-openai:v0.24.0
+    # v0.24.0 image has ENTRYPOINT=["vllm","serve"] — a plain
+    # ``command`` would prepend ``vllm serve``, which then misreads
+    # the next positional argument. Empty entrypoint lets the shell
+    # script below run as-is.
+    entrypoint: ""
+    env_file:
+      - .env
+    ports:
+      - "${VLLM_BIND_PORT:-8000}:8000"
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    environment:
+      # vLLM's strict env-var validation warns about any ``VLLM_*``
+      # variable it does not recognize. Whitelist only what vLLM itself
+      # consumes; the Python client reads its config from the host's
+      # .env (which is auto-loaded by ``analyse_agent.env.load_dotenv``)
+      # so we don't need to forward ``VLLM_BASE_URL`` / ``VLLM_API_KEY``
+      # into the container.
+      - HF_TOKEN=${HF_TOKEN:-}
+      - HF_HUB_ENABLE_HF_TRANSFER=${HF_HUB_ENABLE_HF_TRANSFER:-0}
+      - CUDA_DEVICE_ORDER=PCI_BUS_ID
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+    ipc: host
+    shm_size: '32gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # Default model is NVIDIA's official NVFP4 quant
+    # (``nvidia/Qwen3.6-27B-NVFP4``). Override with LLM_MODEL.
+    # MTP speculative decoding is on by default — Qwen3.6 ships
+    # with MTP weights; set ``LLM_ENABLE_MTP=0`` in .env to disable
+    # it for checkpoints that lack MTP tensors (the
+    # ``--speculative-config`` flag will error out otherwise).
+    #
+    # The sh wrapper does shell-side substitution so the JSON for
+    # --speculative-config can be emitted literally. We avoid YAML
+    # block scalars (``|``) because Compose only interpolates
+    # ``$$`` -> ``$`` inside flow-style scalars.
+    command:
+      - sh
+      - -c
+      - >-
+        MODEL="$${LLM_MODEL:-nvidia/Qwen3.6-27B-NVFP4}";
+        ARGS="$${MODEL} --host 0.0.0.0 --port 8000 --trust-remote-code --dtype bfloat16 --gpu-memory-utilization 0.9 --max-model-len $${LLM_MAX_MODEL_LEN:-32768}";
+        if [ "$${LLM_ENABLE_MTP:-1}" = "1" ]; then
+        ARGS="$${ARGS} --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":3}";
+        fi;
+        exec vllm serve $${ARGS}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request, sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/v1/models', timeout=5).status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+      start_period: 120s
+    restart: unless-stopped
+
+  agent:
+    # Built from the Dockerfile in this repo. Use ``docker compose run
+    # agent sim --runs 100 --policy balanced`` or any other subcommand.
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      # The agent inside the container reaches vLLM through the
+      # compose-network DNS name ``vllm`` on port 8000. The host-side
+      # ``VLLM_BASE_URL`` from .env (e.g. http://localhost:8000/v1) is
+      # overridable per-call via ``docker compose run -e``.
+      - VLLM_BASE_URL=${VLLM_BASE_URL:-http://vllm:8000/v1}
+      - VLLM_API_KEY=${VLLM_API_KEY:-local-dev-token}
+      - GAME_PROJECT_PATH=${GAME_PROJECT_PATH:-/data/game_project}
+    volumes:
+      # Mount your local checkout of study-in-germany inside the
+      # container so ``run_gameplay_agent.py sim`` can drive its
+      # headless Godot runner. Without this mount the agent can
+      # still run the pure-Python anomaly + value analyzers but
+      # cannot produce raw_runs.jsonl.
+      - ${GAME_PROJECT_PATH:-/data/game_project}:/data/game_project:ro
+      # Reports are persisted back onto the host for inspection.
+      - ./reports:/app/reports
+    depends_on:
+      vllm:
+        condition: service_healthy
+    profiles:
+      - cli
+    # No long-running process — the CLI exits when it finishes.
+    command: ["python", "tools/run_gameplay_agent.py", "--help"]
+
+# NB: the agent is opt-in via ``--profile cli``. A bare
+# ``docker compose up`` only starts the vLLM inference server; use
+# ``docker compose --profile cli run agent <subcommand>`` to invoke
+# the CLI on demand. Keeps host resources free when you only want
+# the inference side.

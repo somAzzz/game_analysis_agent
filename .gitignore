@@ -5,5 +5,9 @@ __pycache__/
 *.pyo
 .DS_Store
 *.egg-info/
-reports/**/raw_runs.jsonl
-reports/**/agent_prompt.full.md
+
+# Reports are runtime artifacts (raw_runs.jsonl + CSVs + .md). Keep the
+# directory but ignore everything under it so local runs never leak
+# into commits.
+reports/**
+!reports/.gitkeep

@@ -33,6 +33,23 @@ LLM agent layer (provider: vllm | sglang | deepseek)
 
 ## 快速开始
 
+### 方式 A：Docker（推荐，vLLM + agent 一体化）
+
+```bash
+cp .env.example .env
+# 编辑 .env 填 HF_TOKEN / GAME_PROJECT_PATH 等
+docker compose pull vllm
+docker compose up vllm -d
+docker compose logs -f vllm           # 等待 "Application startup complete"
+docker compose --profile cli run --rm agent all --runs 20 --policy balanced
+```
+
+详见 [docs/DOCKER.md](docs/DOCKER.md)。该方式会在本地启动一个
+vLLM v0.24.0 容器（默认服务 NVIDIA 官方 Qwen3.6 27B NVFP4 + MTP
+投机解码），然后按需启动一个不带 GPU 的 agent CLI 容器跑流水线。
+
+### 方式 B：本地 Python + 已有 vLLM endpoint
+
 1. 复制环境变量模板：
 
 ```bash
@@ -164,6 +181,7 @@ tools/
 - [系统架构](docs/ARCHITECTURE.md)
 - [新 agent 类型说明](docs/GAMEPLAY_AGENT.md)
 - [与 study-in-germany 的集成约定](docs/INTEGRATION_WITH_STUDY_IN_GERMANY.md)
+- [Docker 部署](docs/DOCKER.md)
 - [Godot 接入规范](docs/GODOT_INTEGRATION.md)
 - [本地 vLLM + Qwen 接入](docs/VLLM_QWEN_LOCAL_AGENT.md)
 - [数据与报告规范](docs/DATA_CONTRACTS.md)

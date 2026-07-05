@@ -1,0 +1,43 @@
+# Files / dirs that don't belong in the build context.
+
+# Git + editor metadata
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Python caches and venvs
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+build/
+dist/
+
+# Tests + fixtures inside the image — they go to /app by default but
+# skipping them keeps the image smaller; the dev container rebuilds
+# from the same recipe, and CI runs tests via `python -m pytest`
+# (not inside the runtime image).
+tests/
+
+# Local config + secrets
+.env
+.env.*
+*.log
+
+# Generated artifacts (never commit, but ignore just in case)
+reports/
+!reports/.gitkeep
+
+# Docs built on the host, can be regenerated
+docs/build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs / CI scratch
+.idea/
+.vscode/
+*.swp
