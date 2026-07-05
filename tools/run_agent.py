@@ -7,9 +7,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from analyse_agent.env import load_dotenv
-from analyse_agent.llm_client import LLMConfig, LocalLLMClient
-from analyse_agent.report_bundle import read_report_bundle, render_prompt
+from game_analysis_agent.env import load_dotenv
+from game_analysis_agent.llm_client import LLMConfig, LocalLLMClient
+from game_analysis_agent.report_bundle import read_report_bundle, render_prompt
 
 
 AGENT_OUTPUTS = {

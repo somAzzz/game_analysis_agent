@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from analyse_agent.report_bundle import read_report_bundle, render_prompt
+from game_analysis_agent.report_bundle import read_report_bundle, render_prompt
 
 
 def usage() -> None:

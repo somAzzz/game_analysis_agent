@@ -1,5 +1,5 @@
 [project]
-name = "analyse-agent"
+name = "game-analysis-agent"
 version = "0.1.0"
 description = "Development-side local LLM agent pipeline for Godot balance simulation analysis."
 requires-python = ">=3.10"

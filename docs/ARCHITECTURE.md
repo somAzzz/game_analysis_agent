@@ -71,7 +71,7 @@ prompts/
 scripts/tools/
   放入 Godot 项目的 GDScript 示例。
 
-src/analyse_agent/
+src/game_analysis_agent/
   Python agent client 与报告读取逻辑。
 
 tools/
