@@ -1,4 +1,4 @@
-# analyse_agent
+# game_analysis_agent
 
 面向 Godot 数值模拟游戏的开发侧 AI Agent 流水线。
 
@@ -29,7 +29,7 @@ cp .env.example .env
 MODEL_ID=/path/to/qwen3.6-nvfp4 ./tools/run_vllm_qwen.sh
 ```
 
-3. 从 Godot 项目导出跑局日志，目标格式见 [docs/GODOT_INTEGRATION.md](/Users/bo/projects/analyse_agent/docs/GODOT_INTEGRATION.md)。
+3. 从 Godot 项目导出跑局日志，目标格式见 [docs/GODOT_INTEGRATION.md](docs/GODOT_INTEGRATION.md)。
 
 4. 分析原始日志：
 
@@ -58,11 +58,11 @@ reports/balance/baseline/tuning_proposal.md
 
 ## 项目文档
 
-- [完整项目规划](/Users/bo/projects/analyse_agent/docs/PROJECT_PLAN.md)
-- [系统架构](/Users/bo/projects/analyse_agent/docs/ARCHITECTURE.md)
-- [本地 vLLM + Qwen 接入](/Users/bo/projects/analyse_agent/docs/VLLM_QWEN_LOCAL_AGENT.md)
-- [Godot 接入规范](/Users/bo/projects/analyse_agent/docs/GODOT_INTEGRATION.md)
-- [数据与报告规范](/Users/bo/projects/analyse_agent/docs/DATA_CONTRACTS.md)
+- [完整项目规划](docs/PROJECT_PLAN.md)
+- [系统架构](docs/ARCHITECTURE.md)
+- [本地 vLLM + Qwen 接入](docs/VLLM_QWEN_LOCAL_AGENT.md)
+- [Godot 接入规范](docs/GODOT_INTEGRATION.md)
+- [数据与报告规范](docs/DATA_CONTRACTS.md)
 
 ## 当前状态
 

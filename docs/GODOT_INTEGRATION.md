@@ -49,6 +49,6 @@ func export_state_snapshot() -> Dictionary
 
 ## 4. Runner 示例
 
-示例脚本放在 [scripts/tools/RunBalanceSim.gd](/Users/bo/projects/analyse_agent/scripts/tools/RunBalanceSim.gd)。
+示例脚本放在 [scripts/tools/RunBalanceSim.gd](../scripts/tools/RunBalanceSim.gd)。
 
 这是一个集成模板，不会直接知道你的游戏类名。落地时需要把 `preload` 路径和 action 字段映射改成你项目里的实际结构。
