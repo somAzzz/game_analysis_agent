@@ -1,0 +1,20 @@
+agents:
+  balance:
+    system_prompt: prompts/balance_agent_system.md
+    user_prompt: prompts/balance_agent_user.md
+    output_files:
+      - agent_diagnosis.md
+      - tuning_proposal.md
+    temperature: 0.2
+  content_qa:
+    system_prompt: prompts/content_qa_agent_system.md
+    user_prompt: prompts/content_qa_agent_user.md
+    output_files:
+      - content_issues.md
+    temperature: 0.15
+  event_graph:
+    system_prompt: prompts/event_graph_agent_system.md
+    user_prompt: prompts/event_graph_agent_user.md
+    output_files:
+      - event_graph_report.md
+    temperature: 0.1
