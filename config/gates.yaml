@@ -44,6 +44,37 @@ balance:
   min_work_group_rate_per_run: 0.5
   min_route_distance: 0.15
 
+outcomes:
+  # Failure is part of the game. These endings are valid designed outcomes
+  # when the preceding trace explains how the player got there.
+  designed_failure_endings:
+    - forced_departure
+    - cashflow_collapse
+    - living_imbalance
+    - burnout_pause
+    - registration_failure
+    - academic_failure
+    - work_law_trouble
+    - romance_bankrupt
+    - admin_collapse
+    - mental_crash
+  recovery_or_mixed_endings:
+    - delayed_enrollment
+    - survival_struggle
+  success_endings:
+    - work_warrior
+    - career_launch
+    - high_pressure_top_student
+    - social_connector
+    - stable_start
+  invalid_endings:
+    - unknown
+    - pipeline_stalled
+  require_designed_failure_coverage: true
+  min_designed_failure_types_normal: 2
+  min_designed_failure_types_realistic: 2
+  max_single_designed_failure_rate_play: 0.50
+
 design:
   # Content QA targets — checked by content_qa agent.
   max_generated_choice_ratio_key_events: 0.20

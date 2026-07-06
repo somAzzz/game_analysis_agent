@@ -61,6 +61,16 @@ play:
   weeks: 20
   difficulty: realistic
   seeds: [42]
+  outcome_coverage:
+    success_is_not_required_per_persona: true
+    designed_failure_is_valid: true
+    expected_categories:
+      - success
+      - recovery_or_mixed
+      - designed_failure
+    invalid_endings:
+      - unknown
+      - pipeline_stalled
 
 compare:
   output_dir: reports/compare

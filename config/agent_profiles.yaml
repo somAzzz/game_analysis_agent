@@ -51,7 +51,7 @@ agents:
     extra_inputs:
       - value_report.json
   interactive_player:
-    description: LLM-driven playthrough via tool calling
+    description: LLM-driven playthrough via tool calling; success and designed failure endings are both valid audit outcomes
     system_prompt: prompts/player_system.md
     user_prompt: prompts/player_user.md
     output_files:
