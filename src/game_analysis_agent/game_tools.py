@@ -38,10 +38,14 @@ class InteractiveProbe:
 
     settings: Settings
     plan: list[dict[str, Any]] = field(default_factory=list)
+    seed: int = 42
+    difficulty: str = "normal"
+    scenario: str = "default_first_semester"
     current_week: int = 0
     state: dict[str, Any] | None = None
     last_event_id: str = ""
     last_event_choices: list[dict[str, Any]] = field(default_factory=list)
+    available_actions: list[dict[str, Any]] = field(default_factory=list)
     finished: bool = False
     final_ending: str | None = None
     history: list[dict[str, Any]] = field(default_factory=list)
@@ -50,6 +54,8 @@ class InteractiveProbe:
 
     def get_state(self) -> dict[str, Any]:
         """Return the latest known state (or an empty dict before step 1)."""
+        if self.state is None:
+            self._refresh_snapshot()
         return {
             "week": self.current_week,
             "state": self.state or {},
@@ -58,15 +64,17 @@ class InteractiveProbe:
         }
 
     def list_available_actions(self) -> dict[str, Any]:
-        """Return the action catalog pulled from
-        ``scripts/tools/ExportEventGraph.gd``."""
-        catalog_path = self.settings.game_project_path / "reports" / "action_catalog.json"
-        if not catalog_path.exists():
-            return _maybe_run_export(self.settings)
-        try:
-            return json.loads(catalog_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            return {"error": "action_catalog.json is not valid JSON"}
+        """Return currently legal actions for the active playthrough state."""
+        if self.state is None or not self.available_actions:
+            self._refresh_snapshot()
+        return {"actions": self.available_actions}
+
+    def inspect_action(self, action_id: str) -> dict[str, Any]:
+        catalog = self.list_available_actions()
+        for action in catalog.get("actions", []) or []:
+            if isinstance(action, dict) and action.get("id") == action_id:
+                return action
+        return {"error": f"action_id not found: {action_id}"}
 
     def inspect_event(self, event_id: str) -> dict[str, Any]:
         graph_path = self.settings.game_project_path / "reports" / "event_graph.json"
@@ -98,11 +106,18 @@ class InteractiveProbe:
                 "event_choice_id": event_choice_id,
             }
         )
-        result = _run_one_step(self.settings, self.plan)
+        result = _run_one_step(
+            self.settings,
+            self.plan,
+            seed=self.seed,
+            difficulty=self.difficulty,
+            scenario=self.scenario,
+        )
         self.current_week += 1
-        self.state = result.get("after_state") or self.state or {}
+        self.state = result.get("current_state") or result.get("after_state") or self.state or {}
         self.last_event_id = result.get("triggered_event_id", "")
         self.last_event_choices = result.get("event_choices", []) or []
+        self.available_actions = result.get("next_available_actions", []) or []
         self.history.append(
             {
                 "week": self.current_week,
@@ -123,11 +138,57 @@ class InteractiveProbe:
             "finished": self.finished,
         }
 
+    def preview_step(self, actions: list[str]) -> dict[str, Any]:
+        """Preview this week's event choices without committing the week."""
+        if self.finished:
+            return {"error": "playthrough is already finished"}
+        if not actions:
+            return {"error": "actions list must not be empty"}
+        preview_plan = [
+            *self.plan,
+            {
+                "week": self.current_week + 1,
+                "action_ids": list(actions),
+                "event_choice_id": "",
+                "defer_event_choice": True,
+            },
+        ]
+        return _run_one_step(
+            self.settings,
+            preview_plan,
+            seed=self.seed,
+            difficulty=self.difficulty,
+            scenario=self.scenario,
+        )
+
+    def _refresh_snapshot(self) -> None:
+        try:
+            result = _run_one_step(
+                self.settings,
+                self.plan,
+                seed=self.seed,
+                difficulty=self.difficulty,
+                scenario=self.scenario,
+            )
+        except FileNotFoundError:
+            return
+        self.state = result.get("current_state") or result.get("after_state") or self.state or {}
+        self.available_actions = result.get("next_available_actions") or result.get("available_actions") or []
+        self.last_event_id = result.get("triggered_event_id", self.last_event_id)
+        self.last_event_choices = result.get("event_choices", []) or self.last_event_choices
+
     def finish(self) -> dict[str, Any]:
         if self.plan:
-            final = _run_one_step(self.settings, self.plan, force_finish=True)
-            self.state = final.get("after_state") or self.state or {}
-            self.final_ending = final.get("final_ending_id", "unknown")
+            final = _run_one_step(
+                self.settings,
+                self.plan,
+                force_finish=True,
+                seed=self.seed,
+                difficulty=self.difficulty,
+                scenario=self.scenario,
+            )
+            self.state = final.get("final_state") or final.get("after_state") or self.state or {}
+            self.final_ending = final.get("final_ending_id") or self.final_ending or "unknown"
         self.finished = True
         return {
             "finished": True,
@@ -202,6 +263,23 @@ TOOL_DEFINITIONS: list[dict[str, Any]] = [
     {
         "type": "function",
         "function": {
+            "name": "inspect_action",
+            "description": "Return the full cost/effect/tag metadata for one action id.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "action_id": {
+                        "type": "string",
+                        "description": "Action id, e.g. 'library_day'.",
+                    }
+                },
+                "required": ["action_id"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "step",
             "description": (
                 "Advance the playthrough by one week. Submit the chosen action ids and "
@@ -240,6 +318,7 @@ def build_tool_map(probe: InteractiveProbe) -> dict[str, Callable[..., Any]]:
         "get_state": probe.get_state,
         "list_available_actions": probe.list_available_actions,
         "inspect_event": probe.inspect_event,
+        "inspect_action": probe.inspect_action,
         "step": probe.step,
         "finish": probe.finish,
     }
@@ -282,11 +361,18 @@ def _run_one_step(
     settings: Settings,
     plan: list[dict[str, Any]],
     force_finish: bool = False,
+    *,
+    seed: int = 42,
+    difficulty: str = "normal",
+    scenario: str = "default_first_semester",
 ) -> dict[str, Any]:
     plan_path = settings.game_project_path / "reports" / f"_plan_{uuid.uuid4().hex[:8]}.json"
     out_path = settings.game_project_path / "reports" / f"_trace_{uuid.uuid4().hex[:8]}.json"
     plan_payload = {
         "command": "step",
+        "seed": seed,
+        "difficulty": difficulty,
+        "scenario": scenario,
         "weeks": max((step["week"] for step in plan), default=0),
         "plan": plan,
         "force_finish": force_finish,

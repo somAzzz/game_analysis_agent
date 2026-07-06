@@ -5,7 +5,8 @@ Each agent owns:
 * A ``name`` (slug, matches ``config/agent_profiles.yaml`` and the LLM
   log tag).
 * A ``system_prompt`` (Markdown template rendered from
-  ``prompts/<name>_system.md``).
+  ``prompts/<name>_system.md``; legacy ``<name>_agent_system.md`` is
+  accepted for older prompt packs).
 * A ``user_prompt`` (Markdown template rendered from
   ``prompts/<name>_user.md`` with ``{{REPORT_BUNDLE}}`` filled in).
 * A list of ``output_files`` (paths written into ``<report_dir>``).
@@ -77,8 +78,19 @@ class Agent(ABC):
         """Render the user-prompt template (without the report bundle)."""
 
     def build_system_prompt(self) -> str:
-        path = self.prompts_root / f"{self.name}_system.md"
-        return path.read_text(encoding="utf-8")
+        return self.read_prompt_template("system")
+
+    def read_prompt_template(self, kind: str) -> str:
+        """Read a prompt template, accepting the legacy ``*_agent_*`` names."""
+        candidates = [
+            self.prompts_root / f"{self.name}_{kind}.md",
+            self.prompts_root / f"{self.name}_agent_{kind}.md",
+        ]
+        for path in candidates:
+            if path.exists():
+                return path.read_text(encoding="utf-8")
+        tried = ", ".join(str(path) for path in candidates)
+        raise FileNotFoundError(f"Prompt template not found for {self.name}: {tried}")
 
     def render_user_template(self, report_dir: Path, context: dict[str, Any]) -> str:
         """Combine the report bundle with the user prompt template."""

@@ -15,8 +15,7 @@ class ContentQAAgent(Agent):
     default_temperature = 0.15
 
     def build_user_prompt(self, report_dir: Path, context: dict[str, Any]) -> str:
-        path = self.prompts_root / f"{self.name}_user.md"
-        template = path.read_text(encoding="utf-8")
+        template = self.read_prompt_template("user")
         return template.replace(
             "{{CHOICE_STRUCTURE_FINDINGS}}",
             render_choice_structure_findings(score_choice_structure_from_dir(report_dir)),

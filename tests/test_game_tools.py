@@ -48,6 +48,7 @@ def test_build_tool_map_returns_callable_map() -> None:
         "get_state",
         "list_available_actions",
         "inspect_event",
+        "inspect_action",
         "step",
         "finish",
     }

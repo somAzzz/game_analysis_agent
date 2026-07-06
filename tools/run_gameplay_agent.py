@@ -92,11 +92,47 @@ def _resolve_user_path(game_project: Path) -> Path:
     """Return ``${HOME}/.local/share/godot/app_userdata/<project_name>/``."""
     home = Path.home()
     project_name = game_project.name
-    candidate = home / ".local" / "share" / "godot" / "app_userdata" / project_name
-    if candidate.exists():
-        return candidate
-    legacy = home / ".local" / "share" / "godot" / "app_userdata" / f"{project_name}_0"
-    return legacy if legacy.exists() else candidate
+    user_root = home / ".local" / "share" / "godot" / "app_userdata"
+    names = [project_name]
+    configured_name = _read_godot_project_name(game_project)
+    if configured_name and configured_name not in names:
+        names.append(configured_name)
+    for name in names:
+        for candidate in (user_root / name, user_root / f"{name}_0"):
+            if candidate.exists():
+                return candidate
+    return user_root / project_name
+
+
+def _read_godot_project_name(game_project: Path) -> str | None:
+    project_file = game_project / "project.godot"
+    if not project_file.exists():
+        return None
+    for line in project_file.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if stripped.startswith("config/name="):
+            return stripped.split("=", 1)[1].strip().strip('"')
+    return None
+
+
+def _find_godot_output(game_project: Path, file_name: str) -> Path | None:
+    user_path = _resolve_user_path(game_project) / file_name
+    project_path = game_project / file_name
+    for candidate in (user_path, project_path):
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def _copy_godot_output(game_project: Path, file_name: str, target: Path) -> Path | None:
+    source = _find_godot_output(game_project, file_name)
+    if source is None:
+        return None
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(source, target)
+    if source.parent == game_project:
+        source.unlink(missing_ok=True)
+    return target
 
 
 def _run_godot(
@@ -158,11 +194,12 @@ def cmd_sim(args: argparse.Namespace) -> int:
     if proc.returncode != 0:
         print("Godot simulation failed:", proc.stdout, proc.stderr, file=sys.stderr)
         return 3
-    user_path = _resolve_user_path(settings.game_project_path) / "balance_runs.jsonl"
-    if not user_path.exists():
-        print(f"Could not find Godot output at {user_path}", file=sys.stderr)
+    copied = _copy_godot_output(
+        settings.game_project_path, "balance_runs.jsonl", target_out
+    )
+    if not copied:
+        print("Could not find Godot output: balance_runs.jsonl", file=sys.stderr)
         return 4
-    shutil.copy(user_path, target_out)
     print(f"Copied raw runs to {target_out}")
     return cmd_analyze(
         argparse.Namespace(
@@ -215,11 +252,12 @@ def cmd_probe(args: argparse.Namespace) -> int:
     if proc.returncode != 0:
         print("Godot boundary probe failed:", proc.stdout, proc.stderr, file=sys.stderr)
         return 3
-    user_path = _resolve_user_path(settings.game_project_path) / "boundary_runs.jsonl"
-    if not user_path.exists():
-        print(f"Could not find boundary output at {user_path}", file=sys.stderr)
+    copied = _copy_godot_output(
+        settings.game_project_path, "boundary_runs.jsonl", target_out
+    )
+    if not copied:
+        print("Could not find boundary output: boundary_runs.jsonl", file=sys.stderr)
         return 4
-    shutil.copy(user_path, target_out)
     analyze_and_write(out_dir)
     # also feed the aggregate through the bug detector so the agent has
     # immediate numeric context.
@@ -238,6 +276,10 @@ def cmd_validate(args: argparse.Namespace) -> int:
     results: list[dict[str, object]] = []
     failed = False
     for check in selected:
+        if check == "route":
+            _ensure_route_validation_inputs(settings)
+        if check == "demo":
+            _ensure_demo_validation_inputs(settings)
         script, file_name = VALIDATOR_SCRIPTS[check]
         out_arg = f"--out=res://{file_name}"
         proc = _run_godot(settings, script=script, extra_args=[out_arg])
@@ -264,13 +306,77 @@ def cmd_validate(args: argparse.Namespace) -> int:
     return 1 if failed else 0
 
 
+def _ensure_route_validation_inputs(settings) -> None:
+    route_specs = [
+        ("study", "reports/route_audit_study.jsonl"),
+        ("work", "reports/route_audit_work.jsonl"),
+        ("admin", "reports/route_audit_admin_after_fix.jsonl"),
+        ("social", "reports/route_audit_social.jsonl"),
+        ("slacker", "reports/route_audit_slacker.jsonl"),
+    ]
+    for policy, out_path in route_specs:
+        if _find_godot_output(settings.game_project_path, out_path):
+            continue
+        _run_godot(
+            settings,
+            script="res://scripts/tools/RunSimulation.gd",
+            extra_args=[
+                "--runs=6",
+                f"--policy={policy}",
+                "--difficulty=normal",
+                "--scenario=default_first_semester",
+                "--weeks=20",
+                "--seed=42",
+                f"--out=res://{out_path}",
+            ],
+        )
+
+
+def _ensure_demo_validation_inputs(settings) -> None:
+    demo_specs = [
+        ("reports/gates_balanced_normal.jsonl", "balanced", "normal", "default_first_semester"),
+        ("reports/gates_balanced_realistic.jsonl", "balanced", "realistic", "default_first_semester"),
+        ("reports/gates_balanced_low_money.jsonl", "balanced", "normal", "low_money_start"),
+    ]
+    for out_path, policy, difficulty, scenario in demo_specs:
+        if _find_godot_output(settings.game_project_path, out_path):
+            continue
+        _run_godot(
+            settings,
+            script="res://scripts/tools/RunSimulation.gd",
+            extra_args=[
+                "--runs=12",
+                f"--policy={policy}",
+                f"--difficulty={difficulty}",
+                f"--scenario={scenario}",
+                "--weeks=20",
+                "--seed=42",
+                f"--out=res://{out_path}",
+            ],
+        )
+    if not _find_godot_output(settings.game_project_path, "reports/content_validation.json"):
+        _run_godot(
+            settings,
+            script="res://scripts/tools/ValidateContent.gd",
+            extra_args=["--out=res://reports/content_validation.json"],
+        )
+    if not _find_godot_output(settings.game_project_path, "reports/risk_guidance_validation.json"):
+        _run_godot(
+            settings,
+            script="res://scripts/tools/ValidateRiskGuidance.gd",
+            extra_args=["--out=res://reports/risk_guidance_validation.json"],
+        )
+    if not _find_godot_output(settings.game_project_path, "reports/route_boundary_validation.json"):
+        _ensure_route_validation_inputs(settings)
+        _run_godot(
+            settings,
+            script="res://scripts/tools/ValidateRouteBoundaries.gd",
+            extra_args=["--out=res://reports/route_boundary_validation.json"],
+        )
+
+
 def _copy_user_file(game_project: Path, file_name: str, target: Path) -> Path | None:
-    user_path = _resolve_user_path(game_project) / file_name
-    if not user_path.exists():
-        return None
-    target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy(user_path, target)
-    return target
+    return _copy_godot_output(game_project, file_name, target)
 
 
 def cmd_gates(args: argparse.Namespace) -> int:
@@ -299,15 +405,14 @@ def cmd_export(args: argparse.Namespace) -> int:
     if proc.returncode != 0:
         print("ExportEventGraph failed:", proc.stdout, proc.stderr, file=sys.stderr)
         return 3
-    user_dir = _resolve_user_path(settings.game_project_path)
-    src = user_dir / "event_graph.json"
-    catalog = user_dir / "action_catalog.json"
     target = args.report_dir / "event_graph.json"
     target.parent.mkdir(parents=True, exist_ok=True)
-    if src.exists():
-        shutil.copy(src, target)
-    if catalog.exists():
-        shutil.copy(catalog, args.report_dir / "action_catalog.json")
+    _copy_godot_output(settings.game_project_path, "event_graph.json", target)
+    _copy_godot_output(
+        settings.game_project_path,
+        "action_catalog.json",
+        args.report_dir / "action_catalog.json",
+    )
     print(f"Event graph copied to {target}")
     return 0
 
@@ -371,6 +476,7 @@ def cmd_play(args: argparse.Namespace) -> int:
         max_weeks=args.weeks,
         persona=persona,
         difficulty=getattr(args, "difficulty", None) or "normal",
+        scenario=getattr(args, "scenario", None) or "default_first_semester",
         seed=int(getattr(args, "seed", 42) or 42),
     )
     result, written = agent.play_through(args.report_dir)
@@ -514,6 +620,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     play_p.add_argument(
         "--difficulty", default="normal", help="Godot difficulty to inject into the probe."
+    )
+    play_p.add_argument(
+        "--scenario",
+        default="default_first_semester",
+        help="Godot scenario id to inject into the interactive probe.",
     )
     play_p.add_argument(
         "--seed", type=int, default=42, help="Seed passed to the persona block."

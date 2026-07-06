@@ -18,8 +18,7 @@ class BalanceAgent(Agent):
     default_temperature = 0.2
 
     def build_user_prompt(self, report_dir: Path, context: dict[str, Any]) -> str:
-        path = self.prompts_root / f"{self.name}_user.md"
-        return path.read_text(encoding="utf-8")
+        return self.read_prompt_template("user")
 
     def _split_outputs(self, response: str) -> list[AgentOutput]:
         marker = "# Tuning Proposal"

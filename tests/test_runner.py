@@ -151,6 +151,43 @@ def test_sim_passes_scenario_and_policy_alias(run_gameplay_agent, tmp_path) -> N
     assert "--scenario=low_money_start" in extra_args
 
 
+def test_copy_godot_output_accepts_configured_project_name(
+    run_gameplay_agent, tmp_path, monkeypatch
+) -> None:
+    game_project = tmp_path / "study-in-germany"
+    game_project.mkdir()
+    (game_project / "project.godot").write_text(
+        '[application]\nconfig/name="study_in_germany"\n',
+        encoding="utf-8",
+    )
+    user_root = tmp_path / ".local" / "share" / "godot" / "app_userdata"
+    output_dir = user_root / "study_in_germany"
+    output_dir.mkdir(parents=True)
+    (output_dir / "balance_runs.jsonl").write_text("{}\n", encoding="utf-8")
+    monkeypatch.setenv("HOME", str(tmp_path))
+
+    copied = run_gameplay_agent._copy_godot_output(
+        game_project, "balance_runs.jsonl", tmp_path / "reports" / "raw_runs.jsonl"
+    )
+
+    assert copied == tmp_path / "reports" / "raw_runs.jsonl"
+    assert copied.read_text(encoding="utf-8") == "{}\n"
+
+
+def test_copy_godot_output_accepts_project_root_res_path(run_gameplay_agent, tmp_path) -> None:
+    game_project = tmp_path / "game"
+    game_project.mkdir()
+    (game_project / "content_validation.json").write_text("{}", encoding="utf-8")
+
+    copied = run_gameplay_agent._copy_godot_output(
+        game_project, "content_validation.json", tmp_path / "out" / "content_validation.json"
+    )
+
+    assert copied == tmp_path / "out" / "content_validation.json"
+    assert copied.read_text(encoding="utf-8") == "{}"
+    assert not (game_project / "content_validation.json").exists()
+
+
 def test_gates_command_returns_failure(run_gameplay_agent, tmp_path) -> None:
     gates = tmp_path / "gates.yaml"
     gates.write_text(

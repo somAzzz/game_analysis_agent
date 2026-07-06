@@ -13,7 +13,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 ToolLoopMode = Literal["native", "json_fallback"]
 AnomalyKind = Literal[
@@ -172,6 +172,159 @@ class ValueFinding(BaseModel):
     description: str
 
 
+class StateSummary(BaseModel):
+    """Compact state slice passed to the LLM player each week."""
+
+    model_config = ConfigDict(extra="allow")
+
+    week: int = 0
+    money: int = 0
+    blocked_account_balance: int | None = None
+    energy: int = 0
+    stress: int = 0
+    hunger: int = 0
+    loneliness: int = 0
+    academic_progress: int = 0
+    exam_readiness: int | None = None
+    language: int = 0
+    social: int = 0
+    visa_progress: int = 0
+    career_progress: int = 0
+    gpa_score: int | None = None
+    annual_work_half_days: int | None = None
+    university_tier: str | None = None
+    flags: dict[str, bool] = Field(default_factory=dict)
+
+
+class ActionBrief(BaseModel):
+    """Action facts needed for one weekly decision."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    name: str = ""
+    description: str = ""
+    type: str = ""
+    cost: dict[str, int] = Field(default_factory=dict)
+    effects: dict[str, int] = Field(default_factory=dict)
+    requirements: dict[str, Any] = Field(default_factory=dict)
+    tags: list[str] = Field(default_factory=list)
+    risk_tags: list[str] = Field(default_factory=list)
+    cooldown_group: str | None = None
+    max_per_week: int | None = None
+
+
+class EventChoiceBrief(BaseModel):
+    """Event choice facts needed for one decision."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    choice_id: str
+    text: str = ""
+    success_rate: float | None = None
+    requirements: dict[str, Any] = Field(default_factory=dict)
+    success_effects: dict[str, int] = Field(default_factory=dict)
+    failure_effects: dict[str, int] = Field(default_factory=dict)
+
+
+class RiskBrief(BaseModel):
+    """Small risk row shown to the player agent."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    severity: Literal["low", "medium", "high", "critical"]
+    reason: str
+    suggested_action_types: list[str] = Field(default_factory=list)
+
+
+class WeekMemory(BaseModel):
+    """One compressed historical week for player memory."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    week: int
+    actions: list[str] = Field(default_factory=list)
+    event: str = ""
+    rationale: str = ""
+    delta: dict[str, int] = Field(default_factory=dict)
+
+
+class PlayMemory(BaseModel):
+    """Longitudinal memory shown to the LLM instead of raw history."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    persona: str
+    route_commitment: str = ""
+    long_term_goal: str = ""
+    known_deadlines: list[str] = Field(default_factory=list)
+    unresolved_risks: list[str] = Field(default_factory=list)
+    important_flags: dict[str, bool] = Field(default_factory=dict)
+    repeated_actions: dict[str, int] = Field(default_factory=dict)
+    last_5_weeks: list[WeekMemory] = Field(default_factory=list)
+    mistakes: list[str] = Field(default_factory=list)
+    successful_patterns: list[str] = Field(default_factory=list)
+
+
+class WeekContext(BaseModel):
+    """Complete-but-compact context pack for one weekly LLM decision."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    game_version: str = ""
+    seed: int
+    difficulty: str
+    scenario: str
+    max_action_slots: int = 4
+    persona: str
+    persona_strategy: dict[str, Any] = Field(default_factory=dict)
+    state: StateSummary
+    top_risks: list[RiskBrief] = Field(default_factory=list)
+    available_actions: list[ActionBrief] = Field(default_factory=list)
+    current_event_id: str = ""
+    event_choices: list[EventChoiceBrief] = Field(default_factory=list)
+    memory: PlayMemory
+
+
+class PlayerDecision(BaseModel):
+    """Structured LLM player decision for one week."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    week: int
+    persona: str
+    strategic_goal: str = Field(default="", max_length=160)
+    actions: list[str] = Field(min_length=1, max_length=4)
+    event_choice_id: str = ""
+    risk_awareness: list[str] = Field(default_factory=list, max_length=5)
+    expected_tradeoff: str = Field(default="", max_length=240)
+    confidence: float = Field(default=0.5, ge=0.0, le=1.0)
+
+    @field_validator("actions")
+    @classmethod
+    def _dedupe_actions(cls, value: list[str]) -> list[str]:
+        seen: set[str] = set()
+        cleaned: list[str] = []
+        for item in value:
+            action_id = str(item).strip()
+            if action_id and action_id not in seen:
+                cleaned.append(action_id)
+                seen.add(action_id)
+        return cleaned
+
+
+class DecisionValidation(BaseModel):
+    """Validation outcome for one player decision."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    valid: bool
+    errors: list[str] = Field(default_factory=list)
+    repair_count: int = 0
+    fallback_used: bool = False
+
+
 __all__ = [
     "AgentRunReport",
     "Anomaly",
@@ -180,8 +333,17 @@ __all__ = [
     "BoundaryFinding",
     "BugFinding",
     "LLMCall",
+    "ActionBrief",
     "ToolBudgetUsage",
     "ToolExecutionEvent",
     "ToolLoopMode",
+    "DecisionValidation",
+    "EventChoiceBrief",
+    "PlayerDecision",
+    "PlayMemory",
+    "RiskBrief",
+    "StateSummary",
     "ValueFinding",
+    "WeekContext",
+    "WeekMemory",
 ]

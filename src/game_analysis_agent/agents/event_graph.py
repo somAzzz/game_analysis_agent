@@ -16,8 +16,7 @@ class EventGraphAgent(Agent):
     default_temperature = 0.1
 
     def build_user_prompt(self, report_dir: Path, context: dict[str, Any]) -> str:
-        path = self.prompts_root / f"{self.name}_user.md"
-        template = path.read_text(encoding="utf-8")
+        template = self.read_prompt_template("user")
         return template.replace(
             "{{UNTRIGGERED_EVENTS}}",
             build_untriggered_block_from_dir(report_dir),
