@@ -3,7 +3,7 @@
 Pattern borrowed from ``fintext_llm/src/llm/client.py``. Differences:
 
 * Three providers are supported (``vllm`` / ``sglang`` / ``deepseek``),
-  selected via ``Settings.llm_provider``. SGLang automatically attaches
+  selected via ``Settings.llm_provider``. Local Qwen backends attach
   ``extra_body.chat_template_kwargs.enable_thinking=False`` so reasoning
   models do not pollute the chat transcript with thinking text.
 * The audit row is :class:`game_analysis_agent.schemas.LLMCall` (Pydantic),
@@ -90,11 +90,11 @@ class LocalLLMClient:
     def _extra_body(self) -> dict[str, Any] | None:
         """Return provider-specific request kwargs.
 
-        SGLang-served Qwen reasoning models otherwise prepend a ``<thinking>``
+        Locally served Qwen reasoning models otherwise prepend a long thinking
         transcript by default, which is undesirable for tool-calling /
         structured-output flows.
         """
-        if self.provider == "sglang":
+        if self.provider in {"vllm", "sglang"}:
             return {"chat_template_kwargs": {"enable_thinking": False}}
         return None
 
