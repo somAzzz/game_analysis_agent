@@ -18,6 +18,7 @@ class BugHunterAgent(Agent):
     name = "bug_hunter"
     default_output_files = ("bug_diagnosis.md",)
     default_temperature = 0.2
+    max_anomaly_samples = 50
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -35,9 +36,8 @@ class BugHunterAgent(Agent):
         # Inject the structured anomalies + summary alongside the report bundle.
         extras = (
             "## Auto-detected Anomalies (machine-readable)\n\n"
-            "```jsonl\n"
-            + "\n".join(a.model_dump_json() for a in self.anomalies)
-            + "\n```\n\n"
+            + self._render_anomaly_samples(self.anomalies)
+            + "\n\n"
             "## Anomaly Distribution\n\n"
             + self.summary_text
         )
@@ -51,6 +51,23 @@ class BugHunterAgent(Agent):
         bundle = read_report_bundle(report_dir, files=files)
         bundle += "\n\n" + extras
         return render_prompt_text(user_template, bundle)
+
+    def _render_anomaly_samples(self, anomalies: list[Anomaly]) -> str:
+        if not anomalies:
+            return "(no auto-detected anomalies)"
+        samples = anomalies[: self.max_anomaly_samples]
+        omitted = len(anomalies) - len(samples)
+        header = (
+            f"Showing {len(samples)} of {len(anomalies)} anomalies; "
+            f"{omitted} omitted after deterministic sampling."
+        )
+        return (
+            header
+            + "\n\n"
+            "```jsonl\n"
+            + "\n".join(a.model_dump_json() for a in samples)
+            + "\n```"
+        )
 
     def _ensure_anomalies(
         self, raw_path: Path, anomalies_path: Path
