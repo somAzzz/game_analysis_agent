@@ -20,10 +20,19 @@ policies:
   - random
   - balanced
   - study
-  - money
+  - work
   - social
-  - visa
+  - admin
   - slacker
+
+policy_aliases:
+  money: work
+  visa: admin
+
+scenarios:
+  - default_first_semester
+  - low_money_start
+  - high_stress_start
 
 boundary:
   runs: 30
@@ -62,3 +71,4 @@ compare:
     - anomalies.jsonl
     - value_report.json
     - route_report.json
+    - coverage_report.json

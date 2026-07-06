@@ -107,9 +107,14 @@ def _scan_single_run(
                 continue
             fv = float(value)
             if fv < 0:
+                kind: AnomalyKind = (
+                    "negative_money"
+                    if metric in {"money", "blocked_account_balance"}
+                    else "stat_underflow"
+                )
                 anomalies.append(
                     _mk(
-                        "negative_money" if metric in {"money", "blocked_account_balance"} else "stat_underflow",
+                        kind,
                         run_id,
                         week_no,
                         policy,
@@ -282,7 +287,7 @@ def _scan_single_run(
     # generic invariants cannot catch.
     anomalies.extend(check_semantic_invariants(run))
 
-    return anomalies
+    return [_with_replay_evidence(anomaly, run) for anomaly in anomalies]
 
 
 def _flatten_numeric_state(state: dict[str, Any]) -> dict[str, float]:
@@ -314,6 +319,38 @@ def _mk(
         evidence=evidence or {},
         message=message,
     )
+
+
+def _with_replay_evidence(anomaly: Anomaly, run: dict[str, Any]) -> Anomaly:
+    """Attach seed/week/action context so a finding can be reproduced."""
+    evidence = dict(anomaly.evidence)
+    if "replay" not in evidence:
+        evidence["replay"] = _replay_context(run, anomaly.week)
+    return anomaly.model_copy(update={"evidence": evidence})
+
+
+def _replay_context(run: dict[str, Any], week_no: int) -> dict[str, Any]:
+    week_record: dict[str, Any] = {}
+    for week in run.get("weekly_log", []) or []:
+        if isinstance(week, dict) and int(week.get("week", -999) or -999) == week_no:
+            week_record = week
+            break
+    return {
+        "run_id": run.get("run_id"),
+        "seed": run.get("seed"),
+        "policy": run.get("policy"),
+        "difficulty": run.get("difficulty"),
+        "scenario": run.get("scenario"),
+        "max_weeks": run.get("max_weeks"),
+        "week": week_no,
+        "actions": (
+            week_record.get("selected_action_ids")
+            or week_record.get("actions")
+            or []
+        ),
+        "event_id": week_record.get("triggered_event_id") or week_record.get("event_id") or "",
+        "event_choice_id": week_record.get("event_choice_id") or week_record.get("choice_id") or "",
+    }
 
 
 def write_anomalies_jsonl(anomalies: Iterable[Anomaly], path: Path) -> int:

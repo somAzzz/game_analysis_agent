@@ -114,6 +114,9 @@ class Settings:
     sim_difficulty: str = field(
         default_factory=lambda: _env("SIM_DIFFICULTY", "normal")
     )
+    sim_scenario: str = field(
+        default_factory=lambda: _env("SIM_SCENARIO", "default_first_semester")
+    )
 
     # ---- Derived selectors ---------------------------------------------
     def provider(self) -> str:

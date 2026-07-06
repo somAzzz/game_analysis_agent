@@ -104,3 +104,89 @@ def test_sim_runs_full_pipeline_with_mocked_godot(run_gameplay_agent, tmp_path) 
     assert rc == 0
     out = ROOT / "reports" / "balance" / "test" / "raw_runs.jsonl"
     assert out.exists()
+
+
+def test_sim_passes_scenario_and_policy_alias(run_gameplay_agent, tmp_path) -> None:
+    fake_user_dir = tmp_path / "user"
+    fake_user_dir.mkdir(parents=True, exist_ok=True)
+    (fake_user_dir / "balance_runs.jsonl").write_text(
+        json.dumps(
+            {
+                "run_id": 0,
+                "policy": "work",
+                "scenario": "low_money_start",
+                "seed": 42,
+                "final_ending_id": "cashflow_collapse",
+                "max_weeks": 1,
+                "final_state": {"week": 1, "money": -1200},
+                "weekly_log": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    completed = type("Proc", (), {"returncode": 0, "stdout": "ok", "stderr": ""})()
+
+    with (
+        patch.object(run_gameplay_agent, "_run_godot", return_value=completed) as run_godot,
+        patch.object(run_gameplay_agent, "_resolve_user_path", return_value=fake_user_dir),
+    ):
+        rc = run_gameplay_agent.main(
+            [
+                "sim",
+                "--run-id",
+                "scenario-test",
+                "--runs",
+                "1",
+                "--policy",
+                "money",
+                "--scenario",
+                "low_money_start",
+            ]
+        )
+
+    assert rc == 0
+    extra_args = run_godot.call_args.kwargs["extra_args"]
+    assert "--policy=work" in extra_args
+    assert "--scenario=low_money_start" in extra_args
+
+
+def test_gates_command_returns_failure(run_gameplay_agent, tmp_path) -> None:
+    gates = tmp_path / "gates.yaml"
+    gates.write_text(
+        "critical_fail:\n  crisis_success_ending: 0\nbalance: {}\ndesign: {}\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "anomalies.jsonl").write_text(
+        json.dumps({"kind": "crisis_success_ending"}) + "\n",
+        encoding="utf-8",
+    )
+
+    rc = run_gameplay_agent.main(
+        ["gates", "--report-dir", str(tmp_path), "--gates", str(gates)]
+    )
+
+    assert rc == 1
+    assert (tmp_path / "gate_report.json").exists()
+
+
+def test_validate_runs_selected_check(run_gameplay_agent, tmp_path) -> None:
+    fake_user_dir = tmp_path / "user"
+    fake_user_dir.mkdir(parents=True, exist_ok=True)
+    (fake_user_dir / "content_validation.json").write_text(
+        json.dumps({"errors": [], "warnings": []}),
+        encoding="utf-8",
+    )
+    completed = type("Proc", (), {"returncode": 0, "stdout": "ok", "stderr": ""})()
+
+    with (
+        patch.object(run_gameplay_agent, "_run_godot", return_value=completed) as run_godot,
+        patch.object(run_gameplay_agent, "_resolve_user_path", return_value=fake_user_dir),
+    ):
+        rc = run_gameplay_agent.main(
+            ["validate", "--report-dir", str(tmp_path / "out"), "--check", "content"]
+        )
+
+    assert rc == 0
+    assert run_godot.call_args.kwargs["script"] == "res://scripts/tools/ValidateContent.gd"
+    assert (tmp_path / "out" / "content_validation.json").exists()

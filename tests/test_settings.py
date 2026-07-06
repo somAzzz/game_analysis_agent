@@ -38,6 +38,7 @@ def _clear_env() -> None:
         "SIM_WEEKS",
         "SIM_SEED",
         "SIM_DIFFICULTY",
+        "SIM_SCENARIO",
     ):
         os.environ.pop(key, None)
 
@@ -55,6 +56,7 @@ class TestDefaults:
         _clear_env()
         s = Settings()
         assert s.sim_difficulty == "normal"
+        assert s.sim_scenario == "default_first_semester"
         assert s.sim_runs == 100
         assert s.sim_weeks == 20
 

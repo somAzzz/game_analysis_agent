@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from game_analysis_agent.analytics import (
+from game_analysis_agent.analytics import (  # noqa: E402
     compute_action_pick_rates,
     compute_choice_pick_rates,
     compute_ending_distribution,
@@ -24,6 +24,7 @@ from game_analysis_agent.analytics import (
     load_runs,
     write_csv,
 )
+from game_analysis_agent.coverage import analyze_and_write_coverage  # noqa: E402
 
 
 def usage() -> None:
@@ -63,12 +64,14 @@ def analyze(runs: list[dict], out_dir: Path) -> dict[str, list]:
         choice_rows,
     )
     summary = compute_summary(runs)
+    analyze_and_write_coverage(runs, out_dir)
     summary["generated_files"] = [
         "ending_distribution.csv",
         "weekly_stats.csv",
         "action_pick_rates.csv",
         "event_trigger_rates.csv",
         "choice_pick_rates.csv",
+        "coverage_report.json",
     ]
     (out_dir / "summary.json").write_text(
         __import__("json").dumps(summary, ensure_ascii=False, indent=2),

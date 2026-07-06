@@ -19,6 +19,10 @@ def test_matrix_yaml_has_required_sections() -> None:
     for key in ("version", "weeks", "runs_per_cell", "difficulties", "policies", "boundary"):
         assert key in matrix, f"matrix.yaml missing key: {key}"
     assert isinstance(matrix["policies"], list) and matrix["policies"]
+    assert "work" in matrix["policies"]
+    assert "admin" in matrix["policies"]
+    assert "money" not in matrix["policies"]
+    assert "low_money_start" in matrix["scenarios"]
     assert isinstance(matrix["boundary"]["extremes"], list)
     assert "zero_money" in matrix["boundary"]["extremes"]
     assert "already_registered" in matrix["boundary"]["extremes"]

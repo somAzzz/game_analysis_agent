@@ -305,3 +305,68 @@ balanced,visa_delay,email_foreigners_office,90,0.64
 
 由 `InteractivePlayerAgent` 生成，包含工具调用次数、LLM 调用次数、最终
 状态片段。
+
+## 7. 测试门禁与覆盖率（v0.2）
+
+### coverage_report.json
+
+`analyze` 会根据 `raw_runs.jsonl` 生成状态空间覆盖率：
+
+```json
+{
+  "total_runs": 20,
+  "scenarios": {"low_money_start": 20},
+  "policies": {"work": 20},
+  "state_regimes": [
+    {"regime": "deep_debt", "run_count": 3, "run_rate": 0.15, "week_count": 5}
+  ],
+  "event_coverage": {
+    "distinct_triggered_events": 12,
+    "top_events": {"rent_pressure": 8}
+  }
+}
+```
+
+`regime` 当前取值：`low_money` / `deep_debt` / `high_stress` /
+`high_hunger` / `visa_risk` / `academic_risk` / `work_limit_risk`。
+
+### gate_report.json
+
+`python tools/run_gameplay_agent.py gates --report-dir <dir>` 会读取
+`config/gates.yaml` 并写：
+
+```json
+{
+  "passed": false,
+  "failure_count": 1,
+  "warning_count": 0,
+  "failures": [
+    {
+      "gate": "critical_fail.crisis_success_ending",
+      "actual": 1,
+      "threshold": 0,
+      "message": "crisis_success_ending count 1 exceeds 0"
+    }
+  ],
+  "warnings": []
+}
+```
+
+### anomaly evidence replay
+
+每条 anomaly 的 `evidence.replay` 包含复现定位信息：
+
+```json
+{
+  "run_id": 7,
+  "seed": 99,
+  "policy": "work",
+  "difficulty": "realistic",
+  "scenario": "low_money_start",
+  "max_weeks": 20,
+  "week": 3,
+  "actions": ["part_time_job"],
+  "event_id": "rent_pressure",
+  "event_choice_id": "rent_pressure.choice_01"
+}
+```

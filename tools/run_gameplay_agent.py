@@ -51,12 +51,32 @@ from game_analysis_agent.anomaly_detector import detect_and_write  # noqa: E402
 from game_analysis_agent.bug_summarizer import write_bug_summary  # noqa: E402
 from game_analysis_agent.env import load_dotenv  # noqa: E402
 from game_analysis_agent.llm_client import LocalLLMClient  # noqa: E402
+from game_analysis_agent.quality_gates import evaluate_report_dir, write_gate_report  # noqa: E402
 from game_analysis_agent.settings import get_settings  # noqa: E402
 from game_analysis_agent.value_analyzer import analyze_and_write  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+POLICY_ALIASES = {
+    "money": "work",
+    "visa": "admin",
+    "burnout": "slacker",
+}
+
+VALIDATOR_SCRIPTS = {
+    "content": ("res://scripts/tools/ValidateContent.gd", "content_validation.json"),
+    "json-content": ("res://scripts/tools/ValidateJsonContent.gd", "json_content_validation.json"),
+    "economy": ("res://scripts/tools/ValidateEconomyRules.gd", "economy_validation.json"),
+    "risk": ("res://scripts/tools/ValidateRiskGuidance.gd", "risk_guidance_validation.json"),
+    "route": ("res://scripts/tools/ValidateRouteBoundaries.gd", "route_boundary_validation.json"),
+    "demo": ("res://scripts/tools/ValidateDemoGates.gd", "demo_gate_validation.json"),
+}
+
+
+def _canonical_policy(policy: str) -> str:
+    return POLICY_ALIASES.get(policy, policy)
 
 
 def _resolve_godot(settings) -> str:
@@ -110,10 +130,12 @@ def cmd_sim(args: argparse.Namespace) -> int:
     settings = get_settings()
     run_id = args.run_id or f"run-{uuid.uuid4().hex[:6]}"
     policy = args.policy or settings.sim_policy
+    policy = _canonical_policy(policy)
     runs = args.runs or settings.sim_runs
     seed = args.seed if args.seed is not None else settings.sim_seed
     weeks = args.weeks or settings.sim_weeks
     difficulty = args.difficulty or settings.sim_difficulty
+    scenario = args.scenario or settings.sim_scenario
 
     out_dir = ROOT / "reports" / "balance" / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -125,6 +147,7 @@ def cmd_sim(args: argparse.Namespace) -> int:
         f"--seed={seed}",
         f"--weeks={weeks}",
         f"--difficulty={difficulty}",
+        f"--scenario={scenario}",
         "--out=res://balance_runs.jsonl",
     ]
     proc = _run_godot(
@@ -142,7 +165,12 @@ def cmd_sim(args: argparse.Namespace) -> int:
     shutil.copy(user_path, target_out)
     print(f"Copied raw runs to {target_out}")
     return cmd_analyze(
-        argparse.Namespace(report_dir=out_dir, raw_runs=target_out, run_anomalies=True, run_value=True)
+        argparse.Namespace(
+            report_dir=out_dir,
+            raw_runs=target_out,
+            run_anomalies=True,
+            run_value=True,
+        )
     )
 
 
@@ -173,7 +201,7 @@ def cmd_probe(args: argparse.Namespace) -> int:
     target_out = out_dir / "boundary_runs.jsonl"
     extra_args = [
         f"--runs={args.runs}",
-        f"--policy={args.policy}",
+        f"--policy={_canonical_policy(args.policy)}",
         f"--seed={args.seed}",
         f"--weeks={args.weeks}",
         f"--extreme={args.extreme}",
@@ -200,6 +228,61 @@ def cmd_probe(args: argparse.Namespace) -> int:
     anomalies = detect_and_write(runs, out_dir)
     write_bug_summary(anomalies, out_dir)
     print(f"Boundary probe complete; {len(runs)} runs -> {target_out}")
+    return 0
+
+
+def cmd_validate(args: argparse.Namespace) -> int:
+    settings = get_settings()
+    args.report_dir.mkdir(parents=True, exist_ok=True)
+    selected = args.checks or ["content", "json-content", "economy", "risk"]
+    results: list[dict[str, object]] = []
+    failed = False
+    for check in selected:
+        script, file_name = VALIDATOR_SCRIPTS[check]
+        out_arg = f"--out=res://{file_name}"
+        proc = _run_godot(settings, script=script, extra_args=[out_arg])
+        copied = _copy_user_file(settings.game_project_path, file_name, args.report_dir / file_name)
+        result = {
+            "check": check,
+            "script": script,
+            "returncode": proc.returncode,
+            "stdout": proc.stdout[-4000:],
+            "stderr": proc.stderr[-4000:],
+            "output_file": str(copied) if copied else "",
+        }
+        results.append(result)
+        if proc.returncode != 0:
+            failed = True
+            print(f"[validate:{check}] failed", file=sys.stderr)
+        else:
+            print(f"[validate:{check}] ok")
+    summary = {"passed": not failed, "checks": results}
+    (args.report_dir / "validation_summary.json").write_text(
+        __import__("json").dumps(summary, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return 1 if failed else 0
+
+
+def _copy_user_file(game_project: Path, file_name: str, target: Path) -> Path | None:
+    user_path = _resolve_user_path(game_project) / file_name
+    if not user_path.exists():
+        return None
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(user_path, target)
+    return target
+
+
+def cmd_gates(args: argparse.Namespace) -> int:
+    gates_path = args.gates or (ROOT / "config" / "gates.yaml")
+    report = evaluate_report_dir(args.report_dir, gates_path)
+    out = args.out or (args.report_dir / "gate_report.json")
+    write_gate_report(report, out)
+    print(f"Gate report written to {out}")
+    if not report["passed"]:
+        for failure in report["failures"]:
+            print(f"[gate failed] {failure['gate']}: {failure['message']}", file=sys.stderr)
+        return 1
     return 0
 
 
@@ -254,13 +337,16 @@ def cmd_play(args: argparse.Namespace) -> int:
     settings = get_settings()
     llm = LocalLLMClient.from_settings(settings)
     if not llm.settings.deepseek_configured() and llm.provider == "deepseek":
-        print("DeepSeek key not configured; set DEEPSEEK_API_KEY before using `play`.", file=sys.stderr)
+        print(
+            "DeepSeek key not configured; set DEEPSEEK_API_KEY before using `play`.",
+            file=sys.stderr,
+        )
         return 5
-    from game_analysis_agent.agents.interactive_player import (
-        InteractivePlayerAgent,
+    from game_analysis_agent.agents.interactive_player import (  # noqa: I001
         PERSONAS,
+        InteractivePlayerAgent,
     )
-    from game_analysis_agent.game_tools import (
+    from game_analysis_agent.game_tools import (  # noqa: I001
         TOOL_DEFINITIONS,
         build_probe,
         build_tool_map,
@@ -328,6 +414,7 @@ def build_parser() -> argparse.ArgumentParser:
     sim_p.add_argument("--seed", type=int, default=None)
     sim_p.add_argument("--weeks", type=int, default=None)
     sim_p.add_argument("--difficulty", default=None)
+    sim_p.add_argument("--scenario", default=None)
     sim_p.add_argument("--no-anomalies", dest="run_anomalies", action="store_false")
     sim_p.add_argument("--no-value", dest="run_value", action="store_false")
     sim_p.set_defaults(func=cmd_sim)
@@ -366,6 +453,31 @@ def build_parser() -> argparse.ArgumentParser:
     )
     export_p.set_defaults(func=cmd_export)
 
+    validate_p = sub.add_parser(
+        "validate", help="Run Godot-side validators and collect their JSON reports."
+    )
+    validate_p.add_argument(
+        "--report-dir",
+        type=Path,
+        default=ROOT / "reports" / "validation",
+        help="Where validator JSON reports should be copied.",
+    )
+    validate_p.add_argument(
+        "--check",
+        dest="checks",
+        action="append",
+        choices=tuple(VALIDATOR_SCRIPTS),
+        default=None,
+        help="Validator to run. Repeatable. Default: content + json-content + economy + risk.",
+    )
+    validate_p.set_defaults(func=cmd_validate)
+
+    gates_p = sub.add_parser("gates", help="Evaluate config/gates.yaml against a report dir.")
+    gates_p.add_argument("--report-dir", type=Path, required=True)
+    gates_p.add_argument("--gates", type=Path, default=None)
+    gates_p.add_argument("--out", type=Path, default=None)
+    gates_p.set_defaults(func=cmd_gates)
+
     qa_p = sub.add_parser(
         "qa", help="Run all (or selected) LLM agents against a report dir."
     )
@@ -377,7 +489,10 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         choices=AGENT_NAMES,
         default=None,
-        help="Run a single agent. Repeatable. Default: balance + content_qa + event_graph + bug_hunter + boundary_prober + value_reviewer.",
+        help=(
+            "Run a single agent. Repeatable. Default: balance + content_qa + "
+            "event_graph + bug_hunter + boundary_prober + value_reviewer."
+        ),
     )
     qa_p.set_defaults(func=cmd_qa)
 
@@ -412,6 +527,7 @@ def build_parser() -> argparse.ArgumentParser:
     all_p.add_argument("--seed", type=int, default=None)
     all_p.add_argument("--weeks", type=int, default=None)
     all_p.add_argument("--difficulty", default=None)
+    all_p.add_argument("--scenario", default=None)
     all_p.set_defaults(func=cmd_all)
 
     return parser

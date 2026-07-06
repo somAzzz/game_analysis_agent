@@ -97,3 +97,34 @@ def test_detects_no_anomalies_for_clean_run() -> None:
     anomalies = detect_anomalies(runs)
     critical = [a for a in anomalies if a.severity in {"critical", "error"}]
     assert critical == []
+
+
+def test_anomaly_evidence_contains_replay_context() -> None:
+    anomalies = detect_anomalies(
+        [
+            {
+                "run_id": 7,
+                "seed": 99,
+                "policy": "work",
+                "difficulty": "realistic",
+                "scenario": "low_money_start",
+                "max_weeks": 20,
+                "final_ending_id": "stable_start",
+                "weekly_log": [
+                    {
+                        "week": 3,
+                        "selected_action_ids": ["part_time_job"],
+                        "triggered_event_id": "rent_pressure",
+                        "event_choice_id": "rent_pressure.choice_01",
+                        "after_state": {"week": 3, "money": -5},
+                    }
+                ],
+            }
+        ]
+    )
+
+    replay = anomalies[0].evidence["replay"]
+    assert replay["seed"] == 99
+    assert replay["policy"] == "work"
+    assert replay["scenario"] == "low_money_start"
+    assert replay["actions"] == ["part_time_job"]

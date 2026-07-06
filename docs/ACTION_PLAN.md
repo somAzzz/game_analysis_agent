@@ -509,3 +509,22 @@ return result, paths
 ```
 
 最新对齐审计和补齐计划见 [docs/review/](review/README.md)。
+
+## 真实测试场景补齐（2026-07-06）
+
+来自 [docs/review/REAL_TEST_GAP_ANALYSIS.md](review/REAL_TEST_GAP_ANALYSIS.md)。
+
+- `sim/all` 支持 `--scenario`，默认 `default_first_semester`。
+- CLI policy alias：`money -> work`，`visa -> admin`，避免与 Godot route 名称漂移。
+- `validate` 子命令接入 Godot validators：content / json-content / economy / risk，支持显式选择 route / demo。
+- `gates` 子命令执行 `config/gates.yaml` 并写 `gate_report.json`。
+- `analyze` 现在生成 `coverage_report.json`，记录 scenario / policy / crisis regime / event coverage。
+- `anomalies.jsonl` 的 evidence 增加 replay context：seed、policy、difficulty、scenario、week、actions、event、choice。
+
+验证：
+
+```text
+uv run ruff check <touched files>
+uv run pytest tests/ -q
+113 passed in 0.58s
+```
