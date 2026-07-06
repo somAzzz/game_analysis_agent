@@ -549,44 +549,39 @@ main {
 }
 
 .graph-spotlight {
-  margin: 26px 60px 0;
-  padding: 24px 28px;
-  border: 2px solid var(--accent);
-  border-left-width: 10px;
-  background:
-    linear-gradient(90deg, rgba(200, 85, 61, 0.18), rgba(59, 95, 78, 0.07)),
-    var(--paper);
-  box-shadow: 0 18px 42px rgba(31, 27, 22, 0.1);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 28px;
-  align-items: center;
+  margin: 32px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  display: block;
 }
 
 .graph-eyebrow {
   display: inline-block;
-  margin-bottom: 7px;
+  margin-bottom: 8px;
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--accent-deep);
+  color: var(--ink-soft);
 }
 
 .graph-spotlight h2 {
-  margin: 0;
+  margin: 0 0 16px;
   font-family: var(--serif);
-  font-size: clamp(34px, 4.2vw, 64px);
-  line-height: 0.95;
+  font-size: 36px;
+  line-height: 1;
   font-style: italic;
-  font-variation-settings: "opsz" 120, "wght" 430, "SOFT" 80, "WONK" 1;
+  font-variation-settings: "opsz" 96, "wght" 360, "SOFT" 100;
   color: var(--ink);
 }
 
 .graph-spotlight p {
   max-width: 720px;
-  margin: 12px 0 0;
+  margin: 0 0 18px;
   color: var(--ink-soft);
+  font-size: 16px;
   line-height: 1.45;
   font-style: italic;
 }
@@ -619,7 +614,7 @@ main {
 
 .graph-spotlight-embedded .graph-spotlight-copy {
   max-width: 980px;
-  margin-bottom: 22px;
+  margin-bottom: 0;
 }
 
 .graph-inline-state {
@@ -1288,8 +1283,6 @@ main {
   .tab-rail { margin-left: 24px; margin-right: 24px; }
   .notice-strip { margin-left: 24px; margin-right: 24px; }
   .graph-spotlight {
-    margin-left: 24px;
-    margin-right: 24px;
     grid-template-columns: 1fr;
   }
   .graph-spotlight-cta {

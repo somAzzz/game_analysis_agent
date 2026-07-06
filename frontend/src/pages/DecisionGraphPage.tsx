@@ -406,7 +406,7 @@ export function DecisionGraphExplorer({
             ref={containerRef}
             style={{
               width: "100%",
-              height: 640,
+              height: embedded ? 460 : 640,
               border: "1px solid var(--ink)",
               borderTop: "4px double var(--ink)",
               borderBottom: "4px double var(--ink)",

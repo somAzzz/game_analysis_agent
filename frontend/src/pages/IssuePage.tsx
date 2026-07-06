@@ -59,7 +59,6 @@ export function IssuePage() {
   return (
     <div>
       <Cover manifest={manifest} />
-      {manifest.kind === "balance" && <EmbeddedDecisionGraph issueId={manifest.id} />}
 
       {manifest.gate_report && (
         <div
@@ -89,6 +88,7 @@ export function IssuePage() {
       <main>
         <TracePanel manifest={manifest} />
         <EndingGrid manifest={manifest} />
+        {manifest.kind === "balance" && <EmbeddedDecisionGraph issueId={manifest.id} />}
         <PulseSection manifest={manifest} />
         <ValueFindingsSection manifest={manifest} />
         <AnomaliesSection manifest={manifest} />
@@ -167,9 +167,8 @@ function EmbeddedDecisionGraph({ issueId }: { issueId: string }) {
         <span className="graph-eyebrow">Interactive flow map</span>
         <h2>Decision graph</h2>
         <p>
-          The graph is embedded here so the report can be read and explored in
-          one place. Follow the highlighted path, inspect mock branches, and
-          click any node to see route options.
+          Highlighted path plus mock branches. Click any node to inspect route
+          options.
         </p>
       </div>
       {error && <div className="graph-inline-state">Graph unavailable: {error}</div>}
