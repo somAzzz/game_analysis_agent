@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { fetchIssueManifest } from "@/lib/api";
-import type { IssueManifest, WeeklyPoint } from "@/types";
+import type { AnomalyRow, IssueManifest, ValueFinding, WeeklyPoint } from "@/types";
 
 const SPARK_METRICS: { key: string; color: string; label: string }[] = [
   { key: "stress", color: "var(--accent)", label: "stress" },
@@ -69,27 +69,17 @@ export function IssuePage() {
         <a href="#pulse">Pulse</a>
         <a href="#value">Value findings</a>
         <a href="#agents">Agent columns</a>
-        {manifest.kind === "balance" &&
-          manifest.raw_runs_count > 0 &&
-          manifest.agents.some(() => (manifest.agent_markdown as Record<string, string>)["bugs_summary"]) && (
-            <a href="#anomalies">Anomalies</a>
-          )}
+        {manifest.anomalies.length > 0 && <a href="#anomalies">Anomalies</a>}
+        {manifest.hasOwnProperty("source_summary") && <a href="#trace">Trace</a>}
         {manifest.kind === "balance" && (
-          <a
-            href={`/decision-graph/${encodeURIComponent(manifest.id)}/0`}
-            style={{
-              marginLeft: "auto",
-              background: "var(--accent)",
-              color: "var(--paper)",
-              borderBottomColor: "var(--accent-deep)",
-            }}
-          >
-            ↗ Decision Graph
-          </a>
+          <Link className="tab-cta" to={`/decision-graph/${encodeURIComponent(manifest.id)}/0`}>
+            Decision graph
+          </Link>
         )}
       </nav>
 
       <main>
+        <TracePanel manifest={manifest} />
         <EndingGrid manifest={manifest} />
         <PulseSection manifest={manifest} />
         <ValueFindingsSection manifest={manifest} />
@@ -106,6 +96,13 @@ export function IssuePage() {
 
 function Cover({ manifest }: { manifest: IssueManifest }) {
   const summary = manifest.summary ?? {};
+  const subtitle = [
+    manifest.source_summary?.source_scenario ?? summary.scenario,
+    manifest.source_summary?.source_policy ?? summary.policy,
+    manifest.source_summary?.source_difficulty ?? summary.difficulty,
+  ]
+    .filter(Boolean)
+    .join(" / ");
   return (
     <section className="cover">
       <div className="issue-meta">
@@ -125,13 +122,52 @@ function Cover({ manifest }: { manifest: IssueManifest }) {
           <strong>{Object.keys(manifest.agent_markdown ?? {}).length}</strong>
           agent outputs
         </span>
+        {manifest.public_demo && (
+          <span>
+            <strong>PUBLIC</strong>
+            sanitized dataset
+          </span>
+        )}
       </div>
       <h1>{manifest.id.replace(/-/g, " ")}</h1>
       <p className="deck">
-        {summary && Object.keys(summary).length > 0
-          ? `${manifest.kind} issue · ${Object.values(summary)[0] ?? ""}`.slice(0, 280)
+        {subtitle
+          ? `${manifest.kind} issue · ${subtitle}`
           : `${manifest.kind} issue`}
       </p>
+    </section>
+  );
+}
+
+function TracePanel({ manifest }: { manifest: IssueManifest }) {
+  const summary = manifest.summary ?? {};
+  return (
+    <section id="trace" className="trace-panel">
+      <div>
+        <h2>Traceability</h2>
+        <p>
+          {manifest.public_notice ??
+            "This view is backed by a generated manifest. Use the report manifest for replay-level debugging."}
+        </p>
+      </div>
+      <dl>
+        <div>
+          <dt>report kind</dt>
+          <dd>{manifest.kind}</dd>
+        </div>
+        <div>
+          <dt>runs</dt>
+          <dd>{manifest.raw_runs_count || String(summary.total_runs ?? "n/a")}</dd>
+        </div>
+        <div>
+          <dt>scenario</dt>
+          <dd>{String(manifest.source_summary?.source_scenario ?? summary.scenario ?? "n/a")}</dd>
+        </div>
+        <div>
+          <dt>policy</dt>
+          <dd>{String(manifest.source_summary?.source_policy ?? summary.policy ?? "mixed")}</dd>
+        </div>
+      </dl>
     </section>
   );
 }
@@ -296,9 +332,9 @@ function SparkBlock({
   color: string;
   points: WeeklyPoint[];
 }) {
-  const W = 720, H = 140;
+  const W = 720, H = 160;
   const xs = points.map((p) => p.week);
-  const ys = points.map((p) => p.mean);
+  const ys = points.flatMap((p) => [p.mean, p.p10, p.p90]);
   const xMin = Math.min(...xs);
   const xMax = Math.max(...xs, xMin + 1);
   const yMin = Math.min(...ys);
@@ -310,6 +346,22 @@ function SparkBlock({
       return `${i === 0 ? "M" : "L"} ${px.toFixed(1)} ${py.toFixed(1)}`;
     })
     .join(" ");
+  const bandTop = points
+    .map((p, i) => {
+      const px = ((p.week - xMin) / (xMax - xMin)) * (W - 20) + 10;
+      const py = (1 - (p.p90 - yMin) / (yMax - yMin)) * (H - 40) + 12;
+      return `${i === 0 ? "M" : "L"} ${px.toFixed(1)} ${py.toFixed(1)}`;
+    })
+    .join(" ");
+  const bandBottom = [...points]
+    .reverse()
+    .map((p) => {
+      const px = ((p.week - xMin) / (xMax - xMin)) * (W - 20) + 10;
+      const py = (1 - (p.p10 - yMin) / (yMax - yMin)) * (H - 40) + 12;
+      return `L ${px.toFixed(1)} ${py.toFixed(1)}`;
+    })
+    .join(" ");
+  const band = `${bandTop} ${bandBottom} Z`;
   const last = points[points.length - 1];
   const lx = ((last.week - xMin) / (xMax - xMin)) * (W - 20) + 10;
   const ly = (1 - (last.mean - yMin) / (yMax - yMin)) * (H - 30) + 10;
@@ -317,6 +369,7 @@ function SparkBlock({
     <div className="sparkblock">
       <h4>{metric}</h4>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${metric} by week`}>
+        <path d={band} fill={color} opacity={0.14} />
         <path
           className="sparkline-path"
           d={path}
@@ -326,12 +379,18 @@ function SparkBlock({
         />
         <circle cx={lx} cy={ly} r={3} fill={color} />
       </svg>
+      <div className="spark-meta">
+        mean {last.mean.toFixed(1)} · p10 {last.p10.toFixed(1)} · p90 {last.p90.toFixed(1)}
+      </div>
     </div>
   );
 }
 
 function ValueFindingsSection({ manifest }: { manifest: IssueManifest }) {
-  const findings = manifest.value_findings.slice(0, 8);
+  const findings = [
+    ...manifest.value_findings,
+    ...flattenRouteFindings(manifest),
+  ].slice(0, 12);
   if (findings.length === 0) return null;
   return (
     <section id="value" style={{ marginTop: 48 }}>
@@ -376,6 +435,7 @@ function ValueFindingsSection({ manifest }: { manifest: IssueManifest }) {
 
 function AnomaliesSection({ manifest }: { manifest: IssueManifest }) {
   if (manifest.anomalies.length === 0) return null;
+  const groups = groupAnomalies(manifest.anomalies);
   return (
     <section id="anomalies" style={{ marginTop: 48 }}>
       <h2
@@ -389,13 +449,14 @@ function AnomaliesSection({ manifest }: { manifest: IssueManifest }) {
       >
         Anomaly marginalia
       </h2>
-      <div
-        style={{
-          fontFamily: "var(--mono)",
-          fontSize: 12,
-          color: "var(--ink-soft)",
-        }}
-      >
+      <div className="anomaly-summary">
+        {groups.slice(0, 6).map((group) => (
+          <span key={`${group.kind}-${group.severity}`}>
+            <strong>{group.count}</strong> {group.kind} · {group.severity}
+          </span>
+        ))}
+      </div>
+      <div className="anomaly-list">
         {manifest.anomalies.slice(0, 12).map((a, idx) => (
           <div
             key={`${a.kind}-${a.run_id}-${a.week}-${idx}`}
@@ -473,4 +534,19 @@ function AgentColumns({ manifest }: { manifest: IssueManifest }) {
       ))}
     </div>
   );
+}
+
+function flattenRouteFindings(manifest: IssueManifest): ValueFinding[] {
+  return Object.values(manifest.route_findings ?? {}).flatMap((rows) => rows ?? []);
+}
+
+function groupAnomalies(rows: AnomalyRow[]): { kind: string; severity: string; count: number }[] {
+  const counts = new Map<string, { kind: string; severity: string; count: number }>();
+  for (const row of rows) {
+    const key = `${row.kind}:${row.severity}`;
+    const current = counts.get(key) ?? { kind: row.kind, severity: row.severity, count: 0 };
+    current.count += 1;
+    counts.set(key, current);
+  }
+  return [...counts.values()].sort((a, b) => b.count - a.count);
 }

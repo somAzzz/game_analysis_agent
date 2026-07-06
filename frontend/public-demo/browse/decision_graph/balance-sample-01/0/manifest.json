@@ -1,0 +1,334 @@
+{
+  "issue_id": "balance-sample-01",
+  "run_id": 0,
+  "policy": "public-demo",
+  "scenario": "sanitized",
+  "seed": 42,
+  "max_weeks": 20,
+  "final_ending_id": "Outcome B - recovery pause",
+  "public_demo": true,
+  "public_notice": "Illustrative graph only. The private full event graph is not published.",
+  "run": {
+    "run_id": 0,
+    "policy": "public-demo",
+    "seed": 42,
+    "weekly_log": [
+      {
+        "week": 1,
+        "triggered_event_id": "phase-1",
+        "event_choice_id": "phase-1.choice_01",
+        "choice_index": 0,
+        "selected_action_ids": [
+          "public-action-a",
+          "public-action-b"
+        ],
+        "after_state": {
+          "stress": 35,
+          "money": 700,
+          "social": 20,
+          "academic_progress": 12
+        }
+      },
+      {
+        "week": 3,
+        "triggered_event_id": "phase-2",
+        "event_choice_id": "phase-2.choice_02",
+        "choice_index": 1,
+        "selected_action_ids": [
+          "public-action-a",
+          "public-action-b"
+        ],
+        "after_state": {
+          "stress": 42,
+          "money": 580,
+          "social": 25,
+          "academic_progress": 21
+        }
+      },
+      {
+        "week": 6,
+        "triggered_event_id": "phase-3",
+        "event_choice_id": "phase-3.choice_03",
+        "choice_index": 2,
+        "selected_action_ids": [
+          "public-action-a",
+          "public-action-b"
+        ],
+        "after_state": {
+          "stress": 49,
+          "money": 460,
+          "social": 30,
+          "academic_progress": 30
+        }
+      },
+      {
+        "week": 9,
+        "triggered_event_id": "phase-4",
+        "event_choice_id": "phase-4.choice_01",
+        "choice_index": 0,
+        "selected_action_ids": [
+          "public-action-a",
+          "public-action-b"
+        ],
+        "after_state": {
+          "stress": 56,
+          "money": 340,
+          "social": 35,
+          "academic_progress": 39
+        }
+      },
+      {
+        "week": 13,
+        "triggered_event_id": "phase-5",
+        "event_choice_id": "phase-5.choice_02",
+        "choice_index": 1,
+        "selected_action_ids": [
+          "public-action-a",
+          "public-action-b"
+        ],
+        "after_state": {
+          "stress": 63,
+          "money": 220,
+          "social": 40,
+          "academic_progress": 48
+        }
+      },
+      {
+        "week": 17,
+        "triggered_event_id": "phase-6",
+        "event_choice_id": "phase-6.choice_03",
+        "choice_index": 2,
+        "selected_action_ids": [
+          "public-action-a",
+          "public-action-b"
+        ],
+        "after_state": {
+          "stress": 70,
+          "money": 100,
+          "social": 45,
+          "academic_progress": 57
+        }
+      }
+    ]
+  },
+  "event_graph": {
+    "events": [
+      {
+        "id": "phase-1",
+        "title": "Arrival pressure",
+        "body": "Public demo node. Real game text is withheld.",
+        "event_type": "fixed",
+        "trigger": {
+          "week": 1
+        },
+        "source_order": 0,
+        "choices": [
+          {
+            "text": "Stabilize short-term risk",
+            "success_effects": {
+              "stress": -3,
+              "money": -1,
+              "social": 1
+            }
+          },
+          {
+            "text": "Invest in long-term progress",
+            "success_effects": {
+              "academic_progress": 4,
+              "stress": 2,
+              "money": -2
+            }
+          },
+          {
+            "text": "Ask the support network",
+            "success_effects": {
+              "social": 3,
+              "stress": -1,
+              "money": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "phase-2",
+        "title": "Budget fork",
+        "body": "Public demo node. Real game text is withheld.",
+        "event_type": "conditional",
+        "trigger": {
+          "week": 3
+        },
+        "source_order": 1,
+        "choices": [
+          {
+            "text": "Stabilize short-term risk",
+            "success_effects": {
+              "stress": -3,
+              "money": -1,
+              "social": 1
+            }
+          },
+          {
+            "text": "Invest in long-term progress",
+            "success_effects": {
+              "academic_progress": 4,
+              "stress": 2,
+              "money": -2
+            }
+          },
+          {
+            "text": "Ask the support network",
+            "success_effects": {
+              "social": 3,
+              "stress": -1,
+              "money": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "phase-3",
+        "title": "Social support check",
+        "body": "Public demo node. Real game text is withheld.",
+        "event_type": "conditional",
+        "trigger": {
+          "week": 6
+        },
+        "source_order": 2,
+        "choices": [
+          {
+            "text": "Stabilize short-term risk",
+            "success_effects": {
+              "stress": -3,
+              "money": -1,
+              "social": 1
+            }
+          },
+          {
+            "text": "Invest in long-term progress",
+            "success_effects": {
+              "academic_progress": 4,
+              "stress": 2,
+              "money": -2
+            }
+          },
+          {
+            "text": "Ask the support network",
+            "success_effects": {
+              "social": 3,
+              "stress": -1,
+              "money": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "phase-4",
+        "title": "Study load spike",
+        "body": "Public demo node. Real game text is withheld.",
+        "event_type": "random",
+        "trigger": {
+          "week": 9
+        },
+        "source_order": 3,
+        "choices": [
+          {
+            "text": "Stabilize short-term risk",
+            "success_effects": {
+              "stress": -3,
+              "money": -1,
+              "social": 1
+            }
+          },
+          {
+            "text": "Invest in long-term progress",
+            "success_effects": {
+              "academic_progress": 4,
+              "stress": 2,
+              "money": -2
+            }
+          },
+          {
+            "text": "Ask the support network",
+            "success_effects": {
+              "social": 3,
+              "stress": -1,
+              "money": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "phase-5",
+        "title": "Admin deadline",
+        "body": "Public demo node. Real game text is withheld.",
+        "event_type": "fixed",
+        "trigger": {
+          "week": 13
+        },
+        "source_order": 4,
+        "choices": [
+          {
+            "text": "Stabilize short-term risk",
+            "success_effects": {
+              "stress": -3,
+              "money": -1,
+              "social": 1
+            }
+          },
+          {
+            "text": "Invest in long-term progress",
+            "success_effects": {
+              "academic_progress": 4,
+              "stress": 2,
+              "money": -2
+            }
+          },
+          {
+            "text": "Ask the support network",
+            "success_effects": {
+              "social": 3,
+              "stress": -1,
+              "money": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "phase-6",
+        "title": "Recovery or collapse",
+        "body": "Public demo node. Real game text is withheld.",
+        "event_type": "conditional",
+        "trigger": {
+          "week": 17
+        },
+        "source_order": 5,
+        "choices": [
+          {
+            "text": "Stabilize short-term risk",
+            "success_effects": {
+              "stress": -3,
+              "money": -1,
+              "social": 1
+            }
+          },
+          {
+            "text": "Invest in long-term progress",
+            "success_effects": {
+              "academic_progress": 4,
+              "stress": 2,
+              "money": -2
+            }
+          },
+          {
+            "text": "Ask the support network",
+            "success_effects": {
+              "social": 3,
+              "stress": -1,
+              "money": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

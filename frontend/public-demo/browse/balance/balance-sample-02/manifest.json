@@ -1,0 +1,1018 @@
+{
+  "kind": "balance",
+  "id": "balance-sample-02",
+  "slug": "balance/balance-sample-02",
+  "report_dir": "public-demo/sanitized",
+  "summary": {
+    "total_runs": 20,
+    "scenario": "first semester",
+    "difficulty": "normal",
+    "policy": "balanced",
+    "source": "sanitized aggregate from real local reports",
+    "privacy": "raw runs, replay evidence, and full gameplay graph withheld"
+  },
+  "endings": [
+    {
+      "policy": "balanced",
+      "ending_id": "Outcome A - academic risk",
+      "count": "2",
+      "rate": "0.1000"
+    },
+    {
+      "policy": "balanced",
+      "ending_id": "Outcome B - recovery pause",
+      "count": "6",
+      "rate": "0.3000"
+    },
+    {
+      "policy": "balanced",
+      "ending_id": "Outcome C - career route",
+      "count": "6",
+      "rate": "0.3000"
+    },
+    {
+      "policy": "balanced",
+      "ending_id": "Outcome X - other",
+      "count": "1",
+      "rate": "0.0500"
+    },
+    {
+      "policy": "balanced",
+      "ending_id": "Outcome X - other",
+      "count": "4",
+      "rate": "0.2000"
+    },
+    {
+      "policy": "balanced",
+      "ending_id": "Outcome X - other",
+      "count": "1",
+      "rate": "0.0500"
+    }
+  ],
+  "actions": [
+    {
+      "policy": "balanced",
+      "action_id": "study action",
+      "count": "8",
+      "rate_per_run": "0.4000"
+    },
+    {
+      "policy": "balanced",
+      "action_id": "income action",
+      "count": "8",
+      "rate_per_run": "0.4000"
+    },
+    {
+      "policy": "balanced",
+      "action_id": "admin action",
+      "count": "74",
+      "rate_per_run": "3.7000"
+    },
+    {
+      "policy": "balanced",
+      "action_id": "social action",
+      "count": "354",
+      "rate_per_run": "17.7000"
+    },
+    {
+      "policy": "balanced",
+      "action_id": "recovery action",
+      "count": "238",
+      "rate_per_run": "11.9000"
+    },
+    {
+      "policy": "balanced",
+      "action_id": "living-cost action",
+      "count": "294",
+      "rate_per_run": "14.7000"
+    },
+    {
+      "policy": "balanced",
+      "action_id": "study action",
+      "count": "98",
+      "rate_per_run": "4.9000"
+    },
+    {
+      "policy": "balanced",
+      "action_id": "income action",
+      "count": "50",
+      "rate_per_run": "2.5000"
+    },
+    {
+      "policy": "balanced",
+      "action_id": "admin action",
+      "count": "28",
+      "rate_per_run": "1.4000"
+    },
+    {
+      "policy": "balanced",
+      "action_id": "social action",
+      "count": "166",
+      "rate_per_run": "8.3000"
+    }
+  ],
+  "events": [],
+  "choices": [],
+  "weekly_series": {
+    "stress": [
+      {
+        "week": 1,
+        "mean": 30.0,
+        "p10": 30.0,
+        "p90": 30.0
+      },
+      {
+        "week": 2,
+        "mean": 37.2,
+        "p10": 33.0,
+        "p90": 41.0
+      },
+      {
+        "week": 3,
+        "mean": 64.2,
+        "p10": 59.0,
+        "p90": 68.0
+      },
+      {
+        "week": 4,
+        "mean": 59.5,
+        "p10": 52.0,
+        "p90": 68.0
+      },
+      {
+        "week": 5,
+        "mean": 69.3,
+        "p10": 64.0,
+        "p90": 75.0
+      },
+      {
+        "week": 6,
+        "mean": 83.0,
+        "p10": 73.0,
+        "p90": 96.0
+      },
+      {
+        "week": 7,
+        "mean": 89.4,
+        "p10": 72.0,
+        "p90": 100.0
+      },
+      {
+        "week": 8,
+        "mean": 94.1,
+        "p10": 85.0,
+        "p90": 100.0
+      },
+      {
+        "week": 9,
+        "mean": 94.65,
+        "p10": 85.0,
+        "p90": 97.0
+      },
+      {
+        "week": 10,
+        "mean": 94.75,
+        "p10": 92.0,
+        "p90": 98.0
+      },
+      {
+        "week": 11,
+        "mean": 89.2,
+        "p10": 61.0,
+        "p90": 100.0
+      },
+      {
+        "week": 12,
+        "mean": 93.7,
+        "p10": 78.0,
+        "p90": 100.0
+      },
+      {
+        "week": 13,
+        "mean": 93.9,
+        "p10": 82.0,
+        "p90": 100.0
+      },
+      {
+        "week": 14,
+        "mean": 82.6,
+        "p10": 67.0,
+        "p90": 100.0
+      },
+      {
+        "week": 15,
+        "mean": 75.85,
+        "p10": 53.0,
+        "p90": 100.0
+      },
+      {
+        "week": 16,
+        "mean": 82.95,
+        "p10": 67.0,
+        "p90": 100.0
+      },
+      {
+        "week": 17,
+        "mean": 83.95,
+        "p10": 64.0,
+        "p90": 100.0
+      },
+      {
+        "week": 18,
+        "mean": 81.0,
+        "p10": 62.0,
+        "p90": 100.0
+      },
+      {
+        "week": 19,
+        "mean": 62.2,
+        "p10": 37.0,
+        "p90": 87.0
+      },
+      {
+        "week": 20,
+        "mean": 65.15,
+        "p10": 47.0,
+        "p90": 100.0
+      }
+    ],
+    "hunger": [
+      {
+        "week": 1,
+        "mean": 37.0,
+        "p10": 37.0,
+        "p90": 37.0
+      },
+      {
+        "week": 2,
+        "mean": 12.0,
+        "p10": 12.0,
+        "p90": 12.0
+      },
+      {
+        "week": 3,
+        "mean": 36.0,
+        "p10": 36.0,
+        "p90": 36.0
+      },
+      {
+        "week": 4,
+        "mean": 54.6,
+        "p10": 54.0,
+        "p90": 54.0
+      },
+      {
+        "week": 5,
+        "mean": 78.6,
+        "p10": 78.0,
+        "p90": 78.0
+      },
+      {
+        "week": 6,
+        "mean": 50.9,
+        "p10": 44.0,
+        "p90": 74.0
+      },
+      {
+        "week": 7,
+        "mean": 67.5,
+        "p10": 50.0,
+        "p90": 86.0
+      },
+      {
+        "week": 8,
+        "mean": 83.5,
+        "p10": 54.0,
+        "p90": 100.0
+      },
+      {
+        "week": 9,
+        "mean": 89.1,
+        "p10": 68.0,
+        "p90": 100.0
+      },
+      {
+        "week": 10,
+        "mean": 66.3,
+        "p10": 44.0,
+        "p90": 100.0
+      },
+      {
+        "week": 11,
+        "mean": 71.4,
+        "p10": 43.0,
+        "p90": 96.0
+      },
+      {
+        "week": 12,
+        "mean": 77.65,
+        "p10": 55.0,
+        "p90": 100.0
+      },
+      {
+        "week": 13,
+        "mean": 81.65,
+        "p10": 64.0,
+        "p90": 100.0
+      },
+      {
+        "week": 14,
+        "mean": 50.35,
+        "p10": 24.0,
+        "p90": 75.0
+      },
+      {
+        "week": 15,
+        "mean": 51.6,
+        "p10": 24.0,
+        "p90": 87.0
+      },
+      {
+        "week": 16,
+        "mean": 59.3,
+        "p10": 36.0,
+        "p90": 94.0
+      },
+      {
+        "week": 17,
+        "mean": 62.6,
+        "p10": 28.0,
+        "p90": 94.0
+      },
+      {
+        "week": 18,
+        "mean": 45.25,
+        "p10": 29.0,
+        "p90": 64.0
+      },
+      {
+        "week": 19,
+        "mean": 41.3,
+        "p10": 12.0,
+        "p90": 75.0
+      },
+      {
+        "week": 20,
+        "mean": 27.3,
+        "p10": 0.0,
+        "p90": 64.0
+      }
+    ],
+    "money": [
+      {
+        "week": 1,
+        "mean": 817.0,
+        "p10": 817.0,
+        "p90": 817.0
+      },
+      {
+        "week": 2,
+        "mean": 249.0,
+        "p10": 139.0,
+        "p90": 409.0
+      },
+      {
+        "week": 3,
+        "mean": -426.0,
+        "p10": -536.0,
+        "p90": -266.0
+      },
+      {
+        "week": 4,
+        "mean": -501.0,
+        "p10": -611.0,
+        "p90": -341.0
+      },
+      {
+        "week": 5,
+        "mean": 416.0,
+        "p10": 306.0,
+        "p90": 576.0
+      },
+      {
+        "week": 6,
+        "mean": -397.5,
+        "p10": -492.0,
+        "p90": -338.0
+      },
+      {
+        "week": 7,
+        "mean": -595.0,
+        "p10": -1348.0,
+        "p90": -338.0
+      },
+      {
+        "week": 8,
+        "mean": -697.55,
+        "p10": -1318.0,
+        "p90": -425.0
+      },
+      {
+        "week": 9,
+        "mean": 198.75,
+        "p10": -416.0,
+        "p90": 499.0
+      },
+      {
+        "week": 10,
+        "mean": -313.4,
+        "p10": -684.0,
+        "p90": 165.0
+      },
+      {
+        "week": 11,
+        "mean": -362.85,
+        "p10": -699.0,
+        "p90": -44.0
+      },
+      {
+        "week": 12,
+        "mean": -391.6,
+        "p10": -909.0,
+        "p90": 54.0
+      },
+      {
+        "week": 13,
+        "mean": 518.05,
+        "p10": 139.0,
+        "p90": 998.0
+      },
+      {
+        "week": 14,
+        "mean": 110.15,
+        "p10": -569.0,
+        "p90": 674.0
+      },
+      {
+        "week": 15,
+        "mean": -105.6,
+        "p10": -505.0,
+        "p90": 540.0
+      },
+      {
+        "week": 16,
+        "mean": -180.05,
+        "p10": -595.0,
+        "p90": 297.0
+      },
+      {
+        "week": 17,
+        "mean": 766.7,
+        "p10": 234.0,
+        "p90": 1155.0
+      },
+      {
+        "week": 18,
+        "mean": 443.35,
+        "p10": -266.0,
+        "p90": 901.0
+      },
+      {
+        "week": 19,
+        "mean": 151.65,
+        "p10": -399.0,
+        "p90": 647.0
+      },
+      {
+        "week": 20,
+        "mean": -49.15,
+        "p10": -509.0,
+        "p90": 485.0
+      }
+    ],
+    "academic_progress": [
+      {
+        "week": 1,
+        "mean": 22.0,
+        "p10": 22.0,
+        "p90": 22.0
+      },
+      {
+        "week": 2,
+        "mean": 21.2,
+        "p10": 18.0,
+        "p90": 22.0
+      },
+      {
+        "week": 3,
+        "mean": 29.2,
+        "p10": 23.0,
+        "p90": 31.0
+      },
+      {
+        "week": 4,
+        "mean": 26.8,
+        "p10": 13.0,
+        "p90": 39.0
+      },
+      {
+        "week": 5,
+        "mean": 31.2,
+        "p10": 27.0,
+        "p90": 35.0
+      },
+      {
+        "week": 6,
+        "mean": 29.3,
+        "p10": 27.0,
+        "p90": 33.0
+      },
+      {
+        "week": 7,
+        "mean": 22.35,
+        "p10": 11.0,
+        "p90": 32.0
+      },
+      {
+        "week": 8,
+        "mean": 23.35,
+        "p10": 10.0,
+        "p90": 35.0
+      },
+      {
+        "week": 9,
+        "mean": 27.85,
+        "p10": 14.0,
+        "p90": 39.0
+      },
+      {
+        "week": 10,
+        "mean": 29.85,
+        "p10": 15.0,
+        "p90": 43.0
+      },
+      {
+        "week": 11,
+        "mean": 26.45,
+        "p10": 6.0,
+        "p90": 45.0
+      },
+      {
+        "week": 12,
+        "mean": 27.7,
+        "p10": 10.0,
+        "p90": 44.0
+      },
+      {
+        "week": 13,
+        "mean": 23.5,
+        "p10": 8.0,
+        "p90": 45.0
+      },
+      {
+        "week": 14,
+        "mean": 22.9,
+        "p10": 2.0,
+        "p90": 46.0
+      },
+      {
+        "week": 15,
+        "mean": 25.45,
+        "p10": 3.0,
+        "p90": 51.0
+      },
+      {
+        "week": 16,
+        "mean": 26.25,
+        "p10": 6.0,
+        "p90": 52.0
+      },
+      {
+        "week": 17,
+        "mean": 23.5,
+        "p10": 3.0,
+        "p90": 47.0
+      },
+      {
+        "week": 18,
+        "mean": 23.6,
+        "p10": 0.0,
+        "p90": 48.0
+      },
+      {
+        "week": 19,
+        "mean": 24.7,
+        "p10": 0.0,
+        "p90": 58.0
+      },
+      {
+        "week": 20,
+        "mean": 32.55,
+        "p10": 0.0,
+        "p90": 75.0
+      }
+    ],
+    "social": [
+      {
+        "week": 1,
+        "mean": 15.0,
+        "p10": 15.0,
+        "p90": 15.0
+      },
+      {
+        "week": 2,
+        "mean": 21.0,
+        "p10": 21.0,
+        "p90": 21.0
+      },
+      {
+        "week": 3,
+        "mean": 21.0,
+        "p10": 21.0,
+        "p90": 21.0
+      },
+      {
+        "week": 4,
+        "mean": 27.3,
+        "p10": 28.0,
+        "p90": 28.0
+      },
+      {
+        "week": 5,
+        "mean": 27.3,
+        "p10": 28.0,
+        "p90": 28.0
+      },
+      {
+        "week": 6,
+        "mean": 33.3,
+        "p10": 34.0,
+        "p90": 34.0
+      },
+      {
+        "week": 7,
+        "mean": 34.15,
+        "p10": 34.0,
+        "p90": 34.0
+      },
+      {
+        "week": 8,
+        "mean": 34.8,
+        "p10": 33.0,
+        "p90": 38.0
+      },
+      {
+        "week": 9,
+        "mean": 36.55,
+        "p10": 33.0,
+        "p90": 42.0
+      },
+      {
+        "week": 10,
+        "mean": 41.55,
+        "p10": 34.0,
+        "p90": 48.0
+      },
+      {
+        "week": 11,
+        "mean": 43.75,
+        "p10": 34.0,
+        "p90": 51.0
+      },
+      {
+        "week": 12,
+        "mean": 51.05,
+        "p10": 41.0,
+        "p90": 62.0
+      },
+      {
+        "week": 13,
+        "mean": 51.8,
+        "p10": 41.0,
+        "p90": 65.0
+      },
+      {
+        "week": 14,
+        "mean": 57.9,
+        "p10": 47.0,
+        "p90": 72.0
+      },
+      {
+        "week": 15,
+        "mean": 61.4,
+        "p10": 52.0,
+        "p90": 77.0
+      },
+      {
+        "week": 16,
+        "mean": 62.65,
+        "p10": 52.0,
+        "p90": 78.0
+      },
+      {
+        "week": 17,
+        "mean": 64.8,
+        "p10": 52.0,
+        "p90": 82.0
+      },
+      {
+        "week": 18,
+        "mean": 69.35,
+        "p10": 57.0,
+        "p90": 88.0
+      },
+      {
+        "week": 19,
+        "mean": 72.6,
+        "p10": 59.0,
+        "p90": 88.0
+      },
+      {
+        "week": 20,
+        "mean": 78.45,
+        "p10": 65.0,
+        "p90": 99.0
+      }
+    ],
+    "visa_progress": [
+      {
+        "week": 1,
+        "mean": 17.0,
+        "p10": 17.0,
+        "p90": 17.0
+      },
+      {
+        "week": 2,
+        "mean": 18.6,
+        "p10": 17.0,
+        "p90": 21.0
+      },
+      {
+        "week": 3,
+        "mean": 22.85,
+        "p10": 19.0,
+        "p90": 26.0
+      },
+      {
+        "week": 4,
+        "mean": 22.85,
+        "p10": 19.0,
+        "p90": 26.0
+      },
+      {
+        "week": 5,
+        "mean": 33.85,
+        "p10": 30.0,
+        "p90": 37.0
+      },
+      {
+        "week": 6,
+        "mean": 38.85,
+        "p10": 35.0,
+        "p90": 42.0
+      },
+      {
+        "week": 7,
+        "mean": 47.25,
+        "p10": 42.0,
+        "p90": 51.0
+      },
+      {
+        "week": 8,
+        "mean": 63.05,
+        "p10": 58.0,
+        "p90": 67.0
+      },
+      {
+        "week": 9,
+        "mean": 65.4,
+        "p10": 60.0,
+        "p90": 69.0
+      },
+      {
+        "week": 10,
+        "mean": 65.4,
+        "p10": 60.0,
+        "p90": 69.0
+      },
+      {
+        "week": 11,
+        "mean": 66.15,
+        "p10": 60.0,
+        "p90": 70.0
+      },
+      {
+        "week": 12,
+        "mean": 67.45,
+        "p10": 60.0,
+        "p90": 74.0
+      },
+      {
+        "week": 13,
+        "mean": 68.15,
+        "p10": 60.0,
+        "p90": 81.0
+      },
+      {
+        "week": 14,
+        "mean": 68.9,
+        "p10": 60.0,
+        "p90": 81.0
+      },
+      {
+        "week": 15,
+        "mean": 69.9,
+        "p10": 61.0,
+        "p90": 84.0
+      },
+      {
+        "week": 16,
+        "mean": 70.35,
+        "p10": 61.0,
+        "p90": 86.0
+      },
+      {
+        "week": 17,
+        "mean": 71.05,
+        "p10": 61.0,
+        "p90": 93.0
+      },
+      {
+        "week": 18,
+        "mean": 71.2,
+        "p10": 61.0,
+        "p90": 93.0
+      },
+      {
+        "week": 19,
+        "mean": 71.55,
+        "p10": 61.0,
+        "p90": 100.0
+      },
+      {
+        "week": 20,
+        "mean": 71.9,
+        "p10": 61.0,
+        "p90": 100.0
+      }
+    ]
+  },
+  "anomalies": [
+    {
+      "kind": "negative_money",
+      "severity": "critical",
+      "run_id": 1,
+      "week": 0,
+      "policy": "sanitized",
+      "message": "220 occurrence(s) in the private run set. Replay evidence withheld."
+    },
+    {
+      "kind": "cost_money_exceeds_balance",
+      "severity": "warning",
+      "run_id": 2,
+      "week": 0,
+      "policy": "sanitized",
+      "message": "274 occurrence(s) in the private run set. Replay evidence withheld."
+    },
+    {
+      "kind": "single_week_spike",
+      "severity": "warning",
+      "run_id": 3,
+      "week": 0,
+      "policy": "sanitized",
+      "message": "134 occurrence(s) in the private run set. Replay evidence withheld."
+    },
+    {
+      "kind": "hunger_ignored_too_long",
+      "severity": "warning",
+      "run_id": 4,
+      "week": 0,
+      "policy": "sanitized",
+      "message": "1 occurrence(s) in the private run set. Replay evidence withheld."
+    }
+  ],
+  "value_findings": [
+    {
+      "finding_id": "public-finding-01",
+      "scope": "action",
+      "target_id": "sanitized-target-01",
+      "severity": "warning",
+      "metric": "rate_per_run",
+      "value": 3.7,
+      "threshold": 0.8,
+      "description": "Real aggregate signal on rate_per_run; private action/event identifiers were generalized for the public demo."
+    },
+    {
+      "finding_id": "public-finding-02",
+      "scope": "action",
+      "target_id": "sanitized-target-02",
+      "severity": "warning",
+      "metric": "rate_per_run",
+      "value": 17.7,
+      "threshold": 0.8,
+      "description": "Real aggregate signal on rate_per_run; private action/event identifiers were generalized for the public demo."
+    },
+    {
+      "finding_id": "public-finding-03",
+      "scope": "action",
+      "target_id": "sanitized-target-03",
+      "severity": "warning",
+      "metric": "rate_per_run",
+      "value": 11.9,
+      "threshold": 0.8,
+      "description": "Real aggregate signal on rate_per_run; private action/event identifiers were generalized for the public demo."
+    },
+    {
+      "finding_id": "public-finding-04",
+      "scope": "action",
+      "target_id": "sanitized-target-04",
+      "severity": "warning",
+      "metric": "rate_per_run",
+      "value": 14.7,
+      "threshold": 0.8,
+      "description": "Real aggregate signal on rate_per_run; private action/event identifiers were generalized for the public demo."
+    },
+    {
+      "finding_id": "public-finding-05",
+      "scope": "action",
+      "target_id": "sanitized-target-05",
+      "severity": "warning",
+      "metric": "rate_per_run",
+      "value": 4.9,
+      "threshold": 0.8,
+      "description": "Real aggregate signal on rate_per_run; private action/event identifiers were generalized for the public demo."
+    },
+    {
+      "finding_id": "public-finding-06",
+      "scope": "action",
+      "target_id": "sanitized-target-06",
+      "severity": "warning",
+      "metric": "rate_per_run",
+      "value": 2.5,
+      "threshold": 0.8,
+      "description": "Real aggregate signal on rate_per_run; private action/event identifiers were generalized for the public demo."
+    },
+    {
+      "finding_id": "public-finding-07",
+      "scope": "action",
+      "target_id": "sanitized-target-07",
+      "severity": "warning",
+      "metric": "rate_per_run",
+      "value": 1.4,
+      "threshold": 0.8,
+      "description": "Real aggregate signal on rate_per_run; private action/event identifiers were generalized for the public demo."
+    },
+    {
+      "finding_id": "public-finding-08",
+      "scope": "action",
+      "target_id": "sanitized-target-08",
+      "severity": "warning",
+      "metric": "rate_per_run",
+      "value": 8.3,
+      "threshold": 0.8,
+      "description": "Real aggregate signal on rate_per_run; private action/event identifiers were generalized for the public demo."
+    }
+  ],
+  "route_findings": {
+    "groups": [],
+    "crisis_response": [],
+    "ending_contradictions": [],
+    "route_separation": []
+  },
+  "agents": [
+    {
+      "label": "public review summary",
+      "file": "public_review.md",
+      "bytes": "418"
+    }
+  ],
+  "agent_markdown": {
+    "public_review": "# Public Review Summary\n\nThis public report is derived from a real test cell, but raw traces, full event text, and complete rule graphs are not included.\n\n- Runs represented: **20**\n- Top public outcome: **Outcome B - recovery pause**\n- Sanitized anomaly groups: **4**\n- Ending rows shown: **6**\n\nUse the private report bundle for replay-level debugging. This static site is meant for portfolio and stakeholder review."
+  },
+  "gate_report": {
+    "passed": false,
+    "failure_count": 1,
+    "warning_count": 2,
+    "failures": [
+      {
+        "gate": "balance.max_action_rate_per_run",
+        "actual": 17.7,
+        "threshold": 0.8,
+        "message": "one action is picked too often per run"
+      }
+    ],
+    "warnings": [
+      {
+        "gate": "design.content_validation.json",
+        "message": "content_validation.json not found; design gate was not evaluated"
+      },
+      {
+        "gate": "design.event_graph.json",
+        "message": "event_graph.json not found; design gate was not evaluated"
+      }
+    ]
+  },
+  "coverage_report": {
+    "public_demo": true,
+    "source_issue_id_hash": 633020
+  },
+  "raw_runs_count": 20,
+  "public_demo": true,
+  "public_notice": "Sanitized public demo: complete game rules and raw playthroughs are withheld.",
+  "source_summary": {
+    "source_kind": "balance",
+    "source_policy": "balanced",
+    "source_scenario": "first semester",
+    "source_difficulty": "normal"
+  }
+}

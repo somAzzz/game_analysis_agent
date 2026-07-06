@@ -8,6 +8,7 @@ import path from "node:path";
 // writes one. Per-issue manifests live under public/browse/... and the Vite
 // dev server streams them as static files.
 export default defineConfig({
+  base: process.env.VITE_BASE_PATH || "/",
   plugins: [react()],
   resolve: {
     alias: {

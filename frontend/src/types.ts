@@ -19,10 +19,22 @@ export interface IssueCard {
   anomaly_total: number;
   severity: Severity;
   has_decision_graph: boolean;
+  scenario?: string;
+  difficulty?: string;
+  policy?: string;
 }
 
 export interface FrontManifest {
   generated_at: string;
+  public_demo?: boolean;
+  public_notice?: string;
+  source_counts?: {
+    issues?: number;
+    decision_graphs?: number;
+    total_runs?: number;
+    total_anomalies?: number;
+    total_critical?: number;
+  };
   counts: {
     issues: number;
     decision_graphs: number;
@@ -65,6 +77,14 @@ export interface IssueManifest {
   gate_report: { passed?: boolean; failures?: { gate: string; actual: number; threshold: number; message: string }[]; passed_count?: number } | null;
   coverage_report: unknown;
   raw_runs_count: number;
+  public_demo?: boolean;
+  public_notice?: string;
+  source_summary?: {
+    source_kind?: string;
+    source_policy?: string;
+    source_scenario?: string;
+    source_difficulty?: string;
+  };
 }
 
 export interface AnomalyRow {
@@ -141,6 +161,8 @@ export interface DecisionGraphManifest {
     events?: DecisionGraphEvent[];
     [key: string]: unknown;
   };
+  public_demo?: boolean;
+  public_notice?: string;
 }
 
 export interface TriggeredStep {

@@ -314,14 +314,22 @@ export function DecisionGraphPage() {
             The decision <em>graph</em>
           </h1>
           <p className="deck">
-            Every event the engine could trigger — drawn on a single canvas,
-            one lane per <em>event_type</em> seen in the data, {computed.maxWeek}{" "}
-            weeks across. The terracotta line is the path this run actually
-            took; the small numbered badges are the choices the agent picked at
-            each event. Click any node, any week, any choice — the rest of the
-            page will follow.
+            {manifest.public_notice ??
+              `Every event the engine could trigger is drawn on a single canvas,
+              one lane per event_type seen in the data, ${computed.maxWeek} weeks
+              across. The terracotta line is the path this run actually took.`}
           </p>
         </section>
+
+        {manifest.public_demo && (
+          <div className="notice-strip">
+            <strong>Illustrative graph</strong>
+            <span>
+              This public graph is intentionally small. It demonstrates the
+              interaction model without publishing the private full event graph.
+            </span>
+          </div>
+        )}
 
         <div className="dg-shell">
           {/* Legend */}

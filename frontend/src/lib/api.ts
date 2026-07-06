@@ -11,6 +11,14 @@ import type {
   IssueManifest,
 } from "@/types";
 
+const BASE_URL = import.meta.env.BASE_URL || "/";
+
+function assetPath(path: string): string {
+  const cleanBase = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
+  const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+  return `${cleanBase}${cleanPath}`;
+}
+
 export class ManifestError extends Error {
   status?: number;
   constructor(message: string, status?: number) {
@@ -34,7 +42,7 @@ async function fetchJSON<T>(url: string): Promise<T> {
 }
 
 export function fetchFrontManifest(): Promise<FrontManifest> {
-  return fetchJSON<FrontManifest>("/manifest.json");
+  return fetchJSON<FrontManifest>(assetPath("manifest.json"));
 }
 
 export function fetchIssueManifest(
@@ -42,7 +50,7 @@ export function fetchIssueManifest(
   id: string,
 ): Promise<IssueManifest> {
   return fetchJSON<IssueManifest>(
-    `/browse/${encodeURIComponent(kind)}/${encodeURIComponent(id)}/manifest.json`,
+    assetPath(`browse/${encodeURIComponent(kind)}/${encodeURIComponent(id)}/manifest.json`),
   );
 }
 
@@ -51,6 +59,6 @@ export function fetchDecisionGraphManifest(
   runId = 0,
 ): Promise<DecisionGraphManifest> {
   return fetchJSON<DecisionGraphManifest>(
-    `/browse/decision_graph/${encodeURIComponent(issueId)}/${runId}/manifest.json`,
+    assetPath(`browse/decision_graph/${encodeURIComponent(issueId)}/${runId}/manifest.json`),
   );
 }

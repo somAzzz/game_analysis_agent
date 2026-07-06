@@ -1,0 +1,323 @@
+{
+  "generated_at": "2026-07-06T21:07:19.643051+00:00",
+  "public_demo": true,
+  "public_notice": "This dashboard uses real aggregate report data, but private raw runs, complete event graphs, and gameplay text are withheld.",
+  "source_counts": {
+    "issues": 45,
+    "decision_graphs": 1,
+    "total_runs": 844,
+    "total_anomalies": 31757,
+    "total_critical": 43
+  },
+  "counts": {
+    "issues": 12,
+    "decision_graphs": 1,
+    "total_runs": 240,
+    "total_anomalies": 8284,
+    "total_critical": 12
+  },
+  "issues": [
+    {
+      "kind": "balance",
+      "id": "balance-sample-01",
+      "slug": "balance/balance-sample-01",
+      "title": "First Semester / admin / normal",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "admin",
+        "ending_id": "Outcome A - academic risk",
+        "count": 9,
+        "rate": 0.45
+      },
+      "anomaly_total": 298,
+      "severity": "critical",
+      "has_decision_graph": true,
+      "scenario": "first semester",
+      "difficulty": "normal",
+      "policy": "admin"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-02",
+      "slug": "balance/balance-sample-02",
+      "title": "First Semester / balanced / normal",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "balanced",
+        "ending_id": "Outcome B - recovery pause",
+        "count": 6,
+        "rate": 0.3
+      },
+      "anomaly_total": 629,
+      "severity": "critical",
+      "has_decision_graph": false,
+      "scenario": "first semester",
+      "difficulty": "normal",
+      "policy": "balanced"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-03",
+      "slug": "balance/balance-sample-03",
+      "title": "First Semester / random / normal",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "random",
+        "ending_id": "Outcome D - cash pressure",
+        "count": 8,
+        "rate": 0.4
+      },
+      "anomaly_total": 549,
+      "severity": "critical",
+      "has_decision_graph": false,
+      "scenario": "first semester",
+      "difficulty": "normal",
+      "policy": "random"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-04",
+      "slug": "balance/balance-sample-04",
+      "title": "First Semester / slacker / normal",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "slacker",
+        "ending_id": "Outcome A - academic risk",
+        "count": 16,
+        "rate": 0.8
+      },
+      "anomaly_total": 164,
+      "severity": "critical",
+      "has_decision_graph": false,
+      "scenario": "first semester",
+      "difficulty": "normal",
+      "policy": "slacker"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-05",
+      "slug": "balance/balance-sample-05",
+      "title": "First Semester / social / normal",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "social",
+        "ending_id": "Outcome D - cash pressure",
+        "count": 17,
+        "rate": 0.85
+      },
+      "anomaly_total": 1077,
+      "severity": "critical",
+      "has_decision_graph": false,
+      "scenario": "first semester",
+      "difficulty": "normal",
+      "policy": "social"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-06",
+      "slug": "balance/balance-sample-06",
+      "title": "First Semester / study / normal",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "study",
+        "ending_id": "Outcome D - cash pressure",
+        "count": 16,
+        "rate": 0.8
+      },
+      "anomaly_total": 889,
+      "severity": "critical",
+      "has_decision_graph": false,
+      "scenario": "first semester",
+      "difficulty": "normal",
+      "policy": "study"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-07",
+      "slug": "balance/balance-sample-07",
+      "title": "First Semester / work / normal",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "work",
+        "ending_id": "Outcome B - recovery pause",
+        "count": 20,
+        "rate": 1.0
+      },
+      "anomaly_total": 645,
+      "severity": "critical",
+      "has_decision_graph": false,
+      "scenario": "first semester",
+      "difficulty": "normal",
+      "policy": "work"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-08",
+      "slug": "balance/balance-sample-08",
+      "title": "First Semester / admin / realistic",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "admin",
+        "ending_id": "Outcome B - recovery pause",
+        "count": 20,
+        "rate": 1.0
+      },
+      "anomaly_total": 435,
+      "severity": "critical",
+      "has_decision_graph": false,
+      "scenario": "first semester",
+      "difficulty": "realistic",
+      "policy": "admin"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-09",
+      "slug": "balance/balance-sample-09",
+      "title": "First Semester / balanced / realistic",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "balanced",
+        "ending_id": "Outcome B - recovery pause",
+        "count": 17,
+        "rate": 0.85
+      },
+      "anomaly_total": 888,
+      "severity": "critical",
+      "has_decision_graph": false,
+      "scenario": "first semester",
+      "difficulty": "realistic",
+      "policy": "balanced"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-10",
+      "slug": "balance/balance-sample-10",
+      "title": "First Semester / random / realistic",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "random",
+        "ending_id": "Outcome D - cash pressure",
+        "count": 19,
+        "rate": 0.95
+      },
+      "anomaly_total": 734,
+      "severity": "critical",
+      "has_decision_graph": false,
+      "scenario": "first semester",
+      "difficulty": "realistic",
+      "policy": "random"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-11",
+      "slug": "balance/balance-sample-11",
+      "title": "First Semester / slacker / realistic",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "slacker",
+        "ending_id": "Outcome B - recovery pause",
+        "count": 11,
+        "rate": 0.55
+      },
+      "anomaly_total": 761,
+      "severity": "critical",
+      "has_decision_graph": false,
+      "scenario": "first semester",
+      "difficulty": "realistic",
+      "policy": "slacker"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-12",
+      "slug": "balance/balance-sample-12",
+      "title": "First Semester / social / realistic",
+      "subtitle": "Sanitized aggregate from a real first semester test cell. Raw event text and full rule graph are withheld.",
+      "total_runs": 20,
+      "top_ending": {
+        "policy": "social",
+        "ending_id": "Outcome D - cash pressure",
+        "count": 20,
+        "rate": 1.0
+      },
+      "anomaly_total": 1215,
+      "severity": "critical",
+      "has_decision_graph": false,
+      "scenario": "first semester",
+      "difficulty": "realistic",
+      "policy": "social"
+    }
+  ],
+  "issues_index": [
+    {
+      "kind": "balance",
+      "id": "balance-sample-01",
+      "path": "balance/balance-sample-01"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-02",
+      "path": "balance/balance-sample-02"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-03",
+      "path": "balance/balance-sample-03"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-04",
+      "path": "balance/balance-sample-04"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-05",
+      "path": "balance/balance-sample-05"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-06",
+      "path": "balance/balance-sample-06"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-07",
+      "path": "balance/balance-sample-07"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-08",
+      "path": "balance/balance-sample-08"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-09",
+      "path": "balance/balance-sample-09"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-10",
+      "path": "balance/balance-sample-10"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-11",
+      "path": "balance/balance-sample-11"
+    },
+    {
+      "kind": "balance",
+      "id": "balance-sample-12",
+      "path": "balance/balance-sample-12"
+    }
+  ]
+}
