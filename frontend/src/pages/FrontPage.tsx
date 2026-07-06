@@ -52,6 +52,9 @@ export function FrontPage() {
           .includes(q);
       })
       .sort((a, b) => {
+        if (a.has_decision_graph !== b.has_decision_graph) {
+          return a.has_decision_graph ? -1 : 1;
+        }
         if (sort === "anomalies") return b.anomaly_total - a.anomaly_total;
         if (sort === "runs") return b.total_runs - a.total_runs;
         if (sort === "title") return a.title.localeCompare(b.title);
@@ -233,11 +236,17 @@ function IssueCardView({ card, idx }: { card: IssueCard; idx: number }) {
   const topEnding = card.top_ending?.ending_id ?? "n/a";
   const topRate = card.top_ending ? `${(card.top_ending.rate * 100).toFixed(1)}%` : "n/a";
   return (
-    <Link to={`/issue/${card.kind}/${encodeURIComponent(card.id)}`} className="issue-card">
+    <Link
+      to={`/issue/${card.kind}/${encodeURIComponent(card.id)}`}
+      className={`issue-card ${card.has_decision_graph ? "is-featured" : ""}`}
+    >
       <span className="issue-num">
         #{String(idx + 1).padStart(2, "0")} · {card.kind.toUpperCase()}
         {card.has_decision_graph ? " · GRAPH" : ""}
       </span>
+      {card.has_decision_graph && (
+        <span className="graph-ribbon">Open decision graph</span>
+      )}
       <h3>{card.title}</h3>
       <div className="deck">{card.subtitle || "(no subtitle)"}</div>
       <div className="chip-row">

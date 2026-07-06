@@ -347,6 +347,42 @@ main {
   border-bottom-color: var(--paper-deep);
 }
 
+.issue-card.is-featured {
+  grid-column: span 2;
+  padding: 24px 22px;
+  border: 2px solid var(--accent);
+  border-top: 6px solid var(--accent);
+  background:
+    linear-gradient(90deg, rgba(200, 85, 61, 0.12), transparent 42%),
+    var(--paper);
+  box-shadow: 0 12px 34px rgba(31, 27, 22, 0.08);
+}
+
+.issue-card.is-featured:hover {
+  background:
+    linear-gradient(90deg, rgba(200, 85, 61, 0.16), rgba(59, 95, 78, 0.08)),
+    var(--paper-deep);
+}
+
+.issue-card.is-featured h3 {
+  font-size: 36px;
+  max-width: 760px;
+}
+
+.graph-ribbon {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--paper);
+  padding: 5px 9px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .issue-card .issue-num {
   font-family: var(--mono);
   font-size: 11px;
@@ -1166,4 +1202,10 @@ main {
     grid-template-columns: 1fr;
   }
   .trace-panel dl { grid-template-columns: 1fr; }
+  .issue-card.is-featured { grid-column: span 1; }
+  .graph-ribbon {
+    position: static;
+    display: inline-block;
+    margin-top: 10px;
+  }
 }
