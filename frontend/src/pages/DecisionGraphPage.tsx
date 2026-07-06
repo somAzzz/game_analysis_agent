@@ -165,11 +165,6 @@ export function DecisionGraphPage() {
 
   const [manifest, setManifest] = useState<DecisionGraphManifest | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [currentWeek, setCurrentWeek] = useState<number>(0);
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [autoPlay, setAutoPlay] = useState<boolean>(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const rfRef = useRef<unknown>(null);
 
   useEffect(() => {
     if (!decodedRunId) return;
@@ -178,8 +173,48 @@ export function DecisionGraphPage() {
       .catch((err) => setError(err.message ?? String(err)));
   }, [decodedRunId, runIdxNum]);
 
+  if (error) {
+    return (
+      <div style={{ padding: 60 }}>
+        <h1>Decision graph not found</h1>
+        <pre
+          style={{
+            background: "var(--paper-deep)",
+            padding: 18,
+            fontFamily: "var(--mono)",
+            fontSize: 12,
+            color: "var(--ink-soft)",
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {error}
+        </pre>
+        <Link to="/">← Back to front page</Link>
+      </div>
+    );
+  }
+
+  if (!manifest) {
+    return <div style={{ padding: 60 }}>Loading decision graph…</div>;
+  }
+
+  return <DecisionGraphExplorer manifest={manifest} />;
+}
+
+export function DecisionGraphExplorer({
+  manifest,
+  embedded = false,
+}: {
+  manifest: DecisionGraphManifest;
+  embedded?: boolean;
+}) {
+  const [currentWeek, setCurrentWeek] = useState<number>(0);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [autoPlay, setAutoPlay] = useState<boolean>(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const rfRef = useRef<unknown>(null);
+
   const computed: ComputedGraph | null = useMemo(() => {
-    if (!manifest) return null;
     return computeGraph(manifest);
   }, [manifest]);
 
@@ -239,28 +274,7 @@ export function DecisionGraphPage() {
     return () => clearInterval(id);
   }, [autoPlay, computed]);
 
-  if (error) {
-    return (
-      <div style={{ padding: 60 }}>
-        <h1>Decision graph not found</h1>
-        <pre
-          style={{
-            background: "var(--paper-deep)",
-            padding: 18,
-            fontFamily: "var(--mono)",
-            fontSize: 12,
-            color: "var(--ink-soft)",
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {error}
-        </pre>
-        <Link to="/">← Back to front page</Link>
-      </div>
-    );
-  }
-
-  if (!computed || !layout || !manifest) {
+  if (!computed || !layout) {
     return <div style={{ padding: 60 }}>Loading decision graph…</div>;
   }
 
@@ -274,51 +288,55 @@ export function DecisionGraphPage() {
 
   return (
     <ReactFlowProvider>
-      <div>
-        <header className="masthead">
-          <span className="kicker">
-            <Link to={`/issue/balance/${encodeURIComponent(decodedRunId)}`}>
-              ← Back to issue
-            </Link>
-          </span>
-          <span className="issue-line">
-            Decision graph · run seed {String(manifest.seed ?? "—")} · policy{" "}
-            <em>{manifest.policy}</em>
-          </span>
-          <span className="date">{new Date().toUTCString()}</span>
-        </header>
+      <div className={embedded ? "dg-embedded" : ""}>
+        {!embedded && (
+          <>
+            <header className="masthead">
+              <span className="kicker">
+                <Link to={`/issue/balance/${encodeURIComponent(manifest.issue_id)}`}>
+                  ← Back to issue
+                </Link>
+              </span>
+              <span className="issue-line">
+                Decision graph · run seed {String(manifest.seed ?? "—")} · policy{" "}
+                <em>{manifest.policy}</em>
+              </span>
+              <span className="date">{new Date().toUTCString()}</span>
+            </header>
 
-        <section className="cover">
-          <div className="issue-meta">
-            <span>
-              <strong>{manifest.policy}</strong>
-              policy played
-            </span>
-            <span>
-              <strong>{computed.events.length}</strong>
-              events triggered
-            </span>
-            <span>
-              <strong>{computed.maxWeek}</strong>
-              weeks simulated
-            </span>
-            <span>
-              <strong>{manifest.final_ending_id || "unknown"}</strong>
-              final ending
-            </span>
-          </div>
-          <h1>
-            The decision <em>graph</em>
-          </h1>
-          <p className="deck">
-            {manifest.public_notice ??
-              `Every event the engine could trigger is drawn on a single canvas,
-              one lane per event_type seen in the data, ${computed.maxWeek} weeks
-              across. The terracotta line is the path this run actually took.`}
-          </p>
-        </section>
+            <section className="cover">
+              <div className="issue-meta">
+                <span>
+                  <strong>{manifest.policy}</strong>
+                  policy played
+                </span>
+                <span>
+                  <strong>{computed.events.length}</strong>
+                  events triggered
+                </span>
+                <span>
+                  <strong>{computed.maxWeek}</strong>
+                  weeks simulated
+                </span>
+                <span>
+                  <strong>{manifest.final_ending_id || "unknown"}</strong>
+                  final ending
+                </span>
+              </div>
+              <h1>
+                The decision <em>graph</em>
+              </h1>
+              <p className="deck">
+                {manifest.public_notice ??
+                  `Every event the engine could trigger is drawn on a single canvas,
+                  one lane per event_type seen in the data, ${computed.maxWeek} weeks
+                  across. The terracotta line is the path this run actually took.`}
+              </p>
+            </section>
+          </>
+        )}
 
-        {manifest.public_demo && (
+        {manifest.public_demo && !embedded && (
           <div className="notice-strip">
             <strong>Illustrative graph</strong>
             <span>
@@ -328,7 +346,7 @@ export function DecisionGraphPage() {
           </div>
         )}
 
-        <div className="dg-shell">
+        <div className={embedded ? "dg-shell dg-shell-embedded" : "dg-shell"}>
           {/* Legend */}
           <div
             style={{

@@ -1,8 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import { fetchIssueManifest } from "@/lib/api";
-import type { AnomalyRow, IssueManifest, ValueFinding, WeeklyPoint } from "@/types";
+import { fetchDecisionGraphManifest, fetchIssueManifest } from "@/lib/api";
+import { DecisionGraphExplorer } from "@/pages/DecisionGraphPage";
+import type {
+  AnomalyRow,
+  DecisionGraphManifest,
+  IssueManifest,
+  ValueFinding,
+  WeeklyPoint,
+} from "@/types";
 
 const SPARK_METRICS: { key: string; color: string; label: string }[] = [
   { key: "stress", color: "var(--accent)", label: "stress" },
@@ -52,7 +59,7 @@ export function IssuePage() {
   return (
     <div>
       <Cover manifest={manifest} />
-      {manifest.kind === "balance" && <DecisionGraphSpotlight manifest={manifest} />}
+      {manifest.kind === "balance" && <EmbeddedDecisionGraph issueId={manifest.id} />}
 
       {manifest.gate_report && (
         <div
@@ -73,9 +80,9 @@ export function IssuePage() {
         {manifest.anomalies.length > 0 && <a href="#anomalies">Anomalies</a>}
         {manifest.hasOwnProperty("source_summary") && <a href="#trace">Trace</a>}
         {manifest.kind === "balance" && (
-          <Link className="tab-cta" to={`/decision-graph/${encodeURIComponent(manifest.id)}/0`}>
+          <a className="tab-cta" href="#decision-graph">
             Decision graph
-          </Link>
+          </a>
         )}
       </nav>
 
@@ -140,23 +147,34 @@ function Cover({ manifest }: { manifest: IssueManifest }) {
   );
 }
 
-function DecisionGraphSpotlight({ manifest }: { manifest: IssueManifest }) {
+function EmbeddedDecisionGraph({ issueId }: { issueId: string }) {
+  const [manifest, setManifest] = useState<DecisionGraphManifest | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchDecisionGraphManifest(issueId, 0)
+      .then(setManifest)
+      .catch((err) => setError(err.message ?? String(err)));
+  }, [issueId]);
+
   return (
-    <section className="graph-spotlight" aria-label="Decision graph entry">
+    <section
+      id="decision-graph"
+      className="graph-spotlight graph-spotlight-embedded"
+      aria-label="Decision graph"
+    >
       <div className="graph-spotlight-copy">
         <span className="graph-eyebrow">Interactive flow map</span>
-        <h2>Open the decision graph</h2>
+        <h2>Decision graph</h2>
         <p>
-          Follow the highlighted path, inspect the mock branches, and click any
-          node to see route options without exposing the private full event graph.
+          The graph is embedded here so the report can be read and explored in
+          one place. Follow the highlighted path, inspect mock branches, and
+          click any node to see route options.
         </p>
       </div>
-      <Link
-        className="graph-spotlight-cta"
-        to={`/decision-graph/${encodeURIComponent(manifest.id)}/0`}
-      >
-        Launch graph
-      </Link>
+      {error && <div className="graph-inline-state">Graph unavailable: {error}</div>}
+      {!error && !manifest && <div className="graph-inline-state">Loading graph...</div>}
+      {manifest && <DecisionGraphExplorer manifest={manifest} embedded />}
     </section>
   );
 }
