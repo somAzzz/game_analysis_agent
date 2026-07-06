@@ -52,6 +52,10 @@ from game_analysis_agent.bug_summarizer import write_bug_summary  # noqa: E402
 from game_analysis_agent.env import load_dotenv  # noqa: E402
 from game_analysis_agent.llm_client import LocalLLMClient  # noqa: E402
 from game_analysis_agent.quality_gates import evaluate_report_dir, write_gate_report  # noqa: E402
+from game_analysis_agent.report_manifest import (  # noqa: E402
+    write_report_manifest,
+    write_reports_index,
+)
 from game_analysis_agent.settings import get_settings  # noqa: E402
 from game_analysis_agent.value_analyzer import analyze_and_write  # noqa: E402
 
@@ -175,6 +179,21 @@ def cmd_sim(args: argparse.Namespace) -> int:
 
     out_dir = ROOT / "reports" / "balance" / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
+    write_report_manifest(
+        out_dir,
+        report_type="balance",
+        run_id=run_id,
+        command="sim",
+        parameters={
+            "runs": runs,
+            "policy": policy,
+            "seed": seed,
+            "weeks": weeks,
+            "difficulty": difficulty,
+            "scenario": scenario,
+        },
+        status="started",
+    )
     target_out = ROOT / "reports" / "balance" / run_id / "raw_runs.jsonl"
     # Simpler: write to res://balance_runs.jsonl then cp.
     extra_args = [
@@ -200,6 +219,23 @@ def cmd_sim(args: argparse.Namespace) -> int:
     if not copied:
         print("Could not find Godot output: balance_runs.jsonl", file=sys.stderr)
         return 4
+    write_report_manifest(
+        out_dir,
+        report_type="balance",
+        run_id=run_id,
+        command="sim",
+        parameters={
+            "runs": runs,
+            "policy": policy,
+            "seed": seed,
+            "weeks": weeks,
+            "difficulty": difficulty,
+            "scenario": scenario,
+        },
+        source_files=[target_out],
+        generated_files=[target_out],
+        status="simulated",
+    )
     print(f"Copied raw runs to {target_out}")
     return cmd_analyze(
         argparse.Namespace(
@@ -218,7 +254,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         return 1
     runs = load_runs(raw_path)
     out_dir = args.report_dir
-    analyze(runs, out_dir)
+    analyze(runs, out_dir, raw_runs_path=raw_path)
     if args.run_anomalies:
         from game_analysis_agent.anomaly_detector import detect_and_write
 
@@ -226,6 +262,32 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         write_bug_summary(anomalies, out_dir)
     if args.run_value:
         analyze_and_write(out_dir)
+    write_report_manifest(
+        out_dir,
+        report_type="balance",
+        run_id=out_dir.name,
+        command="analyze",
+        parameters={
+            "run_anomalies": bool(args.run_anomalies),
+            "run_value": bool(args.run_value),
+        },
+        source_files=[raw_path],
+        generated_files=[
+            "summary.json",
+            "ending_distribution.csv",
+            "weekly_stats.csv",
+            "action_pick_rates.csv",
+            "event_trigger_rates.csv",
+            "choice_pick_rates.csv",
+            "coverage_report.json",
+            "anomalies.jsonl",
+            "bugs.jsonl",
+            "bugs_summary.md",
+            "value_report.json",
+            "route_report.json",
+        ],
+        summary={"total_runs": len(runs)},
+    )
     print(f"Analysis written to {out_dir}")
     return 0
 
@@ -235,6 +297,20 @@ def cmd_probe(args: argparse.Namespace) -> int:
     run_id = args.run_id or f"boundary-{uuid.uuid4().hex[:6]}"
     out_dir = ROOT / "reports" / "boundary" / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
+    write_report_manifest(
+        out_dir,
+        report_type="boundary",
+        run_id=run_id,
+        command="probe",
+        parameters={
+            "runs": args.runs,
+            "policy": _canonical_policy(args.policy),
+            "seed": args.seed,
+            "weeks": args.weeks,
+            "extreme": args.extreme,
+        },
+        status="started",
+    )
     target_out = out_dir / "boundary_runs.jsonl"
     extra_args = [
         f"--runs={args.runs}",
@@ -265,6 +341,22 @@ def cmd_probe(args: argparse.Namespace) -> int:
 
     anomalies = detect_and_write(runs, out_dir)
     write_bug_summary(anomalies, out_dir)
+    write_report_manifest(
+        out_dir,
+        report_type="boundary",
+        run_id=run_id,
+        command="probe",
+        source_files=[target_out],
+        generated_files=[
+            target_out,
+            "anomalies.jsonl",
+            "bugs.jsonl",
+            "bugs_summary.md",
+            "value_report.json",
+            "route_report.json",
+        ],
+        summary={"total_runs": len(runs), "anomalies": len(anomalies)},
+    )
     print(f"Boundary probe complete; {len(runs)} runs -> {target_out}")
     return 0
 
@@ -302,6 +394,17 @@ def cmd_validate(args: argparse.Namespace) -> int:
     (args.report_dir / "validation_summary.json").write_text(
         __import__("json").dumps(summary, ensure_ascii=False, indent=2),
         encoding="utf-8",
+    )
+    write_report_manifest(
+        args.report_dir,
+        report_type="validation",
+        run_id=args.report_dir.name,
+        command="validate",
+        parameters={"checks": selected},
+        generated_files=["validation_summary.json"]
+        + [result["output_file"] for result in results if result.get("output_file")],
+        status="failed" if failed else "completed",
+        summary={"passed": not failed, "check_count": len(results)},
     )
     return 1 if failed else 0
 
@@ -384,6 +487,20 @@ def cmd_gates(args: argparse.Namespace) -> int:
     report = evaluate_report_dir(args.report_dir, gates_path)
     out = args.out or (args.report_dir / "gate_report.json")
     write_gate_report(report, out)
+    write_report_manifest(
+        args.report_dir,
+        report_type="gate",
+        run_id=args.report_dir.name,
+        command="gates",
+        source_files=[args.gates or (ROOT / "config" / "gates.yaml")],
+        generated_files=[out],
+        status="completed" if report["passed"] else "failed",
+        summary={
+            "passed": report["passed"],
+            "failure_count": report.get("failure_count", 0),
+            "warning_count": report.get("warning_count", 0),
+        },
+    )
     print(f"Gate report written to {out}")
     if not report["passed"]:
         for failure in report["failures"]:
@@ -413,6 +530,13 @@ def cmd_export(args: argparse.Namespace) -> int:
         "action_catalog.json",
         args.report_dir / "action_catalog.json",
     )
+    write_report_manifest(
+        args.report_dir,
+        report_type="catalog",
+        run_id=args.report_dir.name,
+        command="export",
+        generated_files=["event_graph.json", "action_catalog.json"],
+    )
     print(f"Event graph copied to {target}")
     return 0
 
@@ -433,6 +557,15 @@ def cmd_qa(args: argparse.Namespace) -> int:
         )
         result = agent.run(args.report_dir)
         written = write_agent_result(args.report_dir, result)
+        write_report_manifest(
+            args.report_dir,
+            report_type="agent_qa",
+            run_id=args.report_dir.name,
+            command="qa",
+            parameters={"agent": agent_name},
+            generated_files=written,
+            summary={"agent": agent_name, "output_count": len(written)},
+        )
         for path in written:
             print(f"[{agent_name}] {path}")
     return 0
@@ -480,6 +613,27 @@ def cmd_play(args: argparse.Namespace) -> int:
         seed=int(getattr(args, "seed", 42) or 42),
     )
     result, written = agent.play_through(args.report_dir)
+    write_report_manifest(
+        args.report_dir,
+        report_type="play",
+        run_id=args.report_dir.name,
+        command="play",
+        parameters={
+            "persona": persona,
+            "weeks": args.weeks,
+            "difficulty": getattr(args, "difficulty", None) or "normal",
+            "scenario": getattr(args, "scenario", None) or "default_first_semester",
+            "seed": int(getattr(args, "seed", 42) or 42),
+            "provider": llm.provider,
+            "model": llm.model,
+        },
+        generated_files=written,
+        summary={
+            "final_ending": result.final_ending,
+            "steps": len(result.steps),
+            "llm_calls": len(result.report.llm_calls),
+        },
+    )
     for path in written:
         print(f"[interactive_player] {path}")
     print(
@@ -502,6 +656,13 @@ def cmd_all(args: argparse.Namespace) -> int:
             agents=[name for name in AGENT_NAMES if name != "interactive_player"],
         )
     )
+
+
+def cmd_index(args: argparse.Namespace) -> int:
+    index = write_reports_index(args.reports)
+    print(f"Report index written to {args.reports / 'report_index.json'}")
+    print(f"Indexed {index['report_count']} reports")
+    return 0
 
 
 # ---------------------------------------------------------------------------
@@ -577,6 +738,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validator to run. Repeatable. Default: content + json-content + economy + risk.",
     )
     validate_p.set_defaults(func=cmd_validate)
+
+    index_p = sub.add_parser(
+        "index", help="Build reports/report_index.json from report manifests."
+    )
+    index_p.add_argument(
+        "--reports",
+        type=Path,
+        default=ROOT / "reports",
+        help="Reports root to scan.",
+    )
+    index_p.set_defaults(func=cmd_index)
 
     gates_p = sub.add_parser("gates", help="Evaluate config/gates.yaml against a report dir.")
     gates_p.add_argument("--report-dir", type=Path, required=True)

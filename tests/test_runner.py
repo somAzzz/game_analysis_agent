@@ -104,6 +104,11 @@ def test_sim_runs_full_pipeline_with_mocked_godot(run_gameplay_agent, tmp_path) 
     assert rc == 0
     out = ROOT / "reports" / "balance" / "test" / "raw_runs.jsonl"
     assert out.exists()
+    manifest = ROOT / "reports" / "balance" / "test" / "report_manifest.json"
+    assert manifest.exists()
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    assert payload["run_id"] == "test"
+    assert payload["trace"]["runs"][0]["run_id"] == 0
 
 
 def test_sim_passes_scenario_and_policy_alias(run_gameplay_agent, tmp_path) -> None:

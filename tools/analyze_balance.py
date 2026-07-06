@@ -25,13 +25,14 @@ from game_analysis_agent.analytics import (  # noqa: E402
     write_csv,
 )
 from game_analysis_agent.coverage import analyze_and_write_coverage  # noqa: E402
+from game_analysis_agent.report_manifest import write_report_manifest  # noqa: E402
 
 
 def usage() -> None:
     print("Usage: python3 tools/analyze_balance.py <raw_runs.jsonl> <out_dir>")
 
 
-def analyze(runs: list[dict], out_dir: Path) -> dict[str, list]:
+def analyze(runs: list[dict], out_dir: Path, *, raw_runs_path: Path | None = None) -> dict[str, list]:
     out_dir.mkdir(parents=True, exist_ok=True)
     ending_rows = compute_ending_distribution(runs)
     action_rows = compute_action_pick_rates(runs)
@@ -77,6 +78,18 @@ def analyze(runs: list[dict], out_dir: Path) -> dict[str, list]:
         __import__("json").dumps(summary, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+    write_report_manifest(
+        out_dir,
+        report_type="balance",
+        command="analyze_balance",
+        source_files=[raw_runs_path or (out_dir / "raw_runs.jsonl")],
+        generated_files=summary["generated_files"] + ["summary.json"],
+        summary={
+            "total_runs": summary.get("total_runs", len(runs)),
+            "policies": summary.get("policies", {}),
+            "run_id_count": len({run.get("run_id") for run in runs}),
+        },
+    )
     return {
         "ending_rows": ending_rows,
         "action_rows": action_rows,
@@ -96,7 +109,7 @@ def main() -> int:
         print(f"Missing raw file: {raw_path}", file=sys.stderr)
         return 1
     runs = load_runs(raw_path)
-    analyze(runs, out_dir)
+    analyze(runs, out_dir, raw_runs_path=raw_path)
     print(f"Analysis written to {out_dir}")
     return 0
 

@@ -22,6 +22,7 @@ class AnalyzeBalanceTest(unittest.TestCase):
             self.assertTrue((out / "summary.json").exists())
             self.assertTrue((out / "ending_distribution.csv").exists())
             self.assertTrue((out / "weekly_stats.csv").exists())
+            self.assertTrue((out / "report_manifest.json").exists())
 
 
 if __name__ == "__main__":
