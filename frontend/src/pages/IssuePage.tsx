@@ -78,11 +78,6 @@ export function IssuePage() {
         <a href="#agents">Agent columns</a>
         {manifest.anomalies.length > 0 && <a href="#anomalies">Anomalies</a>}
         {manifest.hasOwnProperty("source_summary") && <a href="#trace">Trace</a>}
-        {manifest.kind === "balance" && (
-          <a className="tab-cta" href="#decision-graph">
-            Decision graph
-          </a>
-        )}
       </nav>
 
       <main>

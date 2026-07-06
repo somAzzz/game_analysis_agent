@@ -941,13 +941,6 @@ main {
 
 .tab-rail a:hover { background: var(--paper-deep); border-bottom-color: var(--ink); }
 
-.tab-rail .tab-cta {
-  margin-left: auto;
-  background: var(--accent);
-  color: var(--paper);
-  border-bottom-color: var(--accent-deep);
-}
-
 .tab-rail a.active {
   background: var(--ink);
   color: var(--paper);
