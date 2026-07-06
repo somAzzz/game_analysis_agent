@@ -1,0 +1,54 @@
+# Quality gates for the v0.2 demo.
+#
+# These thresholds are referenced by docs/ACTION_PLAN.md T08 and feed the
+# future ``gates`` subcommand of ``tools/run_gameplay_agent.py``. For now
+# they are documented in code only and not enforced automatically — run
+# the matrix and inspect the per-dimension counts by hand.
+#
+# Each section answers a different question:
+#
+# * ``critical_fail`` — pass/fail hard invariants. Any non-zero value is a
+#   ship-blocker (numerical corruption, stuck engine, rule-of-the-game
+#   contradictions).
+# * ``balance`` — quality targets. A run that violates these is *playable*
+#   but the designer should iterate.
+# * ``design`` — content / narrative quality. These are aspirational and
+#   mostly rely on the LLM agents (content_qa / event_graph) to flag
+#   violations.
+
+critical_fail:
+  # Universal invariants — every matrix cell must hit these.
+  ending_id_empty: 0
+  pipeline_stalled: 0
+  stat_overflow: 0
+  stat_underflow: 0
+  # Game-semantic invariants (added in v0.2 review action plan T04).
+  crisis_success_ending: 0
+  social_success_under_survival_crisis: 0
+  academic_success_with_failed_courses: 0
+  visa_success_without_registration: 0
+  testdaf_pass_with_low_language: 0
+  aps_pass_with_low_aps_knowledge: 0
+
+balance:
+  # Hard ceilings — anything above is a play-balance bug.
+  max_single_ending_rate_normal: 0.45
+  max_single_ending_rate_realistic: 0.55
+  max_action_rate_per_run: 0.80
+  max_recovery_group_rate_per_run: 2.5
+  max_escape_group_rate_per_run: 2.0
+  # Hard floors — anything below is "路线没有分化" or "难度太软".
+  min_distinct_endings_normal: 5
+  min_distinct_endings_realistic: 4
+  min_study_group_rate_per_run: 1.0
+  min_work_group_rate_per_run: 0.5
+  min_route_distance: 0.15
+
+design:
+  # Content QA targets — checked by content_qa agent.
+  max_generated_choice_ratio_key_events: 0.20
+  min_key_event_tradeoff_score: 0.70
+  # Event-graph coverage targets — checked by event_graph agent.
+  min_event_trigger_rate_for_key_events: 0.10
+  # Play-test targets — checked by interactive_player agent.
+  max_playthrough_anomalies_per_5_weeks: 1

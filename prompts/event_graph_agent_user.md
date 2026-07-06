@@ -18,6 +18,8 @@ Output:
 ## Reachability Notes
 ## Suggested Fixes
 
+{{UNTRIGGERED_EVENTS}}
+
 Event graph bundle:
 
 {{REPORT_BUNDLE}}

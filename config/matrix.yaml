@@ -1,0 +1,64 @@
+# Test matrix for the study-in-germany v0.2 demo.
+#
+# This file describes the cells of the simulation matrix. The CLI does not
+# (yet) read this file automatically; it is a single source of truth for
+# the human who runs the matrix and for any future automation that wants
+# to spawn N parallel ``run_gameplay_agent.py all`` jobs.
+#
+# See docs/REVIEW_FEEDBACK.md §15 and docs/ACTION_PLAN.md T08.
+
+version: demo-v02
+weeks: 20
+runs_per_cell: 200
+seeds: [42, 43, 44]
+
+difficulties:
+  - normal
+  - realistic
+
+policies:
+  - random
+  - balanced
+  - study
+  - money
+  - social
+  - visa
+  - slacker
+
+boundary:
+  runs: 30
+  seed: 42
+  weeks: 20
+  policy: balanced
+  extremes:
+    - zero_money
+    - deep_debt
+    - no_energy
+    - all_negative
+    - no_language
+    - flag_chaos
+    - week_zero
+    - already_registered
+
+play:
+  default_persona: newbie
+  personas:
+    - newbie
+    - study
+    - money
+    - social
+    - visa
+    - slacker
+  weeks: 20
+  difficulty: realistic
+  seeds: [42]
+
+compare:
+  output_dir: reports/compare
+  include:
+    - ending_distribution.csv
+    - action_pick_rates.csv
+    - weekly_stats.csv
+    - anomalies.jsonl
+    - value_report.json
+    - route_report.json

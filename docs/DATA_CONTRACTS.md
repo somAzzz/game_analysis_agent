@@ -162,7 +162,23 @@ balanced,visa_delay,email_foreigners_office,90,0.64
 `kind` 取值：`negative_money` / `stat_overflow` / `stat_underflow` /
 `non_repeatable_event_repeated` / `dead_state` / `week_overflow` /
 `single_week_spike` / `cost_money_exceeds_balance` / `pipeline_stalled` /
-`ending_id_empty`。
+`ending_id_empty` /
+`crisis_success_ending` / `social_success_under_survival_crisis` /
+`academic_success_with_failed_courses` / `visa_success_without_registration` /
+`testdaf_pass_with_low_language` / `aps_pass_with_low_aps_knowledge` /
+`black_work_without_risk` / `hunger_ignored_too_long` /
+`stress_zero_lock` / `social_overflow_pattern`。
+
+游戏语义类 kind 的 evidence 字段示例：
+
+```json
+{"kind": "crisis_success_ending", "evidence": {"ending_id": "academic_success", "money": -1500, "threshold": -1000}}
+{"kind": "social_success_under_survival_crisis", "evidence": {"ending_id": "social_connector", "hunger": 92, "stress": 88}}
+{"kind": "testdaf_pass_with_low_language", "evidence": {"language": 18, "threshold": 25}}
+{"kind": "hunger_ignored_too_long", "evidence": {"streak_weeks": 8}}
+```
+
+详细规则见 `src/game_analysis_agent/anomaly_semantics.py`。
 
 ### bugs.jsonl
 

@@ -27,6 +27,17 @@ AnomalyKind = Literal[
     "cost_money_exceeds_balance",
     "pipeline_stalled",
     "ending_id_empty",
+    # Game-semantic invariants (added in v0.2 review action plan T03).
+    "crisis_success_ending",
+    "social_success_under_survival_crisis",
+    "academic_success_with_failed_courses",
+    "visa_success_without_registration",
+    "testdaf_pass_with_low_language",
+    "aps_pass_with_low_aps_knowledge",
+    "black_work_without_risk",
+    "hunger_ignored_too_long",
+    "stress_zero_lock",
+    "social_overflow_pattern",
 ]
 AnomalySeverity = Literal["info", "warning", "error", "critical"]
 
@@ -143,7 +154,16 @@ class ValueFinding(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     finding_id: str
-    scope: Literal["action", "event", "choice", "ending"]
+    scope: Literal[
+        "action",
+        "event",
+        "choice",
+        "ending",
+        "action_group",
+        "crisis_response",
+        "ending_contradiction",
+        "route",
+    ]
     target_id: str
     severity: AnomalySeverity
     metric: str

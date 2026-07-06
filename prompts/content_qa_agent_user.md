@@ -15,6 +15,8 @@ Output a table:
 
 event_id | issue_type | severity | explanation | suggested_fix
 
+{{CHOICE_STRUCTURE_FINDINGS}}
+
 Content bundle:
 
 {{REPORT_BUNDLE}}

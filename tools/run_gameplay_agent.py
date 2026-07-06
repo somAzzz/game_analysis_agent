@@ -256,7 +256,10 @@ def cmd_play(args: argparse.Namespace) -> int:
     if not llm.settings.deepseek_configured() and llm.provider == "deepseek":
         print("DeepSeek key not configured; set DEEPSEEK_API_KEY before using `play`.", file=sys.stderr)
         return 5
-    from game_analysis_agent.agents.interactive_player import InteractivePlayerAgent
+    from game_analysis_agent.agents.interactive_player import (
+        InteractivePlayerAgent,
+        PERSONAS,
+    )
     from game_analysis_agent.game_tools import (
         TOOL_DEFINITIONS,
         build_probe,
@@ -265,6 +268,13 @@ def cmd_play(args: argparse.Namespace) -> int:
 
     probe = build_probe(settings)
     tool_map = build_tool_map(probe)
+    persona = getattr(args, "persona", None) or "newbie"
+    if persona not in PERSONAS:
+        print(
+            f"Unknown persona {persona!r}; valid: {sorted(PERSONAS)}",
+            file=sys.stderr,
+        )
+        return 6
 
     agent = InteractivePlayerAgent(
         llm=llm,
@@ -273,10 +283,17 @@ def cmd_play(args: argparse.Namespace) -> int:
         tool_definitions=TOOL_DEFINITIONS,
         tool_map=tool_map,
         max_weeks=args.weeks,
+        persona=persona,
+        difficulty=getattr(args, "difficulty", None) or "normal",
+        seed=int(getattr(args, "seed", 42) or 42),
     )
     result, written = agent.play_through(args.report_dir)
     for path in written:
         print(f"[interactive_player] {path}")
+    print(
+        f"[interactive_player] ending={result.final_ending} "
+        f"steps={len(result.steps)}"
+    )
     return 0
 
 
@@ -374,6 +391,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Where to write playthrough.jsonl + playthrough_summary.md.",
     )
     play_p.add_argument("--weeks", type=int, default=20)
+    play_p.add_argument(
+        "--persona",
+        default="newbie",
+        choices=("newbie", "study", "money", "social", "visa", "slacker"),
+        help="LLM player persona to drive the playthrough.",
+    )
+    play_p.add_argument(
+        "--difficulty", default="normal", help="Godot difficulty to inject into the probe."
+    )
+    play_p.add_argument(
+        "--seed", type=int, default=42, help="Seed passed to the persona block."
+    )
     play_p.set_defaults(func=cmd_play)
 
     all_p = sub.add_parser("all", help="sim -> analyze -> qa in one command.")

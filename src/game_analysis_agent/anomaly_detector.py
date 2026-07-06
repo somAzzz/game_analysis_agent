@@ -25,6 +25,7 @@ from game_analysis_agent.analytics import (
     NON_NEGATIVE_METRICS,
     UPPER_BOUNDED_METRICS,
 )
+from game_analysis_agent.anomaly_semantics import check_semantic_invariants
 from game_analysis_agent.schemas import (
     Anomaly,
     AnomalyKind,
@@ -274,6 +275,12 @@ def _scan_single_run(
                 message="Run ended without producing a concrete ending_id.",
             )
         )
+
+    # Game-semantic invariants (T04). These rules look at the
+    # final ending alongside the final / weekly state and the run's
+    # flag dict, and surface rule-of-the-game contradictions that the
+    # generic invariants cannot catch.
+    anomalies.extend(check_semantic_invariants(run))
 
     return anomalies
 

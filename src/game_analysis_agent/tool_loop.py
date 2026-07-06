@@ -268,6 +268,8 @@ def _json_final_answer(parsed: dict[str, Any] | None, raw_content: str) -> str |
 def _json_choice_to_tool_call(
     parsed: dict[str, Any] | None,
     round_index: int,
+    *,
+    index_hint: int = 0,
 ) -> dict[str, Any] | None:
     if parsed is None:
         return None
@@ -278,10 +280,59 @@ def _json_choice_to_tool_call(
     if not isinstance(raw_args, str):
         raw_args = json.dumps(raw_args or {})
     return {
-        "id": f"json-call-{round_index}",
+        "id": f"json-call-{round_index}-{index_hint}",
         "type": "function",
         "function": {"name": name, "arguments": raw_args},
     }
+
+
+def parse_model_response_to_tool_calls(
+    content: str,
+    *,
+    round_index: int = 0,
+) -> list[dict[str, Any]]:
+    """Extract tool calls from a raw model message.
+
+    Two on-the-wire JSON shapes are accepted as a *fallback* for
+    providers (notably local Qwen) that struggle with native OpenAI
+    ``tool_calls``:
+
+    1. ``{"tool": "foo", "arguments": {...}}`` — single-tool shorthand.
+    2. ``{"tool_calls": [{"name": "foo", "arguments": {...}}, ...]}`` —
+       OpenAI-style array. Each entry may use either ``name`` / ``arguments``
+       or the nested ``function.name`` / ``function.arguments`` form.
+
+    Returns an empty list when the content is not JSON, when the JSON
+    has no tool indicator, or when the JSON cannot be parsed. Errors
+    never raise — the caller treats an empty list as "no fallback
+    tool calls available".
+    """
+    parsed = _parse_json_choice(content)
+    if parsed is None:
+        return []
+
+    # Shape 1: single-tool shorthand.
+    if parsed.get("tool") or parsed.get("name"):
+        single = _json_choice_to_tool_call(parsed, round_index, index_hint=0)
+        return [single] if single is not None else []
+
+    # Shape 2: array of tool calls.
+    raw_calls = parsed.get("tool_calls")
+    if isinstance(raw_calls, list) and raw_calls:
+        collected: list[dict[str, Any]] = []
+        for idx, entry in enumerate(raw_calls):
+            if not isinstance(entry, dict):
+                continue
+            sub = dict(entry)
+            if "function" in sub and isinstance(sub["function"], dict):
+                sub.setdefault("name", sub["function"].get("name"))
+                sub.setdefault("arguments", sub["function"].get("arguments", {}))
+            call = _json_choice_to_tool_call(sub, round_index, index_hint=idx)
+            if call is not None:
+                collected.append(call)
+        return collected
+
+    return []
 
 
 class OpenAICompatibleToolLoop:
@@ -391,6 +442,34 @@ class OpenAICompatibleToolLoop:
             message = response.choices[0].message
             content = _field(message, "content", None) or ""
             tool_calls = list(_field(message, "tool_calls", None) or [])
+            # JSON fallback for local Qwen / providers that don't emit
+            # native tool_calls. We only fall back when the model returned
+            # zero native tool calls *and* the content actually parses as a
+            # JSON tool invocation; otherwise we treat content as the
+            # final answer (and prefer the extracted ``final_answer`` if the
+            # model wrapped the answer in JSON).
+            if not tool_calls:
+                fallback_calls = parse_model_response_to_tool_calls(
+                    content, round_index=round_index
+                )
+                if fallback_calls:
+                    tool_calls = fallback_calls
+                else:
+                    parsed = _parse_json_choice(content)
+                    final_text = _json_final_answer(parsed, content) or content
+                    audit = self._build_audit(
+                        transcript,
+                        final_text,
+                        [],
+                        round_index,
+                        getattr(response, "usage", None),
+                    )
+                    audit_calls.append(audit)
+                    self._llm_call_sink(audit)
+                    assistant_payload = dict(assistant_message_to_dict(message))
+                    assistant_payload["content"] = final_text
+                    transcript.append(assistant_payload)
+                    return final_text, audit_calls, self.last_tool_events
             audit = self._build_audit(
                 transcript,
                 content,
@@ -401,8 +480,6 @@ class OpenAICompatibleToolLoop:
             audit_calls.append(audit)
             self._llm_call_sink(audit)
             transcript.append(assistant_message_to_dict(message))
-            if not tool_calls:
-                return content, audit_calls, self.last_tool_events
 
             for tool_call in tool_calls:
                 message_row, event = execute_tool_call_with_event(
@@ -487,6 +564,7 @@ __all__ = [
     "assistant_message_to_dict",
     "execute_tool_call",
     "execute_tool_call_with_event",
+    "parse_model_response_to_tool_calls",
     "tool_call_to_dict",
     "tool_message",
 ]
