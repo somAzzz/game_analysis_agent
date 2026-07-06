@@ -548,6 +548,71 @@ main {
   max-width: 760px;
 }
 
+.graph-spotlight {
+  margin: 26px 60px 0;
+  padding: 24px 28px;
+  border: 2px solid var(--accent);
+  border-left-width: 10px;
+  background:
+    linear-gradient(90deg, rgba(200, 85, 61, 0.18), rgba(59, 95, 78, 0.07)),
+    var(--paper);
+  box-shadow: 0 18px 42px rgba(31, 27, 22, 0.1);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 28px;
+  align-items: center;
+}
+
+.graph-eyebrow {
+  display: inline-block;
+  margin-bottom: 7px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+}
+
+.graph-spotlight h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(34px, 4.2vw, 64px);
+  line-height: 0.95;
+  font-style: italic;
+  font-variation-settings: "opsz" 120, "wght" 430, "SOFT" 80, "WONK" 1;
+  color: var(--ink);
+}
+
+.graph-spotlight p {
+  max-width: 720px;
+  margin: 12px 0 0;
+  color: var(--ink-soft);
+  line-height: 1.45;
+  font-style: italic;
+}
+
+.graph-spotlight-cta {
+  display: inline-flex;
+  min-height: 72px;
+  min-width: 190px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--accent-deep);
+  background: var(--accent);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom-color: var(--accent-deep);
+}
+
+.graph-spotlight-cta:hover {
+  background: var(--accent-deep);
+  border-color: var(--ink);
+}
+
 .article {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
@@ -1195,6 +1260,14 @@ main {
   .dg-toolbar { grid-template-columns: 1fr; }
   .tab-rail { margin-left: 24px; margin-right: 24px; }
   .notice-strip { margin-left: 24px; margin-right: 24px; }
+  .graph-spotlight {
+    margin-left: 24px;
+    margin-right: 24px;
+    grid-template-columns: 1fr;
+  }
+  .graph-spotlight-cta {
+    width: 100%;
+  }
   .dashboard-controls { grid-template-columns: 1fr; }
   .trace-panel {
     margin-left: 24px;

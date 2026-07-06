@@ -52,6 +52,7 @@ export function IssuePage() {
   return (
     <div>
       <Cover manifest={manifest} />
+      {manifest.kind === "balance" && <DecisionGraphSpotlight manifest={manifest} />}
 
       {manifest.gate_report && (
         <div
@@ -135,6 +136,27 @@ function Cover({ manifest }: { manifest: IssueManifest }) {
           ? `${manifest.kind} issue · ${subtitle}`
           : `${manifest.kind} issue`}
       </p>
+    </section>
+  );
+}
+
+function DecisionGraphSpotlight({ manifest }: { manifest: IssueManifest }) {
+  return (
+    <section className="graph-spotlight" aria-label="Decision graph entry">
+      <div className="graph-spotlight-copy">
+        <span className="graph-eyebrow">Interactive flow map</span>
+        <h2>Open the decision graph</h2>
+        <p>
+          Follow the highlighted path, inspect the mock branches, and click any
+          node to see route options without exposing the private full event graph.
+        </p>
+      </div>
+      <Link
+        className="graph-spotlight-cta"
+        to={`/decision-graph/${encodeURIComponent(manifest.id)}/0`}
+      >
+        Launch graph
+      </Link>
     </section>
   );
 }
