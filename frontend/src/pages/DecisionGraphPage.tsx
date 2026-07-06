@@ -16,8 +16,16 @@ import {
 } from "@xyflow/react";
 import dagre from "dagre";
 import { fetchDecisionGraphManifest } from "@/lib/api";
-import { computeGraph, type ComputedGraph } from "@/lib/layout";
+import {
+  computeGraph,
+  laneFor,
+  safeChoiceEffects,
+  safeChoiceText,
+  triggerWeek,
+  type ComputedGraph,
+} from "@/lib/layout";
 import type {
+  DecisionGraphEvent,
   DecisionGraphManifest,
   TriggeredStep,
 } from "@/types";
@@ -33,6 +41,8 @@ interface EventNodeData extends Record<string, unknown> {
   event_type: string;
   choice_index: number;
   isCurrent: boolean;
+  isTriggered: boolean;
+  isSelected: boolean;
   totalChoices?: number;
 }
 
@@ -42,7 +52,8 @@ function EventNode({ data }: NodeProps<Node<EventNodeData>>) {
     "event-node",
     d.event_type || "uncategorised",
     d.isCurrent ? "is-current" : "",
-    "is-triggered",
+    d.isTriggered ? "is-triggered" : "",
+    d.isSelected ? "is-selected" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -51,35 +62,20 @@ function EventNode({ data }: NodeProps<Node<EventNodeData>>) {
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
       <div className="node-id">W{d.week}</div>
       <div style={{ marginTop: 4, fontSize: 9 }}>{d.event_type}</div>
-      {d.choice_index >= 0 ? (
+      {d.isTriggered && d.choice_index >= 0 ? (
         <div className="node-choice">choice #{d.choice_index + 1}</div>
-      ) : (
+      ) : d.isTriggered ? (
         <div className="node-choice-none">no choice</div>
+      ) : (
+        <div className="node-choice-none">branch</div>
       )}
       <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
     </div>
   );
 }
 
-interface BgEventNodeData extends Record<string, unknown> {
-  id: string;
-  title: string;
-  eventType: string;
-}
-
-function BackgroundEventNode({ data }: NodeProps<Node<BgEventNodeData>>) {
-  const d = data as unknown as BgEventNodeData;
-  const cls = ["event-node", d.eventType || "uncategorised"].join(" ");
-  return (
-    <div className={cls} title={d.title || ""}>
-      <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
-    </div>
-  );
-}
-
 const NODE_TYPES = {
   event: EventNode,
-  backgroundEvent: BackgroundEventNode,
 };
 
 const DEFAULT_MARKER: EdgeMarker = { type: MarkerType.ArrowClosed, color: "var(--accent)" };
@@ -88,75 +84,66 @@ const DEFAULT_MARKER: EdgeMarker = { type: MarkerType.ArrowClosed, color: "var(-
 /* Layout with dagre                                                  */
 /* ------------------------------------------------------------------ */
 
-function layoutWithDagre(
-  triggered: TriggeredStep[],
-  allEventIds: string[],
-): { nodes: Node[]; edges: Edge[] } {
-  // Background event nodes (faint dots) — placed on a separate dagre layer.
-  const bgG = new dagre.graphlib.Graph();
-  bgG.setDefaultEdgeLabel(() => ({}));
-  bgG.setGraph({ rankdir: "LR", nodesep: 20, ranksep: 50 });
+function layoutWithDagre(computed: ComputedGraph): { nodes: Node[]; edges: Edge[] } {
+  const events = computed.layout.events;
+  const triggeredById = new Map(computed.events.map((step) => [step.event_id, step]));
+  const pathPairs = new Set(
+    computed.events.slice(0, -1).map((step, idx) => {
+      const next = computed.events[idx + 1];
+      return `${step.event_id}->${next.event_id}`;
+    }),
+  );
 
-  const bgNodes: Node[] = [];
-  const triggeredIds = new Set(triggered.map((t) => t.event_id));
-  for (const evId of allEventIds) {
-    if (triggeredIds.has(evId)) continue;
-    bgG.setNode(evId, { width: 16, height: 16 });
-    bgNodes.push({
-      id: `bg-${evId}`,
-      type: "backgroundEvent",
-      position: { x: 0, y: 0 },
-      data: { id: evId, title: evId, eventType: "uncategorised" },
-      draggable: false,
-      selectable: false,
-    });
-  }
-  dagre.layout(bgG);
-  for (const node of bgNodes) {
-    const layoutNode = bgG.node((node.data as { id: string }).id);
-    if (layoutNode) {
-      node.position = { x: layoutNode.x, y: layoutNode.y };
-    }
-  }
-
-  // Foreground (triggered) event nodes — laid out by week on the X axis.
   const fgG = new dagre.graphlib.Graph();
   fgG.setDefaultEdgeLabel(() => ({}));
-  fgG.setGraph({ rankdir: "LR", nodesep: 40, ranksep: 80 });
+  fgG.setGraph({ rankdir: "LR", nodesep: 34, ranksep: 90 });
 
   const fgNodes: Node[] = [];
   const fgEdges: Edge[] = [];
-  triggered.forEach((step, idx) => {
-    fgG.setNode(step.event_id, { width: 96, height: 96 });
+  events.forEach((event) => {
+    if (!event.id) return;
+    const triggered = triggeredById.get(event.id);
+    const week = triggered?.week ?? triggerWeek(event.trigger) ?? 0;
+    fgG.setNode(event.id, { width: triggered ? 96 : 84, height: triggered ? 96 : 84 });
     fgNodes.push({
-      id: step.event_id,
+      id: event.id,
       type: "event",
       position: { x: 0, y: 0 },
       data: {
-        event_id: step.event_id,
-        week: step.week,
-        title: step.title,
-        event_type: step.event_type,
-        choice_index: step.choice_index,
+        event_id: event.id,
+        week,
+        title: event.title ?? event.id,
+        event_type: laneFor(event),
+        choice_index: triggered?.choice_index ?? -1,
         isCurrent: false,
-        totalChoices: 4,
+        isTriggered: !!triggered,
+        isSelected: false,
+        totalChoices: event.choices?.length ?? 0,
       },
       draggable: true,
     });
-    if (idx > 0) {
-      const prev = triggered[idx - 1];
-      fgG.setEdge(prev.event_id, step.event_id);
+  });
+
+  for (const event of events) {
+    if (!event.id) continue;
+    for (const [choiceIdx, choice] of (event.choices ?? []).entries()) {
+      const target = choice.next_event_id;
+      if (!target) continue;
+      fgG.setEdge(event.id, target);
+      const isPath = pathPairs.has(`${event.id}->${target}`);
       fgEdges.push({
-        id: `e-${prev.event_id}->${step.event_id}`,
-        source: prev.event_id,
-        target: step.event_id,
+        id: `e-${event.id}->${target}-${choiceIdx}`,
+        source: event.id,
+        target,
         type: "default",
-        animated: false,
+        animated: isPath,
         markerEnd: DEFAULT_MARKER,
-        className: "",
+        className: isPath ? "is-path branch-path" : "is-branch",
+        label: `c${choiceIdx + 1}`,
       });
     }
-  });
+  }
+
   dagre.layout(fgG);
   for (const node of fgNodes) {
     const layoutNode = fgG.node(node.id);
@@ -164,7 +151,7 @@ function layoutWithDagre(
       node.position = { x: layoutNode.x - 48, y: layoutNode.y - 48 };
     }
   }
-  return { nodes: [...bgNodes, ...fgNodes], edges: fgEdges };
+  return { nodes: fgNodes, edges: fgEdges };
 }
 
 /* ------------------------------------------------------------------ */
@@ -179,6 +166,7 @@ export function DecisionGraphPage() {
   const [manifest, setManifest] = useState<DecisionGraphManifest | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [currentWeek, setCurrentWeek] = useState<number>(0);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [autoPlay, setAutoPlay] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rfRef = useRef<unknown>(null);
@@ -197,11 +185,8 @@ export function DecisionGraphPage() {
 
   const layout = useMemo(() => {
     if (!computed) return null;
-    const allEventIds = (manifest?.event_graph?.events ?? [])
-      .filter((e) => typeof e.id === "string")
-      .map((e) => e.id as string);
-    return layoutWithDagre(computed.events, allEventIds);
-  }, [computed, manifest]);
+    return layoutWithDagre(computed);
+  }, [computed]);
 
   // Highlight: nodes whose week <= currentWeek get is-current=true.
   // Edges get is-path=true when their source week's step is <= current.
@@ -211,26 +196,33 @@ export function DecisionGraphPage() {
     const nodes = layout.nodes.map((n) => {
       if (n.type !== "event") return n;
       const ev = triggeredById.get(n.id);
-      if (!ev) return n;
       return {
         ...n,
-        data: { ...n.data, isCurrent: ev.week <= currentWeek },
+        data: {
+          ...n.data,
+          isCurrent: ev ? ev.week <= currentWeek : false,
+          isSelected: n.id === selectedEventId,
+        },
       };
     });
     const edges = layout.edges.map((e) => {
       const sourceWeek = triggeredById.get(e.source)?.week ?? 0;
+      const isBranch = String(e.className ?? "").includes("is-branch");
+      const isPath = String(e.className ?? "").includes("branch-path");
       return {
         ...e,
-        className:
-          sourceWeek < currentWeek
-            ? "is-path"
-            : sourceWeek > currentWeek
-              ? "is-faded"
-              : "",
+        className: [
+          e.className,
+          isPath && sourceWeek < currentWeek ? "is-current-path" : "",
+          isPath && sourceWeek > currentWeek ? "is-faded" : "",
+          isBranch && selectedEventId === e.source ? "is-branch-source" : "",
+        ]
+          .filter(Boolean)
+          .join(" "),
       };
     });
     return { nodes, edges };
-  }, [layout, computed, currentWeek]);
+  }, [layout, computed, currentWeek, selectedEventId]);
 
   // Auto-play: tick the slider every 700ms.
   useEffect(() => {
@@ -272,8 +264,13 @@ export function DecisionGraphPage() {
     return <div style={{ padding: 60 }}>Loading decision graph…</div>;
   }
 
+  const selectedEvent =
+    (selectedEventId && computed.layout.eventIndex[selectedEventId]) ||
+    null;
   const currentStep =
-    computed.events.find((e) => e.week === currentWeek) ?? computed.events[0];
+    (selectedEventId && computed.events.find((e) => e.event_id === selectedEventId)) ||
+    computed.events.find((e) => e.week === currentWeek) ||
+    computed.events[0];
 
   return (
     <ReactFlowProvider>
@@ -412,6 +409,7 @@ export function DecisionGraphPage() {
               }}
               onNodeClick={(_, node) => {
                 if (node.type !== "event") return;
+                setSelectedEventId(node.id);
                 const ev = computed.events.find((e) => e.event_id === node.id);
                 if (ev) setCurrentWeek(ev.week);
               }}
@@ -503,6 +501,8 @@ export function DecisionGraphPage() {
               </h2>
               {currentStep ? (
                 <WeekDetail step={currentStep} />
+              ) : selectedEvent ? (
+                <EventDetail event={selectedEvent} />
               ) : (
                 <p
                   style={{
@@ -515,7 +515,13 @@ export function DecisionGraphPage() {
               )}
             </div>
             <aside>
-              {currentStep ? <ChoicePanel step={currentStep} /> : null}
+              {currentStep && currentStep.event_id === selectedEventId ? (
+                <ChoicePanel step={currentStep} />
+              ) : selectedEvent ? (
+                <BranchPanel event={selectedEvent} />
+              ) : currentStep ? (
+                <ChoicePanel step={currentStep} />
+              ) : null}
             </aside>
           </div>
 
@@ -640,6 +646,52 @@ function WeekDetail({ step }: { step: TriggeredStep }) {
   );
 }
 
+function EventDetail({ event }: { event: DecisionGraphEvent }) {
+  const week = triggerWeek(event.trigger);
+  return (
+    <div
+      style={{
+        fontFamily: "var(--body)",
+        fontSize: 17,
+        lineHeight: 1.6,
+        color: "var(--ink-soft)",
+      }}
+    >
+      <p style={{ margin: 0 }}>
+        <strong
+          style={{
+            fontFamily: "var(--mono)",
+            fontSize: 12,
+            color: "var(--forest)",
+            letterSpacing: "0.12em",
+          }}
+        >
+          {week === null ? "W?" : `W${week}`} · {event.id}
+        </strong>
+      </p>
+      <p
+        style={{
+          fontFamily: "var(--serif)",
+          fontStyle: "italic",
+          fontSize: 22,
+          lineHeight: 1.3,
+          color: "var(--ink)",
+          margin: "6px 0",
+        }}
+      >
+        {event.title || event.id}
+      </p>
+      <p style={{ fontSize: 14 }}>
+        This is an available branch node in the public mock flow. It was not on
+        the highlighted path, but it can be clicked to inspect the route shape.
+      </p>
+      <p style={{ fontSize: 13, color: "var(--muted)" }}>
+        {event.body || "No public description recorded."}
+      </p>
+    </div>
+  );
+}
+
 function ChoicePanel({ step }: { step: TriggeredStep }) {
   const effects = step.choice_effects;
   const effectRows = Object.entries(effects).map(([k, v]) => {
@@ -662,6 +714,42 @@ function ChoicePanel({ step }: { step: TriggeredStep }) {
       <h4 style={{ marginTop: 14 }}>Effects</h4>
       <div className="effects">
         {effectRows.length > 0 ? effectRows : <span style={{ color: "var(--muted)" }}>no effects recorded</span>}
+      </div>
+    </div>
+  );
+}
+
+function BranchPanel({ event }: { event: DecisionGraphEvent }) {
+  const choices = event.choices ?? [];
+  return (
+    <div className="panel-card">
+      <h4>Branch options</h4>
+      <p className="pick-text">{event.title || event.id}</p>
+      <div className="branch-choice-list">
+        {choices.length > 0 ? (
+          choices.map((choice, idx) => {
+            const effects = safeChoiceEffects(choice);
+            return (
+              <div key={`${event.id}-${idx}`} className="branch-choice">
+                <strong>choice #{idx + 1}</strong>
+                <span>{safeChoiceText(choice) || "(no public label)"}</span>
+                {choice.next_event_id && <code>next: {choice.next_event_id}</code>}
+                {Object.keys(effects).length > 0 && (
+                  <div className="effects">
+                    {Object.entries(effects).map(([k, v]) => (
+                      <span key={k} className={v >= 0 ? "pos" : "neg"}>
+                        {k} {v >= 0 ? "+" : ""}
+                        {v}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })
+        ) : (
+          <span style={{ color: "var(--muted)" }}>terminal outcome node</span>
+        )}
       </div>
     </div>
   );

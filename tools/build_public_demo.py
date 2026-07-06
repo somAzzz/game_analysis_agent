@@ -293,54 +293,210 @@ def _sanitize_issue(issue: dict[str, Any], card: dict[str, Any], source_id: str)
 
 
 def _mock_decision_graph(issue_id: str) -> dict[str, Any]:
-    events = [
-        ("phase-1", 1, "Arrival pressure", "fixed"),
-        ("phase-2", 3, "Budget fork", "conditional"),
-        ("phase-3", 6, "Social support check", "conditional"),
-        ("phase-4", 9, "Study load spike", "random"),
-        ("phase-5", 13, "Admin deadline", "fixed"),
-        ("phase-6", 17, "Recovery or collapse", "conditional"),
+    event_specs = [
+        {
+            "id": "start-orientation",
+            "week": 1,
+            "title": "Orientation: choose the first stabilizer",
+            "type": "fixed",
+            "choices": [
+                ("Secure basics", "cashflow-branch", {"stress": -2, "money": -1}),
+                ("Prioritize study rhythm", "study-branch", {"academic_progress": 3, "stress": 1}),
+                ("Find a support circle", "social-branch", {"social": 4, "stress": -1}),
+            ],
+        },
+        {
+            "id": "cashflow-branch",
+            "week": 3,
+            "title": "Money branch: short-term liquidity",
+            "type": "conditional",
+            "choices": [
+                ("Take a small work block", "workload-check", {"money": 4, "stress": 2}),
+                ("Cut expenses first", "budget-check", {"money": 2, "social": -1}),
+            ],
+        },
+        {
+            "id": "study-branch",
+            "week": 3,
+            "title": "Study branch: protect exam progress",
+            "type": "conditional",
+            "choices": [
+                ("Build a weekly study plan", "workload-check", {"academic_progress": 4}),
+                ("Overcommit early", "stress-spike", {"academic_progress": 5, "stress": 5}),
+            ],
+        },
+        {
+            "id": "social-branch",
+            "week": 3,
+            "title": "Support branch: ask for help",
+            "type": "conditional",
+            "choices": [
+                ("Invest in friends", "friend-buffer", {"social": 5, "money": -2}),
+                ("Stay independent", "lonely-risk", {"money": 1, "social": -3}),
+            ],
+        },
+        {
+            "id": "budget-check",
+            "week": 6,
+            "title": "Budget check",
+            "type": "random",
+            "choices": [
+                ("Stay conservative", "admin-deadline", {"money": 2, "stress": 1}),
+                ("Spend to solve a blocker", "friend-buffer", {"money": -3, "social": 2}),
+            ],
+        },
+        {
+            "id": "workload-check",
+            "week": 6,
+            "title": "Workload check",
+            "type": "random",
+            "choices": [
+                ("Keep the load balanced", "admin-deadline", {"stress": -2}),
+                ("Push harder this month", "stress-spike", {"money": 3, "stress": 4}),
+            ],
+        },
+        {
+            "id": "friend-buffer",
+            "week": 8,
+            "title": "Friend buffer",
+            "type": "conditional",
+            "choices": [
+                ("Ask for advice early", "admin-deadline", {"social": 2, "stress": -3}),
+                ("Borrow small emergency cash", "recovery-window", {"money": 3, "social": -1}),
+            ],
+        },
+        {
+            "id": "lonely-risk",
+            "week": 8,
+            "title": "No-support risk",
+            "type": "random",
+            "choices": [
+                ("Rebuild contact", "friend-buffer", {"social": 3, "stress": -1}),
+                ("Ignore it", "stress-spike", {"stress": 4, "social": -2}),
+            ],
+        },
+        {
+            "id": "stress-spike",
+            "week": 10,
+            "title": "Stress spike",
+            "type": "random",
+            "choices": [
+                ("Pause and recover", "recovery-window", {"stress": -5, "academic_progress": -1}),
+                ("Push through", "final-risk", {"academic_progress": 3, "stress": 5}),
+            ],
+        },
+        {
+            "id": "admin-deadline",
+            "week": 12,
+            "title": "Deadline checkpoint",
+            "type": "fixed",
+            "choices": [
+                ("Submit paperwork", "exam-week", {"visa_progress": 5, "stress": 1}),
+                ("Delay one more week", "final-risk", {"visa_progress": -3, "stress": 3}),
+            ],
+        },
+        {
+            "id": "recovery-window",
+            "week": 14,
+            "title": "Recovery window",
+            "type": "conditional",
+            "choices": [
+                ("Use the buffer", "exam-week", {"stress": -4, "social": 1}),
+                ("Spend the buffer", "final-risk", {"money": -3, "stress": 2}),
+            ],
+        },
+        {
+            "id": "exam-week",
+            "week": 18,
+            "title": "Outcome week",
+            "type": "fixed",
+            "choices": [
+                ("Consolidate the route", "stable-outcome", {"academic_progress": 4, "stress": -1}),
+                ("Accept a mixed result", "mixed-outcome", {"stress": -2}),
+            ],
+        },
+        {
+            "id": "final-risk",
+            "week": 18,
+            "title": "Risk outcome",
+            "type": "conditional",
+            "choices": [
+                ("Recover late", "mixed-outcome", {"stress": -2, "social": 1}),
+                ("Let pressure win", "failure-outcome", {"stress": 4, "money": -2}),
+            ],
+        },
+        {
+            "id": "stable-outcome",
+            "week": 20,
+            "title": "Stable outcome",
+            "type": "ending",
+            "choices": [],
+        },
+        {
+            "id": "mixed-outcome",
+            "week": 20,
+            "title": "Mixed recovery outcome",
+            "type": "ending",
+            "choices": [],
+        },
+        {
+            "id": "failure-outcome",
+            "week": 20,
+            "title": "Designed failure outcome",
+            "type": "ending",
+            "choices": [],
+        },
     ]
+
     graph_events = []
-    weekly_log = []
-    for idx, (event_id, week, title, event_type) in enumerate(events):
+    for idx, spec in enumerate(event_specs):
         graph_events.append(
             {
-                "id": event_id,
-                "title": title,
-                "body": "Public demo node. Real game text is withheld.",
-                "event_type": event_type,
-                "trigger": {"week": week},
+                "id": spec["id"],
+                "title": spec["title"],
+                "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+                "event_type": spec["type"],
+                "trigger": {"week": spec["week"]},
                 "source_order": idx,
                 "choices": [
                     {
-                        "text": "Stabilize short-term risk",
-                        "success_effects": {"stress": -3, "money": -1, "social": 1},
-                    },
-                    {
-                        "text": "Invest in long-term progress",
-                        "success_effects": {"academic_progress": 4, "stress": 2, "money": -2},
-                    },
-                    {
-                        "text": "Ask the support network",
-                        "success_effects": {"social": 3, "stress": -1, "money": 1},
-                    },
+                        "text": text,
+                        "next_event_id": next_event,
+                        "success_effects": effects,
+                    }
+                    for text, next_event, effects in spec["choices"]
                 ],
             }
         )
-        choice_index = idx % 3
+
+    selected_path = [
+        ("start-orientation", 0, 1),
+        ("cashflow-branch", 0, 3),
+        ("workload-check", 0, 6),
+        ("admin-deadline", 0, 12),
+        ("exam-week", 0, 18),
+        ("stable-outcome", -1, 20),
+    ]
+    weekly_log = []
+    for idx, (event_id, choice_index, week) in enumerate(selected_path):
         weekly_log.append(
             {
                 "week": week,
                 "triggered_event_id": event_id,
-                "event_choice_id": f"{event_id}.choice_{choice_index + 1:02d}",
+                "event_choice_id": ""
+                if choice_index < 0
+                else f"{event_id}.choice_{choice_index + 1:02d}",
                 "choice_index": choice_index,
-                "selected_action_ids": ["public-action-a", "public-action-b"],
+                "selected_action_ids": [
+                    f"public-action-{idx + 1}",
+                    "inspect-risk",
+                ],
                 "after_state": {
-                    "stress": 35 + idx * 7,
-                    "money": 700 - idx * 120,
-                    "social": 20 + idx * 5,
-                    "academic_progress": 12 + idx * 9,
+                    "stress": max(18, 36 + idx * 5 - (idx % 2) * 7),
+                    "money": 760 - idx * 85,
+                    "social": 22 + idx * 4,
+                    "academic_progress": 15 + idx * 10,
+                    "visa_progress": 18 + idx * 7,
                 },
             }
         )
@@ -351,9 +507,9 @@ def _mock_decision_graph(issue_id: str) -> dict[str, Any]:
         "scenario": "sanitized",
         "seed": 42,
         "max_weeks": 20,
-        "final_ending_id": "Outcome B - recovery pause",
+        "final_ending_id": "Outcome F - stable semester",
         "public_demo": True,
-        "public_notice": "Illustrative graph only. The private full event graph is not published.",
+        "public_notice": "Illustrative branching graph only. The private full event graph is not published.",
         "run": {
             "run_id": 0,
             "policy": "public-demo",

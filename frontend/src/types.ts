@@ -114,6 +114,7 @@ export interface Choice {
   name?: string;
   description?: string;
   title?: string;
+  next_event_id?: string;
   success_effects?: Record<string, number>;
   effects?: Record<string, number>;
   outcome_effects?: Record<string, number>;

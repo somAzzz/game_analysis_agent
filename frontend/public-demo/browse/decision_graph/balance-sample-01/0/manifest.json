@@ -5,9 +5,9 @@
   "scenario": "sanitized",
   "seed": 42,
   "max_weeks": 20,
-  "final_ending_id": "Outcome B - recovery pause",
+  "final_ending_id": "Outcome F - stable semester",
   "public_demo": true,
-  "public_notice": "Illustrative graph only. The private full event graph is not published.",
+  "public_notice": "Illustrative branching graph only. The private full event graph is not published.",
   "run": {
     "run_id": 0,
     "policy": "public-demo",
@@ -15,98 +15,104 @@
     "weekly_log": [
       {
         "week": 1,
-        "triggered_event_id": "phase-1",
-        "event_choice_id": "phase-1.choice_01",
+        "triggered_event_id": "start-orientation",
+        "event_choice_id": "start-orientation.choice_01",
         "choice_index": 0,
         "selected_action_ids": [
-          "public-action-a",
-          "public-action-b"
+          "public-action-1",
+          "inspect-risk"
         ],
         "after_state": {
-          "stress": 35,
-          "money": 700,
-          "social": 20,
-          "academic_progress": 12
+          "stress": 36,
+          "money": 760,
+          "social": 22,
+          "academic_progress": 15,
+          "visa_progress": 18
         }
       },
       {
         "week": 3,
-        "triggered_event_id": "phase-2",
-        "event_choice_id": "phase-2.choice_02",
-        "choice_index": 1,
+        "triggered_event_id": "cashflow-branch",
+        "event_choice_id": "cashflow-branch.choice_01",
+        "choice_index": 0,
         "selected_action_ids": [
-          "public-action-a",
-          "public-action-b"
+          "public-action-2",
+          "inspect-risk"
         ],
         "after_state": {
-          "stress": 42,
-          "money": 580,
-          "social": 25,
-          "academic_progress": 21
+          "stress": 34,
+          "money": 675,
+          "social": 26,
+          "academic_progress": 25,
+          "visa_progress": 25
         }
       },
       {
         "week": 6,
-        "triggered_event_id": "phase-3",
-        "event_choice_id": "phase-3.choice_03",
-        "choice_index": 2,
+        "triggered_event_id": "workload-check",
+        "event_choice_id": "workload-check.choice_01",
+        "choice_index": 0,
         "selected_action_ids": [
-          "public-action-a",
-          "public-action-b"
+          "public-action-3",
+          "inspect-risk"
         ],
         "after_state": {
-          "stress": 49,
-          "money": 460,
+          "stress": 46,
+          "money": 590,
           "social": 30,
-          "academic_progress": 30
+          "academic_progress": 35,
+          "visa_progress": 32
         }
       },
       {
-        "week": 9,
-        "triggered_event_id": "phase-4",
-        "event_choice_id": "phase-4.choice_01",
+        "week": 12,
+        "triggered_event_id": "admin-deadline",
+        "event_choice_id": "admin-deadline.choice_01",
         "choice_index": 0,
         "selected_action_ids": [
-          "public-action-a",
-          "public-action-b"
+          "public-action-4",
+          "inspect-risk"
+        ],
+        "after_state": {
+          "stress": 44,
+          "money": 505,
+          "social": 34,
+          "academic_progress": 45,
+          "visa_progress": 39
+        }
+      },
+      {
+        "week": 18,
+        "triggered_event_id": "exam-week",
+        "event_choice_id": "exam-week.choice_01",
+        "choice_index": 0,
+        "selected_action_ids": [
+          "public-action-5",
+          "inspect-risk"
         ],
         "after_state": {
           "stress": 56,
-          "money": 340,
-          "social": 35,
-          "academic_progress": 39
+          "money": 420,
+          "social": 38,
+          "academic_progress": 55,
+          "visa_progress": 46
         }
       },
       {
-        "week": 13,
-        "triggered_event_id": "phase-5",
-        "event_choice_id": "phase-5.choice_02",
-        "choice_index": 1,
+        "week": 20,
+        "triggered_event_id": "stable-outcome",
+        "event_choice_id": "",
+        "choice_index": -1,
         "selected_action_ids": [
-          "public-action-a",
-          "public-action-b"
+          "public-action-6",
+          "inspect-risk"
         ],
         "after_state": {
-          "stress": 63,
-          "money": 220,
-          "social": 40,
-          "academic_progress": 48
-        }
-      },
-      {
-        "week": 17,
-        "triggered_event_id": "phase-6",
-        "event_choice_id": "phase-6.choice_03",
-        "choice_index": 2,
-        "selected_action_ids": [
-          "public-action-a",
-          "public-action-b"
-        ],
-        "after_state": {
-          "stress": 70,
-          "money": 100,
-          "social": 45,
-          "academic_progress": 57
+          "stress": 54,
+          "money": 335,
+          "social": 42,
+          "academic_progress": 65,
+          "visa_progress": 53
         }
       }
     ]
@@ -114,9 +120,9 @@
   "event_graph": {
     "events": [
       {
-        "id": "phase-1",
-        "title": "Arrival pressure",
-        "body": "Public demo node. Real game text is withheld.",
+        "id": "start-orientation",
+        "title": "Orientation: choose the first stabilizer",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
         "event_type": "fixed",
         "trigger": {
           "week": 1
@@ -124,35 +130,35 @@
         "source_order": 0,
         "choices": [
           {
-            "text": "Stabilize short-term risk",
+            "text": "Secure basics",
+            "next_event_id": "cashflow-branch",
             "success_effects": {
-              "stress": -3,
-              "money": -1,
-              "social": 1
+              "stress": -2,
+              "money": -1
             }
           },
           {
-            "text": "Invest in long-term progress",
+            "text": "Prioritize study rhythm",
+            "next_event_id": "study-branch",
             "success_effects": {
-              "academic_progress": 4,
-              "stress": 2,
-              "money": -2
+              "academic_progress": 3,
+              "stress": 1
             }
           },
           {
-            "text": "Ask the support network",
+            "text": "Find a support circle",
+            "next_event_id": "social-branch",
             "success_effects": {
-              "social": 3,
-              "stress": -1,
-              "money": 1
+              "social": 4,
+              "stress": -1
             }
           }
         ]
       },
       {
-        "id": "phase-2",
-        "title": "Budget fork",
-        "body": "Public demo node. Real game text is withheld.",
+        "id": "cashflow-branch",
+        "title": "Money branch: short-term liquidity",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
         "event_type": "conditional",
         "trigger": {
           "week": 3
@@ -160,174 +166,360 @@
         "source_order": 1,
         "choices": [
           {
-            "text": "Stabilize short-term risk",
+            "text": "Take a small work block",
+            "next_event_id": "workload-check",
             "success_effects": {
-              "stress": -3,
-              "money": -1,
-              "social": 1
+              "money": 4,
+              "stress": 2
             }
           },
           {
-            "text": "Invest in long-term progress",
+            "text": "Cut expenses first",
+            "next_event_id": "budget-check",
             "success_effects": {
-              "academic_progress": 4,
-              "stress": 2,
-              "money": -2
-            }
-          },
-          {
-            "text": "Ask the support network",
-            "success_effects": {
-              "social": 3,
-              "stress": -1,
-              "money": 1
+              "money": 2,
+              "social": -1
             }
           }
         ]
       },
       {
-        "id": "phase-3",
-        "title": "Social support check",
-        "body": "Public demo node. Real game text is withheld.",
+        "id": "study-branch",
+        "title": "Study branch: protect exam progress",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
         "event_type": "conditional",
         "trigger": {
-          "week": 6
+          "week": 3
         },
         "source_order": 2,
         "choices": [
           {
-            "text": "Stabilize short-term risk",
+            "text": "Build a weekly study plan",
+            "next_event_id": "workload-check",
             "success_effects": {
-              "stress": -3,
-              "money": -1,
-              "social": 1
+              "academic_progress": 4
             }
           },
           {
-            "text": "Invest in long-term progress",
+            "text": "Overcommit early",
+            "next_event_id": "stress-spike",
             "success_effects": {
-              "academic_progress": 4,
-              "stress": 2,
-              "money": -2
-            }
-          },
-          {
-            "text": "Ask the support network",
-            "success_effects": {
-              "social": 3,
-              "stress": -1,
-              "money": 1
+              "academic_progress": 5,
+              "stress": 5
             }
           }
         ]
       },
       {
-        "id": "phase-4",
-        "title": "Study load spike",
-        "body": "Public demo node. Real game text is withheld.",
-        "event_type": "random",
+        "id": "social-branch",
+        "title": "Support branch: ask for help",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "conditional",
         "trigger": {
-          "week": 9
+          "week": 3
         },
         "source_order": 3,
         "choices": [
           {
-            "text": "Stabilize short-term risk",
+            "text": "Invest in friends",
+            "next_event_id": "friend-buffer",
             "success_effects": {
-              "stress": -3,
-              "money": -1,
-              "social": 1
-            }
-          },
-          {
-            "text": "Invest in long-term progress",
-            "success_effects": {
-              "academic_progress": 4,
-              "stress": 2,
+              "social": 5,
               "money": -2
             }
           },
           {
-            "text": "Ask the support network",
+            "text": "Stay independent",
+            "next_event_id": "lonely-risk",
             "success_effects": {
-              "social": 3,
-              "stress": -1,
-              "money": 1
+              "money": 1,
+              "social": -3
             }
           }
         ]
       },
       {
-        "id": "phase-5",
-        "title": "Admin deadline",
-        "body": "Public demo node. Real game text is withheld.",
-        "event_type": "fixed",
+        "id": "budget-check",
+        "title": "Budget check",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "random",
         "trigger": {
-          "week": 13
+          "week": 6
         },
         "source_order": 4,
         "choices": [
           {
-            "text": "Stabilize short-term risk",
+            "text": "Stay conservative",
+            "next_event_id": "admin-deadline",
             "success_effects": {
-              "stress": -3,
-              "money": -1,
-              "social": 1
+              "money": 2,
+              "stress": 1
             }
           },
           {
-            "text": "Invest in long-term progress",
+            "text": "Spend to solve a blocker",
+            "next_event_id": "friend-buffer",
             "success_effects": {
-              "academic_progress": 4,
-              "stress": 2,
-              "money": -2
-            }
-          },
-          {
-            "text": "Ask the support network",
-            "success_effects": {
-              "social": 3,
-              "stress": -1,
-              "money": 1
+              "money": -3,
+              "social": 2
             }
           }
         ]
       },
       {
-        "id": "phase-6",
-        "title": "Recovery or collapse",
-        "body": "Public demo node. Real game text is withheld.",
-        "event_type": "conditional",
+        "id": "workload-check",
+        "title": "Workload check",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "random",
         "trigger": {
-          "week": 17
+          "week": 6
         },
         "source_order": 5,
         "choices": [
           {
-            "text": "Stabilize short-term risk",
+            "text": "Keep the load balanced",
+            "next_event_id": "admin-deadline",
             "success_effects": {
-              "stress": -3,
-              "money": -1,
+              "stress": -2
+            }
+          },
+          {
+            "text": "Push harder this month",
+            "next_event_id": "stress-spike",
+            "success_effects": {
+              "money": 3,
+              "stress": 4
+            }
+          }
+        ]
+      },
+      {
+        "id": "friend-buffer",
+        "title": "Friend buffer",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "conditional",
+        "trigger": {
+          "week": 8
+        },
+        "source_order": 6,
+        "choices": [
+          {
+            "text": "Ask for advice early",
+            "next_event_id": "admin-deadline",
+            "success_effects": {
+              "social": 2,
+              "stress": -3
+            }
+          },
+          {
+            "text": "Borrow small emergency cash",
+            "next_event_id": "recovery-window",
+            "success_effects": {
+              "money": 3,
+              "social": -1
+            }
+          }
+        ]
+      },
+      {
+        "id": "lonely-risk",
+        "title": "No-support risk",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "random",
+        "trigger": {
+          "week": 8
+        },
+        "source_order": 7,
+        "choices": [
+          {
+            "text": "Rebuild contact",
+            "next_event_id": "friend-buffer",
+            "success_effects": {
+              "social": 3,
+              "stress": -1
+            }
+          },
+          {
+            "text": "Ignore it",
+            "next_event_id": "stress-spike",
+            "success_effects": {
+              "stress": 4,
+              "social": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "stress-spike",
+        "title": "Stress spike",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "random",
+        "trigger": {
+          "week": 10
+        },
+        "source_order": 8,
+        "choices": [
+          {
+            "text": "Pause and recover",
+            "next_event_id": "recovery-window",
+            "success_effects": {
+              "stress": -5,
+              "academic_progress": -1
+            }
+          },
+          {
+            "text": "Push through",
+            "next_event_id": "final-risk",
+            "success_effects": {
+              "academic_progress": 3,
+              "stress": 5
+            }
+          }
+        ]
+      },
+      {
+        "id": "admin-deadline",
+        "title": "Deadline checkpoint",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "fixed",
+        "trigger": {
+          "week": 12
+        },
+        "source_order": 9,
+        "choices": [
+          {
+            "text": "Submit paperwork",
+            "next_event_id": "exam-week",
+            "success_effects": {
+              "visa_progress": 5,
+              "stress": 1
+            }
+          },
+          {
+            "text": "Delay one more week",
+            "next_event_id": "final-risk",
+            "success_effects": {
+              "visa_progress": -3,
+              "stress": 3
+            }
+          }
+        ]
+      },
+      {
+        "id": "recovery-window",
+        "title": "Recovery window",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "conditional",
+        "trigger": {
+          "week": 14
+        },
+        "source_order": 10,
+        "choices": [
+          {
+            "text": "Use the buffer",
+            "next_event_id": "exam-week",
+            "success_effects": {
+              "stress": -4,
               "social": 1
             }
           },
           {
-            "text": "Invest in long-term progress",
+            "text": "Spend the buffer",
+            "next_event_id": "final-risk",
             "success_effects": {
-              "academic_progress": 4,
-              "stress": 2,
-              "money": -2
-            }
-          },
-          {
-            "text": "Ask the support network",
-            "success_effects": {
-              "social": 3,
-              "stress": -1,
-              "money": 1
+              "money": -3,
+              "stress": 2
             }
           }
         ]
+      },
+      {
+        "id": "exam-week",
+        "title": "Outcome week",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "fixed",
+        "trigger": {
+          "week": 18
+        },
+        "source_order": 11,
+        "choices": [
+          {
+            "text": "Consolidate the route",
+            "next_event_id": "stable-outcome",
+            "success_effects": {
+              "academic_progress": 4,
+              "stress": -1
+            }
+          },
+          {
+            "text": "Accept a mixed result",
+            "next_event_id": "mixed-outcome",
+            "success_effects": {
+              "stress": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "final-risk",
+        "title": "Risk outcome",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "conditional",
+        "trigger": {
+          "week": 18
+        },
+        "source_order": 12,
+        "choices": [
+          {
+            "text": "Recover late",
+            "next_event_id": "mixed-outcome",
+            "success_effects": {
+              "stress": -2,
+              "social": 1
+            }
+          },
+          {
+            "text": "Let pressure win",
+            "next_event_id": "failure-outcome",
+            "success_effects": {
+              "stress": 4,
+              "money": -2
+            }
+          }
+        ]
+      },
+      {
+        "id": "stable-outcome",
+        "title": "Stable outcome",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "ending",
+        "trigger": {
+          "week": 20
+        },
+        "source_order": 13,
+        "choices": []
+      },
+      {
+        "id": "mixed-outcome",
+        "title": "Mixed recovery outcome",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "ending",
+        "trigger": {
+          "week": 20
+        },
+        "source_order": 14,
+        "choices": []
+      },
+      {
+        "id": "failure-outcome",
+        "title": "Designed failure outcome",
+        "body": "Public mock node. Real game text, triggers, and tuning data are withheld.",
+        "event_type": "ending",
+        "trigger": {
+          "week": 20
+        },
+        "source_order": 15,
+        "choices": []
       }
     ]
   }
