@@ -38,6 +38,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPORTS = ROOT / "reports"
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from game_analysis_agent.report_manifest import write_reports_index  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -276,6 +281,7 @@ class Issue:
     playthrough: list[dict] = field(default_factory=list)
     playthrough_summary_md: str = ""
     raw_runs_count: int = 0
+    manifest: dict | None = None
 
 
 def _weekly_series_from_csv(rows: list[dict[str, str]]) -> tuple[list[WeeklyPoint], list[str]]:
@@ -412,6 +418,7 @@ def _aggregate_balance_issue(report_dir: Path, slug: str) -> Issue | None:
         gate_report=_load_json(report_dir / "gate_report.json"),
         coverage_report=_load_json(report_dir / "coverage_report.json"),
         raw_runs_count=len(raw_runs),
+        manifest=_load_json(report_dir / "report_manifest.json"),
     )
 
 
@@ -461,6 +468,7 @@ def _aggregate_boundary_issue(report_dir: Path, slug: str) -> Issue | None:
         value_review_md=_load_text(report_dir / "value_review.md"),
         bugs_summary_md=_load_text(report_dir / "bugs_summary.md"),
         raw_runs_count=len(boundary_runs),
+        manifest=_load_json(report_dir / "report_manifest.json"),
     )
 
 
@@ -483,6 +491,7 @@ def _aggregate_play_issue(report_dir: Path, slug: str) -> Issue | None:
         playthrough_summary_md=_load_text(report_dir / "playthrough_summary.md"),
         agents=_scan_agents(report_dir),
         raw_runs_count=len(raw_runs),
+        manifest=_load_json(report_dir / "report_manifest.json"),
     )
 
 
@@ -2353,6 +2362,18 @@ def render_issue(issue: Issue) -> str:
                 f"{html.escape(failures_text)}</div>"
             )
 
+    manifest_block = ""
+    if issue.manifest:
+        trace = issue.manifest.get("trace", {}) if isinstance(issue.manifest, dict) else {}
+        manifest_block = (
+            "<div class='gate-pass' style='border-color:var(--ink);color:var(--ink)'>"
+            f"TRACEABLE REPORT — run_id "
+            f"<strong>{html.escape(str(issue.manifest.get('run_id', issue.issue_id)))}</strong>"
+            f" · manifest <strong>report_manifest.json</strong>"
+            f" · trace <strong>{html.escape(str(trace.get('primary_file', '')))}</strong>"
+            "</div>"
+        )
+
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -2377,6 +2398,7 @@ def render_issue(issue: Issue) -> str:
   </div>
   <h1>{_highlight(issue.title)}</h1>
   <p class="deck">{html.escape(issue.subtitle)}</p>
+  {manifest_block}
   {gate_summary}
 </section>
 
@@ -2456,6 +2478,25 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_dg.set_defaults(func=cmd_decision_graph)
 
+    # Emit just the React frontend's JSON data feed (without rebuilding
+    # every static HTML page). Useful when iterating on the React app.
+    p_emit = sub.add_parser(
+        "emit-frontend-manifest",
+        help="Emit only the JSON manifest consumed by the React frontend.",
+    )
+    p_emit.add_argument(
+        "--reports",
+        type=Path,
+        default=DEFAULT_REPORTS,
+    )
+    p_emit.add_argument(
+        "--frontend-public",
+        type=Path,
+        default=None,
+        help="If set, mirror manifest.json + browse/ into this directory.",
+    )
+    p_emit.set_defaults(func=cmd_emit_frontend_manifest)
+
     p_all.set_defaults(func=cmd_all)
     parser.set_defaults(func=cmd_all)
     return parser
@@ -2504,39 +2545,6 @@ def _emit_decision_graph_for(
         event_graph_path=report_dir / "event_graph.json",
     )
     return True
-
-
-def cmd_all(args) -> int:
-    reports: Path = args.reports.resolve()
-    if not reports.exists():
-        print(f"--reports does not exist: {reports}", file=sys.stderr)
-        return 2
-    front = reports / "index.html"
-    browse_root: Path = (args.out or (reports / "browse")).resolve()
-    issues = _discover_issues(reports)
-    front.write_text(render_front_page(issues), encoding="utf-8")
-
-    for issue in issues:
-        target_dir = browse_root / issue.issue_kind / issue.issue_id
-        target_dir.mkdir(parents=True, exist_ok=True)
-        page_html = render_issue(issue)
-        report_dir = reports / issue.issue_kind / issue.issue_id
-        if issue.issue_kind in ("balance", "play") and (report_dir / "raw_runs.jsonl").exists():
-            if _emit_decision_graph_for(
-                browse_root=browse_root,
-                report_dir=report_dir,
-                issue_id=issue.issue_id,
-                back_href=f"../../{issue.issue_kind}/{issue.issue_id}/index.html",
-            ):
-                page_html = _inject_dg_link(
-                    page_html,
-                    dg_link=f"decision_graph/{issue.issue_id}/0/index.html",
-                )
-        (target_dir / "index.html").write_text(page_html, encoding="utf-8")
-
-    print(f"Wrote {front} (front page)")
-    print(f"Wrote {len(issues)} issue pages under {browse_root}")
-    return 0
 
 
 def _inject_dg_link(page_html: str, *, dg_link: str) -> str:
@@ -2610,6 +2618,90 @@ def _display_path(path: Path) -> str:
         except ValueError:
             return str(path)
     return str(path)
+
+
+def cmd_all(args) -> int:
+    reports: Path = args.reports.resolve()
+    if not reports.exists():
+        print(f"--reports does not exist: {reports}", file=sys.stderr)
+        return 2
+    front = reports / "index.html"
+    browse_root: Path = (args.out or (reports / "browse")).resolve()
+    issues = _discover_issues(reports)
+    front.write_text(render_front_page(issues), encoding="utf-8")
+
+    for issue in issues:
+        target_dir = browse_root / issue.issue_kind / issue.issue_id
+        target_dir.mkdir(parents=True, exist_ok=True)
+        page_html = render_issue(issue)
+        report_dir = reports / issue.issue_kind / issue.issue_id
+        if issue.issue_kind in ("balance", "play") and (report_dir / "raw_runs.jsonl").exists():
+            if _emit_decision_graph_for(
+                browse_root=browse_root,
+                report_dir=report_dir,
+                issue_id=issue.issue_id,
+                back_href=f"../../{issue.issue_kind}/{issue.issue_id}/index.html",
+            ):
+                page_html = _inject_dg_link(
+                    page_html,
+                    dg_link=f"decision_graph/{issue.issue_id}/0/index.html",
+                )
+        (target_dir / "index.html").write_text(page_html, encoding="utf-8")
+
+    # Emit the React frontend's data feed (manifest.json + per-issue
+    # bundles). Idempotent — running this on every dashboard build means
+    # the Vite app always has fresh data.
+    try:
+        from emit_manifest import emit_all as _emit_manifest_all
+
+        _emit_manifest_all(reports)
+    except Exception as exc:
+        print(f"manifest emit failed: {exc}", file=sys.stderr)
+
+    print(f"Wrote {front} (front page)")
+    print(f"Wrote {len(issues)} issue pages under {browse_root}")
+    return 0
+
+
+def cmd_emit_frontend_manifest(args) -> int:
+    """Sub-command: write the JSON feed the React frontend consumes.
+
+    Useful when iterating on the React app without rebuilding every
+    static HTML page. Pair with:
+
+        python tools/build_dashboard.py emit-frontend-manifest \
+          --reports reports \
+          --frontend-public frontend/public
+    """
+    from emit_manifest import emit_all as _emit_manifest_all
+
+    _emit_manifest_all(args.reports)
+    if args.frontend_public:
+        target = args.frontend_public
+        target.mkdir(parents=True, exist_ok=True)
+        # Mirror the manifest tree: manifest.json + browse/...
+        src_root = args.reports.resolve()
+        # Copy manifest.json
+        src = src_root / "manifest.json"
+        if src.exists():
+            (target / "manifest.json").write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+        # Mirror browse/
+        browse_src = src_root / "browse"
+        if browse_src.exists():
+            browse_dst = target / "browse"
+            browse_dst.mkdir(parents=True, exist_ok=True)
+            for path in browse_src.rglob("manifest.json"):
+                rel = path.relative_to(browse_src)
+                dst = browse_dst / rel
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                dst.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+            for path in browse_src.rglob("_diagnostics.json"):
+                rel = path.relative_to(browse_src)
+                dst = browse_dst / rel
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                dst.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+        print(f"Mirrored manifest into {target}/")
+    return 0
 
 
 def cmd_decision_graph(args) -> int:
