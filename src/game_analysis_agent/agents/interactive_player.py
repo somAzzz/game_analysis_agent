@@ -207,6 +207,7 @@ class InteractivePlayerAgent(Agent):
         """
         context = context or {}
         report_dir.mkdir(parents=True, exist_ok=True)
+        run_id = str(context.get("run_id") or report_dir.name)
         playthrough_path = playthrough_path or report_dir / "playthrough.jsonl"
 
         # The InteractiveProbe is the canonical owner of the Godot
@@ -328,7 +329,7 @@ class InteractivePlayerAgent(Agent):
                 anomalies=anomalies,
             )
             steps.append(step)
-            _append_step_jsonl(playthrough_path, step)
+            _append_step_jsonl(playthrough_path, step, run_id=run_id)
             memory = _update_memory(memory, step)
 
             if result.get("finished"):
@@ -348,7 +349,11 @@ class InteractivePlayerAgent(Agent):
             agent=self.name,
             started_at=datetime.now(tz=UTC),
             completed_at=datetime.now(tz=UTC),
-            output_files=["playthrough.jsonl", "playthrough_summary.md"],
+            output_files=[
+                "playthrough.jsonl",
+                "playthrough_summary.md",
+                "playthrough_agent_report.json",
+            ],
             llm_calls=llm_calls,
             tool_events=[],
             budget_usage=None,
@@ -356,7 +361,12 @@ class InteractivePlayerAgent(Agent):
 
         summary_path = report_dir / "playthrough_summary.md"
         summary_path.write_text(
-            _render_summary(steps, final_state, final_ending, truncated),
+            _render_summary(run_id, steps, final_state, final_ending, truncated),
+            encoding="utf-8",
+        )
+        agent_report_path = report_dir / "playthrough_agent_report.json"
+        agent_report_path.write_text(
+            run_report.model_dump_json(indent=2),
             encoding="utf-8",
         )
 
@@ -366,7 +376,7 @@ class InteractivePlayerAgent(Agent):
             final_state=final_state,
             final_ending=final_ending,
         )
-        return result, [playthrough_path, summary_path]
+        return result, [playthrough_path, summary_path, agent_report_path]
 
     # -- helpers ----------------------------------------------------------
 
@@ -895,11 +905,12 @@ def _normalize_decision_payload(
     normalized["persona"] = context_pack.persona
     return normalized
 
-def _append_step_jsonl(path: Path, step: PlaythroughStep) -> None:
+def _append_step_jsonl(path: Path, step: PlaythroughStep, *, run_id: str) -> None:
     with path.open("a", encoding="utf-8") as handle:
         handle.write(
             json.dumps(
                 {
+                    "run_id": run_id,
                     "step_id": str(uuid.uuid4()),
                     "week": step.week,
                     "week_context": step.week_context,
@@ -923,6 +934,7 @@ def _append_step_jsonl(path: Path, step: PlaythroughStep) -> None:
 
 
 def _render_summary(
+    run_id: str,
     steps: list[PlaythroughStep],
     final_state: dict[str, Any],
     final_ending: str,
@@ -930,6 +942,7 @@ def _render_summary(
 ) -> str:
     lines = ["# Interactive Player Summary", ""]
     lines.append("## Overview\n")
+    lines.append(f"- run id: **{run_id}**")
     lines.append(f"- weeks played: **{len(steps)}**")
     lines.append(f"- final ending: **{final_ending}**")
     lines.append(f"- truncated at max_weeks: **{truncated}**")

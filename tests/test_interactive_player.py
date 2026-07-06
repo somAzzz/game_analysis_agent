@@ -167,16 +167,20 @@ def test_play_through_runs_explicit_weekly_loop(tmp_path) -> None:
 
     summary_path = tmp_path / "playthrough_summary.md"
     jsonl_path = tmp_path / "playthrough.jsonl"
+    agent_report_path = tmp_path / "playthrough_agent_report.json"
     assert summary_path.exists()
     assert jsonl_path.exists()
+    assert agent_report_path.exists()
     summary = summary_path.read_text(encoding="utf-8")
     assert "## Weekly Decisions" in summary
     assert "weeks played: **5**" in summary
+    assert "run id:" in summary
 
     rows = [
         json.loads(line) for line in jsonl_path.read_text(encoding="utf-8").splitlines() if line.strip()
     ]
     assert len(rows) == 5
+    assert rows[0]["run_id"] == tmp_path.name
     assert rows[0]["chosen_actions"] == ["study_library"]
     assert rows[1]["chosen_actions"] == ["sleep_recover"]
 
