@@ -113,6 +113,16 @@ python3 tools/run_gameplay_agent.py play --report-dir reports/play/test --weeks 
 
 # 仅跑某个 agent（如果只想看一份诊断）
 python3 tools/run_agent.py balance reports/balance/baseline
+
+# Build an editorial-style HTML dashboard over all reports/
+python3 tools/build_dashboard.py all
+# → reports/index.html + reports/browse/<kind>/<id>/index.html
+# → reports/browse/decision_graph/<run>/<id>/index.html  (full decision graph
+#   with every game event plotted across three lanes; agent's path glowing)
+
+# Render the decision graph for one specific run on demand:
+python3 tools/build_dashboard.py decision-graph \
+  --report-dir reports/balance/<run>/ --run-id 0
 ```
 
 ## 目录结构

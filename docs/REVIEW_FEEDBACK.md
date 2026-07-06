@@ -745,5 +745,46 @@ $ uv run pytest tests/ -q
 
 ### 遗留 / 已记录在 `docs/ACTION_PLAN.md` 中暂未实施
 
-- T01 / T12 — smoke + 全量矩阵需要 Godot 项目和真实运行环境；
-- T13 — HTML dashboard（P2）。
+- T01 / T12 — smoke + 全量矩阵需要 Godot 项目和真实运行环境。
+
+### T13 — Editorial HTML dashboard ✅
+
+- **新增**: `tools/build_dashboard.py` —— 单文件 Python CLI，无第三方依赖。
+- **aesthetic**: 编辑部 / 数据新闻学风格（Pudding / FiveThirtyEight / NYT Graphics 一类）。Fraunces（display）+ Newsreader（body）+ IBM Plex Mono（kicker / 数据 / numerics）。配色：paper cream `#F4EFE6` + ink `#1F1B16` + terracotta `#C8553D` + forest `#3B5F4E`。
+- **核心设定**：把每一个 report 目录当作 *杂志的一期* —— 有封面、masthead、署名、版面编号、byline、deck（导言）、drop cap、pull quote、anomaly marginalia（页边注脚）。
+- **front page** (`reports/index.html`)：masthead（vol/issue/date 三段式）+ banner（巨型 Fraunces title + 副标题）+ KPI strip（4 个并列数字栏）+ Issue Shelf（24 张本期目录卡片）+ Colophon（版权页）。
+- **per-issue page** (`reports/browse/<kind>/<run_id>/index.html`)：cover（issue 编号 / 4 段 meta / 巨型 H1 / deck）+ tab rail + Ending Grid（红条形 bar）+ Pulse of the simulation（4 个 SVG sparkline，CSS `stroke-dashoffset` 动画 stagger 出现）+ Value findings（带 severity 标签的表格）+ Anomaly marginalia（页边小圆圈 + hover tooltip）+ Playthrough spine（如果存在：横轴时间线，红点 = anomaly 周）+ Agent columns（markdown 渲染成版面正文 + drop cap）。
+- **细节落点**：
+  - `::first-letter` drop cap，color = terracotta。
+  - `md-quote` blockquote 用左侧 terracotta 竖线。
+  - `byline-rule` 用 `::before` / `::after` 双侧虚线 + mono 小字。
+  - Sparkline path class 加 `delay-0..4` 错开出现。
+  - 卡片加 `fade-in d0..d3` 错开渐显。
+  - GATE report 用红/绿横幅直显。
+- **零依赖**：自写 markdown 子集渲染（headings / paragraph / list / blockquote / code fence / table / inline bold-italic-code），inline CSS，inline SVG。
+- **测试**: `tests/test_build_dashboard.py` 9 个 case（markdown 各元素 + front page + issue page + 聚合器）。
+- **验证**: `pytest tests/test_build_dashboard.py -v` → 9 passed；全量 `pytest tests/`（除 pre-existing broken test）→ 123 passed。
+- **使用**:
+  ```bash
+  python3 tools/build_dashboard.py --reports reports
+  # → reports/index.html + reports/browse/<kind>/<id>/index.html
+  #   open in browser via file://
+  ```
+- **当前状态**：基于仓库内真实 reports（54 个 issue：50 balance + 4 boundary + 0 play），play 模块结构就绪但目前仓库还没有真实 playthrough 跑出来。运行一次 `play` 子命令即可让 `browse/play/<persona>/` 自动出现。
+
+### Decision-graph view (T13.5) ✅
+
+- **新增**: `tools/build_dashboard.py` 增加 `decision-graph` 子命令 + 一整套渲染函数（`_compute_graph_layout` / `_decision_graph_payload` / `_decision_graph_svg` / `render_decision_graph_page`）。
+- **核心设计**：把所有 128 个 game event 在 SVG 画布上铺开，3 条横向 lane 按 `event_type`（fixed / conditional / random），X 轴 = 触发周。被 agent 触发的事件节点用 terracotta 描边 + 黑色填充凸显，连成一条发光的 path polyline（CSS `stroke-dashoffset` 动画）。
+- **choice 高亮**：每个被触发的事件节点里叠一个 wedge 扇形（按 4 等份划分），扇形位置代表该 event 4 个 choice 中 agent 选的那个（1/2/3/4）。Hover 节点 → tooltip 显示 event title + choice text + 关键 effects；点击节点 / 点击 timeline 一格 → 同步高亮，下方 panel 显示该周的 choice + effects + selected_actions + after_state。
+- **interactivity**：底部 timeline 横轴有 slider（0..20）+ Play / Pause / Reset 按钮 —— Play 会自动一周一周推进画布高亮，模拟"实时回放 agent 的决策过程"。
+- **触发数量**：128 events total（62 random + 38 conditional + 8 fixed），balanced policy 在 default_first_semester 下触发了 20 个节点（每 week 一个），全在 fixed / conditional lane，random lane 因为触发条件不满足保持空。
+- **接入**：每个 balance issue 页面的 tab rail 增加 "↗ Decision Graph" 链接，独立 URL `reports/browse/decision_graph/<run>/<run_id>/index.html`，可通过 CLI `decision-graph --report-dir ... --run-id N` 单跑一份。
+- **测试**：`tests/test_build_dashboard.py` 增加 5 个 case（layout lane 分离 / wedge SVG / 空 wedge 处理 / payload 抽取 choice / page 渲染关键 section）→ 14 passed。
+- **验证**：全量 `pytest tests/` → 128 passed；`python tools/build_dashboard.py all` → 写出 front page + 54 issue pages + 4 decision-graph pages。
+  ```bash
+  python3 tools/build_dashboard.py all
+  # → reports/index.html
+  # → reports/browse/balance/<run>/index.html          (per-issue page)
+  # → reports/browse/decision_graph/<run>/<id>/...   (interactive decision graph)
+  ```
