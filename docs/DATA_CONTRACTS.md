@@ -298,15 +298,67 @@ balanced,visa_delay,email_foreigners_office,90,0.64
 
 ### playthrough.jsonl
 
-每行一个 step，包含 model 决策、tool 调用结果与状态变化。详见
-`game_analysis_agent.game_tools.InteractiveProbe.step`。
+每行一个 step，包含 `run_id`、`step_id`、model 决策、tool 调用结果与状态变化。
+详见 `game_analysis_agent.game_tools.InteractiveProbe.step`。
 
 ### playthrough_summary.md
 
 由 `InteractivePlayerAgent` 生成，包含工具调用次数、LLM 调用次数、最终
 状态片段。
 
-## 7. 测试门禁与覆盖率（v0.2）
+### playthrough_agent_report.json
+
+由 `InteractivePlayerAgent` 生成，保存 `AgentRunReport`，包括每次 LLM 调用的
+provider、model、prompt/response 文本、token 统计与耗时。用于从前端或审核页面
+追溯某一步决策背后的模型输入输出。
+
+## 7. 可溯源报告索引（v0.3）
+
+### report_manifest.json
+
+每个 report 目录都会生成。它不替代原始报告文件，而是作为前端和人工审核的
+统一入口。
+
+```json
+{
+  "schema_version": "trace-manifest-v1",
+  "report_id": "balance:run-abc123",
+  "report_type": "balance",
+  "run_id": "run-abc123",
+  "status": "completed",
+  "command": "analyze",
+  "parameters": {"runs": 20, "policy": "balanced"},
+  "source_files": [
+    {"path": "raw_runs.jsonl", "bytes": 1234, "sha256": "..."}
+  ],
+  "generated_files": [
+    {"path": "summary.json", "bytes": 456, "sha256": "..."}
+  ],
+  "trace": {
+    "primary_file": "raw_runs.jsonl",
+    "runs": [
+      {
+        "run_id": 0,
+        "trace_file": "raw_runs.jsonl",
+        "line": 1,
+        "policy": "balanced",
+        "seed": 42,
+        "final_ending_id": "stable_start",
+        "step_count": 20
+      }
+    ],
+    "steps": []
+  }
+}
+```
+
+### report_index.json
+
+位于 `reports/report_index.json`，由 `tools/run_gameplay_agent.py index` 或
+`tools/build_dashboard.py all` 生成。前端列表页应优先读取该文件，再根据其中的
+`manifest` 字段打开对应 `report_manifest.json`。
+
+## 8. 测试门禁与覆盖率（v0.2）
 
 ### coverage_report.json
 

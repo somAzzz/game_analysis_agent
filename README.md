@@ -96,6 +96,7 @@ python3 tools/run_gameplay_agent.py all --runs 20 --policy balanced
    reports/balance/<run_id>/event_graph_report.md
    reports/balance/<run_id>/bug_diagnosis.md
    reports/balance/<run_id>/value_review.md
+   reports/balance/<run_id>/report_manifest.json
    ```
 
 5. 单独运行其它子命令：
@@ -119,11 +120,32 @@ python3 tools/build_dashboard.py all
 # → reports/index.html + reports/browse/<kind>/<id>/index.html
 # → reports/browse/decision_graph/<run>/<id>/index.html  (full decision graph
 #   with every game event plotted across three lanes; agent's path glowing)
+# → reports/manifest.json + reports/browse/<kind>/<id>/manifest.json
+#   (data feed for the React frontend below)
 
 # Render the decision graph for one specific run on demand:
 python3 tools/build_dashboard.py decision-graph \
   --report-dir reports/balance/<run>/ --run-id 0
+
+# React + React Flow frontend (alternative to the static HTML):
+cd frontend && npm install
+npm run dev          # http://localhost:5173
+npm run build        # → frontend/dist/   (static SPA, ready to serve)
+# Mirror the manifest into the Vite project for development:
+python3 tools/build_dashboard.py emit-frontend-manifest \
+  --reports reports --frontend-public frontend/public
 ```
+
+## Traceable reports
+
+Every generated report directory writes `report_manifest.json`. It keeps the
+report-level `run_id`, command parameters, source/generated files, sha256 file
+hashes, and a trace index back to `raw_runs.jsonl`, `boundary_runs.jsonl`, or
+`playthrough.jsonl` line numbers. Frontends should read `reports/report_index.json`
+for the list view, then open each report's `report_manifest.json` for drill-down.
+
+Interactive playtests also write `playthrough_agent_report.json` with LLM call
+audit rows, while every `playthrough.jsonl` step includes the report `run_id`.
 
 ## 目录结构
 

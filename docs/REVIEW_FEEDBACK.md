@@ -788,3 +788,98 @@ $ uv run pytest tests/ -q
   # → reports/browse/balance/<run>/index.html          (per-issue page)
   # → reports/browse/decision_graph/<run>/<id>/...   (interactive decision graph)
   ```
+
+### Decision-graph adaptive layer ✅
+
+- **修改**: `tools/build_dashboard.py` 重写，让 graph 生成器**自适应上游 schema 变化**（这是用户对 graph 可自动更新迭代的明确要求）。
+- **5 条适应轴线**：
+  1. **Lanes 自动派生**：`_compute_graph_layout` 不再用硬编码的 `{"fixed": 110, "conditional": 250, "random": 390}`。`_lane_for_event(ev)` 从 `event_type` / `type` / `kind` 字段取 lane name，缺失则归入 `uncategorised`，unknown 类型自动新开 lane。
+  2. **Lane y 自动计算**：根据 lane 数量平均分摊 plot 高度，新增第 4 / 5 条 lane 时画布自动长高。
+  3. **触发周兼容 5+ 种字段名**：`_trigger_week()` 依次尝试 `week` / `min_week` / `start_week` / `first_week` / `at_week` / `fire_week` / `weeks: [N, …]`，任一命中即可；缺失则按 `source_order` 横向铺开。
+  4. **Choice ID 7 种正则兼容**：`_choice_index_from_id()` 依次试 `.choice_(\d+)_` / `.choice_(\d+)$` / `/c(\d+)` / `/choice(\d+)` / `:choice?(\d+)` / `:(\d+)` / `_(\d+)`，并 explicit `choice_index` 字段优先级最高。Out-of-range 或空 → -1（不画 wedge，不抛错）。
+  5. **Choice text / effects 兼容**：`_safe_get_choice_text()` 试 `text` / `label` / `name` / `description` / `title`；`_safe_get_choice_effects()` 试 `success_effects` / `effects` / `outcome_effects`。
+- **Diagnostics 落地**：每个决策图页面 + 每个对应 `_diagnostics.json`（pages/browse/decision_graph/<run>/<id>/_diagnostics.json），记录：实际发现的 event_type 列表、data-driven lane order、观察到的 max_week、triggered 但 event_graph.json 里没有的事件 ID（schema drift 信号）、payload diagnostics 备注列表。同时页面里有一个可折叠的 `<details>` 块，把备注渲染在画布下方。
+- **Play reports 也被自动发现**：`cmd_all` 现在扫 balance *和* play 两个目录，只要有 `raw_runs.jsonl + event_graph.json` 就自动产出决策图页。
+- **画布自动横向延展**：若 `weekly_log` 里 week > 声明的 `max_weeks`（异常路径），payload 自动把 `max_week` 抬高到观察值，让图能完整画出 path。
+- **测试**：`tests/test_build_dashboard.py` 新增 12 个自适应 case：
+  - `test_layout_adapts_to_new_event_types`（新 lane 类型被吸收）
+  - `test_layout_orders_lanes_by_frequency`（多事件 lane 排前面）
+  - `test_layout_height_scales_with_lane_count`（高度自适应）
+  - `test_trigger_week_accepts_alternate_field_names`（6 种 trigger key）
+  - `test_choice_index_from_id_accepts_alternate_formats`（7 种 choice id）
+  - `test_lane_for_event_tolerates_alternate_field_names`（event_type / type / kind / missing）
+  - `test_payload_handles_alternative_trigger_field`（fire_week + slash choice id）
+  - `test_payload_adapts_to_unknown_event_type`（quantum_entangled 这种奇怪 lane）
+  - `test_payload_records_diagnostics_for_missing_event`（不在 event_graph 里的 triggered 事件）
+  - `test_payload_handles_missing_choice_text`（choice 没 text 字段）
+  - `test_payload_handles_explicit_choice_index_field`（直接 emit choice_index）
+  - `test_diagnostics_json_written`（`_diagnostics.json` 落地）
+  - `test_layout_max_week_widens_to_observed`（异常延展）
+- **验证**: `pytest tests/ --ignore=tests/test_analyze_balance.py -q` → **145 passed** (从 128 + 17)；`python tools/build_dashboard.py all` → 71 pages emitted (54 issue + 13 play decision_graph 等等自适应扩展)。
+- **未来扩展零代码改动示例**：
+  - 加个 `event_type: "meta"` 到 EventData → 自动出现 "META" lane
+  - 把 `trigger.week` 改名为 `trigger.fire_week` → 自动适配
+  - 把 `event_choice_id` 改成 `eid/c1` 格式 → wedge 自动定位
+  - 给 choice 加 `label` 字段代替 `text` → 自动拿到
+  - 任意新增 / 删除事件 / 调整次数 → 重新 `python tools/build_dashboard.py all`，graph 自动重新铺。
+
+### React + React Flow frontend ✅
+
+- **新增**: 整个 `frontend/` 子项目 —— Vite + React 18 + TypeScript + @xyflow/react (React Flow 12) + dagre (自动布局) + react-markdown + react-router-dom。
+- **3 条路由**:
+  - `/` → `FrontPage.tsx`（杂志封面 + KPI + issue shelf）
+  - `/issue/:kind/:id` → `IssuePage.tsx`（cover + ending grid + 4 个 sparkline + value findings + anomaly marginalia + 7 个 agent markdown column 用 react-markdown 渲染 + drop cap）
+  - `/decision-graph/:runId` → `DecisionGraphPage.tsx`（React Flow 画布 + 自定义 EventNode + BackgroundEventNode 节点 + dagre 自动布局 + 选择 / 拖动 / MiniMap / 自动播放 timeline）
+- **Python 后端 → React 前端 的数据线**：
+  - 新增 `tools/emit_manifest.py`：扫描 `reports/`，写出 `reports/manifest.json`（顶层 index）+ `reports/browse/<kind>/<id>/manifest.json`（per-issue 完整 payload，含 weekly_series / anomalies / value_findings / 8 个 agent_markdown body）+ `reports/browse/decision_graph/<run>/<id>/manifest.json`（含 raw run + 完整 event_graph）。
+  - `tools/build_dashboard.py` 新增 `cmd_emit_frontend_manifest` 子命令，可把 manifest 镜像到 `frontend/public/` 供 Vite dev server 静态服务。
+  - 跑一次 `python tools/build_dashboard.py all` 会自动跑 manifest emitter + 镜像到 frontend/public/，前端下次 dev / build 永远拿到最新数据。
+- **TypeScript 自适应层**：`frontend/src/lib/layout.ts` 是 Python `_compute_graph_layout` + `_decision_graph_payload` 的 TypeScript 端口，保持五条自适应轴线一致（lanes 由 event_type 派生、lane y 自动延展、trigger week 兼容 6 种字段名、choice index 兼容 7 种正则、choice text/effects 多字段名）。React 端不需要 Python 重算，可纯客户端渲染自适应 graph。
+- **Editorial 风格保留**：同一套 CSS variables (`--paper #F4EFE6` / `--accent #C8553D` / `--ink #1F1B16` 等)、同一套字体 (Fraunces / Newsreader / IBM Plex Mono)。`/decision-graph/...` 的 React Flow 自定义节点用了 React 端的 `.event-node` 类，跟静态 SVG 版视觉一致（圆形 80px / triggered 时 96px / 黑色 + terracotta 描边 / hover 放大）。
+- **交互功能**：
+  - Click node → 自动跳到对应 week 并同步高亮 timeline + side panel。
+  - Click timeline cell → 自动跳到对应 week 并同步 graph 高亮。
+  - Slider 0..maxWeek → scrub path，<= currentWeek 的节点 + 边自动 highlight。
+  - Play / Pause / Reset 按钮 → 700ms 间隔自动推进 slider。
+  - MiniMap + Controls + Background dots → 标准 React Flow 体验。
+- **Tests**：`tests/test_frontend_build.py` 3 个 case（Vite build 成功、dist/manifest.json 存在、Python manifest 解析有效）。`tests/test_emit_manifest.py` 4 个 case（顶层 + per-issue + decision-graph + 容错）。
+- **验证**：`pytest tests/ --ignore=tests/test_analyze_balance.py -q` → **155 passed**（Python 152 + frontend 3）。`cd frontend && npm run build` → 580KB JS / 32KB CSS，dist/index.html 干净输出。
+- **目录结构**：
+  ```
+  frontend/
+  ├── package.json             # vite + react + @xyflow/react + dagre + react-markdown + react-router-dom
+  ├── tsconfig.json
+  ├── vite.config.ts
+  ├── index.html
+  ├── public/                  # Python pipeline 镜像的 manifest.json + browse/
+  └── src/
+      ├── main.tsx
+      ├── App.tsx
+      ├── global.d.ts
+      ├── types.ts             # TS mirror of Python schemas
+      ├── styles/global.css    # editorial palette + typography
+      ├── lib/
+      │   ├── api.ts           # fetchJSON helpers
+      │   └── layout.ts        # TypeScript port of _compute_graph_layout
+      ├── components/
+      │   └── Masthead.tsx
+      └── pages/
+          ├── FrontPage.tsx
+          ├── IssuePage.tsx
+          ├── DecisionGraphPage.tsx
+          └── NotFoundPage.tsx
+  ```
+- **使用**:
+  ```bash
+  # 1. 生成报告（已有）
+  python tools/run_gameplay_agent.py all --runs 200
+  
+  # 2. 一条命令同时构建静态 HTML 和 manifest
+  python tools/build_dashboard.py all
+  
+  # 3. 启动 React SPA
+  cd frontend && npm install && npm run dev   # http://localhost:5173
+  
+  # 4. 生产构建
+  cd frontend && npm run build              # → frontend/dist/
+  ```
