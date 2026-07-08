@@ -5,11 +5,15 @@ integration is the Godot `study-in-germany` demo, but the project is structured
 as a reusable game QA agent framework for balance testing, boundary probing,
 bug discovery, value analysis, quality gates, and interactive LLM playtesting.
 
-![Dashboard preview](docs/assets/dashboard-preview.png)
+<p>
+  <a href="docs/assets/dashboard-preview.png">
+    <img src="docs/assets/dashboard-preview-thumb.png" alt="Dashboard preview" width="720">
+  </a>
+</p>
 
 | Report view | Decision graph |
 | --- | --- |
-| ![Report preview](docs/assets/report-preview.png) | ![Decision graph preview](docs/assets/decision-graph-preview.png) |
+| <a href="docs/assets/report-preview.png"><img src="docs/assets/report-preview-thumb.png" alt="Report preview" width="360"></a> | <a href="docs/assets/decision-graph-preview.png"><img src="docs/assets/decision-graph-preview-thumb.png" alt="Decision graph preview" width="360"></a> |
 
 PDF exports are kept in [docs/assets/dashboard-preview.pdf](docs/assets/dashboard-preview.pdf)
 and [docs/assets/decision-graph-preview.pdf](docs/assets/decision-graph-preview.pdf).
