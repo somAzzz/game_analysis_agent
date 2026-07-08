@@ -1,9 +1,18 @@
 # game_analysis_agent
 
-Development-side AI agent pipeline for Godot simulation games. The project is
-currently tailored to the `study-in-germany` demo, but the core workflow is
-intended to be reusable for balance testing, boundary probing, bug discovery,
-value analysis, and interactive LLM playtesting.
+Development-side AI agent pipeline for simulation games. The current reference
+integration is the Godot `study-in-germany` demo, but the project is structured
+as a reusable game QA agent framework for balance testing, boundary probing,
+bug discovery, value analysis, quality gates, and interactive LLM playtesting.
+
+![Dashboard preview](docs/assets/dashboard-preview.png)
+
+| Report view | Decision graph |
+| --- | --- |
+| ![Report preview](docs/assets/report-preview.png) | ![Decision graph preview](docs/assets/decision-graph-preview.png) |
+
+PDF exports are kept in [docs/assets/dashboard-preview.pdf](docs/assets/dashboard-preview.pdf)
+and [docs/assets/decision-graph-preview.pdf](docs/assets/decision-graph-preview.pdf).
 
 The agent is not embedded in the game runtime as an NPC. Instead, it runs beside
 the game as a QA and design-review system:
@@ -79,36 +88,74 @@ For the full end-to-end workflow:
 
 The pure Python analyzers and tests can run without Godot or a live LLM.
 
-## Quick Start: Local Python
+## Quick Start A: No Godot, No LLM
+
+Use this path to inspect the project shape, run tests, and build a dashboard
+from committed sample reports.
 
 ```bash
 cp .env.example .env
 uv venv .venv
 source .venv/bin/activate
 uv pip install -e ".[dev]"
+uv run pytest
+uv run python tools/build_dashboard.py all --reports examples/sample_reports
 ```
 
-Edit `.env` as needed. The most important values are:
+Open:
+
+```text
+examples/sample_reports/index.html
+```
+
+The richer React demo dataset lives under `frontend/public-demo/` and is safe to
+show publicly because private raw runs, complete event graphs, and gameplay text
+are withheld.
+
+## Quick Start B: With Local LLM
+
+Edit `.env` for an OpenAI-compatible local endpoint:
 
 ```bash
 LLM_PROVIDER=vllm
 VLLM_BASE_URL=http://localhost:8000/v1
 VLLM_API_KEY=local-dev-token
 VLLM_MODEL=nvidia/Qwen3.6-27B-NVFP4
-GAME_PROJECT_PATH=/path/to/study-in-germany
-GODOT_BIN=godot4
 ```
 
-Run the Python test suite:
+Run LLM review agents against a report directory:
 
 ```bash
-uv run pytest
+uv run python tools/run_gameplay_agent.py qa \
+  --report-dir examples/sample_reports/balance/sample_balance_report
+```
+
+Or run only one agent:
+
+```bash
+uv run python tools/run_agent.py balance \
+  examples/sample_reports/balance/sample_balance_report
+```
+
+## Quick Start C: Full Godot Integration
+
+Set the target game project and Godot CLI:
+
+```bash
+GAME_PROJECT_PATH=/path/to/study-in-germany
+GODOT_BIN=godot4
 ```
 
 Run the main CLI help:
 
 ```bash
 uv run python tools/run_gameplay_agent.py --help
+```
+
+Run the simple end-to-end path:
+
+```bash
+uv run python tools/run_gameplay_agent.py all --runs 20 --policy balanced
 ```
 
 ## Quick Start: Docker + vLLM
@@ -204,6 +251,19 @@ Run the simple end-to-end path:
 uv run python tools/run_gameplay_agent.py all --runs 20 --policy balanced
 ```
 
+## Adapting to Another Game
+
+The reference game is `study-in-germany`, but the expected integration surface
+is intentionally small:
+
+1. Export the game's actions, events, endings, and state metrics.
+2. Implement a headless simulation command for repeatable runs.
+3. Emit `raw_runs.jsonl` with weekly state, actions, events, choices, and final
+   ending.
+4. Configure `config/gates.yaml` for project-specific quality thresholds.
+5. Run the Python analyzers and LLM review agents.
+6. Build the static or React dashboard for reviewers.
+
 ## Reports and Traceability
 
 Report directories live under `reports/`, usually grouped by kind:
@@ -268,6 +328,12 @@ Build the static HTML dashboard and frontend manifests:
 uv run python tools/build_dashboard.py all
 ```
 
+Build it from the committed sample reports:
+
+```bash
+uv run python tools/build_dashboard.py all --reports examples/sample_reports
+```
+
 This writes:
 
 ```text
@@ -321,15 +387,20 @@ config/
 
 docs/
   ARCHITECTURE.md
+  PORTFOLIO.md
   DATA_CONTRACTS.md
   DOCKER.md
   GAMEPLAY_AGENT.md
   GODOT_INTEGRATION.md
   INTEGRATION_WITH_STUDY_IN_GERMANY.md
   VLLM_QWEN_LOCAL_AGENT.md
+  assets/
   interactive_playtest/
   playability_fix/
   review/
+
+examples/
+  sample_reports/           Tiny sanitized reports for dashboard demos
 
 frontend/
   React + Vite dashboard with React Flow decision graphs
@@ -382,8 +453,15 @@ tests/
 - [Godot Integration](docs/GODOT_INTEGRATION.md)
 - [Integration with study-in-germany](docs/INTEGRATION_WITH_STUDY_IN_GERMANY.md)
 - [Local vLLM + Qwen](docs/VLLM_QWEN_LOCAL_AGENT.md)
+- [Portfolio Notes](docs/PORTFOLIO.md)
 - [Interactive Playtest Plan](docs/interactive_playtest/README.md)
 - [Review Documents](docs/review/README.md)
+
+## Current Limitations
+
+Interactive LLM playtesting is implemented as an orchestration target. Full
+real-time Godot stepping depends on the target game exposing the required probe
+script and data contracts.
 
 ## Notes
 

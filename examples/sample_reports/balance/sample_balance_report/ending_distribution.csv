@@ -1,0 +1,3 @@
+policy,ending_id,count,rate
+balanced,stable_semester,1,0.500
+balanced,cash_pressure,1,0.500

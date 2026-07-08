@@ -1,0 +1,2 @@
+{"kind":"cashflow_risk","severity":"warning","run_id":1,"week":4,"policy":"balanced","message":"Sample run ended with low money while academic progress remained recoverable."}
+{"kind":"stress_risk","severity":"info","run_id":1,"week":4,"policy":"balanced","message":"Stress crossed the sample review threshold."}

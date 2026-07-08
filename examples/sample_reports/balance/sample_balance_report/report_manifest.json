@@ -1,0 +1,18 @@
+{
+  "run_id": "sample_balance_report",
+  "kind": "balance",
+  "generated_at": "2026-07-06T21:35:38Z",
+  "public_demo": true,
+  "inputs": [],
+  "outputs": [
+    "raw_runs.jsonl",
+    "summary.json",
+    "ending_distribution.csv",
+    "weekly_stats.csv",
+    "action_pick_rates.csv",
+    "anomalies.jsonl",
+    "gate_report.json",
+    "agent_diagnosis.md",
+    "tuning_proposal.md"
+  ]
+}

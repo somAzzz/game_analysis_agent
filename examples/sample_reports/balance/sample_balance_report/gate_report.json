@@ -1,0 +1,10 @@
+{
+  "passed": false,
+  "failures": [
+    {
+      "gate": "sample_cash_floor",
+      "severity": "warning",
+      "message": "One sample run ended below the public demo cash floor."
+    }
+  ]
+}

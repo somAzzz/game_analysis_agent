@@ -1,0 +1,11 @@
+{
+  "total_runs": 2,
+  "policies": {
+    "balanced": 2
+  },
+  "top_events": {
+    "orientation": 2,
+    "rent_due": 2,
+    "midterm_week": 2
+  }
+}

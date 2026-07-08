@@ -1,0 +1,10 @@
+{
+  "run_id": "sample_playthrough_report",
+  "kind": "play",
+  "generated_at": "2026-07-06T21:35:38Z",
+  "public_demo": true,
+  "outputs": [
+    "raw_runs.jsonl",
+    "playthrough_summary.md"
+  ]
+}

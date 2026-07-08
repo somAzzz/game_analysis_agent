@@ -1,0 +1,2 @@
+{"run_id":0,"extreme":"zero_money","policy":"balanced","final_ending_id":"cash_pressure","anomalies":[{"kind":"resource_floor","severity":"warning","message":"Money stayed near zero for two sample weeks."}]}
+{"run_id":1,"extreme":"high_stress","policy":"balanced","final_ending_id":"recovery_pause","anomalies":[{"kind":"stress_ceiling","severity":"warning","message":"Stress exceeded the sample ceiling before recovery."}]}

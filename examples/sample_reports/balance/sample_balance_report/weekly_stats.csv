@@ -1,0 +1,13 @@
+metric,week,mean,p10,p90
+money,1,770,760,780
+money,2,485,280,690
+money,3,430,210,650
+money,4,370,120,620
+stress,1,23,22,24
+stress,2,41,34,48
+stress,3,50,39,61
+stress,4,55,42,68
+academic_progress,1,9,8,10
+academic_progress,2,22.5,21,24
+academic_progress,3,31.5,29,34
+academic_progress,4,42,38,46

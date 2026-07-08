@@ -1,0 +1,10 @@
+{
+  "run_id": "sample_boundary_report",
+  "kind": "boundary",
+  "generated_at": "2026-07-06T21:35:38Z",
+  "public_demo": true,
+  "outputs": [
+    "boundary_runs.jsonl",
+    "boundary_report.md"
+  ]
+}
