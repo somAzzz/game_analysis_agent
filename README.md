@@ -5,18 +5,14 @@ integration is the Godot `study-in-germany` demo, but the project is structured
 as a reusable game QA agent framework for balance testing, boundary probing,
 bug discovery, value analysis, quality gates, and interactive LLM playtesting.
 
-<p>
-  <a href="docs/assets/dashboard-preview.png">
-    <img src="docs/assets/dashboard-preview-thumb.png" alt="Dashboard preview" width="720">
-  </a>
-</p>
+## Live Demo
 
-| Report view | Decision graph |
-| --- | --- |
-| <a href="docs/assets/report-preview.png"><img src="docs/assets/report-preview-thumb.png" alt="Report preview" width="360"></a> | <a href="docs/assets/decision-graph-preview.png"><img src="docs/assets/decision-graph-preview-thumb.png" alt="Decision graph preview" width="360"></a> |
+**Open the public dashboard:**  
+**[https://somazzz.github.io/game_analysis_agent/](https://somazzz.github.io/game_analysis_agent/)**
 
-PDF exports are kept in [docs/assets/dashboard-preview.pdf](docs/assets/dashboard-preview.pdf)
-and [docs/assets/decision-graph-preview.pdf](docs/assets/decision-graph-preview.pdf).
+The GitHub Pages demo uses sanitized report data, so reviewers can inspect the
+dashboard and decision-graph experience without running Godot, local LLMs, or
+private game assets.
 
 The agent is not embedded in the game runtime as an NPC. Instead, it runs beside
 the game as a QA and design-review system:
