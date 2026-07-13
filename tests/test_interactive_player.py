@@ -15,6 +15,7 @@ from game_analysis_agent.agents.interactive_player import (
     build_week_context,
 )
 from game_analysis_agent.game_tools import InteractiveProbe
+from game_analysis_agent.llm_client import LLMRequestError
 from game_analysis_agent.schemas import LLMCall, PlayMemory
 from game_analysis_agent.settings import Settings
 
@@ -291,6 +292,26 @@ def test_play_through_falls_back_to_first_action_when_decision_invalid(tmp_path)
     assert probe.calls[0]["actions"] == ["study_library"]
     # Three invalid attempts per week must all remain in the audit report.
     assert len(result.report.llm_calls) == 15
+
+
+def test_play_through_records_failed_llm_call_before_fallback(tmp_path) -> None:
+    probe = _FakeProbe(finish_at=1)
+    agent = _build_agent([], probe)
+    failed_call = _fake_llm_call()
+    failed_call.error = "NotFoundError: model does not exist"
+
+    def fail_chat(messages, **kwargs):  # noqa: ANN001, ANN003, ARG001
+        raise LLMRequestError(failed_call)
+
+    agent.llm.chat = fail_chat  # type: ignore[method-assign]
+    agent.max_weeks = 1
+
+    result, _written = agent.play_through(tmp_path, probe=probe)  # type: ignore[arg-type]
+
+    assert result.steps[0].validation["fallback_used"] is True
+    assert result.report.llm_calls == [failed_call]
+    saved = json.loads((tmp_path / "playthrough_agent_report.json").read_text())
+    assert saved["llm_calls"][0]["error"] == failed_call.error
 
 
 def test_play_through_handles_json_fallback_tool_call(tmp_path) -> None:

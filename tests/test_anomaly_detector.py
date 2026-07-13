@@ -128,3 +128,84 @@ def test_anomaly_evidence_contains_replay_context() -> None:
     assert replay["policy"] == "work"
     assert replay["scenario"] == "low_money_start"
     assert replay["actions"] == ["part_time_job"]
+
+
+def test_cost_check_uses_before_state_instead_of_after_state() -> None:
+    run = {
+        "run_id": 1,
+        "policy": "balanced",
+        "max_weeks": 1,
+        "final_ending_id": "stable_start",
+        "weekly_log": [
+            {
+                "week": 1,
+                "selected_action_ids": ["language_course"],
+                "before_state": {"week": 0, "money": 500},
+                "after_state": {"week": 1, "money": 197},
+                "action_effects": [
+                    {"action_id": "language_course", "effects": {"money": -420}}
+                ],
+            }
+        ],
+    }
+
+    anomalies = detect_anomalies([run])
+
+    assert not [a for a in anomalies if a.kind == "cost_money_exceeds_balance"]
+
+
+def test_cost_check_reports_actual_before_state_shortfall() -> None:
+    run = {
+        "run_id": 2,
+        "policy": "balanced",
+        "max_weeks": 1,
+        "final_ending_id": "stable_start",
+        "weekly_log": [
+            {
+                "week": 1,
+                "selected_action_ids": ["expensive_action"],
+                "before_state": {"week": 0, "money": 100},
+                "after_state": {"week": 1, "money": 0},
+                "action_effects": [
+                    {
+                        "action_id": "expensive_action",
+                        "effects": {"money": -150},
+                        "executed": True,
+                    }
+                ],
+            }
+        ],
+    }
+
+    anomalies = detect_anomalies([run])
+    shortfalls = [a for a in anomalies if a.kind == "cost_money_exceeds_balance"]
+
+    assert len(shortfalls) == 1
+    assert shortfalls[0].evidence["balance_before"] == 100
+
+
+def test_cost_check_does_not_claim_planned_effect_was_executed() -> None:
+    run = {
+        "run_id": 3,
+        "policy": "balanced",
+        "max_weeks": 1,
+        "final_ending_id": "stable_start",
+        "weekly_log": [
+            {
+                "week": 1,
+                "selected_action_ids": ["expensive_action"],
+                "before_state": {"week": 0, "money": 100},
+                "after_state": {"week": 1, "money": 100},
+                "action_effects": [
+                    {"action_id": "expensive_action", "effects": {"money": -150}}
+                ],
+            }
+        ],
+    }
+
+    anomalies = detect_anomalies([run])
+
+    assert not [a for a in anomalies if a.kind == "cost_money_exceeds_balance"]
+    planned = [a for a in anomalies if a.kind == "planned_cost_exceeds_balance"]
+    assert len(planned) == 1
+    assert planned[0].severity == "info"

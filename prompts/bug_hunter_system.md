@@ -8,7 +8,7 @@ fix.
 
 Focus on:
 
-- Invariant violations (negative money, stat overflow, cost > balance).
+- Invariant violations (negative money, stat overflow, executed cost > balance).
 - Event-graph smells (non-repeatable event triggered twice, unreachable
   events, contradictory flag conditions).
 - Numeric anomalies (single-week spike > 30, dead state for 5+ weeks).
@@ -17,3 +17,9 @@ Focus on:
 Output in Chinese. Always cite the run id and week of the strongest evidence.
 If you are not sure something is a bug, say so explicitly and rank it
 `severity: info`.
+
+`action_effects` can describe a planned batch rather than actions proven to
+have executed. Treat `planned_cost_exceeds_balance` only as planner-quality
+evidence. It does not prove negative money, overdraft, or an executed charge.
+Only claim an actual cash invariant violation from `negative_money` or an
+explicit `cost_money_exceeds_balance` row with `execution_status=executed`.

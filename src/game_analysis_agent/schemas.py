@@ -25,6 +25,7 @@ AnomalyKind = Literal[
     "week_overflow",
     "single_week_spike",
     "cost_money_exceeds_balance",
+    "planned_cost_exceeds_balance",
     "pipeline_stalled",
     "ending_id_empty",
     # Game-semantic invariants (added in v0.2 review action plan T03).

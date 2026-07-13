@@ -266,7 +266,7 @@ uv run python -m json.tool \
 正式测试把 `--weeks` 改成 `20`。可用 persona 为 `newbie`、`study`、
 `money`、`social`、`visa` 和 `slacker`。合格结果至少应满足：
 
-- `valid: true` 且 `errors` 为空；
+- `valid: true`、`strict_passed: true`，且 `errors`、`quality_errors` 为空；
 - `final_valid_rate >= 0.95`；
 - `fallback_rate <= 0.05`；
 - `illegal_action_rate == 0`；

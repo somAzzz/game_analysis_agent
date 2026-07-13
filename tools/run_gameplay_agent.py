@@ -65,7 +65,10 @@ from game_analysis_agent.contracts import (  # noqa: E402
     validate_trace_catalog_consistency,
 )
 from game_analysis_agent.env import load_dotenv  # noqa: E402
-from game_analysis_agent.llm_client import LocalLLMClient  # noqa: E402
+from game_analysis_agent.llm_client import (  # noqa: E402
+    LLMPreflightError,
+    LocalLLMClient,
+)
 from game_analysis_agent.quality_gates import evaluate_report_dir, write_gate_report  # noqa: E402
 from game_analysis_agent.report_manifest import (  # noqa: E402
     write_report_manifest,
@@ -254,9 +257,9 @@ def cmd_sim(args: argparse.Namespace) -> int:
 
     requested_report_dir = getattr(args, "report_dir", None)
     out_dir = (
-        Path(requested_report_dir)
+        Path(requested_report_dir).resolve()
         if requested_report_dir
-        else (ROOT / "reports" / "balance" / run_id)
+        else (ROOT / "reports" / "balance" / run_id).resolve()
     )
     _reset_known_report_outputs(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -1006,6 +1009,11 @@ def cmd_export(args: argparse.Namespace) -> int:
 def cmd_qa(args: argparse.Namespace) -> int:
     settings = get_settings()
     llm = LocalLLMClient.from_settings(settings)
+    try:
+        llm.validate_model_available()
+    except LLMPreflightError as exc:
+        print(f"LLM preflight failed: {exc}", file=sys.stderr)
+        return 5
     prompts_root = ROOT / "prompts"
     for agent_name in args.agents:
         if agent_name == "interactive_player":
@@ -1035,7 +1043,6 @@ def cmd_qa(args: argparse.Namespace) -> int:
 
 def cmd_play(args: argparse.Namespace) -> int:
     settings = get_settings()
-    _reset_known_report_outputs(args.report_dir)
     llm = LocalLLMClient.from_settings(settings)
     if not llm.settings.deepseek_configured() and llm.provider == "deepseek":
         print(
@@ -1043,6 +1050,13 @@ def cmd_play(args: argparse.Namespace) -> int:
             file=sys.stderr,
         )
         return 5
+    try:
+        llm.validate_model_available()
+    except LLMPreflightError as exc:
+        print(f"LLM preflight failed: {exc}", file=sys.stderr)
+        return 5
+    args.report_dir = args.report_dir.resolve()
+    _reset_known_report_outputs(args.report_dir)
     from game_analysis_agent.agents.interactive_player import (  # noqa: I001
         PERSONAS,
         InteractivePlayerAgent,
@@ -1076,7 +1090,7 @@ def cmd_play(args: argparse.Namespace) -> int:
         seed=int(getattr(args, "seed", 42) or 42),
     )
     result, written = agent.play_through(args.report_dir)
-    evaluate_and_write(args.report_dir)
+    evaluation = evaluate_and_write(args.report_dir)
     written = [*written, args.report_dir / "agent_eval.json"]
     write_report_manifest(
         args.report_dir,
@@ -1102,6 +1116,10 @@ def cmd_play(args: argparse.Namespace) -> int:
     for path in written:
         print(f"[interactive_player] {path}")
     print(f"[interactive_player] ending={result.final_ending} steps={len(result.steps)}")
+    if not evaluation["strict_passed"]:
+        for error in [*evaluation["errors"], *evaluation["quality_errors"]]:
+            print(f"[play failed] {error}", file=sys.stderr)
+        return 8
     return 0
 
 
@@ -1167,8 +1185,8 @@ def cmd_eval(args: argparse.Namespace) -> int:
     report = evaluate_and_write(args.report_dir, output=args.out)
     target = args.out or args.report_dir / "agent_eval.json"
     print(f"Agent eval written to {target}")
-    if not report["valid"]:
-        for error in report["errors"]:
+    if not report["strict_passed"]:
+        for error in [*report["errors"], *report["quality_errors"]]:
             print(f"[eval failed] {error}", file=sys.stderr)
         return 1
     return 0

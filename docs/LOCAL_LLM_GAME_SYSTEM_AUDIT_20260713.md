@@ -1,6 +1,6 @@
 # 本地 LLM 游戏系统真实测试报告（2026-07-13）
 
-> 状态：基线审计完成，问题尚未修复。
+> 状态：基线审计完成；P0 Agent 可靠性修复已在后续修复分支实现。
 > 测试对象：`game_analysis_agent` + `study-in-germany` Godot 游戏。
 > 推理后端：本地 vLLM，实际 served model 为 `qwen3.6-27b-nvfp4`。
 > 游戏运行时：Docker 中的 Godot `4.4.stable`。
@@ -16,6 +16,24 @@ trace 一致。
 Agent 侧同时存在默认模型名错误、失败调用丢失、相对路径错误、异常检测假阳性、
 质量门禁单位不一致和评估指标失真等问题。因此当前 LLM 生成的 QA Markdown
 只能作为线索，不能直接作为修复依据。
+
+### 1.1 P0 修复进展
+
+基线报告提交后已完成：
+
+- 统一 `LLM_SERVED_MODEL_NAME`，并在 `play`/`qa` 前校验 `/v1/models`；
+- 失败聊天请求携带并持久化 `LLMCall`；
+- `sim` 在调用 Godot 前把 `report_dir` 规范化为绝对路径；
+- 用 `before_state` 检测资金 shortfall，并区分计划效果与已执行效果；
+- 增加 `strict_passed`，全 fallback、无 LLM 审计、错误率超限或非法决策返回非零；
+- Bug Hunter 在存在 raw trace 时重算派生异常，避免读取 stale `anomalies.jsonl`。
+
+修复后重新读取原始 50 局 trace：`cost_money_exceeds_balance` 从 482 降为 0；
+另保留 82 条 `planned_cost_exceeds_balance` info，表示同周动作计划累计费用可能超过
+余额，但不声称这些动作已经执行或产生负资金。
+
+真实默认配置 smoke 结果：`strict_passed=true`、2 次 LLM 调用、0 错误、
+0 fallback。全量验证为 256 个 pytest 通过、Ruff 通过、Compose 配置通过。
 
 ## 2. 测试环境
 
@@ -59,7 +77,7 @@ uv run python tools/run_gameplay_agent.py interactive-probe \
 为避免默认模型名错误，真实成功运行使用：
 
 ```bash
-VLLM_MODEL=qwen3.6-27b-nvfp4 \
+LLM_SERVED_MODEL_NAME=qwen3.6-27b-nvfp4 \
   uv run python tools/run_gameplay_agent.py play ...
 ```
 
@@ -341,6 +359,6 @@ reports/validation/local-llm-audit-20260713/
 - 失败调用的数量、错误类型和延迟进入 agent report；
 - 全 fallback 运行不能通过 strict eval；
 - 相对和绝对 report directory 产生相同规范化位置；
-- 资金异常检测使用 `before_state`，现有 482 个假阳性消失；
+- 资金异常检测使用 `before_state`，实际透支误报归零，计划超支单独标记；
 - LLM QA 中每个关键数值都能引用到 report artifact 和字段；
 - unit tests、Ruff、Godot contract smoke、economy/risk validators 通过。

@@ -33,6 +33,18 @@ from game_analysis_agent.settings import Settings, get_settings
 NoOpSink = Callable[[LLMCall], None]
 
 
+class LLMPreflightError(RuntimeError):
+    """Raised when the configured OpenAI-compatible endpoint is unusable."""
+
+
+class LLMRequestError(RuntimeError):
+    """Chat failure carrying the audit row that must be persisted by callers."""
+
+    def __init__(self, call: LLMCall) -> None:
+        self.call = call
+        super().__init__(call.error or "LLM request failed")
+
+
 def _no_sink(_call: LLMCall) -> None:
     """Default no-op sink used when no caller-supplied sink is provided."""
 
@@ -98,6 +110,32 @@ class LocalLLMClient:
             return {"chat_template_kwargs": {"enable_thinking": False}}
         return None
 
+    def validate_model_available(self) -> list[str]:
+        """Fail closed unless the configured model is exposed by the endpoint."""
+
+        try:
+            response = self.client.models.list()
+        except Exception as exc:
+            raise LLMPreflightError(
+                f"Could not query models from {self.base_url}: "
+                f"{type(exc).__name__}: {exc}"
+            ) from exc
+        data = getattr(response, "data", None)
+        available = sorted(
+            {
+                str(model_id)
+                for item in (data if isinstance(data, list) else [])
+                if (model_id := getattr(item, "id", None))
+            }
+        )
+        if self.model not in available:
+            shown = ", ".join(available) if available else "(none)"
+            raise LLMPreflightError(
+                f"Configured model {self.model!r} is not served by {self.base_url}; "
+                f"available models: {shown}"
+            )
+        return available
+
     def _chat(
         self,
         messages: list[dict[str, str]],
@@ -142,7 +180,7 @@ class LocalLLMClient:
             )
             if emit_call:
                 self._llm_call_sink(call)
-            raise
+            raise LLMRequestError(call) from exc
 
         try:
             content = response.choices[0].message.content or ""
@@ -309,6 +347,8 @@ class LegacyLocalLLMClient:
 
 
 __all__ = [
+    "LLMPreflightError",
+    "LLMRequestError",
     "LLMConfig",
     "LegacyLocalLLMClient",
     "LocalLLMClient",

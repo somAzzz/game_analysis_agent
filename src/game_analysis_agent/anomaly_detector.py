@@ -202,37 +202,55 @@ def _scan_single_run(
                     )
                 )
 
-        # Cost_money exceeded current money
+        # Cost_money exceeded the balance immediately before that action.
+        # Never use after_state here: doing so applies the same cost twice and
+        # turns normal purchases into false positives.
         effects = week.get("action_effects", []) or []
+        before_state = week.get("before_state")
+        action_balance = (
+            before_state.get("money") if isinstance(before_state, dict) else None
+        )
         for effect_record in effects:
             if not isinstance(effect_record, dict):
                 continue
             effects_dict = effect_record.get("effects", {}) or {}
             cost_money = int(effects_dict.get("money", 0))
-            current_money = state.get("money")
+            balance_before = action_balance
             if (
                 cost_money < 0
-                and isinstance(current_money, (int, float))
-                and current_money + cost_money < 0
+                and isinstance(balance_before, (int, float))
+                and balance_before + cost_money < 0
             ):
+                executed = effect_record.get("executed") is True
                 anomalies.append(
                     _mk(
-                        "cost_money_exceeds_balance",
+                        "cost_money_exceeds_balance"
+                        if executed
+                        else "planned_cost_exceeds_balance",
                         run_id,
                         week_no,
                         policy,
-                        severity="warning",
+                        severity="warning" if executed else "info",
                         evidence={
                             "action_id": effect_record.get("action_id"),
                             "cost_money": cost_money,
-                            "balance_before": current_money,
+                            "balance_before": balance_before,
+                            "execution_status": "executed" if executed else "unknown",
                         },
                         message=(
-                            f"Action `{effect_record.get('action_id')}` would push "
-                            f"money to {current_money + cost_money}."
+                            f"{'Action' if executed else 'Planned action'} "
+                            f"`{effect_record.get('action_id')}` would push money to "
+                            f"{balance_before + cost_money}."
                         ),
                     )
                 )
+            money_delta = effects_dict.get("money", 0)
+            if isinstance(action_balance, (int, float)) and isinstance(
+                money_delta, (int, float)
+            ):
+                # The game clamps money at zero and may create arrears. Keep
+                # the sequential estimate aligned with that invariant.
+                action_balance = max(0, action_balance + money_delta)
 
         # Week overflow (state.week > max_weeks)
         max_weeks = int(run.get("max_weeks", 20) or 20)

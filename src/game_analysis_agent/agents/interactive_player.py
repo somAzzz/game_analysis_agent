@@ -39,7 +39,7 @@ from pydantic import ValidationError
 from game_analysis_agent.agents.base import Agent, AgentOutput, AgentRunResult
 from game_analysis_agent.contracts import ProbeRiskGuidance
 from game_analysis_agent.game_tools import InteractiveProbe
-from game_analysis_agent.llm_client import LocalLLMClient
+from game_analysis_agent.llm_client import LLMRequestError, LocalLLMClient
 from game_analysis_agent.schemas import (
     ActionBrief,
     AgentRunReport,
@@ -446,6 +446,8 @@ class InteractivePlayerAgent(Agent):
                 )
                 calls.append(call)
             except Exception as exc:
+                if isinstance(exc, LLMRequestError):
+                    calls.append(exc.call)
                 errors = [f"LLM error: {exc}"]
                 break
             decision, errors = _parse_player_decision(
