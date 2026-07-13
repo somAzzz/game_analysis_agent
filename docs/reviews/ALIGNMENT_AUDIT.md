@@ -1,3 +1,10 @@
+---
+status: superseded
+date: 2026-07-06
+audience: reviewers
+scope: v0.2 评审对齐审计（已被后续修复分支覆盖）
+---
+
 # Feedback Alignment Audit
 
 Date: 2026-07-06
@@ -7,7 +14,7 @@ Date: 2026-07-06
 The current code is strongly aligned with the main review direction:
 Godot produces real run data, Python performs deterministic diagnostics,
 and LLM agents explain or review compressed evidence. The important P0
-engineering items from `docs/ACTION_PLAN.md` are present in code.
+engineering items from `ACTION_PLAN.md` are present in code.
 
 This pass found drift in two P1 agent upgrades and one small semantic-rule
 threshold mismatch; all three were remediated.

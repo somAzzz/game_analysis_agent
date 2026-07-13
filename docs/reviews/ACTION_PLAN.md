@@ -1,6 +1,13 @@
+---
+status: active
+date: 2026-07-06
+audience: maintainers
+scope: 评审任务 T01–T13 拆解与状态
+---
+
 # 行动计划 (Action Plan)
 
-> 来自评审 [docs/REVIEW_FEEDBACK.md](REVIEW_FEEDBACK.md)。每条任务都有：
+> 来自评审 [REVIEW_FEEDBACK.md](REVIEW_FEEDBACK.md)。每条任务都有：
 > - **目标**：评审里到底要解决什么
 > - **实现位置**：文件 / 函数
 > - **验证手段**：单元测试 / 命令 / 期望输出
@@ -110,7 +117,7 @@
   ]
   ```
 
-- 同步更新 `docs/DATA_CONTRACTS.md` §3 的 `kind` 取值列表。
+- 同步更新 `DATA_CONTRACTS.md` §3 的 `kind` 取值列表。
 
 ### 验证
 - `pytest tests/` 现有全部测试通过（enum 扩展向后兼容）。
@@ -160,7 +167,7 @@
 - `src/game_analysis_agent/anomaly_detector.py`：`detect_anomalies` 末尾加一行 `anomalies.extend(_semantic.check_semantic_invariants(run))`。
 - `tests/fixtures/anomaly_runs.jsonl`：加 2 条分别触发 `crisis_success_ending` 和 `social_success_under_survival_crisis` 的 run。
 - `tests/test_anomaly_detector.py`：加 6 个 case 覆盖新增 kind（每个 case 一条 fixture run）。
-- `docs/DATA_CONTRACTS.md` §3 更新 `kind` 列表 + 增加每个新 kind 的 evidence 字段示例。
+- `DATA_CONTRACTS.md` §3 更新 `kind` 列表 + 增加每个新 kind 的 evidence 字段示例。
 
 ### 验证
 - `pytest tests/test_anomaly_detector.py -v` 全绿。
@@ -508,11 +515,11 @@ return result, paths
   - 未完成项: <如有>
 ```
 
-最新对齐审计和补齐计划见 [docs/review/](review/README.md)。
+最新对齐审计和补齐计划见 [reviews/README.md](README.md)。
 
 ## 真实测试场景补齐（2026-07-06）
 
-来自 [docs/review/REAL_TEST_GAP_ANALYSIS.md](review/REAL_TEST_GAP_ANALYSIS.md)。
+来自 [REAL_TEST_GAP_ANALYSIS.md](REAL_TEST_GAP_ANALYSIS.md)。
 
 - `sim/all` 支持 `--scenario`，默认 `default_first_semester`。
 - CLI policy alias：`money -> work`，`visa -> admin`，避免与 Godot route 名称漂移。

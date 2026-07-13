@@ -1,3 +1,10 @@
+---
+status: active
+date: 2026-07-13
+audience: maintainers
+scope: 真实游戏 + 本地 vLLM 的端到端基线审计
+---
+
 # 本地 LLM 游戏系统真实测试报告（2026-07-13）
 
 > 状态：基线审计完成；P0 Agent 可靠性修复已在后续修复分支实现。

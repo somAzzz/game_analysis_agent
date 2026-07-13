@@ -1,3 +1,10 @@
+---
+status: superseded
+date: 2026-07-06
+audience: maintainers
+scope: ALIGNMENT_AUDIT 补齐的补丁计划（已在后续修复分支落地）
+---
+
 # Detailed Execution Plan
 
 This plan covers the gaps found in `ALIGNMENT_AUDIT.md`. It has been executed

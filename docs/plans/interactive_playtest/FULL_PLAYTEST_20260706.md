@@ -1,3 +1,10 @@
+---
+status: archived
+date: 2026-07-06
+audience: maintainers
+scope: 单次完整交互式跑批记录（snapshot）
+---
+
 # Full Interactive Playtest - 2026-07-06
 
 ## Scope

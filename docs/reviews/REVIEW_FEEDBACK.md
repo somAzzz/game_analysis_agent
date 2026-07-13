@@ -1,6 +1,13 @@
+---
+status: active
+date: 2026-07-06
+audience: maintainers
+scope: 原始评审意见 + 逐条落实日志
+---
+
 # 评审意见 (Review feedback)
 
-> 状态：原始意见记录。**已逐条细化为可执行任务，详见 [docs/ACTION_PLAN.md](ACTION_PLAN.md)；当前分层文档入口见 [docs/review/README.md](review/README.md)；每条任务的实施记录见本文档的「落实日志」小节。**
+> 状态：原始意见记录。**已逐条细化为可执行任务，详见 [ACTION_PLAN.md](ACTION_PLAN.md)；当前分层文档入口见 [reviews/README.md](README.md)；每条任务的实施记录见本文档的「落实日志」小节。**
 >
 > 评审对象：v0.2 `game_analysis_agent` 仓库（含 7 个 agent、anomaly / value 检测、tool loop、本地 vLLM / SGLang / DeepSeek provider 切换）。
 > 评审目标：让测试系统从"能生成报告"升级成"能证明改动是否真的提升了可玩性"。
@@ -660,7 +667,7 @@ design:
 - **新增**: `src/game_analysis_agent/anomaly_semantics.py` 提供 `check_semantic_invariants(run, **thresholds)`，与 `action_group_keyword` heuristic 配套。
 - **接入**: `src/game_analysis_agent/anomaly_detector.py` 的 `detect_anomalies` 末尾追加 `anomalies.extend(check_semantic_invariants(run))`。
 - **新增**: `tests/test_anomaly_semantics.py` 12 个 case（每条规则 1 个 + 一个 clean run 不触发 + 一个集成到 `detect_anomalies` 的 case）。
-- **同步**: `docs/DATA_CONTRACTS.md` §3 更新 `kind` 取值 + 增加 evidence 字段示例。
+- **同步**: `DATA_CONTRACTS.md` §3 更新 `kind` 取值 + 增加 evidence 字段示例。
 - **验证**: `pytest tests/test_anomaly_semantics.py -v` → 12 passed。
 
 ### T05 — `interactive_player` 改为显式周循环 ✅
@@ -743,7 +750,7 @@ $ uv run pytest tests/ -q
 106 passed in 0.58s
 ```
 
-### 遗留 / 已记录在 `docs/ACTION_PLAN.md` 中暂未实施
+### 遗留 / 已记录在 `ACTION_PLAN.md` 中暂未实施
 
 - T01 / T12 — smoke + 全量矩阵需要 Godot 项目和真实运行环境。
 

@@ -33,7 +33,7 @@ build, so do not replace that CI integrity check with an unverified image.
 ## MCP migration order
 
 Before implementing any MCP wrapper, read
-`docs/MCP_MIGRATION_PLAN.md`. The hard architectural rule is:
+`docs/architecture/MCP_MIGRATION_PLAN.md`. The hard architectural rule is:
 
 1. Extract transport-independent services first:
    `simulation_service.run(...)`, `report_service.read(...)`, and

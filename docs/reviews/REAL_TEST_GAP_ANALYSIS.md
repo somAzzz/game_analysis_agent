@@ -1,3 +1,10 @@
+---
+status: active
+date: 2026-07-13
+audience: maintainers
+scope: 与 study-in-germany 的真实测试能力差距分析
+---
+
 # Real Test System Status
 
 Date: 2026-07-13

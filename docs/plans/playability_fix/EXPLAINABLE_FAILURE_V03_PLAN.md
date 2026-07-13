@@ -1,3 +1,10 @@
+---
+status: active
+date: 2026-07-06
+audience: maintainers
+scope: 可解释失败设计迭代（v0.3）
+---
+
 # Demo v0.3 可解释失败修复计划
 
 ## 1. 目标

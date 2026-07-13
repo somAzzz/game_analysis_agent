@@ -190,12 +190,12 @@ uv run python tools/run_gameplay_agent.py play \
 The opt-in `agent` container is for pure-Python analysis and QA of existing
 reports. It intentionally cannot execute commands in the Godot sidecar.
 
-See [docs/DOCKER.md](docs/DOCKER.md) and
-[docs/VLLM_QWEN_LOCAL_AGENT.md](docs/VLLM_QWEN_LOCAL_AGENT.md) for deployment
+See [docs/operations/DOCKER.md](docs/operations/DOCKER.md) and
+[docs/operations/VLLM_QWEN_LOCAL_AGENT.md](docs/operations/VLLM_QWEN_LOCAL_AGENT.md) for deployment
 details.
 
 For the future MCP surface, follow the
-[service-first MCP migration plan](docs/MCP_MIGRATION_PLAN.md). The existing
+[service-first MCP migration plan](docs/architecture/MCP_MIGRATION_PLAN.md). The existing
 CLI must be refactored onto typed services before any MCP wrapper is added.
 
 ## Common Workflows
@@ -530,7 +530,7 @@ generates and analyzes a fresh trace, runs all six validators with fresh
 prerequisites, enforces deterministic smoke gates, validates the cross-repo
 contracts, captures canonical interactive risk guidance, and uploads the
 evidence. See [Game artifact contract
-testing](docs/GAME_CONTRACT_TESTING.md).
+testing](docs/operations/GAME_CONTRACT_TESTING.md).
 
 ## Dashboards
 
@@ -600,18 +600,14 @@ config/
   player_personas.yaml      Interactive player personas
 
 docs/
-  ARCHITECTURE.md
-  PORTFOLIO.md
-  DATA_CONTRACTS.md
-  DOCKER.md
-  GAMEPLAY_AGENT.md
-  GODOT_INTEGRATION.md
-  INTEGRATION_WITH_STUDY_IN_GERMANY.md
-  VLLM_QWEN_LOCAL_AGENT.md
-  assets/
-  interactive_playtest/
-  playability_fix/
-  review/
+  README.md                   Audience-keyed index — start here
+  architecture/               Developer + reviewer reference (evergreen)
+  operations/                 Docker + vLLM + contract test plans
+  portfolio/                  Public / portfolio summary
+  reviews/                    Date-sorted audits and gap analyses
+  plans/                      WIP designs and design iterations
+  legacy/                     Superseded docs (not linked from README)
+  assets/                     Preview images and PDFs
 
 examples/
   sample_reports/           Tiny sanitized reports for dashboard demos
@@ -664,18 +660,23 @@ tests/
 
 ## Documentation
 
-- [Architecture](docs/ARCHITECTURE.md)
-- [Data Contracts](docs/DATA_CONTRACTS.md)
-- [Docker Deployment](docs/DOCKER.md)
-- [Gameplay Agent](docs/GAMEPLAY_AGENT.md)
-- [Godot Integration](docs/GODOT_INTEGRATION.md)
-- [Integration with study-in-germany](docs/INTEGRATION_WITH_STUDY_IN_GERMANY.md)
-- [Local vLLM + Qwen](docs/VLLM_QWEN_LOCAL_AGENT.md)
-- [Local LLM Real-Game Audit (2026-07-13)](docs/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md)
-- [Service-first MCP Migration Plan](docs/MCP_MIGRATION_PLAN.md)
-- [Portfolio Notes](docs/PORTFOLIO.md)
-- [Interactive Playtest Plan](docs/interactive_playtest/README.md)
-- [Review Documents](docs/review/README.md)
+Start at [docs/README.md](docs/README.md) — audience-keyed index.
+
+Selected entry points:
+
+- [Architecture](docs/architecture/ARCHITECTURE.md)
+- [Data Contracts](docs/architecture/DATA_CONTRACTS.md)
+- [Gameplay Agent](docs/architecture/GAMEPLAY_AGENT.md)
+- [Godot Integration](docs/architecture/GODOT_INTEGRATION.md)
+- [Integration with study-in-germany](docs/architecture/INTEGRATION_WITH_STUDY_IN_GERMANY.md)
+- [Service-first MCP Migration Plan](docs/architecture/MCP_MIGRATION_PLAN.md)
+- [Docker Deployment](docs/operations/DOCKER.md)
+- [Local vLLM + Qwen](docs/operations/VLLM_QWEN_LOCAL_AGENT.md)
+- [Game artifact contract testing](docs/operations/GAME_CONTRACT_TESTING.md)
+- [Portfolio Notes](docs/portfolio/PORTFOLIO.md)
+- [Local LLM Real-Game Audit (2026-07-13)](docs/reviews/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md)
+- [Interactive Playtest Plan](docs/plans/interactive_playtest/README.md)
+- [Review Documents](docs/reviews/README.md)
 
 ## Current Limitations
 
