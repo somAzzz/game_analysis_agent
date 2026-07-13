@@ -1,9 +1,8 @@
 # Quality gates for the v0.2 demo.
 #
-# These thresholds are referenced by docs/ACTION_PLAN.md T08 and feed the
-# future ``gates`` subcommand of ``tools/run_gameplay_agent.py``. For now
-# they are documented in code only and not enforced automatically — run
-# the matrix and inspect the per-dimension counts by hand.
+# These thresholds are executed fail-closed by the ``gates`` subcommand
+# and by the default ``all`` pipeline. Unknown keys and missing or malformed
+# required evidence are gate failures.
 #
 # Each section answers a different question:
 #
@@ -81,5 +80,9 @@ design:
   min_key_event_tradeoff_score: 0.70
   # Event-graph coverage targets — checked by event_graph agent.
   min_event_trigger_rate_for_key_events: 0.10
-  # Play-test targets — checked by interactive_player agent.
+  # Play-test targets — computed from agent_eval.json.
   max_playthrough_anomalies_per_5_weeks: 1
+  min_decision_valid_rate: 0.95
+  max_fallback_rate: 0.05
+  max_illegal_action_rate: 0.0
+  max_llm_error_rate: 0.05

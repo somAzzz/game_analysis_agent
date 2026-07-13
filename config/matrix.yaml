@@ -1,16 +1,17 @@
 # Test matrix for the study-in-germany v0.2 demo.
 #
-# This file describes the cells of the simulation matrix. The CLI does not
-# (yet) read this file automatically; it is a single source of truth for
-# the human who runs the matrix and for any future automation that wants
-# to spawn N parallel ``run_gameplay_agent.py all`` jobs.
+# This file is the executable source of truth for the strict, resumable
+# ``run_gameplay_agent.py matrix`` command. CI can dry-run it on every
+# change and execute it on scheduled/manual integration runs.
 #
 # See docs/REVIEW_FEEDBACK.md §15 and docs/ACTION_PLAN.md T08.
 
 version: demo-v02
 weeks: 20
 runs_per_cell: 200
-seeds: [42, 43, 44]
+# RunSimulation expands each base seed across runs_per_cell consecutive seeds.
+# Keep bases at least 200 apart so repetition batches do not overlap.
+seeds: [42, 1042, 2042]
 
 difficulties:
   - normal

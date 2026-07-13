@@ -1,0 +1,16 @@
+# Deterministic smoke gates for the real-Godot CI job.
+#
+# Product-balance thresholds need the full matrix sample size. This profile
+# intentionally checks only universal invariants on a small fresh simulation;
+# the normal config/gates.yaml remains the release gate.
+critical_fail:
+  ending_id_empty: 0
+  pipeline_stalled: 0
+  stat_overflow: 0
+  stat_underflow: 0
+  crisis_success_ending: 0
+  social_success_under_survival_crisis: 0
+  academic_success_with_failed_courses: 0
+  visa_success_without_registration: 0
+  testdaf_pass_with_low_language: 0
+  aps_pass_with_low_aps_knowledge: 0
