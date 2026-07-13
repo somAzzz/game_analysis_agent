@@ -1,0 +1,29 @@
+{
+  "contract_version": "1.0",
+  "event_count": 1,
+  "action_count": 1,
+  "events": [
+    {
+      "id": "first_lecture",
+      "title": "第一次上课",
+      "body": "教授开始提问。",
+      "event_type": "fixed",
+      "trigger": {"week": 1},
+      "weight": 1.0,
+      "repeatable": false,
+      "choice_count": 1,
+      "choices": [
+        {
+          "text": "举手回答",
+          "success_rate": 0.75,
+          "success_effects": {"academic_progress": 5},
+          "failure_effects": {"stress": 4},
+          "success_modifiers": {"language": 0.003},
+          "requirements": {},
+          "set_flag": "",
+          "next_event_id": ""
+        }
+      ]
+    }
+  ]
+}

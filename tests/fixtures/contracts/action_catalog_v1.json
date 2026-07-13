@@ -1,0 +1,21 @@
+{
+  "contract_version": "1.0",
+  "action_count": 1,
+  "actions": [
+    {
+      "id": "study_library",
+      "name": "图书馆自习",
+      "description": "完成本周课程复习。",
+      "cost_energy": 20,
+      "cost_money": 0,
+      "cost_slots": 1,
+      "effects": {"academic_progress": 10, "loneliness": 2},
+      "requirements": {},
+      "tags": ["study"],
+      "risk_tags": [],
+      "set_flag": "",
+      "cooldown_group": "",
+      "max_per_week": 0
+    }
+  ]
+}

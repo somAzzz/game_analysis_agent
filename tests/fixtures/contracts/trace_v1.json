@@ -1,0 +1,66 @@
+{
+  "contract_version": "1.0",
+  "run_id": 1,
+  "seed": 7300,
+  "policy": "balanced",
+  "difficulty": "normal",
+  "scenario": "default_first_semester",
+  "content_version": "dev-hardcoded-0.1.0",
+  "rules_version": "sim-0.2.0",
+  "max_weeks": 20,
+  "final_ending_id": "social_connector",
+  "final_state": {
+    "week": 20,
+    "money": 1200,
+    "energy": 65,
+    "stress": 44,
+    "loneliness": 30,
+    "academic_progress": 70,
+    "language": 62,
+    "social": 55,
+    "visa_progress": 72,
+    "career_progress": 20
+  },
+  "weekly_log": [
+    {
+      "week": 1,
+      "available_action_ids": ["study_library", "rest_at_home"],
+      "selected_action_ids": ["study_library"],
+      "before_state": {
+        "week": 1,
+        "money": 1250,
+        "energy": 80,
+        "stress": 40,
+        "loneliness": 30,
+        "academic_progress": 60,
+        "language": 60,
+        "social": 50,
+        "visa_progress": 70,
+        "career_progress": 18
+      },
+      "after_state": {
+        "week": 1,
+        "money": 1200,
+        "energy": 65,
+        "stress": 44,
+        "loneliness": 30,
+        "academic_progress": 70,
+        "language": 62,
+        "social": 55,
+        "visa_progress": 72,
+        "career_progress": 20
+      },
+      "triggered_event_id": "first_lecture",
+      "event_choice_id": "first_lecture.choice_01_ask_question",
+      "event_effects": {"language": 2},
+      "event_success": true
+    }
+  ],
+  "action_sequence": [
+    {
+      "week": 1,
+      "actions": ["study_library"],
+      "event_choice": "first_lecture.choice_01_ask_question"
+    }
+  ]
+}

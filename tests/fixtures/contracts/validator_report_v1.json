@@ -1,0 +1,11 @@
+{
+  "contract_version": "1.0",
+  "errors": [],
+  "warnings": [],
+  "summary": {
+    "actions": 43,
+    "events": 128,
+    "characters": 5,
+    "endings": 17
+  }
+}

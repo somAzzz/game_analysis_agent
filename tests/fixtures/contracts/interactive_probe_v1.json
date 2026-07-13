@@ -1,0 +1,31 @@
+{
+  "contract_version": "1.0",
+  "finished": false,
+  "final_week": 2,
+  "triggered_event_id": "",
+  "event_choices": [],
+  "final_ending_id": "",
+  "final_state": {},
+  "current_state": {
+    "week": 2,
+    "money": 420
+  },
+  "risk_guidance": {
+    "contract_version": "1.0",
+    "source": "game_risk_evaluator",
+    "evaluator": "RiskEvaluator.get_top_risks",
+    "generated_for_week": 2,
+    "top_risks": [
+      {
+        "id": "money",
+        "title": "现金流",
+        "score": 78,
+        "body": "当前现金不足。",
+        "suggested_actions": [
+          "budget_call",
+          "part_time_job"
+        ]
+      }
+    ]
+  }
+}
