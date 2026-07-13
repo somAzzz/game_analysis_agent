@@ -29,3 +29,20 @@ Environment overrides:
 Use the Docker wrapper for routine local real-game tests. The scheduled/manual
 CI job deliberately downloads and SHA-512-verifies its pinned official Godot
 build, so do not replace that CI integrity check with an unverified image.
+
+## MCP migration order
+
+Before implementing any MCP wrapper, read
+`docs/MCP_MIGRATION_PLAN.md`. The hard architectural rule is:
+
+1. Extract transport-independent services first:
+   `simulation_service.run(...)`, `report_service.read(...)`, and
+   `gameplay_service.step(...)`.
+2. Make the existing argparse CLI a thin adapter over those services.
+3. Complete the service-layer acceptance gates and regressions.
+4. Only then add the MCP adapter.
+
+Do not register `tools/run_gameplay_agent.py` `cmd_*` functions as MCP
+tools, construct `argparse.Namespace` inside MCP code, or duplicate
+Godot/contract/report logic in an MCP package. CLI and MCP must share the same
+typed request/result services.
