@@ -31,18 +31,16 @@ import math
 import re
 import sys
 from collections import Counter, defaultdict
-from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPORTS = ROOT / "reports"
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
-
-from game_analysis_agent.report_manifest import write_reports_index  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -1663,7 +1661,7 @@ def _decision_graph_svg(payload: dict) -> str:
     )
     # Edges (curved lines between consecutive triggered events)
     edges: list[str] = []
-    for prev, curr in zip(triggered, triggered[1:]):
+    for prev, curr in zip(triggered, triggered[1:], strict=False):
         x1, y1 = prev["x"], prev["y"]
         x2, y2 = curr["x"], curr["y"]
         mid_x = (x1 + x2) / 2
@@ -2635,17 +2633,20 @@ def cmd_all(args) -> int:
         target_dir.mkdir(parents=True, exist_ok=True)
         page_html = render_issue(issue)
         report_dir = reports / issue.issue_kind / issue.issue_id
-        if issue.issue_kind in ("balance", "play") and (report_dir / "raw_runs.jsonl").exists():
-            if _emit_decision_graph_for(
+        if (
+            issue.issue_kind in ("balance", "play")
+            and (report_dir / "raw_runs.jsonl").exists()
+            and _emit_decision_graph_for(
                 browse_root=browse_root,
                 report_dir=report_dir,
                 issue_id=issue.issue_id,
                 back_href=f"../../{issue.issue_kind}/{issue.issue_id}/index.html",
-            ):
-                page_html = _inject_dg_link(
-                    page_html,
-                    dg_link=f"decision_graph/{issue.issue_id}/0/index.html",
-                )
+            )
+        ):
+            page_html = _inject_dg_link(
+                page_html,
+                dg_link=f"decision_graph/{issue.issue_id}/0/index.html",
+            )
         (target_dir / "index.html").write_text(page_html, encoding="utf-8")
 
     # Emit the React frontend's data feed (manifest.json + per-issue
