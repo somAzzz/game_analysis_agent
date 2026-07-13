@@ -5,6 +5,7 @@ personas:
       - avoid_immediate_crisis
       - follow_top_risks
       - try_visible_actions
+    alignment_risk_guided: true
     risk_tolerance: 0.35
     exploration: 0.45
     failure_intent: false
@@ -19,6 +20,11 @@ personas:
       - exam_readiness
       - language
       - aps_knowledge
+    alignment_action_tags:
+      - study
+      - language
+      - application
+      - exam
     risk_tolerance: 0.4
     exploration: 0.25
     failure_intent: false
@@ -35,6 +41,10 @@ personas:
       - money
       - career_progress
       - survival
+    alignment_action_tags:
+      - work
+      - career
+      - income
     risk_tolerance: 0.65
     exploration: 0.35
     failure_intent: false
@@ -51,6 +61,9 @@ personas:
       - social
       - loneliness_reduction
       - language
+    alignment_action_tags:
+      - social
+      - language
     risk_tolerance: 0.45
     exploration: 0.55
     failure_intent: false
@@ -65,6 +78,10 @@ personas:
       - registration
       - deadline_safety
       - document_ready
+    alignment_action_tags:
+      - admin
+      - application
+      - visa
     risk_tolerance: 0.25
     exploration: 0.2
     failure_intent: false
@@ -78,6 +95,11 @@ personas:
       - stress_reduction
       - energy_recovery
       - short_term_comfort
+    alignment_action_tags:
+      - mental
+      - life
+      - recovery
+      - avoidance
     risk_tolerance: 0.8
     exploration: 0.65
     failure_intent: true

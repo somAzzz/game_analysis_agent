@@ -61,7 +61,14 @@ def analyze(runs: list[dict], out_dir: Path, *, raw_runs_path: Path | None = Non
     )
     write_csv(
         out_dir / "action_pick_rates.csv",
-        ["policy", "action_id", "count", "rate_per_run"],
+        [
+            "policy",
+            "action_id",
+            "count",
+            "rate_per_run",
+            "pick_share",
+            "run_presence_rate",
+        ],
         action_rows,
     )
     write_csv(

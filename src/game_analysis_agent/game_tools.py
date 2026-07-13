@@ -234,7 +234,10 @@ class InteractiveProbe:
                 for step in self.history
             ],
         }
-        return detect_anomalies([synthetic_run])
+        anomalies = detect_anomalies([synthetic_run])
+        if not self.finished:
+            anomalies = [item for item in anomalies if item.kind != "ending_id_empty"]
+        return anomalies
 
 
 # -----------------------------------------------------------------------

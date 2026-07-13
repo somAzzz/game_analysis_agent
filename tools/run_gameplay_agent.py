@@ -74,6 +74,7 @@ from game_analysis_agent.report_manifest import (  # noqa: E402
     write_report_manifest,
     write_reports_index,
 )
+from game_analysis_agent.schemas import AgentRunReport  # noqa: E402
 from game_analysis_agent.settings import get_settings  # noqa: E402
 from game_analysis_agent.test_matrix import (  # noqa: E402
     MatrixConfigError,
@@ -1008,7 +1009,8 @@ def cmd_export(args: argparse.Namespace) -> int:
 
 def cmd_qa(args: argparse.Namespace) -> int:
     settings = get_settings()
-    llm = LocalLLMClient.from_settings(settings)
+    qa_calls = []
+    llm = LocalLLMClient.from_settings(settings, llm_call_sink=qa_calls.append)
     try:
         llm.validate_model_available()
     except LLMPreflightError as exc:
@@ -1019,14 +1021,33 @@ def cmd_qa(args: argparse.Namespace) -> int:
         if agent_name == "interactive_player":
             print("Skipping interactive_player in `qa`; use the `play` subcommand.")
             continue
+        started_at = datetime.now(tz=UTC)
+        first_call = len(qa_calls)
         agent = build_agent(
             agent_name,
             llm=llm,
             prompts_root=prompts_root,
             settings=settings,
         )
-        result = agent.run(args.report_dir)
-        written = write_agent_result(args.report_dir, result)
+        error: str | None = None
+        try:
+            result = agent.run(args.report_dir)
+            written = write_agent_result(args.report_dir, result)
+        except Exception as exc:
+            error = f"{type(exc).__name__}: {exc}"
+            written = []
+        agent_calls = qa_calls[first_call:]
+        audit_path = args.report_dir / f"{agent_name}_agent_report.json"
+        audit = AgentRunReport(
+            agent=agent_name,
+            started_at=started_at,
+            completed_at=datetime.now(tz=UTC),
+            output_files=[path.name for path in written],
+            llm_calls=agent_calls,
+            error=error,
+        )
+        audit_path.write_text(audit.model_dump_json(indent=2), encoding="utf-8")
+        written = [*written, audit_path]
         write_report_manifest(
             args.report_dir,
             report_type="agent_qa",
@@ -1034,10 +1055,21 @@ def cmd_qa(args: argparse.Namespace) -> int:
             command="qa",
             parameters={"agent": agent_name},
             generated_files=written,
-            summary={"agent": agent_name, "output_count": len(written)},
+            status="failed" if error else "completed",
+            summary={
+                "agent": agent_name,
+                "output_count": len(written),
+                "llm_call_count": len(agent_calls),
+                "llm_error_count": sum(call.error is not None for call in agent_calls),
+                "provider": llm.provider,
+                "model": llm.model,
+            },
         )
         for path in written:
             print(f"[{agent_name}] {path}")
+        if error:
+            print(f"[{agent_name} failed] {error}", file=sys.stderr)
+            return 5
     return 0
 
 
@@ -1088,6 +1120,14 @@ def cmd_play(args: argparse.Namespace) -> int:
         difficulty=getattr(args, "difficulty", None) or "normal",
         scenario=getattr(args, "scenario", None) or "default_first_semester",
         seed=int(getattr(args, "seed", 42) or 42),
+        progress_callback=lambda event: print(
+            "[interactive_player] "
+            f"week={event['week']}/{event['max_weeks']} "
+            f"phase={event['phase']} "
+            f"elapsed={event.get('elapsed_s', 0)}s "
+            f"eta={event.get('eta_s', 0)}s",
+            flush=True,
+        ),
     )
     result, written = agent.play_through(args.report_dir)
     evaluation = evaluate_and_write(args.report_dir)

@@ -40,5 +40,5 @@ def test_gates_yaml_has_required_sections() -> None:
     # Balance ceilings.
     balance = gates["balance"]
     assert balance["max_single_ending_rate_normal"] <= 0.5
-    assert balance["max_action_rate_per_run"] <= 1.0
+    assert balance["max_action_pick_share"] <= 1.0
     assert balance["min_distinct_endings_normal"] >= 3

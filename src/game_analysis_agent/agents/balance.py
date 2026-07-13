@@ -26,7 +26,7 @@ class BalanceAgent(Agent):
         if marker in response:
             before, after = response.split(marker, 1)
             before = before.strip() + "\n"
-            after = f"{marker}{after.strip()}\n"
+            after = f"{marker}\n\n{after.strip()}\n"
         else:
             after = f"{marker}\n\nAgent did not emit a separate section.\n"
             before = response.strip() + "\n"

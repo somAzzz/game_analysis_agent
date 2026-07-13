@@ -109,6 +109,22 @@ def test_finish_marks_finished_and_returns_unknown_when_no_plan(
     assert "final_state" in out
 
 
+def test_incomplete_probe_does_not_report_empty_ending(tmp_path: Path) -> None:
+    probe = build_probe(_settings(tmp_path))
+    probe.history = [
+        {
+            "week": 1,
+            "actions": ["study_library"],
+            "triggered_event_id": "",
+            "after_state": {"week": 1, "money": 1000},
+        }
+    ]
+
+    anomalies = probe.detect_anomalies()
+
+    assert "ending_id_empty" not in {item.kind for item in anomalies}
+
+
 def test_run_one_step_validates_contract_and_cleans_temp_files(
     tmp_path, monkeypatch
 ) -> None:

@@ -11,11 +11,14 @@ import importlib
 import importlib.util
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
+
+from game_analysis_agent.schemas import LLMCall
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
@@ -328,6 +331,61 @@ def test_gates_command_returns_failure(run_gameplay_agent, tmp_path) -> None:
 
     assert rc == 1
     assert (tmp_path / "gate_report.json").exists()
+
+
+def test_qa_persists_llm_provenance_and_split_outputs(
+    run_gameplay_agent,
+    tmp_path,
+) -> None:
+    class FakeLLM:
+        provider = "vllm"
+        model = "local-test-model"
+
+        def __init__(self, sink) -> None:  # noqa: ANN001
+            self._sink = sink
+
+        def validate_model_available(self) -> list[str]:
+            return [self.model]
+
+        def complete(self, prompt, **kwargs):  # noqa: ANN001, ANN003
+            response = "# Balance Diagnosis\nOK\n# Tuning Proposal\nChange one value."
+            call = LLMCall(
+                call_id="llm-qa-test",
+                agent=kwargs["agent"],
+                step_name=kwargs["step_name"],
+                provider=self.provider,
+                model=self.model,
+                prompt_text=prompt,
+                response_text=response,
+                latency_ms=1,
+                started_at=datetime.now(tz=timezone.utc),
+                completed_at=datetime.now(tz=timezone.utc),
+            )
+            self._sink(call)
+            return response
+
+    def from_settings(_settings, *, llm_call_sink):  # noqa: ANN001
+        return FakeLLM(llm_call_sink)
+
+    with patch.object(
+        run_gameplay_agent.LocalLLMClient,
+        "from_settings",
+        side_effect=from_settings,
+    ):
+        rc = run_gameplay_agent.main(
+            ["qa", "--report-dir", str(tmp_path), "--agent", "balance"]
+        )
+
+    assert rc == 0
+    audit = json.loads((tmp_path / "balance_agent_report.json").read_text())
+    assert audit["error"] is None
+    assert audit["output_files"] == ["agent_diagnosis.md", "tuning_proposal.md"]
+    assert audit["llm_calls"][0]["provider"] == "vllm"
+    assert audit["llm_calls"][0]["model"] == "local-test-model"
+    assert audit["llm_calls"][0]["prompt_text"]
+    assert audit["llm_calls"][0]["response_text"].startswith("# Balance Diagnosis")
+    proposal = (tmp_path / "tuning_proposal.md").read_text()
+    assert proposal.startswith("# Tuning Proposal\n\n")
 
 
 def test_validate_runs_selected_check(run_gameplay_agent, tmp_path) -> None:

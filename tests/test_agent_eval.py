@@ -173,3 +173,38 @@ def test_evaluate_playthrough_requires_final_ending(tmp_path: Path) -> None:
     assert report["valid"] is False
     assert report["final_ending"] == ""
     assert any("final ending is missing" in error for error in report["errors"])
+
+
+def test_risk_acknowledgement_requires_current_risk_id(tmp_path: Path) -> None:
+    _write_artifacts(tmp_path)
+    path = tmp_path / "playthrough.jsonl"
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    rows[0]["decision"]["risk_awareness"] = ["I considered the situation"]
+    path.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+
+    metrics = evaluate_playthrough(tmp_path)["metrics"]
+
+    assert metrics["risk_acknowledgement_rate"] == 0.0
+    assert metrics["unmatched_risk_awareness_count"] == 1
+
+
+def test_persona_alignment_uses_explicit_action_tag_mapping(tmp_path: Path) -> None:
+    _write_artifacts(tmp_path)
+    path = tmp_path / "playthrough.jsonl"
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    rows[0]["week_context"]["persona_strategy"] = {
+        "priorities": ["academic_progress", "exam_readiness"],
+        "alignment_action_tags": ["study", "exam"],
+    }
+    path.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+
+    metrics = evaluate_playthrough(tmp_path)["metrics"]
+
+    assert metrics["persona_alignment_rate"] == 1.0
+    assert metrics["persona_alignment_opportunities"] == 2

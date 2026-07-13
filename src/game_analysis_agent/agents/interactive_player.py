@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -137,6 +138,8 @@ class InteractivePlayerAgent(Agent):
         extra_files: tuple[str, ...] = (),
         output_files: tuple[str, ...] | None = None,
         temperature: float | None = None,
+        progress_callback: Callable[[dict[str, Any]], None] | None = None,
+        cancellation_check: Callable[[], bool] | None = None,
     ) -> None:
         super().__init__(
             llm=llm,
@@ -155,6 +158,8 @@ class InteractivePlayerAgent(Agent):
         self.difficulty = difficulty
         self.scenario = scenario
         self.seed = seed
+        self.progress_callback = progress_callback
+        self.cancellation_check = cancellation_check
         self.persona_strategy = load_player_personas(prompts_root.parent).get(
             self.persona, PERSONAS[self.persona]
         )
@@ -213,6 +218,7 @@ class InteractivePlayerAgent(Agent):
         # must not silently append decisions from an earlier model/game build.
         playthrough_path.unlink(missing_ok=True)
         run_started_at = datetime.now(tz=UTC)
+        run_started_clock = time.perf_counter()
 
         # The InteractiveProbe is the canonical owner of the Godot
         # connection. Tests inject their own; production code uses the
@@ -238,8 +244,19 @@ class InteractivePlayerAgent(Agent):
         probe.scenario = self.scenario
 
         for week in range(1, self.max_weeks + 1):
+            if self.cancellation_check is not None and self.cancellation_check():
+                raise RuntimeError(f"Playthrough cancelled before week {week}")
             if probe.finished:
                 break
+
+            self._emit_progress(
+                {
+                    "phase": "decision",
+                    "week": week,
+                    "max_weeks": self.max_weeks,
+                    "completed_weeks": len(steps),
+                }
+            )
 
             state_before = probe.get_state()
             catalog = probe.list_available_actions()
@@ -297,14 +314,13 @@ class InteractivePlayerAgent(Agent):
                         scenario=self.scenario,
                         seed=self.seed,
                     )
-                    event_decision, event_validation, event_calls = self._decide_one_week(
+                    event_choice_id, event_validation, event_calls = self._decide_event_choice(
                         week=week,
                         context_pack=event_context,
-                        system_prompt=system_prompt,
-                        probe=probe,
+                        selected_actions=decision.actions,
                     )
                     llm_calls.extend(event_calls)
-                    decision.event_choice_id = event_decision.event_choice_id
+                    decision.event_choice_id = event_choice_id
                     validation = DecisionValidation(
                         valid=validation.valid and event_validation.valid,
                         errors=[*validation.errors, *event_validation.errors],
@@ -340,6 +356,19 @@ class InteractivePlayerAgent(Agent):
             steps.append(step)
             _append_step_jsonl(playthrough_path, step, run_id=run_id)
             memory = _update_memory(memory, step)
+            elapsed_s = time.perf_counter() - run_started_clock
+            eta_s = elapsed_s / max(1, len(steps)) * max(0, self.max_weeks - len(steps))
+            self._emit_progress(
+                {
+                    "phase": "completed",
+                    "week": week,
+                    "max_weeks": self.max_weeks,
+                    "completed_weeks": len(steps),
+                    "elapsed_s": round(elapsed_s, 1),
+                    "eta_s": round(eta_s, 1),
+                    "finished": bool(result.get("finished")),
+                }
+            )
 
             if result.get("finished"):
                 break
@@ -395,6 +424,10 @@ class InteractivePlayerAgent(Agent):
         system_template = (self.prompts_root / "player_system.md").read_text(encoding="utf-8")
         persona_block = self._persona_block()
         return f"{system_template}\n\n{persona_block}"
+
+    def _emit_progress(self, event: dict[str, Any]) -> None:
+        if self.progress_callback is not None:
+            self.progress_callback(event)
 
     def _persona_block(self) -> str:
         persona = PERSONAS[self.persona]
@@ -484,13 +517,14 @@ class InteractivePlayerAgent(Agent):
         agent: str,
         step_name: str,
         temperature: float | None,
+        max_tokens: int | None = None,
     ) -> tuple[str, LLMCall]:
         try:
             return self.llm.chat(
                 messages,
                 agent=agent,
                 step_name=step_name,
-                max_tokens=self.decision_max_tokens,
+                max_tokens=max_tokens or self.decision_max_tokens,
                 temperature=temperature,
             )
         except TypeError as exc:
@@ -503,6 +537,94 @@ class InteractivePlayerAgent(Agent):
                 temperature=temperature,
             )
 
+    def _decide_event_choice(
+        self,
+        *,
+        week: int,
+        context_pack: WeekContext,
+        selected_actions: list[str],
+    ) -> tuple[str, DecisionValidation, list[LLMCall]]:
+        valid_choices = [choice.choice_id for choice in context_pack.event_choices]
+        compact_context = {
+            "week": week,
+            "persona": self.persona,
+            "priorities": context_pack.persona_strategy.get("priorities", []),
+            "selected_actions": selected_actions,
+            "state": context_pack.state.model_dump(mode="json"),
+            "top_risk_ids": [risk.id for risk in context_pack.top_risks],
+            "event_id": context_pack.current_event_id,
+            "event_choices": [
+                choice.model_dump(mode="json") for choice in context_pack.event_choices
+            ],
+        }
+        calls: list[LLMCall] = []
+        errors: list[str] = []
+        for attempt in range(2):
+            if self.cancellation_check is not None and self.cancellation_check():
+                raise RuntimeError(f"Playthrough cancelled during week {week} event")
+            prompt = "\n".join(
+                [
+                    "/no_think",
+                    "Choose exactly one event_choice_id from the JSON context.",
+                    json.dumps(compact_context, ensure_ascii=False, separators=(",", ":")),
+                    "Valid event_choice_id values:",
+                    json.dumps(valid_choices, ensure_ascii=False),
+                    (
+                        "Return only compact JSON: {\"event_choice_id\":\"...\"}."
+                        if attempt == 0
+                        else f"Previous errors: {errors}. Return one valid id as JSON only."
+                    ),
+                ]
+            )
+            try:
+                content, call = self._chat_decision(
+                    [
+                        {
+                            "role": "system",
+                            "content": "Select one game event option. Never invent an id.",
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    agent=self.name,
+                    step_name=(
+                        f"week-{week}-event"
+                        if attempt == 0
+                        else f"week-{week}-event-repair-{attempt}"
+                    ),
+                    temperature=self.temperature,
+                    max_tokens=192,
+                )
+                calls.append(call)
+            except Exception as exc:
+                if isinstance(exc, LLMRequestError):
+                    calls.append(exc.call)
+                errors = [f"LLM error: {exc}"]
+                break
+            parsed = _extract_json_object(content)
+            choice_id = str(parsed.get("event_choice_id") or "") if parsed else ""
+            if choice_id in valid_choices:
+                return (
+                    choice_id,
+                    DecisionValidation(
+                        valid=True,
+                        errors=errors,
+                        repair_count=attempt,
+                    ),
+                    calls,
+                )
+            errors = [f"Invalid event_choice_id: {choice_id or '(empty)'}"]
+        fallback = valid_choices[0] if valid_choices else ""
+        return (
+            fallback,
+            DecisionValidation(
+                valid=False,
+                errors=errors,
+                repair_count=max(0, len(calls) - 1),
+                fallback_used=True,
+            ),
+            calls,
+        )
+
     def _build_user_prompt(self, context_pack: WeekContext) -> str:
         schema_hint = {
             "week": context_pack.state.week,
@@ -512,7 +634,7 @@ class InteractivePlayerAgent(Agent):
             if context_pack.available_actions
             else ["rest_at_home"],
             "event_choice_id": "",
-            "risk_awareness": ["本周注意到的主要风险"],
+            "risk_awareness": [risk.id for risk in context_pack.top_risks[:3]],
             "expected_tradeoff": "收益与代价，最多 240 字",
             "confidence": 0.7,
         }
@@ -529,6 +651,7 @@ class InteractivePlayerAgent(Agent):
                 "",
                 "Respond with one raw JSON object only. Do not use markdown, prose, or code fences. "
                 "Do not include analysis before or after the JSON. Keep every string concise. "
+                "risk_awareness must contain only exact ids from WeekContext.top_risks. "
                 "Match this exact PlayerDecision shape:",
                 "```json",
                 json.dumps(schema_hint, ensure_ascii=False, indent=2),

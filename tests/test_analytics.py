@@ -70,6 +70,8 @@ def test_compute_action_pick_rates_does_not_double_count_replay_mirror() -> None
 
     assert by_action["study"]["count"] == 1
     assert by_action["study"]["rate_per_run"] == 1.0
+    assert by_action["study"]["pick_share"] == 0.5
+    assert by_action["study"]["run_presence_rate"] == 1.0
     assert by_action["rest"]["count"] == 1
 
 
