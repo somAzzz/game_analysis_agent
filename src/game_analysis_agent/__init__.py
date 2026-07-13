@@ -20,19 +20,8 @@ Public surface:
 
 from __future__ import annotations
 
-from game_analysis_agent import (
-    agents,
-    analytics,
-    anomaly_detector,
-    bug_summarizer,
-    game_tools,
-    llm_client,
-    report_bundle,
-    schemas,
-    settings,
-    tool_loop,
-    value_analyzer,
-)
+from importlib import import_module
+from types import ModuleType
 
 __all__ = [
     "agents",
@@ -47,3 +36,17 @@ __all__ = [
     "tool_loop",
     "value_analyzer",
 ]
+
+
+def __getattr__(name: str) -> ModuleType:
+    """Load public submodules on demand.
+
+    Pure report tooling such as analytics must remain usable without
+    importing the optional OpenAI client and its dependencies.
+    """
+
+    if name not in __all__:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    module = import_module(f"{__name__}.{name}")
+    globals()[name] = module
+    return module

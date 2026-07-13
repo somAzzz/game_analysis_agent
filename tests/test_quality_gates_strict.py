@@ -194,6 +194,31 @@ design: {}
     } <= _failure_gates(report)
 
 
+def test_action_dominance_gate_uses_pick_share_not_count_per_run(tmp_path: Path) -> None:
+    gates = _write_gates(
+        tmp_path,
+        """
+critical_fail: {}
+balance:
+  max_action_pick_share: 0.6
+outcomes: {}
+design: {}
+""",
+    )
+    (tmp_path / "action_pick_rates.csv").write_text(
+        "policy,action_id,count,rate_per_run\n"
+        "balanced,common,20,10.0\n"
+        "balanced,other,20,10.0\n",
+        encoding="utf-8",
+    )
+
+    report = evaluate_report_dir(tmp_path, gates)
+
+    assert "balance.max_action_pick_share" not in _failure_gates(report)
+    cell = next(iter(report["balance_summary"]["cells"].values()))
+    assert cell["max_action_pick_share"] == 0.5
+
+
 def test_route_distance_uses_balanced_comparator_per_context(tmp_path: Path) -> None:
     gates = _write_gates(
         tmp_path,

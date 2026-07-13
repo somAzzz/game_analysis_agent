@@ -160,15 +160,20 @@ def compute_action_pick_rates(
     runs: Iterable[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     by_policy: dict[str, Counter[str]] = defaultdict(Counter)
+    by_policy_presence: dict[str, Counter[str]] = defaultdict(Counter)
     policy_total: Counter[str] = Counter()
     for run in runs:
         policy = str(run.get("policy", "unknown"))
         policy_total[policy] += 1
-        for action_id in _iter_action_ids(run):
+        action_ids = list(_iter_action_ids(run))
+        for action_id in action_ids:
             by_policy[policy][action_id] += 1
+        for action_id in set(action_ids):
+            by_policy_presence[policy][action_id] += 1
     rows: list[dict[str, Any]] = []
     for policy, actions in sorted(by_policy.items()):
         total = policy_total[policy]
+        total_picks = sum(actions.values())
         for action_id, count in sorted(actions.items()):
             rows.append(
                 {
@@ -176,6 +181,10 @@ def compute_action_pick_rates(
                     "action_id": action_id,
                     "count": count,
                     "rate_per_run": round(count / max(1, total), 6),
+                    "pick_share": round(count / max(1, total_picks), 6),
+                    "run_presence_rate": round(
+                        by_policy_presence[policy][action_id] / max(1, total), 6
+                    ),
                 }
             )
     return rows

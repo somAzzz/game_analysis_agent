@@ -7,6 +7,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 from game_analysis_agent.agents.interactive_player import (
     PERSONAS,
     InteractivePlayerAgent,
@@ -44,10 +46,21 @@ class _FakeLLM:
         self.contents = list(contents)
         self.settings = settings
         self.calls: list[LLMCall] = []
+        self.requests: list[dict[str, Any]] = []
 
-    def chat(self, messages, *, agent, step_name, temperature=None):  # noqa: ANN001
+    def chat(
+        self,
+        messages,
+        *,
+        agent,
+        step_name,
+        temperature=None,
+        max_tokens=None,
+    ):  # noqa: ANN001
         content = self.contents.pop(0) if self.contents else ""
         call = _fake_llm_call(content)
+        call.step_name = step_name
+        self.requests.append({"messages": messages, "max_tokens": max_tokens})
         self.calls.append(call)
         return content, call
 
@@ -398,3 +411,85 @@ def test_play_through_reusing_report_dir_replaces_old_trace(tmp_path) -> None:
     ]
     assert len(rows) == 2
     assert rows[0]["chosen_actions"] == ["mini_job"]
+
+
+def test_event_choice_uses_compact_dedicated_prompt() -> None:
+    probe = _FakeProbe()
+    agent = _build_agent(
+        [json.dumps({"event_choice_id": "rent_warning.pay_now"})],
+        probe,
+    )
+    context = build_week_context(
+        week=3,
+        max_weeks=20,
+        persona="study",
+        persona_strategy={"priorities": ["academic_progress"]},
+        state_payload={"state": {"week": 2, **probe.state}},
+        action_catalog=probe.list_available_actions(),
+        event_choices=[
+            {
+                "choice_id": "rent_warning.pay_now",
+                "text": "Pay now",
+                "success_effects": {"money": -100},
+            },
+            {
+                "choice_id": "rent_warning.delay",
+                "text": "Delay",
+                "failure_effects": {"stress": 10},
+            },
+        ],
+        last_event_id="rent_warning",
+        memory=PlayMemory(persona="study"),
+        difficulty="normal",
+        scenario="default_first_semester",
+        seed=42,
+    )
+
+    choice_id, validation, calls = agent._decide_event_choice(
+        week=3,
+        context_pack=context,
+        selected_actions=["study_library"],
+    )
+
+    assert choice_id == "rent_warning.pay_now"
+    assert validation.valid is True
+    assert calls[0].step_name == "week-3-event"
+    request = agent.llm.requests[0]  # type: ignore[attr-defined]
+    assert request["max_tokens"] == 192
+    assert "WeekContext JSON" not in request["messages"][1]["content"]
+    assert len(request["messages"][1]["content"]) < len(agent._build_user_prompt(context))
+
+
+def test_play_through_emits_progress_events(tmp_path) -> None:
+    probe = _FakeProbe(finish_at=2)
+    agent = _build_agent(
+        [
+            json.dumps({"actions": ["study_library"], "rationale": "wk1"}),
+            json.dumps({"actions": ["mini_job"], "rationale": "wk2"}),
+        ],
+        probe,
+    )
+    events: list[dict[str, Any]] = []
+    agent.progress_callback = events.append
+
+    agent.play_through(tmp_path, probe=probe)  # type: ignore[arg-type]
+
+    assert [(event["week"], event["phase"]) for event in events] == [
+        (1, "decision"),
+        (1, "completed"),
+        (2, "decision"),
+        (2, "completed"),
+    ]
+    assert events[-1]["completed_weeks"] == 2
+    assert events[-1]["eta_s"] >= 0
+
+
+def test_play_through_honors_cancellation_before_first_week(tmp_path) -> None:
+    probe = _FakeProbe()
+    agent = _build_agent([], probe)
+    agent.cancellation_check = lambda: True
+
+    with pytest.raises(RuntimeError, match="cancelled before week 1"):
+        agent.play_through(tmp_path, probe=probe)  # type: ignore[arg-type]
+
+    assert probe.current_week == 0

@@ -38,6 +38,7 @@ _ALLOWED_KEYS: dict[str, set[str]] = {
         "max_single_ending_rate_normal",
         "max_single_ending_rate_realistic",
         "max_action_rate_per_run",
+        "max_action_pick_share",
         "max_recovery_group_rate_per_run",
         "max_escape_group_rate_per_run",
         "min_distinct_endings_normal",
@@ -163,7 +164,11 @@ def evaluate_report_dir(report_dir: Path, gates_path: Path) -> dict[str, Any]:
         "min_distinct_endings_normal",
         "min_distinct_endings_realistic",
     }
-    action_gates = {"max_action_rate_per_run", *_GROUP_GATES}
+    action_gates = {
+        "max_action_rate_per_run",
+        "max_action_pick_share",
+        *_GROUP_GATES,
+    }
     endings = (
         _read_ending_rows(report_dir, defaults, difficulty_candidates, failures)
         if outcomes or ending_gates.intersection(balance)
@@ -747,6 +752,36 @@ def _eval_balance(
                         **_cell_payload(cell),
                         "message": (
                             "one action is picked too often in "
+                            f"{_cell_label(cell)}"
+                        ),
+                    }
+                )
+
+    max_action_share_threshold = _configured_number(
+        balance, "max_action_pick_share"
+    )
+    if max_action_share_threshold is not None:
+        for cell, rows in sorted(by_action_cell.items()):
+            total_picks = sum(row["count"] for row in rows)
+            top = max(
+                rows,
+                key=lambda row: row["count"] / max(1, total_picks),
+            )
+            top_share = top["count"] / max(1, total_picks)
+            summary["cells"].setdefault(
+                _cell_key(cell), _cell_payload(cell)
+            )["max_action_pick_share"] = round(top_share, 6)
+            if top_share > max_action_share_threshold:
+                target = warnings if _is_interactive_cell(cell) else failures
+                target.append(
+                    {
+                        "gate": "balance.max_action_pick_share",
+                        "actual": round(top_share, 6),
+                        "threshold": max_action_share_threshold,
+                        "action_id": top["action_id"],
+                        **_cell_payload(cell),
+                        "message": (
+                            "one action owns too much of all action picks in "
                             f"{_cell_label(cell)}"
                         ),
                     }

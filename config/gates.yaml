@@ -33,7 +33,7 @@ balance:
   # Hard ceilings — anything above is a play-balance bug.
   max_single_ending_rate_normal: 0.45
   max_single_ending_rate_realistic: 0.55
-  max_action_rate_per_run: 0.80
+  max_action_pick_share: 0.25
   max_recovery_group_rate_per_run: 2.5
   max_escape_group_rate_per_run: 2.0
   # Hard floors — anything below is "路线没有分化" or "难度太软".

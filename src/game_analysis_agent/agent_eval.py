@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from statistics import fmean
 from typing import Any
@@ -38,6 +39,7 @@ def evaluate_playthrough(report_dir: Path) -> dict[str, Any]:
     risk_acknowledged = 0
     persona_opportunities = 0
     persona_aligned = 0
+    unmatched_risk_awareness = 0
 
     for index, row in enumerate(rows, start=1):
         validation = row.get("validation") if isinstance(row.get("validation"), dict) else {}
@@ -93,25 +95,70 @@ def evaluate_playthrough(report_dir: Path) -> dict[str, Any]:
         if isinstance(risks, list) and risks:
             risk_opportunities += 1
             awareness = _string_list(decision.get("risk_awareness"))
-            risk_acknowledged += int(bool(awareness))
+            risk_ids = {
+                str(risk.get("id")).strip().lower()
+                for risk in risks
+                if isinstance(risk, dict) and risk.get("id")
+            }
+            matched_risks = {
+                risk_id
+                for risk_id in risk_ids
+                if any(_mentions_signal(item, risk_id) for item in awareness)
+            }
+            risk_acknowledged += int(bool(matched_risks))
+            unmatched_risk_awareness += int(bool(awareness) and not matched_risks)
 
         strategy = week_context.get("persona_strategy")
         actions = week_context.get("available_actions")
         if isinstance(strategy, dict) and isinstance(actions, list):
             priorities = {str(item) for item in strategy.get("priorities", []) if str(item)}
+            alignment_tags = {
+                str(item)
+                for item in strategy.get("alignment_action_tags", [])
+                if str(item)
+            }
+            alignment_ids = {
+                str(item)
+                for item in strategy.get("alignment_action_ids", [])
+                if str(item)
+            }
             action_by_id = {
                 str(action.get("id")): action
                 for action in actions
                 if isinstance(action, dict) and action.get("id")
             }
-            if priorities and chosen:
+            risk_guided = strategy.get("alignment_risk_guided") is True
+            suggested_actions = {
+                str(action_id)
+                for risk in (risks if isinstance(risks, list) else [])
+                if isinstance(risk, dict)
+                for action_id in risk.get("suggested_action_ids", [])
+                if str(action_id)
+            }
+            legacy_priorities = (
+                priorities
+                if not alignment_tags and not alignment_ids and not risk_guided
+                else set()
+            )
+            configured_signals = alignment_tags or alignment_ids or legacy_priorities
+            if (configured_signals or (risk_guided and suggested_actions)) and chosen:
                 persona_opportunities += 1
                 chosen_tags: set[str] = set()
                 for action_id in chosen:
                     action = action_by_id.get(action_id, {})
                     chosen_tags.update(_string_list(action.get("tags")))
                     chosen_tags.update(_string_list(action.get("risk_tags")))
-                persona_aligned += int(bool(priorities & (chosen_tags | set(chosen))))
+                aligned = bool(
+                    alignment_tags & chosen_tags
+                    or alignment_ids & set(chosen)
+                    or (
+                        not alignment_tags
+                        and not alignment_ids
+                        and legacy_priorities & (chosen_tags | set(chosen))
+                    )
+                    or (risk_guided and suggested_actions & set(chosen))
+                )
+                persona_aligned += int(aligned)
 
         if not chosen:
             errors.append(f"line {index}: chosen_actions is empty")
@@ -149,7 +196,9 @@ def evaluate_playthrough(report_dir: Path) -> dict[str, Any]:
         "anomaly_count": anomaly_count,
         "anomaly_rate_per_5_weeks": round(anomaly_count * 5 / total, 6) if total else None,
         "risk_acknowledgement_rate": _ratio(risk_acknowledged, risk_opportunities),
+        "unmatched_risk_awareness_count": unmatched_risk_awareness,
         "persona_alignment_rate": _ratio(persona_aligned, persona_opportunities),
+        "persona_alignment_opportunities": persona_opportunities,
         "llm_call_count": len(valid_calls),
         "llm_error_rate": _ratio(llm_errors, len(valid_calls)),
         "mean_latency_ms": round(fmean(latencies), 3) if latencies else None,
@@ -248,6 +297,14 @@ def _string_list(value: Any) -> list[str]:
     if not isinstance(value, list):
         return []
     return [str(item) for item in value if str(item)]
+
+
+def _mentions_signal(text: str, signal: str) -> bool:
+    normalized = str(text).strip().lower()
+    target = str(signal).strip().lower()
+    if not normalized or not target:
+        return False
+    return bool(re.search(rf"(?<![a-z0-9_]){re.escape(target)}(?![a-z0-9_])", normalized))
 
 
 def _non_negative_int(value: Any) -> int:

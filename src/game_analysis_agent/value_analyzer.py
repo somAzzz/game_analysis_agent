@@ -117,7 +117,10 @@ def analyze_values(
             policy = row.get("policy", "")
             action_id = row.get("action_id", "")
             try:
-                rate = float(row.get("rate_per_run", 0.0))
+                metric_name = (
+                    "pick_share" if row.get("pick_share") not in (None, "") else "rate_per_run"
+                )
+                rate = float(row.get(metric_name, 0.0))
                 count = int(row.get("count", 0))
             except (TypeError, ValueError):
                 continue
@@ -128,12 +131,12 @@ def analyze_values(
                         scope="action",
                         target_id=f"{policy}:{action_id}",
                         severity="warning",
-                        metric="rate_per_run",
+                        metric=metric_name,
                         value=rate,
                         threshold=dominant_pick,
                         description=(
                             f"Action `{action_id}` (policy={policy}) is picked "
-                            f"{rate:.1%} of runs — probable 'must-pick'."
+                            f"{rate:.1%} of action picks — probable 'must-pick'."
                         ),
                     )
                 )
@@ -144,12 +147,12 @@ def analyze_values(
                         scope="action",
                         target_id=f"{policy}:{action_id}",
                         severity="info",
-                        metric="rate_per_run",
+                        metric=metric_name,
                         value=rate,
                         threshold=dead_pick,
                         description=(
                             f"Action `{action_id}` (policy={policy}) was picked "
-                            f"{rate:.1%} of runs — likely 'no value'."
+                            f"{rate:.1%} of action picks — likely 'no value'."
                         ),
                     )
                 )
