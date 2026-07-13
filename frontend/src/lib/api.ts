@@ -13,6 +13,79 @@ import type {
 
 const BASE_URL = import.meta.env.BASE_URL || "/";
 
+type FieldKind = "array" | "number" | "object" | "string";
+type ManifestShape = Record<string, FieldKind>;
+
+const FRONT_MANIFEST_SHAPE: ManifestShape = {
+  generated_at: "string",
+  counts: "object",
+  issues: "array",
+  issues_index: "array",
+};
+
+const ISSUE_MANIFEST_SHAPE: ManifestShape = {
+  kind: "string",
+  id: "string",
+  slug: "string",
+  report_dir: "string",
+  summary: "object",
+  endings: "array",
+  actions: "array",
+  events: "array",
+  choices: "array",
+  weekly_series: "object",
+  anomalies: "array",
+  value_findings: "array",
+  route_findings: "object",
+  agents: "array",
+  agent_markdown: "object",
+  raw_runs_count: "number",
+};
+
+const DECISION_GRAPH_MANIFEST_SHAPE: ManifestShape = {
+  issue_id: "string",
+  run_id: "number",
+  policy: "string",
+  scenario: "string",
+  max_weeks: "number",
+  final_ending_id: "string",
+  run: "object",
+  event_graph: "object",
+};
+
+function matchesKind(value: unknown, kind: FieldKind): boolean {
+  if (kind === "array") return Array.isArray(value);
+  if (kind === "object") {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+  }
+  if (kind === "number") {
+    return typeof value === "number" && Number.isFinite(value);
+  }
+  return typeof value === kind;
+}
+
+function decodeManifest<T>(
+  value: unknown,
+  url: string,
+  label: string,
+  shape: ManifestShape,
+): T {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new ManifestError(url + " returned invalid " + label + " manifest: root must be an object");
+  }
+  const record = value as Record<string, unknown>;
+  const invalidField = Object.entries(shape).find(
+    ([field, kind]) => !matchesKind(record[field], kind),
+  );
+  if (invalidField) {
+    const [field, kind] = invalidField;
+    throw new ManifestError(
+      url + " returned invalid " + label + " manifest: " + field + " must be " + kind,
+    );
+  }
+  return value as T;
+}
+
 function assetPath(path: string): string {
   const cleanBase = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
@@ -27,22 +100,32 @@ export class ManifestError extends Error {
   }
 }
 
-async function fetchJSON<T>(url: string): Promise<T> {
+async function fetchJSON<T>(
+  url: string,
+  label: string,
+  shape: ManifestShape,
+): Promise<T> {
   const res = await fetch(url, { headers: { Accept: "application/json" } });
   if (!res.ok) {
     throw new ManifestError(`${url} → HTTP ${res.status}`, res.status);
   }
+  let value: unknown;
   try {
-    return (await res.json()) as T;
+    value = await res.json();
   } catch (err) {
     throw new ManifestError(
-      `${url} returned non-JSON: ${(err as Error).message}`,
+      `${url} returned non-JSON: ${err instanceof Error ? err.message : String(err)}`,
     );
   }
+  return decodeManifest<T>(value, url, label, shape);
 }
 
 export function fetchFrontManifest(): Promise<FrontManifest> {
-  return fetchJSON<FrontManifest>(assetPath("manifest.json"));
+  return fetchJSON<FrontManifest>(
+    assetPath("manifest.json"),
+    "front",
+    FRONT_MANIFEST_SHAPE,
+  );
 }
 
 export function fetchIssueManifest(
@@ -51,6 +134,8 @@ export function fetchIssueManifest(
 ): Promise<IssueManifest> {
   return fetchJSON<IssueManifest>(
     assetPath(`browse/${encodeURIComponent(kind)}/${encodeURIComponent(id)}/manifest.json`),
+    "issue",
+    ISSUE_MANIFEST_SHAPE,
   );
 }
 
@@ -60,5 +145,7 @@ export function fetchDecisionGraphManifest(
 ): Promise<DecisionGraphManifest> {
   return fetchJSON<DecisionGraphManifest>(
     assetPath(`browse/decision_graph/${encodeURIComponent(issueId)}/${runId}/manifest.json`),
+    "decision graph",
+    DECISION_GRAPH_MANIFEST_SHAPE,
   );
 }
