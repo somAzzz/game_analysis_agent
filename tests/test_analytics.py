@@ -38,7 +38,12 @@ def test_compute_ending_distribution_counts_correctly() -> None:
     # The fixture has two balanced runs but with different ending_ids
     # (academic_success, burnout) — each appears once with rate 0.5.
     assert by_key[("balanced", "academic_success")]["count"] == 1
-    assert by_key[("balanced", "academic_success")]["rate"] == 0.5
+    academic = by_key[("balanced", "academic_success")]
+    assert academic["rate"] == 0.5
+    assert academic["sample_size"] == 2
+    assert academic["difficulty"] == "unknown"
+    assert academic["scenario"] == "default"
+    assert academic["ci95_low"] < academic["rate"] < academic["ci95_high"]
     assert by_key[("balanced", "burnout")]["count"] == 1
 
 
@@ -49,6 +54,23 @@ def test_compute_action_pick_rates_handles_v02_keys() -> None:
     pick_ids = {row["action_id"] for row in rows}
     assert "study_library" in pick_ids
     assert "rest_at_home" in pick_ids
+
+
+def test_compute_action_pick_rates_does_not_double_count_replay_mirror() -> None:
+    runs = [
+        {
+            "policy": "balanced",
+            "weekly_log": [{"selected_action_ids": ["study", "rest"]}],
+            "action_sequence": [{"actions": ["study", "rest"]}],
+        }
+    ]
+
+    rows = compute_action_pick_rates(runs)
+    by_action = {row["action_id"]: row for row in rows}
+
+    assert by_action["study"]["count"] == 1
+    assert by_action["study"]["rate_per_run"] == 1.0
+    assert by_action["rest"]["count"] == 1
 
 
 def test_compute_weekly_stats_keys_metrics() -> None:

@@ -94,30 +94,67 @@ def json_loads(text: str) -> Any:
     return json.loads(text)
 
 
+def wilson_interval(
+    successes: int,
+    total: int,
+    *,
+    z: float = 1.959963984540054,
+) -> tuple[float, float]:
+    """Return a Wilson score interval for a binomial proportion."""
+
+    if total <= 0:
+        return 0.0, 0.0
+    proportion = successes / total
+    z_squared = z * z
+    denominator = 1 + z_squared / total
+    center = (proportion + z_squared / (2 * total)) / denominator
+    margin = (
+        z
+        * (
+            (proportion * (1 - proportion) / total)
+            + (z_squared / (4 * total * total))
+        )
+        ** 0.5
+        / denominator
+    )
+    return max(0.0, center - margin), min(1.0, center + margin)
+
+
 def compute_ending_distribution(
     runs: Iterable[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """``[{"policy": ..., "ending_id": ..., "count": ..., "rate": ...}, ...]``"""
-    by_policy: dict[str, list[str]] = defaultdict(list)
+    """Return cell-aware ending rates with Wilson 95% confidence intervals."""
+
+    by_cell: dict[tuple[str, str, str], list[str]] = defaultdict(list)
     for run in runs:
-        by_policy[str(run.get("policy", "unknown"))].append(
+        cell = (
+            str(run.get("policy", "unknown")),
+            str(run.get("difficulty") or "unknown"),
+            str(run.get("scenario") or "default"),
+        )
+        by_cell[cell].append(
             str(run.get("final_ending_id") or run.get("ending_id") or "unknown")
         )
     rows: list[dict[str, Any]] = []
-    for policy, endings in sorted(by_policy.items()):
+    for (policy, difficulty, scenario), endings in sorted(by_cell.items()):
         counter = Counter(endings)
         total = len(endings)
         for ending_id, count in sorted(counter.items()):
+            ci_low, ci_high = wilson_interval(count, total)
             rows.append(
                 {
                     "policy": policy,
+                    "difficulty": difficulty,
+                    "scenario": scenario,
                     "ending_id": ending_id,
                     "count": count,
+                    "sample_size": total,
                     "rate": round(count / max(1, total), 6),
+                    "ci95_low": round(ci_low, 6),
+                    "ci95_high": round(ci_high, 6),
                 }
             )
     return rows
-
 
 def compute_action_pick_rates(
     runs: Iterable[dict[str, Any]],
@@ -272,10 +309,19 @@ def _iter_action_ids(run: dict[str, Any]) -> Iterable[str]:
     v0.2 ``study-in-germany`` schema (``weekly_log[].selected_action_ids``
     and ``action_sequence[].actions``).
     """
+    weekly_actions: list[str] = []
     for week in run.get("weekly_log", []) or []:
-        for key in ("selected_action_ids", "actions"):
-            for action_id in week.get(key, []) or []:
-                yield str(action_id)
+        selected = week.get("selected_action_ids")
+        legacy = week.get("actions")
+        values = selected if isinstance(selected, list) else legacy
+        if isinstance(values, list):
+            weekly_actions.extend(str(action_id) for action_id in values)
+    if weekly_actions:
+        yield from weekly_actions
+        return
+
+    # action_sequence is a replay/index mirror in current Godot traces.  It is
+    # only a fallback for older/minimal traces that lack weekly action data.
     for step in run.get("action_sequence", []) or []:
         for action_id in step.get("actions", []) or []:
             yield str(action_id)
@@ -293,5 +339,6 @@ __all__ = [
     "compute_weekly_stats",
     "load_runs",
     "percentile",
+    "wilson_interval",
     "write_csv",
 ]

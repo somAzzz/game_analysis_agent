@@ -41,7 +41,17 @@ def analyze(runs: list[dict], out_dir: Path, *, raw_runs_path: Path | None = Non
     weekly_rows = compute_weekly_stats(runs)
     write_csv(
         out_dir / "ending_distribution.csv",
-        ["policy", "ending_id", "count", "rate"],
+        [
+            "policy",
+            "difficulty",
+            "scenario",
+            "ending_id",
+            "count",
+            "sample_size",
+            "rate",
+            "ci95_low",
+            "ci95_high",
+        ],
         ending_rows,
     )
     write_csv(
