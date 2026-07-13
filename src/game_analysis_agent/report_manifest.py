@@ -8,15 +8,21 @@ trace references.
 
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
+import os
+import platform
+import shutil
+import subprocess
+import sys
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 MANIFEST_FILE = "report_manifest.json"
 REPORT_INDEX_FILE = "report_index.json"
-SCHEMA_VERSION = "trace-manifest-v1"
+SCHEMA_VERSION = "trace-manifest-v2"
 
 
 def write_report_manifest(
@@ -74,6 +80,7 @@ def write_report_manifest(
         ),
         "file_inventory": inventory,
         "trace": trace,
+        "provenance": collect_provenance(),
         "frontend": {
             "detail_href": "index.html",
             "primary_trace_file": trace.get("primary_file", ""),
@@ -174,8 +181,7 @@ def _trace_index(report_dir: Path, run_id: str) -> dict[str, Any]:
                 "difficulty": row.get("difficulty", ""),
                 "scenario": row.get("scenario", ""),
                 "final_ending_id": row.get("final_ending_id") or row.get("ending_id", ""),
-                "final_week": row.get("final_week")
-                or (row.get("final_state") or {}).get("week"),
+                "final_week": row.get("final_week") or (row.get("final_state") or {}).get("week"),
                 "step_count": len(weekly_log) if isinstance(weekly_log, list) else 0,
             }
         )
@@ -195,7 +201,186 @@ def _file_ref(report_dir: Path, item: str | Path) -> dict[str, Any]:
         "exists": exists,
         "bytes": path.stat().st_size if exists and path.is_file() else 0,
         "sha256": _sha256(path) if exists and path.is_file() else "",
+        "modified_at": (
+            datetime.fromtimestamp(path.stat().st_mtime, tz=UTC).isoformat()
+            if exists and path.is_file()
+            else ""
+        ),
     }
+
+
+def collect_provenance() -> dict[str, Any]:
+    """Return reproducibility metadata for the Agent and canonical game."""
+
+    root = Path(__file__).resolve().parents[2]
+    game_root = Path(
+        os.environ.get(
+            "GAME_PROJECT_PATH",
+            "/home/bo/projects/python/study-in-germany",
+        )
+    )
+    godot_bin = os.environ.get("GODOT_BIN", "godot4")
+    agent_source = runtime_source_fingerprint(root)
+    game_source = game_source_fingerprint(game_root)
+    return {
+        "agent_repository": _git_provenance(root),
+        "game_repository": _git_provenance(game_root),
+        "runtime": {
+            "python": platform.python_version(),
+            "python_executable": sys.executable,
+            "platform": platform.platform(),
+            "godot": _command_version(godot_bin),
+        },
+        "fingerprints": {
+            "runtime_source_sha256": agent_source,
+            "game_source_sha256": game_source,
+            "execution_source_sha256": _combine_source_fingerprints(agent_source, game_source),
+            "config_sha256": _tree_sha256(root / "config"),
+            "prompts_sha256": _tree_sha256(root / "prompts"),
+        },
+    }
+
+
+def runtime_source_fingerprint(root: Path) -> str:
+    """Hash the executable Agent source, including uncommitted changes.
+
+    A git commit plus a dirty flag cannot distinguish two different dirty
+    worktrees. Matrix resume and report provenance need the exact code bytes
+    that produced an artifact, so this digest deliberately covers only
+    runtime-owned inputs and excludes generated/cache files.
+    """
+
+    root = root.resolve()
+    candidates: list[Path] = []
+    for directory in ("src", "tools", "scripts", "config", "prompts"):
+        base = root / directory
+        if base.is_dir():
+            candidates.extend(path for path in base.rglob("*") if path.is_file())
+    candidates.extend(
+        path
+        for name in ("pyproject.toml", "uv.lock", "Dockerfile", "docker-compose.yml")
+        if (path := root / name).is_file()
+    )
+
+    digest = hashlib.sha256()
+    included = 0
+    for path in sorted(set(candidates)):
+        relative = path.relative_to(root)
+        if (
+            "__pycache__" in relative.parts
+            or path.suffix in {".pyc", ".pyo", ".orig"}
+            or any(part.startswith(".") for part in relative.parts)
+        ):
+            continue
+        digest.update(relative.as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+        included += 1
+    return digest.hexdigest() if included else ""
+
+
+def game_source_fingerprint(root: Path) -> str:
+    """Hash canonical Godot code/content while excluding reports and imports."""
+
+    root = root.resolve()
+    candidates: list[Path] = []
+    for directory in ("autoload", "data", "scenes", "scripts"):
+        base = root / directory
+        if base.is_dir():
+            candidates.extend(path for path in base.rglob("*") if path.is_file())
+    project_file = root / "project.godot"
+    if project_file.is_file():
+        candidates.append(project_file)
+
+    digest = hashlib.sha256()
+    included = 0
+    for path in sorted(set(candidates)):
+        relative = path.relative_to(root)
+        if (
+            "__pycache__" in relative.parts
+            or path.suffix in {".import", ".pyc", ".pyo", ".orig"}
+            or any(part.startswith(".") for part in relative.parts)
+        ):
+            continue
+        digest.update(relative.as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+        included += 1
+    return digest.hexdigest() if included else ""
+
+
+def execution_source_fingerprint(agent_root: Path, game_root: Path) -> str:
+    """Return one identity for every local source tree affecting a matrix run."""
+
+    return _combine_source_fingerprints(
+        runtime_source_fingerprint(agent_root),
+        game_source_fingerprint(game_root),
+    )
+
+
+def _combine_source_fingerprints(agent: str, game: str) -> str:
+    payload = f"agent:{agent}\ngame:{game}\n".encode("ascii")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _git_provenance(path: Path) -> dict[str, Any]:
+    base = {"path": str(path), "available": False, "commit": "", "dirty": None}
+    if not (path / ".git").exists():
+        return base
+    commit = _run_capture(["git", "-C", str(path), "rev-parse", "HEAD"])
+    status = _run_capture(["git", "-C", str(path), "status", "--porcelain"])
+    return {
+        **base,
+        "available": bool(commit),
+        "commit": commit,
+        "dirty": bool(status) if commit else None,
+    }
+
+
+@functools.lru_cache(maxsize=8)
+def _command_version(command: str) -> dict[str, Any]:
+    resolved = shutil.which(command)
+    if not resolved:
+        fallback = shutil.which("godot") if command == "godot4" else None
+        resolved = fallback
+    if not resolved:
+        return {"available": False, "command": command, "version": ""}
+    version = _run_capture([resolved, "--version"], timeout=5)
+    return {
+        "available": bool(version),
+        "command": resolved,
+        "version": version,
+    }
+
+
+def _run_capture(command: list[str], *, timeout: int = 5) -> str:
+    try:
+        completed = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+    if completed.returncode != 0:
+        return ""
+    return completed.stdout.strip()
+
+
+def _tree_sha256(root: Path) -> str:
+    if not root.exists():
+        return ""
+    digest = hashlib.sha256()
+    for path in sorted(item for item in root.rglob("*") if item.is_file()):
+        digest.update(str(path.relative_to(root)).encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
 
 
 def _sha256(path: Path) -> str:
@@ -252,6 +437,10 @@ __all__ = [
     "MANIFEST_FILE",
     "REPORT_INDEX_FILE",
     "SCHEMA_VERSION",
+    "collect_provenance",
+    "execution_source_fingerprint",
+    "game_source_fingerprint",
+    "runtime_source_fingerprint",
     "write_report_manifest",
     "write_reports_index",
 ]

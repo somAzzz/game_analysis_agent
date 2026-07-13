@@ -24,7 +24,7 @@ def test_emit_writes_top_level_manifest(tmp_path) -> None:
         "policy,ending_id,count,rate\nbalanced,academic_success,5,1.0\n",
         encoding="utf-8",
     )
-    summary = emit_all(tmp_path / "reports")
+    emit_all(tmp_path / "reports")
     assert (tmp_path / "reports" / "manifest.json").exists()
     parsed = json.loads((tmp_path / "reports" / "manifest.json").read_text())
     assert parsed["counts"]["issues"] >= 1

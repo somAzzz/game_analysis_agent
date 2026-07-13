@@ -402,7 +402,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    summary = emit_all(args.reports)
+    emit_all(args.reports)
     if args.out:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         # Re-emit just the front-page manifest to the alternate path

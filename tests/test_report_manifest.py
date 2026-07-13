@@ -6,6 +6,8 @@ from pathlib import Path
 from game_analysis_agent.report_manifest import (
     MANIFEST_FILE,
     REPORT_INDEX_FILE,
+    execution_source_fingerprint,
+    runtime_source_fingerprint,
     write_report_manifest,
     write_reports_index,
 )
@@ -56,6 +58,15 @@ def test_write_report_manifest_indexes_raw_runs(tmp_path: Path) -> None:
     assert manifest["trace"]["runs"][0]["run_id"] == 7
     assert manifest["trace"]["runs"][0]["line"] == 1
     assert manifest["source_files"][0]["sha256"]
+    assert manifest["source_files"][0]["modified_at"]
+    assert manifest["schema_version"] == "trace-manifest-v2"
+    provenance = manifest["provenance"]
+    assert provenance["agent_repository"]["commit"]
+    assert len(provenance["fingerprints"]["config_sha256"]) == 64
+    assert len(provenance["fingerprints"]["prompts_sha256"]) == 64
+    assert len(provenance["fingerprints"]["runtime_source_sha256"]) == 64
+    assert len(provenance["fingerprints"]["execution_source_sha256"]) == 64
+    assert provenance["runtime"]["python"]
 
 
 def test_write_report_manifest_indexes_playthrough_steps(tmp_path: Path) -> None:
@@ -102,3 +113,38 @@ def test_write_reports_index_collects_manifests(tmp_path: Path) -> None:
     assert index["report_count"] == 1
     assert index["reports"][0]["run_id"] == "run-a"
     assert index["reports"][0]["manifest"] == "balance/run-a/report_manifest.json"
+
+
+def test_runtime_source_fingerprint_tracks_source_but_ignores_cache(tmp_path: Path) -> None:
+    source = tmp_path / "src" / "package" / "module.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("VALUE = 1\n", encoding="utf-8")
+    first = runtime_source_fingerprint(tmp_path)
+
+    cache = source.parent / "__pycache__" / "module.pyc"
+    cache.parent.mkdir()
+    cache.write_bytes(b"generated")
+    assert runtime_source_fingerprint(tmp_path) == first
+
+    source.write_text("VALUE = 2\n", encoding="utf-8")
+    assert runtime_source_fingerprint(tmp_path) != first
+
+
+def test_execution_source_fingerprint_tracks_game_but_ignores_reports(
+    tmp_path: Path,
+) -> None:
+    agent_root = tmp_path / "agent"
+    game_root = tmp_path / "game"
+    (agent_root / "src").mkdir(parents=True)
+    (agent_root / "src" / "agent.py").write_text("VALUE = 1\n", encoding="utf-8")
+    (game_root / "scripts").mkdir(parents=True)
+    game_script = game_root / "scripts" / "simulation.gd"
+    game_script.write_text("const VALUE = 1\n", encoding="utf-8")
+    first = execution_source_fingerprint(agent_root, game_root)
+
+    (game_root / "reports").mkdir()
+    (game_root / "reports" / "generated.json").write_text("{}", encoding="utf-8")
+    assert execution_source_fingerprint(agent_root, game_root) == first
+
+    game_script.write_text("const VALUE = 2\n", encoding="utf-8")
+    assert execution_source_fingerprint(agent_root, game_root) != first
