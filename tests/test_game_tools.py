@@ -14,14 +14,17 @@ from game_analysis_agent.game_tools import (
 from game_analysis_agent.settings import Settings
 
 
-def _settings() -> Settings:
+def _settings(tmp_path: Path) -> Settings:
     base = Settings()
     return Settings(
         **{
             **base.__dict__,
             # Keep these unit tests independent from a host or Docker Godot runtime.
             "godot_bin": "/definitely/missing/godot-for-unit-test",
-            "game_project_path": base.game_project_path.parent,
+            # Pin to the per-test tmp dir so _run_one_step can mkdir
+            # reports/ without touching the host's GAME_PROJECT_PATH or
+            # any path under the developer's home directory.
+            "game_project_path": tmp_path,
         }
     )
 
@@ -33,16 +36,16 @@ def test_tool_definitions_have_unique_names() -> None:
     assert expected.issubset(set(names))
 
 
-def test_build_probe_starts_at_week_zero() -> None:
-    settings = _settings()
+def test_build_probe_starts_at_week_zero(tmp_path: Path) -> None:
+    settings = _settings(tmp_path)
     probe = build_probe(settings)
     assert probe.current_week == 0
     assert probe.state is None
     assert probe.finished is False
 
 
-def test_get_state_returns_initial_shape() -> None:
-    settings = _settings()
+def test_get_state_returns_initial_shape(tmp_path: Path) -> None:
+    settings = _settings(tmp_path)
     probe = build_probe(settings)
     payload = probe.get_state()
     assert payload["week"] == 0
@@ -50,7 +53,9 @@ def test_get_state_returns_initial_shape() -> None:
     assert payload["state"] == {}
 
 
-def test_probe_propagates_risk_guidance_from_snapshot(monkeypatch) -> None:
+def test_probe_propagates_risk_guidance_from_snapshot(
+    tmp_path: Path, monkeypatch
+) -> None:
     guidance = {
         "contract_version": "1.0",
         "source": "game_risk_evaluator",
@@ -69,15 +74,15 @@ def test_probe_propagates_risk_guidance_from_snapshot(monkeypatch) -> None:
         }
 
     monkeypatch.setattr(game_tools, "_run_one_step", fake_run_one_step)
-    probe = build_probe(_settings())
+    probe = build_probe(_settings(tmp_path))
 
     payload = probe.get_state()
 
     assert payload["risk_guidance"] == guidance
 
 
-def test_build_tool_map_returns_callable_map() -> None:
-    probe = build_probe(_settings())
+def test_build_tool_map_returns_callable_map(tmp_path: Path) -> None:
+    probe = build_probe(_settings(tmp_path))
     tool_map = build_tool_map(probe)
     assert set(tool_map.keys()) == {
         "get_state",
@@ -89,14 +94,16 @@ def test_build_tool_map_returns_callable_map() -> None:
     }
 
 
-def test_step_rejects_empty_actions() -> None:
-    probe = build_probe(_settings())
+def test_step_rejects_empty_actions(tmp_path: Path) -> None:
+    probe = build_probe(_settings(tmp_path))
     out = probe.step([])
     assert out.get("error")
 
 
-def test_finish_marks_finished_and_returns_unknown_when_no_plan() -> None:
-    probe = build_probe(_settings())
+def test_finish_marks_finished_and_returns_unknown_when_no_plan(
+    tmp_path: Path,
+) -> None:
+    probe = build_probe(_settings(tmp_path))
     out = probe.finish()
     assert out["finished"] is True
     assert "final_state" in out

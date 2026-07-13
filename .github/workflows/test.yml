@@ -53,9 +53,16 @@ jobs:
         run: uv sync --extra dev --locked
 
       - name: Run Python tests
+        env:
+          # CI runners don't load .env. Pin GAME_PROJECT_PATH to a
+          # per-job temp dir so Settings() never falls back to the
+          # host-specific default that the developers use locally.
+          GAME_PROJECT_PATH: ${{ runner.temp }}/game_analysis_agent/project
         run: uv run pytest -q -ra
 
       - name: Validate the complete matrix plan
+        env:
+          GAME_PROJECT_PATH: ${{ runner.temp }}/game_analysis_agent/project
         run: >-
           uv run python tools/run_gameplay_agent.py matrix
           --dry-run --jobs 4 --out /tmp/game-analysis-matrix-plan

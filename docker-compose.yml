@@ -99,7 +99,12 @@ services:
     volumes:
       # Mount the shared parent of both repositories at the identical path.
       # The runner passes absolute game --path and Agent report --out paths.
-      - ${GODOT_DOCKER_MOUNT_ROOT:-/home/bo/projects/python}:${GODOT_DOCKER_MOUNT_ROOT:-/home/bo/projects/python}
+      # Set GODOT_DOCKER_MOUNT_ROOT to the parent directory that contains
+      # both game_analysis_agent and study-in-germany before `compose up`.
+      # The fallback below is /tmp so the service can still start on a
+      # clean machine, but it is only useful for syntax / healthcheck checks
+      # — real game runs need the project tree mounted here.
+      - ${GODOT_DOCKER_MOUNT_ROOT:-/tmp}:${GODOT_DOCKER_MOUNT_ROOT:-/tmp}
       - /tmp:/tmp
     working_dir: /tmp
     init: true

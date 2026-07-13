@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import functools
 import os
+import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -39,6 +40,19 @@ def _env_path(name: str, default: Path) -> Path:
     return Path(raw) if raw else default
 
 
+def _default_game_project_path() -> Path:
+    """Fallback path used when ``GAME_PROJECT_PATH`` is unset.
+
+    Returns a writable location under the system temp directory so the
+    process never assumes a host-specific home directory. Production
+    callers should still export ``GAME_PROJECT_PATH`` to point at a real
+    Godot checkout; this fallback exists only so unit tests and CI
+    (which do not load ``.env``) don't crash trying to ``mkdir`` a path
+    under a developer's home that doesn't exist on the runner.
+    """
+    return Path(tempfile.gettempdir()) / "game_analysis_agent_default_project"
+
+
 _SUPPORTED_PROVIDERS = frozenset({"vllm", "sglang", "deepseek"})
 _PLACEHOLDER_TOKENS = frozenset({"", "empty", "dummy", "replace_me"})
 
@@ -60,7 +74,9 @@ class Settings:
         default_factory=lambda: _env("VLLM_API_KEY", "local-dev-token")
     )
     vllm_model: str = field(
-        default_factory=lambda: _env("VLLM_MODEL", "/models/qwen3.6-nvfp4")
+        default_factory=lambda: _env(
+            "LLM_SERVED_MODEL_NAME", "qwen3.6-27b-nvfp4"
+        )
     )
 
     # ---- Local SGLang (alternative) ------------------------------------
@@ -102,7 +118,7 @@ class Settings:
     )
     game_project_path: Path = field(
         default_factory=lambda: _env_path(
-            "GAME_PROJECT_PATH", Path("/home/bo/projects/python/study-in-germany")
+            "GAME_PROJECT_PATH", _default_game_project_path()
         )
     )
 
