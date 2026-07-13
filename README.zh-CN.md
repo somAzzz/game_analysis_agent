@@ -33,20 +33,26 @@ LLM agent layer (provider: vllm | sglang | deepseek)
 
 ## 快速开始
 
-### 方式 A：Docker（推荐，vLLM + agent 一体化）
+### 方式 A：Docker（推荐，vLLM + Godot sidecar）
 
 ```bash
 cp .env.example .env
 # 编辑 .env 填 HF_TOKEN / GAME_PROJECT_PATH 等
 docker compose pull vllm
-docker compose up vllm -d
+docker compose up -d vllm godot
 docker compose logs -f vllm           # 等待 "Application startup complete"
-docker compose --profile cli run --rm agent all --runs 20 --policy balanced
+docker compose ps                      # 确认 vllm / godot 都是 healthy
+
+# 真实玩法命令从宿主机运行，wrapper 会进入 Godot sidecar
+uv run python tools/run_gameplay_agent.py play \
+  --report-dir reports/play/local-smoke \
+  --persona newbie --weeks 5 --seed 42
 ```
 
 详见 [docs/DOCKER.md](docs/DOCKER.md)。该方式会在本地启动一个
 vLLM v0.25.0 容器（默认服务 NVIDIA 官方 Qwen3.6 27B NVFP4 + MTP
-投机解码），然后按需启动一个不带 GPU 的 agent CLI 容器跑流水线。
+投机解码）以及一个常驻 Godot 工具容器。可选的 `agent` 容器只用于已有
+报告的纯 Python 分析/QA，不负责进入 Godot sidecar 执行游戏进程。
 
 ### 方式 B：本地 Python + 已有 vLLM endpoint
 
@@ -226,6 +232,75 @@ wrapper 会优先复用 compose 中常驻的 `godot` 服务；服务未启动时
 容器。默认镜像是本机已缓存的 `barichello/godot-ci:4.4`；可通过
 `GODOT_DOCKER_IMAGE` 覆盖。挂载约定和 CI 完整性要求见 [AGENTS.md](AGENTS.md)。
 
+### 使用本地 LLM Agent 做真实测试
+
+最直接的端到端测试是让本地 LLM 选择行动，同时由真实 Godot 项目推进游戏。
+先做不调用 LLM 的游戏契约预检，便于区分 Godot 和模型问题：
+
+```bash
+docker compose up -d vllm godot
+docker compose ps
+
+uv run python tools/run_gameplay_agent.py interactive-probe \
+  --report-dir reports/interactive/local-smoke
+```
+
+然后运行 5 周 smoke test，并独立重验录制证据：
+
+```bash
+uv run python tools/run_gameplay_agent.py play \
+  --report-dir reports/play/local-newbie-smoke \
+  --persona newbie \
+  --difficulty normal \
+  --scenario default_first_semester \
+  --seed 42 \
+  --weeks 5
+
+uv run python tools/run_gameplay_agent.py eval \
+  --report-dir reports/play/local-newbie-smoke
+
+uv run python -m json.tool \
+  reports/play/local-newbie-smoke/agent_eval.json
+```
+
+正式测试把 `--weeks` 改成 `20`。可用 persona 为 `newbie`、`study`、
+`money`、`social`、`visa` 和 `slacker`。合格结果至少应满足：
+
+- `valid: true` 且 `errors` 为空；
+- `final_valid_rate >= 0.95`；
+- `fallback_rate <= 0.05`；
+- `illegal_action_rate == 0`；
+- `llm_error_rate <= 0.05`；
+- `anomaly_rate_per_5_weeks <= 1`。
+
+`persona_alignment_rate` 和 `risk_acknowledgement_rate` 分别反映角色策略
+一致性以及模型是否理解游戏原生风险提示，也应人工对比不同 persona。
+
+若要让六个 LLM 审查 Agent 分析新生成的真实游戏数据，可把所有证据写入同一个
+报告目录：
+
+```bash
+REPORT=reports/balance/local-real-42
+
+uv run python tools/run_gameplay_agent.py sim \
+  --report-dir "$REPORT" --runs 200 --weeks 20 \
+  --policy balanced --difficulty normal --seed 42
+uv run python tools/run_gameplay_agent.py export --report-dir "$REPORT"
+uv run python tools/run_gameplay_agent.py probe \
+  --report-dir "$REPORT" --runs 30 --weeks 20 \
+  --policy balanced --seed 42 \
+  --extreme "zero_money,deep_debt,no_energy,flag_chaos"
+uv run python tools/run_gameplay_agent.py qa --report-dir "$REPORT"
+uv run python tools/run_gameplay_agent.py gates --report-dir "$REPORT"
+```
+
+`play` 会生成 `playthrough.jsonl`、`playthrough_summary.md`、
+`playthrough_agent_report.json`、`agent_eval.json` 和
+`report_manifest.json`。虽然 `play` 已自动生成评估，仍建议再运行一次
+`eval`：录制证据无效时，独立命令会返回非零退出码。当前游戏 demo 有 3 个
+已知平衡失败，所以一体化 `all` 可能在 validator 阶段正确停止、尚未进入
+LLM QA；上面的分步流程可以分别检查每个阶段。
+
 本地确定性检查：
 
 ```bash
@@ -331,6 +406,8 @@ tools/
 - [Godot 接入规范](docs/GODOT_INTEGRATION.md)
 - [本地 vLLM + Qwen 接入](docs/VLLM_QWEN_LOCAL_AGENT.md)
 - [数据与报告规范](docs/DATA_CONTRACTS.md)
+- [本地 LLM 游戏系统真实测试报告（2026-07-13）](docs/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md)
+- [Service-first MCP 迁移计划](docs/MCP_MIGRATION_PLAN.md)
 
 ## 当前状态
 

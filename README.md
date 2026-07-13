@@ -166,29 +166,36 @@ endpoint is unavailable; deterministic validation and gates still run.
 
 ## Quick Start: Docker + vLLM
 
-Start the local vLLM service:
+Start the local vLLM service and persistent Godot sidecar:
 
 ```bash
 cp .env.example .env
 # Edit .env: HF_TOKEN, GAME_PROJECT_PATH, CUDA_VISIBLE_DEVICES, etc.
 docker compose pull vllm
-docker compose up -d vllm
+docker compose up -d vllm godot
 docker compose logs -f vllm
+docker compose ps
 ```
 
-Wait until the vLLM API is healthy. Then run the agent container explicitly:
+Wait until both services are healthy. Run gameplay commands from the host so
+the repository wrapper can execute Godot inside the sidecar:
 
 ```bash
-docker compose --profile cli run --rm agent \
-  python tools/run_gameplay_agent.py all --runs 20 --policy balanced
+uv run python tools/run_gameplay_agent.py play \
+  --report-dir reports/play/local-smoke \
+  --persona newbie --weeks 5 --seed 42
 ```
 
-The `agent` container does not need GPU access. It calls the vLLM HTTP service
-inside the Compose network.
+The opt-in `agent` container is for pure-Python analysis and QA of existing
+reports. It intentionally cannot execute commands in the Godot sidecar.
 
 See [docs/DOCKER.md](docs/DOCKER.md) and
 [docs/VLLM_QWEN_LOCAL_AGENT.md](docs/VLLM_QWEN_LOCAL_AGENT.md) for deployment
 details.
+
+For the future MCP surface, follow the
+[service-first MCP migration plan](docs/MCP_MIGRATION_PLAN.md). The existing
+CLI must be refactored onto typed services before any MCP wrapper is added.
 
 ## Common Workflows
 
@@ -431,6 +438,74 @@ container when the service is not running. The default image is
 `barichello/godot-ci:4.4`; override it with `GODOT_DOCKER_IMAGE`. See
 [AGENTS.md](AGENTS.md) for mount and CI-integrity details.
 
+### Real local-LLM agent testing
+
+The most direct end-to-end test lets the local LLM choose actions while the
+real Godot project advances. First verify the producer-native game contract
+without contacting the model:
+
+```bash
+docker compose up -d vllm godot
+docker compose ps
+
+uv run python tools/run_gameplay_agent.py interactive-probe \
+  --report-dir reports/interactive/local-smoke
+```
+
+Then run a short LLM smoke test and independently evaluate the recorded
+evidence:
+
+```bash
+uv run python tools/run_gameplay_agent.py play \
+  --report-dir reports/play/local-newbie-smoke \
+  --persona newbie \
+  --difficulty normal \
+  --scenario default_first_semester \
+  --seed 42 \
+  --weeks 5
+
+uv run python tools/run_gameplay_agent.py eval \
+  --report-dir reports/play/local-newbie-smoke
+
+uv run python -m json.tool \
+  reports/play/local-newbie-smoke/agent_eval.json
+```
+
+For a release-sized playthrough, change `--weeks` to `20`. Available
+personas are `newbie`, `study`, `money`, `social`, `visa`, and
+`slacker`. A clean result has `valid: true`, an empty `errors` list,
+`final_valid_rate >= 0.95`, `fallback_rate <= 0.05`,
+`illegal_action_rate == 0`, `llm_error_rate <= 0.05`, and
+`anomaly_rate_per_5_weeks <= 1`. Also review `persona_alignment_rate` and
+`risk_acknowledgement_rate`; they measure behavioral quality rather than
+basic trace validity.
+
+To make the review agents inspect fresh real-game data, build the evidence in
+one directory and then run `qa`:
+
+```bash
+REPORT=reports/balance/local-real-42
+
+uv run python tools/run_gameplay_agent.py sim \
+  --report-dir "$REPORT" --runs 200 --weeks 20 \
+  --policy balanced --difficulty normal --seed 42
+uv run python tools/run_gameplay_agent.py export --report-dir "$REPORT"
+uv run python tools/run_gameplay_agent.py probe \
+  --report-dir "$REPORT" --runs 30 --weeks 20 \
+  --policy balanced --seed 42 \
+  --extreme "zero_money,deep_debt,no_energy,flag_chaos"
+uv run python tools/run_gameplay_agent.py qa --report-dir "$REPORT"
+uv run python tools/run_gameplay_agent.py gates --report-dir "$REPORT"
+```
+
+`play` writes `playthrough.jsonl`, `playthrough_summary.md`,
+`playthrough_agent_report.json`, `agent_eval.json`, and
+`report_manifest.json`. Run `eval` even though `play` already writes the
+evaluation: the separate command gives invalid recorded evidence a non-zero
+exit status. The current game demo has three known balance failures, so the
+monolithic `all` command can correctly stop at validation before model QA;
+the modular sequence above keeps those stages independently inspectable.
+
 Run the deterministic local checks from the repository root:
 
 ```bash
@@ -594,6 +669,8 @@ tests/
 - [Godot Integration](docs/GODOT_INTEGRATION.md)
 - [Integration with study-in-germany](docs/INTEGRATION_WITH_STUDY_IN_GERMANY.md)
 - [Local vLLM + Qwen](docs/VLLM_QWEN_LOCAL_AGENT.md)
+- [Local LLM Real-Game Audit (2026-07-13)](docs/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md)
+- [Service-first MCP Migration Plan](docs/MCP_MIGRATION_PLAN.md)
 - [Portfolio Notes](docs/PORTFOLIO.md)
 - [Interactive Playtest Plan](docs/interactive_playtest/README.md)
 - [Review Documents](docs/review/README.md)
@@ -605,9 +682,9 @@ simulation, validators, and live interactive play still require a compatible
 Godot 4 binary and a `study-in-germany` checkout exposing the expected scripts
 and contracts; live persona evaluation additionally requires an LLM endpoint.
 The reference game repository is private, so scheduled CI also requires the
-`STUDY_IN_GERMANY_TOKEN` secret. This development machine may therefore verify
-fixtures and orchestration without being able to reproduce the real-Godot or
-live-LLM tier locally.
+`STUDY_IN_GERMANY_TOKEN` secret. This development machine can run the real
+Godot and local-vLLM tier through Docker; other environments may be limited to
+fixtures and orchestration when those prerequisites are unavailable.
 
 ## Notes
 
