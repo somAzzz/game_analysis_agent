@@ -122,7 +122,8 @@ Edit `.env` for an OpenAI-compatible local endpoint:
 LLM_PROVIDER=vllm
 VLLM_BASE_URL=http://localhost:8000/v1
 VLLM_API_KEY=local-dev-token
-VLLM_MODEL=nvidia/Qwen3.6-27B-NVFP4
+LLM_MODEL=nvidia/Qwen3.6-27B-NVFP4
+LLM_SERVED_MODEL_NAME=qwen3.6-27b-nvfp4
 ```
 
 Run LLM review agents against a report directory:
@@ -473,7 +474,8 @@ uv run python -m json.tool \
 
 For a release-sized playthrough, change `--weeks` to `20`. Available
 personas are `newbie`, `study`, `money`, `social`, `visa`, and
-`slacker`. A clean result has `valid: true`, an empty `errors` list,
+`slacker`. A clean result has `valid: true`, `strict_passed: true`, empty
+`errors` and `quality_errors` lists,
 `final_valid_rate >= 0.95`, `fallback_rate <= 0.05`,
 `illegal_action_rate == 0`, `llm_error_rate <= 0.05`, and
 `anomaly_rate_per_5_weeks <= 1`. Also review `persona_alignment_rate` and

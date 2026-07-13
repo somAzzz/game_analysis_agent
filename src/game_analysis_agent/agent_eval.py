@@ -12,6 +12,11 @@ class AgentEvalError(ValueError):
     """Raised when a playthrough artifact cannot be evaluated safely."""
 
 
+MIN_FINAL_VALID_RATE = 0.95
+MAX_FALLBACK_RATE = 0.05
+MAX_LLM_ERROR_RATE = 0.05
+
+
 def evaluate_playthrough(report_dir: Path) -> dict[str, Any]:
     """Evaluate recorded decisions without calling an LLM or Godot.
 
@@ -151,10 +156,36 @@ def evaluate_playthrough(report_dir: Path) -> dict[str, Any]:
     }
     if total == 0:
         errors.append("playthrough.jsonl contains no decision rows")
+    quality_errors: list[str] = []
+    final_valid_rate = metrics["final_valid_rate"]
+    fallback_rate = metrics["fallback_rate"]
+    llm_error_rate = metrics["llm_error_rate"]
+    if isinstance(final_valid_rate, (int, float)) and final_valid_rate < MIN_FINAL_VALID_RATE:
+        quality_errors.append(
+            f"final_valid_rate {final_valid_rate} is below {MIN_FINAL_VALID_RATE}"
+        )
+    if isinstance(fallback_rate, (int, float)) and fallback_rate > MAX_FALLBACK_RATE:
+        quality_errors.append(
+            f"fallback_rate {fallback_rate} exceeds {MAX_FALLBACK_RATE}"
+        )
+    if illegal_actions:
+        quality_errors.append(f"illegal_action_count is {illegal_actions}, expected 0")
+    if invalid_event_choices:
+        quality_errors.append(
+            f"invalid_event_choice_count is {invalid_event_choices}, expected 0"
+        )
+    if total and not valid_calls:
+        quality_errors.append("no LLM calls were recorded for a non-empty playthrough")
+    elif isinstance(llm_error_rate, (int, float)) and llm_error_rate > MAX_LLM_ERROR_RATE:
+        quality_errors.append(
+            f"llm_error_rate {llm_error_rate} exceeds {MAX_LLM_ERROR_RATE}"
+        )
     return {
         "schema_version": "agent-eval-v1",
         "valid": not errors,
         "errors": errors,
+        "strict_passed": not errors and not quality_errors,
+        "quality_errors": quality_errors,
         "final_ending": final_ending,
         "metrics": metrics,
     }

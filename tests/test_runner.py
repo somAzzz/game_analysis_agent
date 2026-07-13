@@ -57,6 +57,36 @@ def test_analyze_rejects_missing_raw_runs(run_gameplay_agent, tmp_path) -> None:
     assert rc == 1
 
 
+def test_play_fails_preflight_before_clearing_existing_report(
+    run_gameplay_agent, tmp_path
+) -> None:
+    report_dir = tmp_path / "play"
+    report_dir.mkdir()
+    existing = report_dir / "playthrough.jsonl"
+    existing.write_text("existing evidence\n", encoding="utf-8")
+    fake_llm = SimpleNamespace(
+        provider="vllm",
+        model="missing-model",
+        settings=SimpleNamespace(deepseek_configured=lambda: False),
+    )
+
+    def fail_preflight() -> None:
+        raise run_gameplay_agent.LLMPreflightError("model is not served")
+
+    fake_llm.validate_model_available = fail_preflight
+    with patch.object(
+        run_gameplay_agent.LocalLLMClient,
+        "from_settings",
+        return_value=fake_llm,
+    ):
+        rc = run_gameplay_agent.main(
+            ["play", "--report-dir", str(report_dir), "--weeks", "1"]
+        )
+
+    assert rc == 5
+    assert existing.read_text(encoding="utf-8") == "existing evidence\n"
+
+
 def test_sim_runs_full_pipeline_with_mocked_godot(run_gameplay_agent, tmp_path) -> None:
     """``sim`` should drive ``analyze`` even when Godot is mocked."""
     fake_user_dir = tmp_path / "user"
@@ -216,6 +246,34 @@ def test_sim_honors_isolated_report_directory(run_gameplay_agent, tmp_path) -> N
     assert rc == 0
     assert (report_dir / "raw_runs.jsonl").is_file()
     assert not (ROOT / "reports" / "balance" / "cell" / "raw_runs.jsonl").exists()
+
+
+def test_sim_resolves_relative_report_directory_before_godot(
+    run_gameplay_agent, tmp_path, monkeypatch
+) -> None:
+    completed = type("Proc", (), {"returncode": 0, "stdout": "ok", "stderr": ""})()
+    captured_output: list[Path] = []
+
+    def run_godot(*_args, **kwargs):  # noqa: ANN002, ANN003
+        out_arg = next(arg for arg in kwargs["extra_args"] if arg.startswith("--out="))
+        output = Path(out_arg.removeprefix("--out="))
+        captured_output.append(output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        fixture = ROOT / "tests" / "fixtures" / "contracts" / "trace_v1.json"
+        payload = json.loads(fixture.read_text(encoding="utf-8"))
+        output.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+        return completed
+
+    monkeypatch.chdir(tmp_path)
+    with patch.object(run_gameplay_agent, "_run_godot", side_effect=run_godot):
+        rc = run_gameplay_agent.main(
+            ["sim", "--runs", "1", "--report-dir", "relative-report"]
+        )
+
+    expected = (tmp_path / "relative-report" / "raw_runs.jsonl").resolve()
+    assert rc == 0
+    assert captured_output == [expected]
+    assert expected.is_file()
 
 
 def test_copy_godot_output_accepts_configured_project_name(

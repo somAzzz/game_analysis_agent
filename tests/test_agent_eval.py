@@ -77,6 +77,8 @@ def test_evaluate_playthrough_measures_repairs_risks_and_audit(tmp_path: Path) -
     metrics = report["metrics"]
 
     assert report["valid"] is True
+    assert report["strict_passed"] is False
+    assert any("llm_error_rate" in error for error in report["quality_errors"])
     assert report["final_ending"] == "stable_start"
     assert metrics["steps"] == 2
     assert metrics["first_pass_valid_rate"] == 0.5
@@ -100,10 +102,31 @@ def test_evaluate_playthrough_fails_closed_on_invalid_artifacts(tmp_path: Path) 
     report = evaluate_and_write(tmp_path)
 
     assert report["valid"] is False
+    assert report["strict_passed"] is False
     assert report["metrics"]["illegal_action_count"] == 1
     assert any("invalid JSON" in error for error in report["errors"])
     assert any("missing required artifact" in error for error in report["errors"])
     assert (tmp_path / "agent_eval.json").exists()
+
+
+def test_evaluate_playthrough_rejects_all_fallback_as_strict_success(tmp_path: Path) -> None:
+    _write_artifacts(tmp_path)
+    path = tmp_path / "playthrough.jsonl"
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    for row in rows:
+        row["validation"]["valid"] = False
+        row["validation"]["fallback_used"] = True
+    path.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+
+    report = evaluate_playthrough(tmp_path)
+
+    assert report["valid"] is True
+    assert report["strict_passed"] is False
+    assert any("final_valid_rate" in error for error in report["quality_errors"])
+    assert any("fallback_rate" in error for error in report["quality_errors"])
 
 
 def test_evaluate_playthrough_deduplicates_cumulative_anomalies(tmp_path: Path) -> None:

@@ -16,6 +16,10 @@ Your job:
    - `proposed_fix` (one-line minimum patch in GameState / ActionDef /
      EventResolver / DataRegistry — NOT a full rebalance)
 3. Call out any place where the detector's evidence looks weak.
+4. Separate observed state from inference. In particular,
+   `planned_cost_exceeds_balance` means a selected plan may overcommit the
+   starting balance; it does not mean the game executed the charge or allowed
+   negative money.
 
 Required output structure:
 

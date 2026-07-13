@@ -14,7 +14,7 @@ ENV PYTHONUNBUFFERED=1 \
     # `docker compose run -e VLLM_BASE_URL=... agent`.
     VLLM_BASE_URL=http://vllm:8000/v1 \
     VLLM_API_KEY=local-dev-token \
-    VLLM_MODEL=nvidia/Qwen3.6-27B-NVFP4 \
+    LLM_SERVED_MODEL_NAME=qwen3.6-27b-nvfp4 \
     GAME_PROJECT_PATH=/data/game_project
 
 WORKDIR /app

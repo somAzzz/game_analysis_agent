@@ -72,21 +72,22 @@ class BugHunterAgent(Agent):
     def _ensure_anomalies(
         self, raw_path: Path, anomalies_path: Path
     ) -> list[Anomaly]:
+        # anomalies.jsonl is derived evidence. Recompute it whenever the raw
+        # trace exists so detector fixes cannot leave QA reading stale rows.
+        if raw_path.exists():
+            runs = load_runs(raw_path)
+            from game_analysis_agent.anomaly_detector import detect_anomalies
+
+            anomalies = detect_anomalies(runs)
+            write_anomalies_jsonl(anomalies, anomalies_path)
+            return anomalies
         if anomalies_path.exists() and anomalies_path.stat().st_size > 0:
             return [
                 Anomaly.model_validate_json(line)
                 for line in anomalies_path.read_text(encoding="utf-8").splitlines()
                 if line.strip()
             ]
-        if not raw_path.exists():
-            return []
-        runs = load_runs(raw_path)
-        anomalies: list[Anomaly] = []
-        from game_analysis_agent.anomaly_detector import detect_anomalies
-
-        anomalies = detect_anomalies(runs)
-        write_anomalies_jsonl(anomalies, anomalies_path)
-        return anomalies
+        return []
 
     @staticmethod
     def _summarize(anomalies: list[Anomaly]) -> str:

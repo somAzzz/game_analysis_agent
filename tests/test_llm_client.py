@@ -5,7 +5,13 @@ from __future__ import annotations
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-from game_analysis_agent.llm_client import LocalLLMClient
+import pytest
+
+from game_analysis_agent.llm_client import (
+    LLMPreflightError,
+    LLMRequestError,
+    LocalLLMClient,
+)
 from game_analysis_agent.schemas import LLMCall
 from game_analysis_agent.settings import Settings
 
@@ -120,3 +126,50 @@ def test_chat_returns_audit_row() -> None:
     )
     assert text == "reply"
     assert audit.provider == "vllm"
+
+
+def test_validate_model_available_accepts_exact_served_id() -> None:
+    sdk = MagicMock()
+    sdk.models.list.return_value = SimpleNamespace(
+        data=[SimpleNamespace(id="qwen3.6-27b-nvfp4")]
+    )
+    client = LocalLLMClient(_settings(), model="qwen3.6-27b-nvfp4")
+    client.client = sdk
+
+    assert client.validate_model_available() == ["qwen3.6-27b-nvfp4"]
+
+
+def test_validate_model_available_lists_actual_ids_on_mismatch() -> None:
+    sdk = MagicMock()
+    sdk.models.list.return_value = SimpleNamespace(
+        data=[SimpleNamespace(id="qwen3.6-27b-nvfp4")]
+    )
+    client = LocalLLMClient(_settings(), model="wrong-model")
+    client.client = sdk
+
+    with pytest.raises(LLMPreflightError, match="qwen3.6-27b-nvfp4"):
+        client.validate_model_available()
+
+
+def test_failed_chat_raises_with_persistable_audit_row() -> None:
+    sdk = MagicMock()
+    sdk.chat.completions.create.side_effect = RuntimeError("HTTP 404")
+    audit_rows: list[LLMCall] = []
+    client = LocalLLMClient(
+        _settings(),
+        llm_call_sink=audit_rows.append,
+        model="missing-model",
+    )
+    client.client = sdk
+
+    with pytest.raises(LLMRequestError) as captured:
+        client.chat(
+            [{"role": "user", "content": "ping"}],
+            agent="interactive_player",
+            step_name="week-1",
+        )
+
+    assert len(audit_rows) == 1
+    assert captured.value.call is audit_rows[0]
+    assert captured.value.call.model == "missing-model"
+    assert "HTTP 404" in (captured.value.call.error or "")

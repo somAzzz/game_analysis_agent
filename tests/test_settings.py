@@ -21,7 +21,8 @@ def _clear_env() -> None:
         "LLM_PROVIDER",
         "VLLM_BASE_URL",
         "VLLM_API_KEY",
-        "VLLM_MODEL",
+        "LLM_MODEL",
+        "LLM_SERVED_MODEL_NAME",
         "SGLANG_BASE_URL",
         "SGLANG_API_KEY",
         "SGLANG_MODEL",
@@ -51,6 +52,7 @@ class TestDefaults:
         assert s.provider() == "vllm"
         assert s.base_url().startswith("http://localhost:")
         assert s.model() == s.vllm_model
+        assert s.model() == "qwen3.6-27b-nvfp4"
 
     def test_default_sim_difficulty_is_normal(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _clear_env()
@@ -68,6 +70,14 @@ class TestDefaults:
 
 
 class TestSelectors:
+    def test_vllm_uses_shared_served_model_name(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        _clear_env()
+        monkeypatch.setenv("LLM_SERVED_MODEL_NAME", "local-model-alias")
+
+        assert Settings().model() == "local-model-alias"
+
     def test_provider_selects_correct_endpoint(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _clear_env()
         monkeypatch.setenv("LLM_PROVIDER", "deepseek")
