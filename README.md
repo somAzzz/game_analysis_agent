@@ -65,12 +65,13 @@ endpoints.
 - Analysis agents: `balance`, `content_qa`, `event_graph`, `bug_hunter`,
   `boundary_prober`, `value_reviewer`, and `interactive_player`.
 - Supported orchestration subcommands: `sim`, `analyze`, `probe`, `export`,
-  `validate`, `index`, `gates`, `qa`, `play`, and `all`.
+  `validate`, `matrix`, `compare-matrix`, `index`, `gates`, `eval`, `qa`,
+  `play`, and `all`.
 - Report outputs are designed to be traceable through `run_id`,
   `report_manifest.json`, and `reports/report_index.json`.
-- Frontend dashboard exists under `frontend/` and builds with Vite.
-- Tests are pytest-based; frontend smoke coverage includes the Vite build when
-  Node dependencies are installed.
+- Frontend dashboard tests use Vitest, jsdom, and Testing Library; production
+  builds use Vite.
+- Python tests use pytest and the whole repository is checked by Ruff.
 
 ## Requirements
 
@@ -98,7 +99,8 @@ cp .env.example .env
 uv venv .venv
 source .venv/bin/activate
 uv pip install -e ".[dev]"
-uv run pytest
+uv run pytest -q -ra
+uv run ruff check .
 uv run python tools/build_dashboard.py all --reports examples/sample_reports
 ```
 
@@ -158,6 +160,10 @@ Run the simple end-to-end path:
 uv run python tools/run_gameplay_agent.py all --runs 20 --policy balanced
 ```
 
+`all` runs simulation/analysis, catalog export, all Godot validators, the LLM
+QA agents, and quality gates in that order. Use `--skip-qa` when a live model
+endpoint is unavailable; deterministic validation and gates still run.
+
 ## Quick Start: Docker + vLLM
 
 Start the local vLLM service:
@@ -212,6 +218,18 @@ Export the game event/action/ending catalog:
 uv run python tools/run_gameplay_agent.py export
 ```
 
+Run all six Godot validators (`content`, `json-content`, `economy`, `risk`,
+`route`, and `demo`):
+
+```bash
+uv run python tools/run_gameplay_agent.py validate \
+  --report-dir reports/validation/<run_id>
+```
+
+Route and demo prerequisite traces are generated fresh by default. Existing
+inputs are reused only with the explicit `--reuse-inputs` option. Use repeated
+`--check` options to select a subset.
+
 Evaluate quality gates:
 
 ```bash
@@ -238,6 +256,73 @@ Drive the game with the interactive LLM player:
 uv run python tools/run_gameplay_agent.py play \
   --report-dir reports/play/<run_id> --weeks 20
 ```
+
+Evaluate an already recorded playthrough without contacting Godot or an LLM:
+
+```bash
+uv run python tools/run_gameplay_agent.py eval \
+  --report-dir reports/play/<run_id>
+```
+
+This writes `agent_eval.json` with decision validity, fallback/repair, illegal
+action, event-choice, anomaly, risk acknowledgement, persona alignment, and LLM
+error/latency metrics. Weekly prompts prefer the producer-native
+`RiskEvaluator.get_top_risks` payload; missing, malformed, or stale guidance
+uses a compatibility fallback whose source and reason remain in the trace.
+
+Capture the producer-native interactive snapshot without an LLM:
+
+```bash
+uv run python tools/run_gameplay_agent.py interactive-probe \
+  --report-dir reports/interactive/<run_id>
+```
+
+This command fails if the game omits the versioned
+`RiskEvaluator.get_top_risks` guidance.
+
+Plan or execute the strict test matrix:
+
+```bash
+# Validate and enumerate the plan without running its cells.
+uv run python tools/run_gameplay_agent.py matrix --dry-run --jobs 4
+
+# Execute cells concurrently; a later invocation can resume completed cells.
+uv run python tools/run_gameplay_agent.py matrix --jobs 4
+uv run python tools/run_gameplay_agent.py matrix --jobs 4 --resume
+```
+
+The committed `config/matrix.yaml` expands to 140 stable cells: 126 simulation
+cells (difficulty x policy x scenario x seed), 8 boundary cells, and 6 persona
+play cells. Matrix state is written atomically to `matrix_manifest.json`,
+`matrix_summary.json`, and per-cell `cell_manifest.json` files. The strict YAML
+schema rejects unknown or invalid keys before any cell runs.
+Every matrix and cell manifest also records an exact runtime-source SHA-256;
+`--resume` reruns prior successes whenever executable Agent bytes changed.
+
+Run and compare a fixed-seed before/after experiment. Each `--out` directory
+owns isolated cell report directories, so the second execution cannot overwrite
+the first:
+
+```bash
+uv run python tools/run_gameplay_agent.py matrix \
+  --out reports/matrix/before --jobs 4
+
+# Apply the code change under test; keep config/matrix.yaml unchanged.
+uv run python tools/run_gameplay_agent.py matrix \
+  --out reports/matrix/after --jobs 4
+
+uv run python tools/run_gameplay_agent.py compare-matrix \
+  --before reports/matrix/before \
+  --after reports/matrix/after \
+  --out reports/compare/matrix
+```
+
+`compare-matrix` fails closed unless both executions are complete, non-dry-run,
+and matching in config hash, cell set, parameters, commands, and seeds. It
+independently revalidates simulation, boundary, and persona evidence, including
+CSV schemas, coverage/catalog consistency, trace contracts, report source
+fingerprints, and recomputed Agent metrics. Artifact content may differ and is
+exactly what the per-cell diff and `matrix_compare_summary.json` record.
 
 Build the report index:
 
@@ -312,13 +397,63 @@ Interactive playtest reports also include:
 playthrough.jsonl
 playthrough_summary.md
 playthrough_agent_report.json
+agent_eval.json
 report_manifest.json
 ```
 
-`report_manifest.json` records the report-level `run_id`, command parameters,
-source/generated files, file hashes, and trace indexes back to JSONL line
-numbers. Frontends should use `reports/report_index.json` for list views and
-open each report's manifest for drill-down.
+The `trace-manifest-v2` `report_manifest.json` records the report-level
+`run_id`, command parameters, source/generated files, hashes, modification
+times, and trace indexes back to JSONL line numbers. Its provenance block also
+captures the agent and game Git commits/dirty state, Python/platform/Godot
+versions or availability, an exact runtime-source SHA-256 that distinguishes
+different dirty worktrees, and config/prompt tree hashes. Frontends should use
+`reports/report_index.json` for list views and open each report's manifest for
+drill-down.
+
+## Test System
+
+If the host has no `godot4` binary, use the cached Docker image through the
+repository wrapper. It preserves absolute host paths and runs as the current
+user, so reports are not root-owned:
+
+```bash
+export GAME_PROJECT_PATH=/home/bo/projects/python/study-in-germany
+export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
+docker compose up -d godot vllm
+"$GODOT_BIN" --version
+
+uv run python tools/run_gameplay_agent.py interactive-probe \
+  --report-dir reports/interactive/docker-smoke
+```
+
+The wrapper reuses the compose `godot` service and falls back to a one-shot
+container when the service is not running. The default image is
+`barichello/godot-ci:4.4`; override it with `GODOT_DOCKER_IMAGE`. See
+[AGENTS.md](AGENTS.md) for mount and CI-integrity details.
+
+Run the deterministic local checks from the repository root:
+
+```bash
+uv sync --extra dev --locked
+uv run pytest -q -ra
+uv run ruff check .
+
+cd frontend
+npm ci
+npm test
+npm run test:coverage
+npm run build
+```
+
+Pull requests and pushes run the Python suite, full-repository Ruff, frontend
+coverage floors, the public production build, and a strict dry-run of all 140
+matrix cells. The scheduled/manual real-Godot job checks out a pinned private
+`study-in-germany` revision, verifies the official Godot archive checksum,
+generates and analyzes a fresh trace, runs all six validators with fresh
+prerequisites, enforces deterministic smoke gates, validates the cross-repo
+contracts, captures canonical interactive risk guidance, and uploads the
+evidence. See [Game artifact contract
+testing](docs/GAME_CONTRACT_TESTING.md).
 
 ## Dashboards
 
@@ -359,7 +494,9 @@ uv run python tools/build_dashboard.py emit-frontend-manifest \
   --reports reports --frontend-public frontend/public
 
 cd frontend
-npm install
+npm ci
+npm test
+npm run test:coverage
 npm run dev
 npm run build
 ```
@@ -382,7 +519,7 @@ frontend/dist/
 config/
   agent_profiles.yaml       Agent prompt/profile definitions
   gates.yaml                Quality gate thresholds
-  matrix.yaml               Human-readable scenario/persona test matrix
+  matrix.yaml               Executable strict scenario/persona test matrix
   player_personas.yaml      Interactive player personas
 
 docs/
@@ -413,9 +550,11 @@ scripts/tools/
 
 src/game_analysis_agent/
   analytics.py
+  agent_eval.py
   anomaly_detector.py
   anomaly_semantics.py
   bug_summarizer.py
+  contracts.py
   coverage.py
   env.py
   game_tools.py
@@ -425,6 +564,7 @@ src/game_analysis_agent/
   report_manifest.py
   schemas.py
   settings.py
+  test_matrix.py
   tool_loop.py
   value_analyzer.py
   agents/
@@ -432,6 +572,7 @@ src/game_analysis_agent/
 tools/
   analyze_balance.py
   build_dashboard.py
+  compare_matrix.py
   compare_reports.py
   emit_manifest.py
   generate_agent_prompt.py
@@ -459,9 +600,14 @@ tests/
 
 ## Current Limitations
 
-Interactive LLM playtesting is implemented as an orchestration target. Full
-real-time Godot stepping depends on the target game exposing the required probe
-script and data contracts.
+The deterministic Python/frontend suites do not need Godot or an LLM. Real
+simulation, validators, and live interactive play still require a compatible
+Godot 4 binary and a `study-in-germany` checkout exposing the expected scripts
+and contracts; live persona evaluation additionally requires an LLM endpoint.
+The reference game repository is private, so scheduled CI also requires the
+`STUDY_IN_GERMANY_TOKEN` secret. This development machine may therefore verify
+fixtures and orchestration without being able to reproduce the real-Godot or
+live-LLM tier locally.
 
 ## Notes
 

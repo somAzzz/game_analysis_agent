@@ -34,3 +34,6 @@ pnpm-debug.log*
 # into commits.
 reports/**
 !reports/.gitkeep
+
+# Editor workspace files.
+*.code-workspace
