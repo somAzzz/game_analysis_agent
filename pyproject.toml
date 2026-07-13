@@ -13,6 +13,7 @@ dependencies = [
 dev = [
     "pytest>=7.0",
     "pytest-mock>=3.10",
+    "ruff>=0.12",
 ]
 
 [tool.ruff]
@@ -20,8 +21,15 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-ignore = ["B007", "SIM108"]
+ignore = ["B007", "SIM108", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tools/generate_agent_prompt.py" = ["E402"]
+"tools/run_agent.py" = ["E402"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src", "."]
+markers = [
+    "game_contract: requires a real study-in-germany checkout and generated artifacts",
+]
