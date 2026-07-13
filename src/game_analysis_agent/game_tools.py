@@ -21,6 +21,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from game_analysis_agent.contracts import (
+    ContractKind,
+    ContractValidationError,
+    validate_contract,
+)
 from game_analysis_agent.schemas import Anomaly
 from game_analysis_agent.settings import Settings, get_settings
 
@@ -46,6 +51,7 @@ class InteractiveProbe:
     last_event_id: str = ""
     last_event_choices: list[dict[str, Any]] = field(default_factory=list)
     available_actions: list[dict[str, Any]] = field(default_factory=list)
+    risk_guidance: dict[str, Any] | None = None
     finished: bool = False
     final_ending: str | None = None
     history: list[dict[str, Any]] = field(default_factory=list)
@@ -61,6 +67,7 @@ class InteractiveProbe:
             "state": self.state or {},
             "finished": self.finished,
             "last_event_id": self.last_event_id,
+            "risk_guidance": self.risk_guidance,
         }
 
     def list_available_actions(self) -> dict[str, Any]:
@@ -118,6 +125,8 @@ class InteractiveProbe:
         self.last_event_id = result.get("triggered_event_id", "")
         self.last_event_choices = result.get("event_choices", []) or []
         self.available_actions = result.get("next_available_actions", []) or []
+        guidance = result.get("risk_guidance")
+        self.risk_guidance = guidance if isinstance(guidance, dict) else None
         self.history.append(
             {
                 "week": self.current_week,
@@ -135,6 +144,7 @@ class InteractiveProbe:
             "state": self.state,
             "triggered_event_id": self.last_event_id,
             "event_choices": self.last_event_choices,
+            "risk_guidance": self.risk_guidance,
             "finished": self.finished,
         }
 
@@ -173,9 +183,13 @@ class InteractiveProbe:
         except FileNotFoundError:
             return
         self.state = result.get("current_state") or result.get("after_state") or self.state or {}
-        self.available_actions = result.get("next_available_actions") or result.get("available_actions") or []
+        self.available_actions = (
+            result.get("next_available_actions") or result.get("available_actions") or []
+        )
         self.last_event_id = result.get("triggered_event_id", self.last_event_id)
         self.last_event_choices = result.get("event_choices", []) or self.last_event_choices
+        guidance = result.get("risk_guidance")
+        self.risk_guidance = guidance if isinstance(guidance, dict) else None
 
     def finish(self) -> dict[str, Any]:
         if self.plan:
@@ -189,11 +203,14 @@ class InteractiveProbe:
             )
             self.state = final.get("final_state") or final.get("after_state") or self.state or {}
             self.final_ending = final.get("final_ending_id") or self.final_ending or "unknown"
+            guidance = final.get("risk_guidance")
+            self.risk_guidance = guidance if isinstance(guidance, dict) else None
         self.finished = True
         return {
             "finished": True,
             "final_state": self.state,
             "final_ending": self.final_ending,
+            "risk_guidance": self.risk_guidance,
         }
 
     # -- diagnostics -------------------------------------------------------
@@ -205,9 +222,7 @@ class InteractiveProbe:
         synthetic_run = {
             "run_id": 0,
             "policy": "interactive_player",
-            "max_weeks": max(
-                (step["week"] for step in self.history), default=self.current_week
-            ),
+            "max_weeks": max((step["week"] for step in self.history), default=self.current_week),
             "final_ending_id": self.final_ending or "",
             "weekly_log": [
                 {
@@ -380,16 +395,32 @@ def _run_one_step(
     plan_path.parent.mkdir(parents=True, exist_ok=True)
     plan_path.write_text(json.dumps(plan_payload, ensure_ascii=False), encoding="utf-8")
     try:
-        _invoke_godot(
+        completed = _invoke_godot(
             settings,
             script="res://scripts/tools/RunInteractiveProbe.gd",
             extra_args=[f"--plan={plan_path}", f"--out={out_path}"],
         )
+        if completed.returncode != 0:
+            raise RuntimeError(
+                "RunInteractiveProbe failed: "
+                + (completed.stderr[-2000:] or completed.stdout[-2000:])
+            )
         if not out_path.exists():
-            return {"error": "RunInteractiveProbe did not produce a trace"}
-        return json.loads(out_path.read_text(encoding="utf-8"))
+            raise RuntimeError("RunInteractiveProbe did not produce a trace")
+        try:
+            payload = json.loads(out_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"RunInteractiveProbe produced invalid JSON: {exc.msg}") from exc
+        if not isinstance(payload, dict):
+            raise RuntimeError("RunInteractiveProbe trace root must be an object")
+        try:
+            validate_contract(payload, kind=ContractKind.INTERACTIVE_PROBE)
+        except ContractValidationError as exc:
+            raise RuntimeError(f"RunInteractiveProbe contract failed: {exc}") from exc
+        return payload
     finally:
         plan_path.unlink(missing_ok=True)
+        out_path.unlink(missing_ok=True)
 
 
 def _invoke_godot(

@@ -37,25 +37,25 @@ import yaml
 from pydantic import ValidationError
 
 from game_analysis_agent.agents.base import Agent, AgentOutput, AgentRunResult
+from game_analysis_agent.contracts import ProbeRiskGuidance
 from game_analysis_agent.game_tools import InteractiveProbe
 from game_analysis_agent.llm_client import LocalLLMClient
 from game_analysis_agent.schemas import (
-    AgentRunReport,
     ActionBrief,
+    AgentRunReport,
     DecisionValidation,
     EventChoiceBrief,
     LLMCall,
     PlayerDecision,
     PlayMemory,
     RiskBrief,
+    RiskGuidanceMetadata,
     StateSummary,
-    ToolExecutionEvent,
     WeekContext,
     WeekMemory,
 )
 from game_analysis_agent.settings import Settings
 from game_analysis_agent.tool_loop import parse_model_response_to_tool_calls
-
 
 # Persona catalogue. The agent picks one and tailors its prompts around
 # the persona's play style. Keys map to the *persona* argument on the CLI.
@@ -209,6 +209,10 @@ class InteractivePlayerAgent(Agent):
         report_dir.mkdir(parents=True, exist_ok=True)
         run_id = str(context.get("run_id") or report_dir.name)
         playthrough_path = playthrough_path or report_dir / "playthrough.jsonl"
+        # A normal play invocation is a fresh run. Reusing a report directory
+        # must not silently append decisions from an earlier model/game build.
+        playthrough_path.unlink(missing_ok=True)
+        run_started_at = datetime.now(tz=UTC)
 
         # The InteractiveProbe is the canonical owner of the Godot
         # connection. Tests inject their own; production code uses the
@@ -255,30 +259,36 @@ class InteractivePlayerAgent(Agent):
             )
             available_action_ids = [action.id for action in context_pack.available_actions]
 
-            decision, validation, call = self._decide_one_week(
+            decision, validation, decision_calls = self._decide_one_week(
                 week=week,
                 context_pack=context_pack,
                 system_prompt=system_prompt,
                 probe=probe,
             )
-            if call is not None:
-                llm_calls.append(call)
+            llm_calls.extend(decision_calls)
 
             if not decision.actions:
                 # Model failed to produce a usable action; fall back to a
                 # no-op safe pick to keep the loop alive.
-                decision.actions = [available_action_ids[0]] if available_action_ids else ["rest_at_home"]
+                decision.actions = (
+                    [available_action_ids[0]] if available_action_ids else ["rest_at_home"]
+                )
 
             if hasattr(probe, "preview_step"):
                 preview = probe.preview_step(decision.actions)
-                preview_choices = preview.get("event_choices", []) if isinstance(preview, dict) else []
+                preview_choices = (
+                    preview.get("event_choices", []) if isinstance(preview, dict) else []
+                )
                 if preview_choices:
                     event_context = build_week_context(
                         week=week,
                         max_weeks=self.max_weeks,
                         persona=self.persona,
                         persona_strategy=self.persona_strategy,
-                        state_payload={"state": preview.get("state", {})},
+                        state_payload={
+                            "state": preview.get("state", {}),
+                            "risk_guidance": preview.get("risk_guidance"),
+                        },
                         action_catalog=catalog,
                         event_choices=preview_choices,
                         last_event_id=str(preview.get("triggered_event_id", "")),
@@ -287,14 +297,13 @@ class InteractivePlayerAgent(Agent):
                         scenario=self.scenario,
                         seed=self.seed,
                     )
-                    event_decision, event_validation, event_call = self._decide_one_week(
+                    event_decision, event_validation, event_calls = self._decide_one_week(
                         week=week,
                         context_pack=event_context,
                         system_prompt=system_prompt,
                         probe=probe,
                     )
-                    if event_call is not None:
-                        llm_calls.append(event_call)
+                    llm_calls.extend(event_calls)
                     decision.event_choice_id = event_decision.event_choice_id
                     validation = DecisionValidation(
                         valid=validation.valid and event_validation.valid,
@@ -347,7 +356,7 @@ class InteractivePlayerAgent(Agent):
 
         run_report = AgentRunReport(
             agent=self.name,
-            started_at=datetime.now(tz=UTC),
+            started_at=run_started_at,
             completed_at=datetime.now(tz=UTC),
             output_files=[
                 "playthrough.jsonl",
@@ -383,9 +392,7 @@ class InteractivePlayerAgent(Agent):
     def _build_system_prompt(self) -> str:
         # The prompt file is named ``player_*.md`` (legacy), not
         # ``interactive_player_*.md``.
-        system_template = (self.prompts_root / "player_system.md").read_text(
-            encoding="utf-8"
-        )
+        system_template = (self.prompts_root / "player_system.md").read_text(encoding="utf-8")
         persona_block = self._persona_block()
         return f"{system_template}\n\n{persona_block}"
 
@@ -419,7 +426,7 @@ class InteractivePlayerAgent(Agent):
         context_pack: WeekContext,
         system_prompt: str,
         probe: InteractiveProbe,
-    ) -> tuple[PlayerDecision, DecisionValidation, LLMCall | None]:
+    ) -> tuple[PlayerDecision, DecisionValidation, list[LLMCall]]:
         user_prompt = self._build_user_prompt(context_pack)
         calls: list[LLMCall] = []
         errors: list[str] = []
@@ -453,7 +460,7 @@ class InteractivePlayerAgent(Agent):
                         errors=attempt_errors,
                         repair_count=attempt,
                     ),
-                    call,
+                    list(calls),
                 )
             attempt_errors.extend(errors)
         fallback = _fallback_decision(context_pack, errors)
@@ -465,7 +472,7 @@ class InteractivePlayerAgent(Agent):
                 repair_count=max(0, len(calls) - 1),
                 fallback_used=True,
             ),
-            calls[-1] if calls else None,
+            list(calls),
         )
 
     def _chat_decision(
@@ -553,6 +560,7 @@ def build_week_context(
     seed: int,
 ) -> WeekContext:
     state = _state_summary(state_payload.get("state") or {}, week=week)
+    top_risks, risk_guidance = _resolve_risk_guidance(state_payload, state, max_weeks=max_weeks)
     actions = [_action_brief(action) for action in (action_catalog.get("actions") or [])]
     choices = [
         _event_choice_brief(choice, last_event_id, index)
@@ -568,7 +576,8 @@ def build_week_context(
         persona=persona,
         persona_strategy=persona_strategy,
         state=state,
-        top_risks=_risk_briefs(state, max_weeks=max_weeks),
+        top_risks=top_risks,
+        risk_guidance=risk_guidance,
         available_actions=actions[:80],
         current_event_id=last_event_id or "",
         event_choices=choices[:8],
@@ -614,7 +623,9 @@ def _action_brief(action: Any) -> ActionBrief:
             "slots": int(action.get("cost_slots", 1) or 1),
         },
         effects=_int_dict(action.get("effects", {})),
-        requirements=action.get("requirements", {}) if isinstance(action.get("requirements"), dict) else {},
+        requirements=action.get("requirements", {})
+        if isinstance(action.get("requirements"), dict)
+        else {},
         tags=tags,
         risk_tags=[str(tag) for tag in action.get("risk_tags", []) or []],
         cooldown_group=str(action.get("cooldown_group", "")) or None,
@@ -626,15 +637,106 @@ def _event_choice_brief(choice: dict[str, Any], event_id: str, index: int) -> Ev
     choice_id = str(choice.get("choice_id") or "")
     if not choice_id:
         safe_text = str(choice.get("text", "")).strip().lower().replace(" ", "_")
-        choice_id = f"{event_id}.choice_{index + 1:02d}_{safe_text}" if event_id else f"choice_{index + 1:02d}"
+        choice_id = (
+            f"{event_id}.choice_{index + 1:02d}_{safe_text}"
+            if event_id
+            else f"choice_{index + 1:02d}"
+        )
     return EventChoiceBrief(
         choice_id=choice_id,
         text=str(choice.get("text", "")),
         success_rate=float(choice["success_rate"]) if "success_rate" in choice else None,
-        requirements=choice.get("requirements", {}) if isinstance(choice.get("requirements"), dict) else {},
+        requirements=choice.get("requirements", {})
+        if isinstance(choice.get("requirements"), dict)
+        else {},
         success_effects=_int_dict(choice.get("success_effects", {})),
         failure_effects=_int_dict(choice.get("failure_effects", {})),
     )
+
+
+def _resolve_risk_guidance(
+    state_payload: dict[str, Any],
+    state: StateSummary,
+    *,
+    max_weeks: int,
+) -> tuple[list[RiskBrief], RiskGuidanceMetadata]:
+    """Prefer the same risk rows the game UI renders.
+
+    Older probes do not expose the envelope. They remain runnable, but every
+    resulting prompt records that it used the compatibility implementation.
+    Malformed or stale game data is never partially mixed with local rows.
+    """
+
+    raw_state = state_payload.get("state")
+    probe_week = state.week
+    if isinstance(raw_state, dict) and raw_state.get("week") is not None:
+        probe_week = int(raw_state["week"])
+
+    raw_guidance = state_payload.get("risk_guidance")
+    fallback_reason: str
+    if raw_guidance is None:
+        fallback_reason = "probe payload omitted risk_guidance"
+    elif not isinstance(raw_guidance, dict):
+        fallback_reason = "probe risk_guidance must be an object"
+    else:
+        try:
+            guidance = ProbeRiskGuidance.model_validate(raw_guidance)
+        except ValidationError as exc:
+            fallback_reason = _risk_contract_error(exc)
+        else:
+            if guidance.generated_for_week != probe_week:
+                fallback_reason = (
+                    "probe risk_guidance generated_for_week="
+                    f"{guidance.generated_for_week} does not match probe state week={probe_week}"
+                )
+            else:
+                risks = [
+                    RiskBrief(
+                        id=risk.id,
+                        title=risk.title,
+                        score=risk.score,
+                        severity=_risk_score_severity(risk.score),
+                        reason=risk.body,
+                        suggested_action_ids=list(risk.suggested_actions),
+                    )
+                    for risk in guidance.top_risks
+                ]
+                metadata = RiskGuidanceMetadata(
+                    source=guidance.source,
+                    evaluator=guidance.evaluator,
+                    generated_for_week=guidance.generated_for_week,
+                    contract_version=guidance.contract_version,
+                )
+                return risks, metadata
+
+    return (
+        _risk_briefs(state, max_weeks=max_weeks),
+        RiskGuidanceMetadata(
+            source="python_fallback",
+            evaluator="game_analysis_agent.agents.interactive_player._risk_briefs",
+            generated_for_week=state.week,
+            fallback_reason=fallback_reason,
+        ),
+    )
+
+
+def _risk_contract_error(exc: ValidationError) -> str:
+    errors = exc.errors(include_url=False)
+    if not errors:
+        return "probe risk_guidance failed contract validation"
+    first = errors[0]
+    location = ".".join(str(part) for part in first.get("loc", ())) or "<root>"
+    return f"invalid probe risk_guidance at {location}: {first.get('msg', 'validation failed')}"
+
+
+def _risk_score_severity(score: int) -> str:
+    if score >= 85:
+        return "critical"
+    if score >= 65:
+        return "high"
+    if score >= 40:
+        return "medium"
+    return "low"
 
 
 def _risk_briefs(state: StateSummary, *, max_weeks: int) -> list[RiskBrief]:
@@ -716,7 +818,9 @@ def _risk_briefs(state: StateSummary, *, max_weeks: int) -> list[RiskBrief]:
     return risks[:5]
 
 
-def _parse_player_decision(content: str, context_pack: WeekContext) -> tuple[PlayerDecision, list[str]]:
+def _parse_player_decision(
+    content: str, context_pack: WeekContext
+) -> tuple[PlayerDecision, list[str]]:
     parsed = _extract_json_object(content)
     if isinstance(parsed, dict) and parsed.get("tool") == "step":
         arguments = parsed.get("arguments") if isinstance(parsed.get("arguments"), dict) else {}
@@ -798,7 +902,9 @@ def _repair_prompt(context_pack: WeekContext, errors: list[str]) -> str:
             json.dumps(errors, ensure_ascii=False, indent=2),
             "",
             "Repair it using only these action ids:",
-            json.dumps([action.id for action in context_pack.available_actions], ensure_ascii=False),
+            json.dumps(
+                [action.id for action in context_pack.available_actions], ensure_ascii=False
+            ),
             "",
             "Valid event_choice_id values:",
             json.dumps(valid_choices, ensure_ascii=False),
@@ -905,6 +1011,7 @@ def _normalize_decision_payload(
     normalized["persona"] = context_pack.persona
     return normalized
 
+
 def _append_step_jsonl(path: Path, step: PlaythroughStep, *, run_id: str) -> None:
     with path.open("a", encoding="utf-8") as handle:
         handle.write(
@@ -970,11 +1077,7 @@ def _render_summary(
             )
         lines.append("")
 
-        all_anomalies = [
-            (step.week, anomaly)
-            for step in steps
-            for anomaly in step.anomalies
-        ]
+        all_anomalies = [(step.week, anomaly) for step in steps for anomaly in step.anomalies]
         if all_anomalies:
             lines.append("## Anomalies Triggered\n")
             lines.append("| week | kind | severity | message |")

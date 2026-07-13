@@ -5,18 +5,17 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from types import SimpleNamespace
 from typing import Any
-from unittest.mock import MagicMock
 
 from game_analysis_agent.agents.interactive_player import (
-    InteractivePlayerAgent,
     PERSONAS,
+    InteractivePlayerAgent,
     _extract_action_ids,
     _parse_decision,
+    build_week_context,
 )
 from game_analysis_agent.game_tools import InteractiveProbe
-from game_analysis_agent.schemas import LLMCall
+from game_analysis_agent.schemas import LLMCall, PlayMemory
 from game_analysis_agent.settings import Settings
 
 
@@ -149,6 +148,90 @@ def _build_agent(llm_contents: list[str], probe: _FakeProbe) -> InteractivePlaye
     return agent
 
 
+def _context_for_risk_payload(state_payload: dict[str, Any]):
+    return build_week_context(
+        week=3,
+        max_weeks=20,
+        persona="study",
+        persona_strategy={},
+        state_payload=state_payload,
+        action_catalog={"actions": []},
+        event_choices=[],
+        last_event_id="",
+        memory=PlayMemory(persona="study"),
+        difficulty="normal",
+        scenario="default_first_semester",
+        seed=42,
+    )
+
+
+def _canonical_risk_guidance() -> dict[str, Any]:
+    return {
+        "contract_version": "1.0",
+        "source": "game_risk_evaluator",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 2,
+        "top_risks": [
+            {
+                "id": "money",
+                "title": "现金流",
+                "score": 78,
+                "body": "当前现金不足。",
+                "suggested_actions": ["budget_call", "part_time_job"],
+            }
+        ],
+    }
+
+
+def test_week_context_prefers_canonical_game_ui_risks() -> None:
+    context = _context_for_risk_payload(
+        {
+            "state": {"week": 2, "money": 100, "hunger": 95},
+            "risk_guidance": _canonical_risk_guidance(),
+        }
+    )
+
+    assert [risk.id for risk in context.top_risks] == ["money"]
+    assert context.top_risks[0].severity == "high"
+    assert context.top_risks[0].score == 78
+    assert context.top_risks[0].suggested_action_ids == [
+        "budget_call",
+        "part_time_job",
+    ]
+    assert context.risk_guidance.source == "game_risk_evaluator"
+    assert context.risk_guidance.evaluator == "RiskEvaluator.get_top_risks"
+    assert context.risk_guidance.fallback_reason == ""
+
+
+def test_week_context_marks_missing_invalid_and_stale_guidance_as_fallback() -> None:
+    missing = _context_for_risk_payload({"state": {"week": 2, "money": 100, "hunger": 95}})
+    assert missing.risk_guidance.source == "python_fallback"
+    assert missing.risk_guidance.fallback_reason == "probe payload omitted risk_guidance"
+    assert "hunger" in {risk.id for risk in missing.top_risks}
+
+    invalid_guidance = _canonical_risk_guidance()
+    invalid_guidance["top_risks"][0]["score"] = "78"
+    invalid = _context_for_risk_payload(
+        {
+            "state": {"week": 2, "money": 100, "hunger": 95},
+            "risk_guidance": invalid_guidance,
+        }
+    )
+    assert invalid.risk_guidance.source == "python_fallback"
+    assert "top_risks.0.score" in invalid.risk_guidance.fallback_reason
+
+    stale_guidance = _canonical_risk_guidance()
+    stale_guidance["generated_for_week"] = 1
+    stale = _context_for_risk_payload(
+        {
+            "state": {"week": 2, "money": 100, "hunger": 95},
+            "risk_guidance": stale_guidance,
+        }
+    )
+    assert stale.risk_guidance.source == "python_fallback"
+    assert "does not match probe state week=2" in stale.risk_guidance.fallback_reason
+
+
 def test_play_through_runs_explicit_weekly_loop(tmp_path) -> None:
     probe = _FakeProbe()
     decisions = [
@@ -177,7 +260,9 @@ def test_play_through_runs_explicit_weekly_loop(tmp_path) -> None:
     assert "run id:" in summary
 
     rows = [
-        json.loads(line) for line in jsonl_path.read_text(encoding="utf-8").splitlines() if line.strip()
+        json.loads(line)
+        for line in jsonl_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
     ]
     assert len(rows) == 5
     assert rows[0]["run_id"] == tmp_path.name
@@ -204,6 +289,8 @@ def test_play_through_falls_back_to_first_action_when_decision_invalid(tmp_path)
     result, _written = agent.play_through(tmp_path, probe=probe)  # type: ignore[arg-type]
     assert len(result.steps) == 5
     assert probe.calls[0]["actions"] == ["study_library"]
+    # Three invalid attempts per week must all remain in the audit report.
+    assert len(result.report.llm_calls) == 15
 
 
 def test_play_through_handles_json_fallback_tool_call(tmp_path) -> None:
@@ -242,9 +329,7 @@ def test_parse_decision_handles_garbage() -> None:
 
 
 def test_extract_action_ids_handles_dict_and_string() -> None:
-    assert _extract_action_ids(
-        {"actions": [{"id": "a"}, {"id": "b"}, "c"]}
-    ) == ["a", "b", "c"]
+    assert _extract_action_ids({"actions": [{"id": "a"}, {"id": "b"}, "c"]}) == ["a", "b", "c"]
     assert _extract_action_ids({}) == []
     assert _extract_action_ids({"actions": "not a list"}) == []
 
@@ -262,3 +347,33 @@ def test_real_probe_dataclass_compatibility() -> None:
     # Just verify the surface area we'd rely on is present.
     for attr in ("get_state", "list_available_actions", "step", "finish", "detect_anomalies"):
         assert hasattr(real, attr)
+
+
+def test_play_through_reusing_report_dir_replaces_old_trace(tmp_path) -> None:
+    first_probe = _FakeProbe(finish_at=2)
+    first = _build_agent(
+        [
+            json.dumps({"actions": ["study_library"], "event_choice_id": "", "rationale": "study"}),
+            json.dumps({"actions": ["study_library"], "event_choice_id": "", "rationale": "study"}),
+        ],
+        first_probe,
+    )
+    first.play_through(tmp_path, probe=first_probe)  # type: ignore[arg-type]
+
+    second_probe = _FakeProbe(finish_at=2)
+    second = _build_agent(
+        [
+            json.dumps({"actions": ["mini_job"], "event_choice_id": "", "rationale": "work"}),
+            json.dumps({"actions": ["mini_job"], "event_choice_id": "", "rationale": "work"}),
+        ],
+        second_probe,
+    )
+    second.play_through(tmp_path, probe=second_probe)  # type: ignore[arg-type]
+
+    rows = [
+        json.loads(line)
+        for line in (tmp_path / "playthrough.jsonl").read_text().splitlines()
+        if line.strip()
+    ]
+    assert len(rows) == 2
+    assert rows[0]["chosen_actions"] == ["mini_job"]
