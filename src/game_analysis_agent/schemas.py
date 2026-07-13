@@ -233,9 +233,24 @@ class RiskBrief(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     id: str
+    title: str = ""
+    score: int | None = Field(default=None, ge=0, le=100)
     severity: Literal["low", "medium", "high", "critical"]
     reason: str
     suggested_action_types: list[str] = Field(default_factory=list)
+    suggested_action_ids: list[str] = Field(default_factory=list)
+
+
+class RiskGuidanceMetadata(BaseModel):
+    """Provenance for the risk rows included in a weekly prompt."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    source: Literal["game_risk_evaluator", "python_fallback"]
+    evaluator: str
+    generated_for_week: int = Field(ge=0)
+    contract_version: str = ""
+    fallback_reason: str = ""
 
 
 class WeekMemory(BaseModel):
@@ -281,6 +296,7 @@ class WeekContext(BaseModel):
     persona_strategy: dict[str, Any] = Field(default_factory=dict)
     state: StateSummary
     top_risks: list[RiskBrief] = Field(default_factory=list)
+    risk_guidance: RiskGuidanceMetadata
     available_actions: list[ActionBrief] = Field(default_factory=list)
     current_event_id: str = ""
     event_choices: list[EventChoiceBrief] = Field(default_factory=list)
@@ -342,6 +358,7 @@ __all__ = [
     "PlayerDecision",
     "PlayMemory",
     "RiskBrief",
+    "RiskGuidanceMetadata",
     "StateSummary",
     "ValueFinding",
     "WeekContext",
