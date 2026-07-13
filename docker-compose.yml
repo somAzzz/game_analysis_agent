@@ -1,11 +1,12 @@
 # Orchestration for game_analysis_agent.
 #
-# Two services:
+# Three services:
 #   - vllm   — local Qwen3.6 27B NVFP4 inference server (OpenAI-compatible).
+#   - godot  — persistent headless Godot tool container used through the wrapper.
 #   - agent  — Python CLI one-off container (use `docker compose run agent ...`).
 #
 # Notes (mirrored from fintext_llm/docker-compose.yml for consistency):
-#   * vLLM v0.24.0 is the latest stable image with NVFP4 + MTP support
+#   * vLLM v0.25.0 is the latest stable image with NVFP4 + MTP support
 #     validated against Qwen3.6. vLLM_BIND_PORT defaults to 8000 so
 #     this stack does not collide with fintext_llm on 30000.
 #   * NVFP4 requires Blackwell (sm_100 / sm_120). Qwen3.6 ships with
@@ -17,14 +18,15 @@
 
 services:
   vllm:
-    # Pinned 2026-07-XX: v0.24.0 is the latest stable tag with NVFP4 + MTP
+    # Pinned 2026-07-XX: v0.25.0 is the latest stable tag with NVFP4 + MTP
     # validated against Qwen3.6 27B NVFP4. Bump quarterly. See fintext_llm
     # for the same pin rationale.
-    image: vllm/vllm-openai:v0.24.0
-    # v0.24.0 image has ENTRYPOINT=["vllm","serve"] — a plain
+    image: vllm/vllm-openai:v0.25.0
+    # v0.25.0 image keeps ENTRYPOINT=["vllm","serve"] — a plain
     # ``command`` would prepend ``vllm serve``, which then misreads
     # the next positional argument. Empty entrypoint lets the shell
-    # script below run as-is.
+    # script below run as-is. Verify after upgrade; if upstream changes
+    # the entrypoint back to plain ``vllm``, drop the empty-string override.
     entrypoint: ""
     ports:
       - "${VLLM_BIND_PORT:-8000}:8000"
@@ -85,9 +87,34 @@ services:
       start_period: 600s
     restart: unless-stopped
 
+  godot:
+    # Long-running tool sidecar. scripts/godot-docker-wrapper uses
+    # `docker compose exec` when this service is up and falls back to an
+    # equivalent one-shot `docker run` otherwise.
+    image: ${GODOT_DOCKER_IMAGE:-barichello/godot-ci:4.4}
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["exec sleep infinity"]
+    environment:
+      HOME: /tmp/game-analysis-godot-home
+    volumes:
+      # Mount the shared parent of both repositories at the identical path.
+      # The runner passes absolute game --path and Agent report --out paths.
+      - ${GODOT_DOCKER_MOUNT_ROOT:-/home/bo/projects/python}:${GODOT_DOCKER_MOUNT_ROOT:-/home/bo/projects/python}
+      - /tmp:/tmp
+    working_dir: /tmp
+    init: true
+    healthcheck:
+      test: ["CMD", "godot", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
   agent:
-    # Built from the Dockerfile in this repo. Use ``docker compose run
-    # agent sim --runs 100 --policy balanced`` or any other subcommand.
+    # Built from the Dockerfile in this repo. This container is intended for
+    # pure-Python analysis/QA commands. Gameplay commands run on the host with
+    # GODOT_BIN=scripts/godot-docker-wrapper so they can exec the sidecar.
     build:
       context: .
       dockerfile: Dockerfile
@@ -102,11 +129,8 @@ services:
       - VLLM_API_KEY=${VLLM_API_KEY:-local-dev-token}
       - GAME_PROJECT_PATH=${GAME_PROJECT_PATH:-/data/game_project}
     volumes:
-      # Mount your local checkout of study-in-germany inside the
-      # container so ``run_gameplay_agent.py sim`` can drive its
-      # headless Godot runner. Without this mount the agent can
-      # still run the pure-Python anomaly + value analyzers but
-      # cannot produce raw_runs.jsonl.
+      # Read-only game data remains available to analysis commands, but this
+      # Python image intentionally contains no Docker CLI or Godot binary.
       - ${GAME_PROJECT_PATH:-/data/game_project}:/data/game_project:ro
       # Reports are persisted back onto the host for inspection.
       - ./reports:/app/reports
@@ -119,7 +143,7 @@ services:
     command: ["python", "tools/run_gameplay_agent.py", "--help"]
 
 # NB: the agent is opt-in via ``--profile cli``. A bare
-# ``docker compose up`` only starts the vLLM inference server; use
-# ``docker compose --profile cli run agent <subcommand>`` to invoke
-# the CLI on demand. Keeps host resources free when you only want
-# the inference side.
+# ``docker compose up`` starts both vLLM and the Godot tool sidecar; use
+# ``docker compose --profile cli run agent <analysis-subcommand>`` to invoke
+# the containerized Python analysis CLI on demand. Host gameplay commands should
+# use scripts/godot-docker-wrapper so they execute inside the Godot sidecar.

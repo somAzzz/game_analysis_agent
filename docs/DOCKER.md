@@ -1,8 +1,9 @@
 # Docker setup
 
-The pipeline comes with a `docker-compose.yml` that orchestrates two
-services: a vLLM inference server (GPU) and an opt-in agent CLI
-container (CPU-only). Everything wires together through
+The pipeline comes with a `docker-compose.yml` that orchestrates three
+services: a vLLM inference server (GPU), a persistent headless Godot tool
+sidecar (CPU-only), and an opt-in agent analysis CLI container (CPU-only).
+Everything wires together through
 `docker-compose.yml` + `.env`, mirroring the well-tested setup in
 [fintext_llm/docker-compose.yml](../../fintext_llm/docker-compose.yml)
 so the two projects can share a machine without port collisions.
@@ -15,9 +16,9 @@ so the two projects can share a machine without port collisions.
   older.
 - ~70 GB of free disk for the Qwen3.6 27B NVFP4 weights (cached under
   `~/.cache/huggingface/`).
-- A working `study-in-germany` Godot project if you want the agent to
-  drive `run_gameplay_agent.py sim` / `play` end-to-end. (`probe`,
-  `export`, `analyze`, `qa --report-dir=...` work without Godot.)
+- A working `study-in-germany` Godot project for `sim`, `probe`, `export`,
+  `validate`, `interactive-probe`, or `play`. Pure `analyze`, recorded `eval`,
+  and report QA do not invoke Godot.
 
 ## 2. One-time setup
 
@@ -27,16 +28,21 @@ cp .env.example .env
 #   - HF_TOKEN (if your model is auth-gated — the official NVFP4 quant
 #     does not require a token at the moment).
 #   - GAME_PROJECT_PATH=/abs/path/to/study-in-germany
+#   - GODOT_DOCKER_MOUNT_ROOT=/shared/parent/of/both/checkouts
 #   - VLLM_BIND_PORT=8000 (already the default).
 ```
 
-## 3. Start vLLM
+## 3. Start vLLM and Godot
 
 ```bash
-docker compose up vllm -d
+docker compose up -d vllm godot
 docker compose logs -f vllm     # tail the server boot
-docker compose ps                # confirm ``vllm`` is healthy
+docker compose ps                # confirm ``vllm`` and ``godot`` are healthy
 ```
+
+The Godot service is an idle tool sidecar; the repository wrapper executes
+commands inside it. To use only Godot without reserving the GPU, run
+`docker compose up -d godot`.
 
 Once the container reports `Application startup complete`, the
 endpoint is `http://localhost:8000/v1`. Sanity check:
@@ -51,21 +57,29 @@ You should see `nvidia/Qwen3.6-27B-NVFP4` (or whatever you set
 
 ## 4. Run the agent CLI
 
+Run gameplay commands from the host and point `GODOT_BIN` at the wrapper. It
+reuses the compose sidecar and reaches vLLM through the published host port:
+
+```bash
+export GAME_PROJECT_PATH=/abs/path/to/study-in-germany
+export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
+
+uv run python tools/run_gameplay_agent.py interactive-probe \
+  --report-dir reports/interactive/compose-smoke
+uv run python tools/run_gameplay_agent.py play \
+  --report-dir reports/play/compose-live
+```
+
+The opt-in `agent` container is for pure-Python analysis/QA; it intentionally
+does not mount the Docker socket or execute processes in the Godot sidecar:
+
 ```bash
 # Quick help
 docker compose --profile cli run --rm agent
 
-# 100-run baseline + analysis + every agent
+# Analyze existing trace data
 docker compose --profile cli run --rm agent \
-  all --runs 100 --policy balanced
-
-# Boundary probe (requires GAME_PROJECT_PATH to point at study-in-germany)
-docker compose --profile cli run --rm agent \
-  probe --extreme "zero_money,deep_debt,flag_chaos"
-
-# Interactive playthrough driven by the LLM
-docker compose --profile cli run --rm agent \
-  play --report-dir reports/play/test
+  analyze --report-dir reports/balance/test
 ```
 
 The agent container binds `./reports` back to the host so artifacts
@@ -80,8 +94,8 @@ and a vLLM server reachable at `VLLM_BASE_URL`:
 python3 tools/run_gameplay_agent.py all --runs 100 --policy balanced
 ```
 
-The Docker setup is purely a convenience for users who want a
-containerized vLLM alongside the CLI.
+The Docker setup keeps both external runtimes available while the Python CLI
+remains easy to run and debug on the host.
 
 ## 6. Configurable knobs
 
@@ -95,10 +109,13 @@ All knobs live in `.env`:
 | `HF_TOKEN` | Auth to gated HuggingFace repos | (empty) |
 | `VLLM_BIND_PORT` | Host port the container binds to | `8000` |
 | `CUDA_VISIBLE_DEVICES` | GPU index (or `all`) | `0` |
+| `GODOT_DOCKER_IMAGE` | Godot sidecar/fallback image | `barichello/godot-ci:4.4` |
+| `GAME_PROJECT_PATH` | Absolute checkout mounted at the identical container path | `/home/bo/projects/python/study-in-germany` |
+| `GODOT_DOCKER_MOUNT_ROOT` | Shared parent of Agent and game checkouts, mounted at the same path | `/home/bo/projects/python` |
 
 ## 7. Version pinning
 
-`vllm/vllm-openai:v0.24.0` is the latest stable tag (as of 2026-07-04)
+`vllm/vllm-openai:v0.25.0` is the latest stable tag (as of 2026-07-13)
 with NVFP4 + MTP validated against Qwen3.6 27B NVFP4. Bump quarterly;
 see fintext_llm for the same pinning rationale.
 
@@ -119,3 +136,7 @@ your checkpoint is Qwen3.5 or earlier; set `LLM_ENABLE_MTP=0` in
 **`HF_TOKEN` not set on a gated repo** — fix the env var, then
 `docker compose restart vllm`. The token is forwarded only for
 authenticated model downloads.
+
+**Godot sidecar is not running** — start it with
+`docker compose up -d godot`. The wrapper automatically falls back to a
+one-shot `docker run --rm` when the compose service is absent.
