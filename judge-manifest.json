@@ -1,6 +1,34 @@
 {
   "artifacts": [
     {
+      "bytes": 193,
+      "path": "config/build_week_2026_replay.json",
+      "role": "replay-smoke-manifest",
+      "schema_version": "persona-replay-manifest-v1",
+      "sha256": "57475f4fa20f6d1bfb05d85ef1fbdc42facab7a2605ce2c2d076b4fc8d24896a"
+    },
+    {
+      "bytes": 1258,
+      "path": "tests/fixtures/persona_replay/basic_v1.json",
+      "role": "replay-smoke-fixture",
+      "schema_version": "persona-replay-fixture-v1",
+      "sha256": "c180208d4c3bb6278e68b03d3c23c22e204ab526339f2b93a0ad6f55d218dea8"
+    },
+    {
+      "bytes": 202,
+      "path": "config/build_week_2026_full_replay.json",
+      "role": "replay-campaign-manifest",
+      "schema_version": "persona-replay-manifest-v1",
+      "sha256": "50d8aaccdd438a31090c29b4b7ff76cb5fa9a508dd3a9a1784c8b1dd90dc0119"
+    },
+    {
+      "bytes": 459108,
+      "path": "fixtures/persona_replay/build_week_2026_full_v1.json",
+      "role": "replay-campaign-fixture",
+      "schema_version": "persona-replay-fixture-v1",
+      "sha256": "865f4fb83028f7ada18b581462adef3cbb15f2b06ed4c59cb0601f97b0d5f590"
+    },
+    {
       "bytes": 10389,
       "path": "examples/build_week_2026/campaign-v1/campaign_manifest.json",
       "role": "campaign",

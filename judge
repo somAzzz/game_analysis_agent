@@ -4,9 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
 import json
 import os
+import shutil
+import signal
+import subprocess
 import sys
 import tempfile
 import time
@@ -41,30 +45,25 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--stdout-only", action="store_true")
+    parser.add_argument("--timeout-seconds", type=float, default=120.0)
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     started = time.monotonic()
     args = build_parser().parse_args(argv)
-    if args.mode != "inspect":
-        result = _result(
-            status="unsupported",
-            started=started,
-            checks=[],
-            artifacts=[],
-            limitations=["Tier 1 Replay is not installed in this revision."],
-            error_code="replay_not_implemented",
-            error="Use Inspect to validate committed evidence.",
-            remediation="Run ./judge --mode inspect --offline --json --output-dir -",
+    if args.mode == "replay":
+        result, exit_code = run_replay(
+            args.manifest, started=started, timeout_seconds=args.timeout_seconds
         )
         _emit(result, args)
-        return EXIT_UNSUPPORTED
+        return exit_code
     try:
         result = inspect_manifest(args.manifest, started=started)
     except InspectError as exc:
         result = _result(
             status="failed",
+            stage="inspect",
             started=started,
             checks=[],
             artifacts=[],
@@ -216,6 +215,7 @@ def inspect_manifest(manifest_path: Path, *, started: float) -> dict[str, Any]:
     )
     return _result(
         status="passed",
+        stage="inspect",
         started=started,
         checks=checks,
         artifacts=observed,
@@ -224,6 +224,137 @@ def inspect_manifest(manifest_path: Path, *, started: float) -> dict[str, Any]:
         error=None,
         remediation=None,
     )
+
+
+def run_replay(
+    manifest_path: Path, *, started: float, timeout_seconds: float
+) -> tuple[dict[str, Any], int]:
+    root = manifest_path.resolve().parent
+    uv = shutil.which("uv")
+    limitations = [
+        "Replay consumes committed fixtures and evidence; it does not call OpenAI.",
+        "Replay does not rebuild or rerun the Godot game.",
+    ]
+    if uv is None:
+        return (
+            _result(
+                status="failed",
+                stage="replay",
+                started=started,
+                checks=[],
+                artifacts=[],
+                limitations=limitations,
+                error_code="dependency_missing",
+                error="uv is required for locked Tier 1 Replay",
+                remediation="Install uv, then rerun the documented Replay command.",
+            ),
+            EXIT_FAILED,
+        )
+    command = [
+        uv,
+        "run",
+        "--offline",
+        "--frozen",
+        "python",
+        "tools/judge_replay.py",
+        "--project-root",
+        str(root),
+    ]
+    environment = os.environ.copy()
+    environment.update(
+        {
+            "HF_HUB_OFFLINE": "1",
+            "TRANSFORMERS_OFFLINE": "1",
+            "NO_PROXY": "*",
+            "no_proxy": "*",
+        }
+    )
+    process = subprocess.Popen(
+        command,
+        cwd=root,
+        env=environment,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=max(0.1, min(timeout_seconds, 120.0)))
+    except subprocess.TimeoutExpired:
+        _terminate_process_group(process)
+        return (
+            _result(
+                status="failed",
+                stage="replay",
+                started=started,
+                checks=[],
+                artifacts=[],
+                limitations=limitations,
+                error_code="replay_timeout",
+                error=f"Replay exceeded {timeout_seconds:g} seconds",
+                remediation="Inspect committed evidence, then diagnose the locked Replay environment.",
+            ),
+            EXIT_FAILED,
+        )
+    try:
+        worker = json.loads(stdout)
+    except json.JSONDecodeError:
+        worker = None
+    if process.returncode != 0 or not isinstance(worker, dict):
+        detail = stderr.strip()[-800:] or stdout.strip()[-800:] or "worker produced no result"
+        return (
+            _result(
+                status="failed",
+                stage="replay",
+                started=started,
+                checks=[],
+                artifacts=[],
+                limitations=limitations,
+                error_code="replay_worker_failed",
+                error=detail,
+                remediation="Run uv sync --frozen, then rerun Replay or use Inspect.",
+            ),
+            EXIT_FAILED,
+        )
+    if worker.get("schema_version") != "judge-replay-worker-v1" or worker.get("status") != "passed":
+        return (
+            _result(
+                status="failed",
+                stage="replay",
+                started=started,
+                checks=list(worker.get("checks", [])),
+                artifacts=list(worker.get("artifacts", [])),
+                limitations=limitations,
+                error_code=str(worker.get("error_code") or "replay_evidence_failed"),
+                error=str(worker.get("error") or "Replay evidence gate failed"),
+                remediation=str(worker.get("remediation") or "Restore the reviewed fixtures."),
+            ),
+            EXIT_FAILED,
+        )
+    return (
+        _result(
+            status="passed",
+            stage="replay",
+            started=started,
+            checks=list(worker["checks"]),
+            artifacts=list(worker["artifacts"]),
+            limitations=limitations,
+            error_code=None,
+            error=None,
+            remediation=None,
+        ),
+        0,
+    )
+
+
+def _terminate_process_group(process: subprocess.Popen[str]) -> None:
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+        process.communicate(timeout=2)
+    except (ProcessLookupError, subprocess.TimeoutExpired):
+        with contextlib.suppress(ProcessLookupError):
+            os.killpg(process.pid, signal.SIGKILL)
+        process.communicate()
 
 
 def _safe_relative(value: object) -> str:
@@ -277,6 +408,7 @@ def _sha256(path: Path) -> str:
 def _result(
     *,
     status: str,
+    stage: str,
     started: float,
     checks: list[dict[str, Any]],
     artifacts: list[dict[str, Any]],
@@ -288,7 +420,7 @@ def _result(
     return {
         "schema_version": RESULT_SCHEMA,
         "status": status,
-        "stage": "inspect",
+        "stage": stage,
         "duration_ms": round((time.monotonic() - started) * 1000, 3),
         "checks": checks,
         "artifacts": artifacts,

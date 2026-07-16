@@ -11,6 +11,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 ARTIFACTS = {
+    "config/build_week_2026_replay.json": ("replay-smoke-manifest", "persona-replay-manifest-v1"),
+    "tests/fixtures/persona_replay/basic_v1.json": ("replay-smoke-fixture", "persona-replay-fixture-v1"),
+    "config/build_week_2026_full_replay.json": ("replay-campaign-manifest", "persona-replay-manifest-v1"),
+    "fixtures/persona_replay/build_week_2026_full_v1.json": ("replay-campaign-fixture", "persona-replay-fixture-v1"),
     "examples/build_week_2026/campaign-v1/campaign_manifest.json": ("campaign", "persona-campaign-manifest-v1"),
     "examples/build_week_2026/campaign-v1/campaign_summary.json": ("campaign", "campaign-aggregation-v1"),
     "examples/build_week_2026/campaign-v1/persona_runs.jsonl": ("campaign-rows", None),

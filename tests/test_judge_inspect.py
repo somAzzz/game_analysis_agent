@@ -123,7 +123,7 @@ def test_committed_judge_manifest_passes_dependency_free_inspect() -> None:
 
     assert result.returncode == 0
     assert payload["status"] == "passed"
-    assert len(payload["artifacts"]) == 18
+    assert len(payload["artifacts"]) == 22
     assert payload["checks"][2]["detail"] == (
         "6 public claims resolved to exact JSON values"
     )
