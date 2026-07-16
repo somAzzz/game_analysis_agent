@@ -54,3 +54,25 @@ path, JSONL line number, and canonical row hash. A result rejects citations
 from another cell or from a week beyond its completed evidence. Later cluster
 membership and Codex hypotheses must use these citations; prose-only examples
 are not campaign evidence.
+
+## Scheduler and Resume
+
+`CampaignRunner` expands the frozen matrix, creates one output directory per
+cell, and uses a thread pool capped by the request's Judge concurrency (never
+above four). It writes the manifest, per-cell state, and run summary with
+same-directory temporary files followed by atomic replacement. Executors own
+one cell and therefore keep weeks sequential; the scheduler never interleaves
+weeks from the same playthrough.
+
+On Resume, a Pydantic-valid `cell_result.json` is reused only when both exact
+request and exact source identities match and the prior state is `completed`.
+Every other cell directory is removed and rebuilt so stale rows cannot mix with
+new evidence. A completed campaign is `submittable` only when every expected
+cell is completed.
+
+Cancellation is shared with provider workers and a thread-safe child-process
+registry. Registered Godot or helper processes receive terminate, a bounded
+grace period, and then kill if needed. Cells cancelled before evidence remain
+`cancelled`; cells with flushed weeks retain contiguous citations without being
+mislabeled as completed. Executor exceptions before any row are `failed`, while
+exceptions after valid rows are `partial`.
