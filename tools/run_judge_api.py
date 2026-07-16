@@ -9,6 +9,7 @@ import mimetypes
 import os
 import re
 import sys
+import tempfile
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -162,6 +163,15 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    runtime_directory: tempfile.TemporaryDirectory[str] | None = None
+    if not os.environ.get("GAME_PROJECT_PATH"):
+        from game_analysis_agent.build_week_game_pin import prepare_embedded_game_runtime
+
+        runtime_directory = tempfile.TemporaryDirectory(prefix="playtest-forge-game-")
+        game_runtime = Path(runtime_directory.name) / "study-in-germany"
+        prepare_embedded_game_runtime(ROOT, game_runtime)
+        os.environ["GAME_PROJECT_PATH"] = str(game_runtime)
+
     def live_runner(job):  # noqa: ANN001, ANN202
         try:
             return run_judge_live_campaign(job, project_root=ROOT, environment=os.environ)
@@ -185,6 +195,8 @@ def main() -> int:
         pass
     finally:
         server.server_close()
+        if runtime_directory is not None:
+            runtime_directory.cleanup()
     return 0
 
 

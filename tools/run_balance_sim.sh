@@ -4,6 +4,8 @@
 # revisions are gone; everything is read from environment variables.
 set -euo pipefail
 
+ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+
 RUN_ID="${1:-baseline}"
 POLICY="${2:-${SIM_POLICY:-balanced}}"
 RUNS="${RUNS:-${SIM_RUNS:-100}}"
@@ -11,7 +13,7 @@ SEED="${SEED:-${SIM_SEED:-42}}"
 WEEKS="${WEEKS:-${SIM_WEEKS:-20}}"
 DIFFICULTY="${DIFFICULTY:-${SIM_DIFFICULTY:-normal}}"
 GODOT_BIN="${GODOT_BIN:-godot4}"
-GAME_PROJECT_PATH="${GAME_PROJECT_PATH:-/home/bo/projects/python/study-in-germany}"
+GAME_PROJECT_PATH="${GAME_PROJECT_PATH:-$ROOT/demo/study-in-germany}"
 
 OUT_DIR="reports/balance/${RUN_ID}"
 mkdir -p "$OUT_DIR"
@@ -19,7 +21,7 @@ OUT_FILE="$(pwd)/${OUT_DIR}/raw_runs.jsonl"
 
 if [ ! -d "$GAME_PROJECT_PATH" ]; then
   echo "GAME_PROJECT_PATH does not exist: $GAME_PROJECT_PATH" >&2
-  echo "Set GAME_PROJECT_PATH to the study-in-germany checkout." >&2
+  echo "Set GAME_PROJECT_PATH to a Study in Germany Godot project." >&2
   exit 2
 fi
 

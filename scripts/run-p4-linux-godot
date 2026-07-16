@@ -2,7 +2,6 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-: "${GAME_SOURCE_PATH:?set GAME_SOURCE_PATH to the pinned study-in-germany Git checkout}"
 OUTPUT=${P4_LINUX_GODOT_OUTPUT:-$ROOT/reports/platform-godot}
 EVIDENCE=${P4_LINUX_GODOT_EVIDENCE:-$OUTPUT/evidence.json}
 
@@ -18,9 +17,9 @@ test -z "$(git -C "$ROOT" status --porcelain --untracked-files=all)" || {
 cd "$ROOT"
 scripts/setup-build-week-toolchain --json
 . .tools/build-week/env.sh
-uv run python tools/prepare_build_week_game.py \
-  --source "$GAME_SOURCE_PATH" --materialize-dir "$OUTPUT/game-source" --replace --json
-export GAME_PROJECT_PATH="$OUTPUT/game-source"
+export GAME_PROJECT_PATH="$OUTPUT/game-runtime"
+uv run python tools/prepare_embedded_demo.py \
+  --output "$GAME_PROJECT_PATH" --replace --json > "$OUTPUT/embedded-demo.json"
 uv run python tools/judge_doctor.py --mode real-game --json > "$OUTPUT/doctor-real-game.json"
 uv run python tools/run_gameplay_agent.py sim \
   --run-id ci-smoke --runs 12 --policy balanced --difficulty normal --seed 4242 \

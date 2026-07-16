@@ -3,7 +3,6 @@ set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 : "${OPENAI_API_KEY:?set OPENAI_API_KEY in the server environment}"
-: "${GAME_PROJECT_PATH:?set GAME_PROJECT_PATH to the packaged pinned game}"
 OUTPUT=${P4_LIVE_OPENAI_OUTPUT:-$ROOT/reports/platform-live-openai}
 EVIDENCE=${P4_LIVE_OPENAI_EVIDENCE:-$OUTPUT/evidence.json}
 PORT=${P4_LIVE_OPENAI_PORT:-18082}
@@ -14,6 +13,12 @@ test -z "$(git -C "$ROOT" status --porcelain --untracked-files=all)" || {
 }
 mkdir -p "$OUTPUT"
 cd "$ROOT"
+if [ -z "${GAME_PROJECT_PATH:-}" ]; then
+  GAME_PROJECT_PATH="$OUTPUT/game-runtime"
+  uv run python tools/prepare_embedded_demo.py \
+    --output "$GAME_PROJECT_PATH" --replace --json > "$OUTPUT/embedded-demo.json"
+fi
+export GAME_PROJECT_PATH
 uv run python tools/judge_doctor.py --mode live-openai --json > "$OUTPUT/doctor-live-openai.json"
 uv run python tools/run_judge_api.py --host 127.0.0.1 --port "$PORT" \
   --enable-live-openai > "$OUTPUT/api.stdout" 2> "$OUTPUT/api.stderr" &

@@ -342,7 +342,7 @@ def test_dry_run_writes_plan_without_calling_executor_or_cell_manifests(tmp_path
     assert manifest["compare"]["output_dir"] == config.compare.output_dir
     assert manifest["compare"]["include"] == list(config.compare.include)
     assert manifest["code_fingerprint"] == execution_source_fingerprint(
-        ROOT, ROOT.parent / "study-in-germany"
+        ROOT, ROOT / "demo/study-in-germany"
     )
 
 

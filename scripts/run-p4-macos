@@ -19,10 +19,14 @@ mkdir -p "$OUTPUT"
 cd "$ROOT"
 scripts/setup-build-week-toolchain --json >/dev/null
 . .tools/build-week/env.sh
-: "${GAME_PROJECT_PATH:=$ROOT/reports/build-week-2026/game-source}"
+if [ -z "${GAME_PROJECT_PATH:-}" ]; then
+  GAME_PROJECT_PATH="$OUTPUT/game-runtime"
+  uv run python tools/prepare_embedded_demo.py \
+    --output "$GAME_PROJECT_PATH" --replace --json > "$OUTPUT/embedded-demo.json"
+fi
 export GAME_PROJECT_PATH
 test -f "$GAME_PROJECT_PATH/project.godot" || {
-  echo "materialized study-in-germany project is missing: $GAME_PROJECT_PATH" >&2
+  echo "Study in Germany demo runtime is missing: $GAME_PROJECT_PATH" >&2
   exit 2
 }
 

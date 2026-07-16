@@ -418,7 +418,9 @@ def build_matrix_plan(
         else root / "reports" / "matrix" / matrix_id
     )
     python = str(python_executable or sys.executable)
-    game_root = Path(os.environ.get("GAME_PROJECT_PATH", str(root.parent / "study-in-germany")))
+    game_root = Path(
+        os.environ.get("GAME_PROJECT_PATH", str(root / "demo/study-in-germany"))
+    )
     code_fingerprint = execution_source_fingerprint(root, game_root)
     runner = root / "tools" / "run_gameplay_agent.py"
     reports_root = output_dir / "reports"
