@@ -110,3 +110,19 @@ private game bundle. All six evidence files are reparsed against Pydantic
 schemas and SHA-256 hashed before `gate_report.json` may say `passed`; any
 missing cell, non-completed cell, identity mismatch, forbidden field, secret
 signature, or later file mutation fails verification.
+
+## Full Replay authoring boundary
+
+The one-week unit fixture is not accepted as evidence for the 18-cell campaign.
+`FixtureAuthoringGateway` is a separate authoring-only component that chooses
+legal actions deterministically from the game's action IDs/tags and canonical
+risk suggestions, then records exact request fingerprints, state hashes,
+decisions, and event choices. It is never constructed by the Judge provider
+factory and its outputs are not final campaign evidence.
+
+`tools/author_build_week_replay.py` runs the pinned real Godot game for the
+frozen matrix, writes a repository-relative fixture plus SHA-256 manifest, and
+fails the entire authoring pass if any cell fails. The formal campaign is a
+second run through `RecordedPersonaGateway`; therefore `provider=replay` in the
+submitted evidence means an exact hash-verified lookup, not a heuristic hidden
+behind the Replay label.
