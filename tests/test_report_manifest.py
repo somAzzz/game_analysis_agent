@@ -148,3 +148,41 @@ def test_execution_source_fingerprint_tracks_game_but_ignores_reports(
 
     game_script.write_text("const VALUE = 2\n", encoding="utf-8")
     assert execution_source_fingerprint(agent_root, game_root) != first
+
+
+def test_report_manifest_records_materialized_game_without_absolute_paths(
+    tmp_path: Path, monkeypatch
+) -> None:
+    game = tmp_path / "game"
+    report = tmp_path / "report"
+    game.mkdir()
+    report.mkdir()
+    (game / ".playtest-forge-source.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "build-week-game-materialized-v1",
+                "commit": "a" * 40,
+                "tree": "b" * 40,
+                "archive_sha256": "c" * 64,
+                "content_tree_sha256": "d" * 64,
+                "file_count": 80,
+            }
+        ),
+        encoding="utf-8",
+    )
+    external = tmp_path / "private" / "input.json"
+    external.parent.mkdir()
+    external.write_text("{}", encoding="utf-8")
+    monkeypatch.setenv("GAME_PROJECT_PATH", str(game))
+
+    manifest = write_report_manifest(
+        report,
+        report_type="test",
+        source_files=[external],
+    )
+
+    game_source = manifest["provenance"]["game_repository"]
+    assert game_source["source_type"] == "materialized_bundle"
+    assert game_source["commit"] == "a" * 40
+    assert manifest["source_files"][0]["path"] == "<external>/input.json"
+    assert str(tmp_path) not in json.dumps(manifest)

@@ -23,6 +23,8 @@ from typing import Any
 MANIFEST_FILE = "report_manifest.json"
 REPORT_INDEX_FILE = "report_index.json"
 SCHEMA_VERSION = "trace-manifest-v2"
+MATERIALIZED_GAME_MARKER = ".playtest-forge-source.json"
+MATERIALIZED_GAME_SCHEMA = "build-week-game-materialized-v1"
 
 
 def write_report_manifest(
@@ -192,12 +194,9 @@ def _file_ref(report_dir: Path, item: str | Path) -> dict[str, Any]:
     raw_path = item if isinstance(item, Path) else Path(item)
     path = raw_path if raw_path.is_absolute() else report_dir / raw_path
     exists = path.exists()
-    try:
-        rel: Path | str = path.relative_to(report_dir)
-    except ValueError:
-        rel = path
+    rel = _display_artifact_path(path, report_dir=report_dir)
     return {
-        "path": str(rel),
+        "path": rel,
         "exists": exists,
         "bytes": path.stat().st_size if exists and path.is_file() else 0,
         "sha256": _sha256(path) if exists and path.is_file() else "",
@@ -223,11 +222,11 @@ def collect_provenance() -> dict[str, Any]:
     agent_source = runtime_source_fingerprint(root)
     game_source = game_source_fingerprint(game_root)
     return {
-        "agent_repository": _git_provenance(root),
-        "game_repository": _git_provenance(game_root),
+        "agent_repository": _git_provenance(root, display_path="<project>"),
+        "game_repository": _game_provenance(game_root),
         "runtime": {
             "python": platform.python_version(),
-            "python_executable": sys.executable,
+            "python_executable": Path(sys.executable).name,
             "platform": platform.platform(),
             "godot": _command_version(godot_bin),
         },
@@ -325,8 +324,8 @@ def _combine_source_fingerprints(agent: str, game: str) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def _git_provenance(path: Path) -> dict[str, Any]:
-    base = {"path": str(path), "available": False, "commit": "", "dirty": None}
+def _git_provenance(path: Path, *, display_path: str) -> dict[str, Any]:
+    base = {"path": display_path, "available": False, "commit": "", "dirty": None}
     if not (path / ".git").exists():
         return base
     commit = _run_capture(["git", "-C", str(path), "rev-parse", "HEAD"])
@@ -337,6 +336,23 @@ def _git_provenance(path: Path) -> dict[str, Any]:
         "commit": commit,
         "dirty": bool(status) if commit else None,
     }
+
+
+def _game_provenance(path: Path) -> dict[str, Any]:
+    marker = _read_json(path / MATERIALIZED_GAME_MARKER)
+    if marker.get("schema_version") == MATERIALIZED_GAME_SCHEMA:
+        return {
+            "path": "<game>",
+            "available": True,
+            "source_type": "materialized_bundle",
+            "commit": str(marker.get("commit", "")),
+            "tree": str(marker.get("tree", "")),
+            "archive_sha256": str(marker.get("archive_sha256", "")),
+            "content_tree_sha256": str(marker.get("content_tree_sha256", "")),
+            "file_count": marker.get("file_count", 0),
+            "dirty": False,
+        }
+    return _git_provenance(path, display_path="<game>")
 
 
 @functools.lru_cache(maxsize=8)
@@ -350,9 +366,23 @@ def _command_version(command: str) -> dict[str, Any]:
     version = _run_capture([resolved, "--version"], timeout=5)
     return {
         "available": bool(version),
-        "command": resolved,
+        "command": Path(resolved).name,
         "version": version,
     }
+
+
+def _display_artifact_path(path: Path, *, report_dir: Path) -> str:
+    resolved = path.resolve()
+    try:
+        return resolved.relative_to(report_dir.resolve()).as_posix()
+    except ValueError:
+        pass
+    project_root = Path(__file__).resolve().parents[2]
+    try:
+        relative = resolved.relative_to(project_root)
+    except ValueError:
+        return f"<external>/{resolved.name}"
+    return f"<project>/{relative.as_posix()}"
 
 
 def _run_capture(command: list[str], *, timeout: int = 5) -> str:

@@ -97,6 +97,42 @@ def test_collect_inventory_reports_unknown_game_without_guessing(tmp_path: Path)
     assert strict_exit_code(payload) == 1
 
 
+def test_collect_inventory_accepts_verified_materialized_game(tmp_path: Path) -> None:
+    repo = tmp_path / "analysis"
+    game = repo / "reports" / "game-source"
+    repo.mkdir()
+    (game / "scripts/tools").mkdir(parents=True)
+    (game / "project.godot").write_text("[application]\n", encoding="utf-8")
+    (game / "scripts/tools/RunSimulation.gd").write_text("extends SceneTree\n")
+    (game / ".playtest-forge-source.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "build-week-game-materialized-v1",
+                "commit": "a" * 40,
+                "tree": "b" * 40,
+                "archive_sha256": "c" * 64,
+                "content_tree_sha256": "d" * 64,
+            }
+        ),
+        encoding="utf-8",
+    )
+    scope = _scope(tmp_path / "scope.json")
+
+    payload = collect_inventory(
+        repo,
+        game_project_path=game,
+        scope_path=scope,
+        environ={},
+        command_runner=_fake_git_runner,
+    )
+
+    source = payload["game_repository"]
+    assert source["status"] == "available"
+    assert source["source_type"] == "materialized_bundle"
+    assert source["revision"] == "a" * 40
+    assert payload["readiness"]["status"] == "ready"
+
+
 def test_license_review_is_a_strict_blocker(tmp_path: Path) -> None:
     repo = tmp_path / "analysis"
     game = tmp_path / "game"

@@ -25,6 +25,8 @@ SCHEMA_VERSION = "build-week-inventory-v1"
 SCOPE_SCHEMA_VERSION = "build-week-scope-v1"
 UNKNOWN = "unknown"
 DEFAULT_SCOPE_FILE = "config/build_week_2026_scope.json"
+MATERIALIZED_GAME_MARKER = ".playtest-forge-source.json"
+MATERIALIZED_GAME_SCHEMA = "build-week-game-materialized-v1"
 
 CommandRunner = Callable[[Sequence[str], Path | None], tuple[int, str, str]]
 
@@ -211,7 +213,8 @@ def _game_inventory(
             "required_files": {item: "unknown" for item in required_files},
             "missing_required_files": list(required_files),
         }
-    inventory = _git_inventory(path, root=root, runner=runner)
+    materialized = _materialized_game_source(path, root=root)
+    inventory = materialized or _git_inventory(path, root=root, runner=runner)
     required_status = {
         item: "present" if (path / item).is_file() else "missing" for item in required_files
     }
@@ -220,6 +223,31 @@ def _game_inventory(
         item for item, status in required_status.items() if status != "present"
     ]
     return inventory
+
+
+def _materialized_game_source(path: Path, *, root: Path) -> dict[str, Any] | None:
+    marker = path / MATERIALIZED_GAME_MARKER
+    try:
+        payload = json.loads(marker.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict) or payload.get("schema_version") != MATERIALIZED_GAME_SCHEMA:
+        return None
+    required_values = ("commit", "tree", "archive_sha256", "content_tree_sha256")
+    if not all(isinstance(payload.get(key), str) and payload[key] for key in required_values):
+        return None
+    return {
+        "status": "available",
+        "source_type": "materialized_bundle",
+        "path": _display_path(path, root=root),
+        "revision": payload["commit"],
+        "tree_revision": payload["tree"],
+        "branch": "pinned",
+        "dirty": False,
+        "changed_file_count": 0,
+        "archive_sha256": payload["archive_sha256"],
+        "content_tree_sha256": payload["content_tree_sha256"],
+    }
 
 
 def _collect_tools(*, env: Mapping[str, str], runner: CommandRunner) -> dict[str, Any]:
