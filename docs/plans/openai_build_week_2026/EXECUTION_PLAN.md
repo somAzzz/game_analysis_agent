@@ -807,6 +807,14 @@ passed.
 
 ## 12. P5 — Produce submission evidence and release
 
+**Pre-release preparation (2026-07-16): complete but blocked.** A Devpost
+draft, 2:40 video script, release checklist, and machine-verified claim ledger
+now use only exact committed evidence. Unknown URLs, live runs, platform/image
+proof, manual timing, and clean-room review remain explicit placeholders or
+pending claims. The submission-asset reviewer passes the draft while returning
+`release_status: blocked`; this preparation does not satisfy the G4 dependency
+or authorize P5 release claims.
+
 ### P5.1 Freeze the measured case study
 
 **Depends on:** G3, G4.
