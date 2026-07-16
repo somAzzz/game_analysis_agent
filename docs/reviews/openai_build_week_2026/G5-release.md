@@ -1,7 +1,7 @@
 # G5 Final Release Review
 
 - Decision: **failed**
-- Reviewed commit: `49f74c6a5f594c62d04ee25494746db7fbea6844`
+- Reviewed commit: `2222d1e05bb495dd2d8f63acfa5f3d3d6444ab6b`
 - Checks: 8
 - Failures: 8
 
@@ -15,7 +15,7 @@
 | manual_comparison | failed | manual comparison is not completed |
 | clean_room_review | failed | clean-room review is not completed |
 | video_review | failed | video review is not completed |
-| published_image | failed | invalid or missing JSON: judge-image-metadata.json |
+| published_image | failed | image digest is absent from Devpost draft |
 | license_privacy_secrets | failed | declared repository license is missing |
 
 ## Decision
