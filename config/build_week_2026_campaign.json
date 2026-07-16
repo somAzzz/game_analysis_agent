@@ -1,0 +1,12 @@
+{
+  "schema_version": "persona-campaign-request-v1",
+  "campaign_id": "build-week-2026-evidence-v1",
+  "personas": ["newbie", "study", "money", "social", "visa", "slacker"],
+  "seeds": [42, 43, 44],
+  "max_weeks": 20,
+  "difficulty": "normal",
+  "scenario": "default_first_semester",
+  "provider": "replay",
+  "concurrency": 4,
+  "report_root": "reports/build-week-2026/campaigns"
+}
