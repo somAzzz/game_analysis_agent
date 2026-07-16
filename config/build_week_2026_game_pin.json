@@ -15,7 +15,9 @@
   "packaging": {
     "mode": "private_competition_bundle",
     "mount_name": "study-in-germany",
-    "distribution_status": "maintainer_ownership_confirmation_required",
+    "distribution_status": "approved_by_owner",
+    "approval_basis": "maintainer_ownership_attestation",
+    "approval_date": "2026-07-16",
     "public_distribution": false
   },
   "required_files": [

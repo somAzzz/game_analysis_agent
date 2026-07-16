@@ -12,13 +12,19 @@
       "id": "analysis",
       "source": "repository_root",
       "required": true,
-      "license_status": "review_required"
+      "license_status": "approved",
+      "approval_basis": "maintainer_ownership_attestation",
+      "approval_date": "2026-07-16",
+      "distribution_scope": "competition_submission"
     },
     {
       "id": "game",
       "source": "GAME_PROJECT_PATH or --game-project-path",
       "required": true,
-      "license_status": "review_required"
+      "license_status": "approved",
+      "approval_basis": "maintainer_ownership_attestation",
+      "approval_date": "2026-07-16",
+      "distribution_scope": "private_competition_bundle"
     }
   ],
   "required_game_files": [
