@@ -58,9 +58,9 @@ uv run python tools/record_platform_evidence.py \
 
 ## 3. Pinned Linux Godot 4.4
 
-The default workflow input is `4.4-stable`. Configure
-`STUDY_IN_GERMANY_TOKEN`, manually dispatch `Test`, retain the
-`game-contract-<run-id>` artifact and URL, then validate it:
+The default workflow input is `4.4-stable`. Manually dispatch `Test`; the job
+uses the verified embedded demo and needs no private-repository token. Retain
+the `game-contract-<run-id>` artifact and URL, then validate it:
 
 ```bash
 uv run python tools/record_platform_evidence.py \
@@ -70,11 +70,10 @@ uv run python tools/record_platform_evidence.py \
   --update-review
 ```
 
-For a local native Linux checkout, use the checksum-pinned toolchain and
-canonical game materializer:
+For a local native Linux checkout, use the checksum-pinned toolchain and the
+embedded-demo runtime preparer:
 
 ```bash
-export GAME_SOURCE_PATH=/path/to/study-in-germany
 scripts/run-p4-linux-godot
 ```
 
@@ -121,11 +120,10 @@ DeepSeek may be used as a provider-compatibility development smoke, but it
 cannot close `live_openai_campaign`. The release row requires a completed
 OpenAI Responses API campaign with response IDs, model and aggregate usage.
 
-On macOS or Linux with the pinned game and Godot runtime:
+On macOS or Linux with Godot runtime (the script prepares the embedded demo):
 
 ```bash
 . .tools/build-week/env.sh
-export GAME_PROJECT_PATH="$PWD/reports/build-week-2026/game-source"
 export OPENAI_API_KEY=... # server process only
 scripts/run-p4-live-openai
 ```

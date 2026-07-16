@@ -9,6 +9,55 @@ parent_plan: IMPLEMENTATION_PLAN.md
 
 # Playtest Forge: Stepwise Execution and Review Plan
 
+## 0. Current implementation update — embedded demo and change visibility
+
+The competition baseline is now the complete pinned `study-in-germany` demo at
+`demo/study-in-germany` (commit
+`348b9fd5501e71ebc7142e10f9068fc1490b5124`). It is a demo, not a claim of a
+complete game. The source marker inventories all 80 upstream files; Judge
+Inspect hashes the marker plus every file. CI, macOS, Linux Godot, Live OpenAI,
+and the native Judge API now prepare writable verified copies without a sibling
+checkout or `STUDY_IN_GERMANY_TOKEN`.
+
+Runtime integration follows this boundary:
+
+```text
+embedded canonical demo (read-only, exact pin)
+  -> verified writable runtime copy
+  -> audited Agent probe overlay
+  -> Godot execution and evidence
+  -> candidate patch in isolated experiment only
+```
+
+The canonical demo never receives the rejected repair. Presentation is divided
+by evaluator need:
+
+| Surface | Show | Do not show |
+| --- | --- | --- |
+| Judge frontend | changed files/lines, exact expandable diff, base commit, patch hash, focused-test statement, fixed/holdout results, accepted/rejected disposition | API keys, raw prompts/model output, unbounded logs, or a rejected patch presented as merged |
+| Judge API | verified public experiment, full bounded diff, hashes, cohort and gate records | arbitrary filesystem reads or non-allowlisted experiments |
+| Repository/backend | complete canonical demo, evidence bundles, Skill, manifests, tests and runtime-overlay provenance | generated caches or secret configuration |
+
+This is more judgeable than hiding the source change, while keeping the front
+page focused on the causal decision rather than turning it into a general code
+browser. Commits `9159f23`, `f8333c4`, `ca0ae77`, `01b711c`, and `c48d651`
+implement the source bundle, runtime copy, default execution paths, Judge image
+inventory, and exact-diff UI respectively.
+
+Verification completed on this revision family:
+
+- embedded source verification and replacement-safety tests passed;
+- Judge Inspect passes with 121 hash-pinned artifacts;
+- Python Judge/API/runtime tests and all 15 frontend tests passed;
+- the public frontend build passed and the same-origin route was visually
+  checked at desktop and 390px width;
+- Docker could not be rerun on this macOS host because the executable is
+  unavailable. Because the delivery fingerprint changed, macOS acceptance,
+  Linux amd64/Godot, Linux arm64, and the published multi-arch image evidence
+  must be refreshed before G4 can pass;
+- `live_openai_campaign` still requires a restricted server-side OpenAI key;
+- the final repository license remains a G5 maintainer decision.
+
 ## 1. Purpose
 
 This document turns the competition strategy in

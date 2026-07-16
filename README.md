@@ -9,11 +9,12 @@ The primary review path is repository-only and offline:
 ./judge --mode replay --offline --json --output-dir -
 ```
 
-Inspect needs only Python 3.9+ and validates 39 committed artifact hashes,
+Inspect needs only Python 3.9+ and validates 121 committed artifact hashes,
 schemas, provenance gates, and six exact public claim references. Replay adds
 the locked `uv` environment and consumes hash-pinned persona fixtures; it does
-not need Godot, Docker, a GPU, network, an API key, a browser, or the private
-game checkout. Both commands print one `judge-result-v1` JSON object. Expected
+not need Godot, Docker, a GPU, network, an API key, a browser, or an external
+game checkout. The complete demo source is embedded and hash-inventoried under
+`demo/study-in-germany`. Both commands print one `judge-result-v1` JSON object. Expected
 status is `passed`; `failed` and `unsupported` are never fallback successes.
 
 The committed case is explicitly **prerecorded Replay evidence**: Codex formed
@@ -64,6 +65,16 @@ integration is the Godot `study-in-germany` demo, but the project is structured
 as a reusable game QA agent framework for balance testing, boundary probing,
 bug discovery, value analysis, quality gates, and interactive LLM playtesting.
 
+The embedded game is intentionally a demo, not a complete commercial game. It
+is the exact pinned baseline used by the committed campaign. This verifies all
+canonical files, creates a writable runtime copy, and records the Agent probe
+overlay separately from game-source changes:
+
+```bash
+uv run python tools/prepare_embedded_demo.py \
+  --output reports/local-game-runtime --replace --json
+```
+
 ## Live Demo
 
 **Open the public dashboard:**  
@@ -72,7 +83,7 @@ bug discovery, value analysis, quality gates, and interactive LLM playtesting.
 The GitHub Pages root is the sanitized Campaign → Repair → Proof Judge story;
 the report and decision-graph archive remains under `/reports`. Static hosting
 is clearly labeled prerecorded evidence and needs no Godot, local LLM, API key,
-or private game assets.
+or external game assets.
 
 The agent is not embedded in the game runtime as an NPC. Instead, it runs beside
 the game as a QA and design-review system:
@@ -202,10 +213,12 @@ uv run python tools/run_agent.py balance \
 
 ## Quick Start C: Full Godot Integration
 
-Set the target game project and Godot CLI:
+Prepare the embedded target game and set the Godot CLI:
 
 ```bash
-GAME_PROJECT_PATH=/path/to/study-in-germany
+uv run python tools/prepare_embedded_demo.py \
+  --output reports/local-game-runtime --replace --json
+GAME_PROJECT_PATH="$PWD/reports/local-game-runtime"
 GODOT_BIN=godot4
 ```
 
@@ -742,12 +755,12 @@ Selected entry points:
 
 The deterministic Python/frontend suites do not need Godot or an LLM. Real
 simulation, validators, and live interactive play still require a compatible
-Godot 4 binary and a `study-in-germany` checkout exposing the expected scripts
-and contracts; live persona evaluation additionally requires an LLM endpoint.
-The reference game repository is private, so scheduled CI also requires the
-`STUDY_IN_GERMANY_TOKEN` secret. This development machine can run the real
-Godot and local-vLLM tier through Docker; other environments may be limited to
-fixtures and orchestration when those prerequisites are unavailable.
+Godot 4 binary; live persona evaluation additionally requires an LLM endpoint.
+The reference demo is embedded, so CI and evaluators need no private-repository
+token or sibling checkout. Docker is unavailable on this macOS host, so the
+updated container bundle still needs a fresh Linux/Docker acceptance run. The
+owner approved public bundling, but an explicit repository license remains a
+G5 release decision.
 
 ## Notes
 

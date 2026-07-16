@@ -33,13 +33,14 @@ restricted server-side environment variable before process startup:
 ```bash
 export OPENAI_API_KEY=...
 export OPENAI_PERSONA_MODEL=gpt-5.6-luna
-export GAME_PROJECT_PATH=/path/to/pinned/study-in-germany
 uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080 --enable-live-openai
 ```
 
 The browser never sends, reads, stores, or receives the key. Requests containing
 an `api_key` field fail schema validation. `GET /api/provider-status` returns
 only a boolean `api_key_configured` flag and the configured model name.
+If `GAME_PROJECT_PATH` is unset, the server verifies the embedded demo and
+creates a temporary writable runtime with an audited probe overlay.
 
 The implementation uses the OpenAI Responses API with `store=False`. The
 current OpenAI model guide identifies `gpt-5.6-luna` as the efficient,
@@ -97,6 +98,10 @@ is the deterministic default; OpenAI is selectable only when the server says
 the restricted key and game runtime are ready. The browser has no key input.
 Campaign status and typed remediation are announced through an accessible live
 region, and pass/fail states use text and symbols in addition to color.
+The Repair stage includes an expandable exact diff with the canonical demo
+commit, patch SHA-256, modified paths, and an explicit not-merged disposition.
+The API/repository retains full source and evidence; the UI omits secrets, raw
+model content, and unbounded logs.
 
 `tools/build_judge_frontend_demo.py` regenerates the sanitized static fixture
 from the verified public repair bundle. `npm run prepare:public` copies it into

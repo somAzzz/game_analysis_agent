@@ -37,7 +37,8 @@ Godot, a browser, or any model provider:
 ```
 
 `inspect` uses only the Python standard library and verifies the committed
-`judge-manifest.json`, 39 artifact hashes/schemas, and six claim-to-evidence
+`judge-manifest.json`, 121 artifact hashes/schemas (including the embedded
+demo), and six claim-to-evidence
 references. `replay` additionally requires `uv` and the locked environment; it
 consumes exact hash-pinned persona fixtures and rechecks representative persona,
 determinism, designed-failure, and rejected-repair gates. Neither command needs
@@ -52,8 +53,10 @@ Godot tests unavailable, check Docker. This machine has used the cached image
 `barichello/godot-ci:4.4` through the repository wrapper:
 
 ```bash
-export GAME_PROJECT_PATH=/home/bo/projects/python/study-in-germany
-export GODOT_BIN=/home/bo/projects/python/game_analysis_agent/scripts/godot-docker-wrapper
+uv run python tools/prepare_embedded_demo.py \
+  --output reports/local-game-runtime --replace --json
+export GAME_PROJECT_PATH="$PWD/reports/local-game-runtime"
+export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
 "$GODOT_BIN" --version
 ```
 
@@ -68,7 +71,7 @@ without creating root-owned reports.
 Environment overrides:
 
 - `GODOT_DOCKER_IMAGE` selects another image.
-- `GODOT_DOCKER_MOUNT_ROOT` selects the shared parent of both repositories.
+- `GODOT_DOCKER_MOUNT_ROOT` selects the parent of this repository.
 - `GODOT_DOCKER_HOME` selects the mapped temporary Godot home.
 - `GODOT_COMPOSE_SERVICE` selects the compose service name (default `godot`).
 
@@ -100,5 +103,5 @@ For the committed Build Week persona campaign, run
 game changes. The Skill requires facts before inference, one mechanism, an
 isolated game worktree, budgeted allowlisted edits, fixed and unseen-holdout
 verification, and an explicit accepted/rejected record. Never edit the
-canonical baseline bundle under `reports/build-week-2026/game-source` in place
+canonical baseline bundle under `demo/study-in-germany` in place
 and never merge a repair automatically.

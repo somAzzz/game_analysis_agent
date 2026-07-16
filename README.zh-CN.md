@@ -9,10 +9,11 @@
 ./judge --mode replay --offline --json --output-dir -
 ```
 
-Inspect 只需 Python 3.9+，会校验 22 个已提交证据文件的哈希、schema、来源门禁，
+Inspect 只需 Python 3.9+，会校验 121 个已提交证据、Skill 与 demo 源码文件的哈希、schema、来源门禁，
 以及 6 条公开结论对应的精确 JSON 指针。Replay 额外使用锁定的 `uv` 环境并消费
 哈希固定的 persona fixture；两者都不需要 Godot、Docker、GPU、网络、API key、
-浏览器、端口或相邻的私有游戏仓库。输出是单个 `judge-result-v1` JSON；只有
+浏览器、端口或相邻的私有游戏仓库。完整 demo 已固定在
+`demo/study-in-germany`。输出是单个 `judge-result-v1` JSON；只有
 `passed` 是成功，`failed` 和 `unsupported` 不能视为降级成功。
 
 当前案例明确标记为**预录 Replay 证据**：Codex 提出并实现受限修复假设，但 fixed
@@ -56,7 +57,7 @@ LLM agent layer (provider: vllm | sglang | deepseek)
 
 ```bash
 cp .env.example .env
-# 编辑 .env 填 HF_TOKEN / GAME_PROJECT_PATH 等
+# 编辑 .env 填可选的模型配置；内置 demo 不需要 GAME_PROJECT_PATH
 docker compose pull vllm
 docker compose --profile local-nvidia --profile game-tools up -d vllm godot
 docker compose logs -f vllm           # 等待 "Application startup complete"
@@ -451,7 +452,7 @@ tools/
 在另一台环境复现完整流水线，需要：
 
 1. 一台能跑 Godot 4 的机器（`godot4 --headless`）。
-2. 一份 `study-in-germany` checkout（GAME_PROJECT_PATH）。
+2. 仓库内置的 `demo/study-in-germany`；迁移到其它游戏时才需要外部 checkout。
 3. 若要运行 fresh persona 单元，还需 vLLM / SGLang / DeepSeek 任意一个 endpoint。
 
 缺任何一个，Python 侧仍然能跑：analytics / anomaly_detector / value_analyzer / tests
@@ -463,5 +464,6 @@ tools/
 五个干净 validator、交互 RiskEvaluator 契约及 Agent 关键门禁验证。游戏自身的
 `demo` validator 仍如实报告 3 个平衡失败（动作集中度 2 项、结局多样性 1 项），
 因此完整 `all` 正确返回非零；这不是测试系统跳过或伪造通过。当前没有真实 LLM
-endpoint，所以 fresh persona 矩阵仍需外部服务。私有仓库 CI 还必须配置具有只读
-权限的 `STUDY_IN_GERMANY_TOKEN`。
+endpoint，所以 fresh persona 矩阵仍需外部服务。CI 已直接使用哈希固定的内置
+demo，不再需要 `STUDY_IN_GERMANY_TOKEN`。当前 macOS 环境没有 Docker，因此更新后的
+容器仍需在 Linux/Docker 环境复测；最终公开发布前还需由维护者选择明确的软件许可。

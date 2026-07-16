@@ -75,13 +75,14 @@ Inspect is a Python-standard-library program. It reads
 then checks:
 
 1. manifest and declared artifact schemas;
-2. byte size and SHA-256 for 39 public evidence and Skill artifacts;
+2. byte size and SHA-256 for 121 public evidence, Skill, and embedded-demo artifacts;
 3. six public claims against exact RFC 6901 JSON pointers;
 4. committed campaign, repair, and independent G2/G3 review evidence.
 
 It requires Python 3.9+ only. It does not import the project package and does
 not need `uv`, Docker, Godot, network, secrets, GPU, TTY, browser, port, or a
-sibling `study-in-germany` checkout.
+sibling `study-in-germany` checkout. The complete pinned demo is already under
+`demo/study-in-germany` and is included in Inspect.
 
 ## What Replay proves
 
@@ -157,6 +158,10 @@ The React root route presents the same case as a three-stage evidence ledger:
 Campaign, Repair, and Proof. It explicitly labels the Godot runtime, Replay
 action provider, optional OpenAI live subagent, fixed/holdout cohorts, and the
 rejected candidate. The former report dashboard remains at `/reports`.
+The Repair stage exposes the exact two-file candidate diff, baseline commit,
+patch hash, and `candidate not merged` disposition. Full canonical source and
+hashes remain in the repository/API; secrets, raw model content, and unbounded
+logs are not copied into the UI.
 
 Build and start the same-origin UI/API locally:
 
@@ -170,7 +175,6 @@ environment and opt in explicitly:
 
 ```bash
 . .tools/build-week/env.sh
-export GAME_PROJECT_PATH="$PWD/reports/build-week-2026/game-source"
 export OPENAI_API_KEY=... # server process only; never enter this in the browser
 uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080 --enable-live-openai
 ```
@@ -180,6 +184,10 @@ uses the preselected OpenAI gateway with bounded calls/retries and real Godot;
 provider failure produces a failed/partial campaign and never switches to
 Replay. The public result retains response IDs, model and aggregate usage, but
 not prompts, model output, or the key.
+
+When `GAME_PROJECT_PATH` is unset, the server verifies the embedded demo and
+creates an isolated temporary runtime copy automatically. An external path is
+only an explicit adaptation/development override.
 
 When the API is absent, the public build loads the sanitized
 `judge-demo.json` fixture and labels itself `Static evaluator copy`. It does
