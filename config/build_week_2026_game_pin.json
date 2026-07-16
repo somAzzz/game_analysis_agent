@@ -1,0 +1,48 @@
+{
+  "schema_version": "build-week-game-pin-v1",
+  "repository": {
+    "name": "somAzzz/study-in-germany",
+    "url": "https://github.com/somAzzz/study-in-germany",
+    "visibility": "private",
+    "default_branch": "main"
+  },
+  "pin": {
+    "commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "file_count": 80
+  },
+  "packaging": {
+    "mode": "private_competition_bundle",
+    "mount_name": "study-in-germany",
+    "distribution_status": "maintainer_ownership_confirmation_required",
+    "public_distribution": false
+  },
+  "required_files": [
+    {
+      "path": "project.godot",
+      "git_blob": "dba99bcafb64aa11fc762a487351b914768e5327",
+      "sha256": "f7f6c62f420fb49be0eb7d610609eb13304d15c1f44657c2950278551193b1c5"
+    },
+    {
+      "path": "scripts/tools/RunSimulation.gd",
+      "git_blob": "fc260ee03f6f82528d0c2ccea5bd7e66ffd8a237",
+      "sha256": "e7b35873bb0ec2f33eb38c7457512d3aef42d505c47fa48ffbb26649895768ae"
+    },
+    {
+      "path": "scripts/tools/RunInteractiveProbe.gd",
+      "git_blob": "bf73a75d33d3db4a28e3893e4fd69464263353a0",
+      "sha256": "923e92414a87d639983b78c643d514d39d817083134343e6fb28c4318bc5947e"
+    },
+    {
+      "path": "scripts/tools/RunBoundaryProbe.gd",
+      "git_blob": "f192b97349c560e18d32468ede4f697718449fa5",
+      "sha256": "4260628433d6d4a80861e7faae3d15e8382852bf5ea607330558b53a4718e3d3"
+    },
+    {
+      "path": "scripts/tools/ExportEventGraph.gd",
+      "git_blob": "f517c50a9dc8c837a9ab48b3d0232258b2b94e6f",
+      "sha256": "f460c2c84796818735ba93c203665fc0810d9f91eed9af0435166d6c7d197f9d"
+    }
+  ]
+}
