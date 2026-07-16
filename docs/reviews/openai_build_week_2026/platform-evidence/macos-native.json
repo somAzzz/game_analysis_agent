@@ -1,73 +1,20 @@
 {
-  "schema_version": "build-week-platform-evidence-v1",
-  "mode": "macos-native",
-  "status": "passed",
-  "executed_at": "2026-07-16T18:02:00Z",
-  "source_revision": "2b6cf16978065759c81b8f6937eaa71ce685bc48",
-  "source_dirty": false,
-  "source_contract_sha256": "3a0bd376acc18fe614778c63b3c285c963ae69163c7481ae32b98c8d0d9400e4",
-  "platform": {
-    "system": "macOS",
-    "version": "26.5.2",
-    "kernel": "Darwin 25.5.0",
-    "architecture": "arm64"
-  },
-  "toolchain": {
-    "system_python": "3.9.6",
-    "locked_python": "3.12.13",
-    "node": "20.20.2",
-    "npm": "10.8.2",
-    "uv": "0.11.23",
-    "godot": "4.4.stable.official.4c311cbee"
-  },
-  "checks": [
-    {
-      "id": "macos_system_python_inspect",
-      "status": "passed",
-      "command": "/usr/bin/python3 tools/judge_doctor.py --mode inspect --json; ./judge --mode inspect --offline --json --output-dir -"
-    },
-    {
-      "id": "macos_locked_replay",
-      "status": "passed",
-      "command": "./judge --mode replay --offline --json --output-dir -"
-    },
-    {
-      "id": "macos_idempotent_setup",
-      "status": "passed",
-      "command": "EVALUATOR_OFFLINE=1 scripts/setup-evaluator (twice)"
-    },
-    {
-      "id": "macos_native_ui_api",
-      "status": "passed",
-      "command": "tools/run_judge_api.py plus provider-status, experiment, root HTML HTTP probes"
-    },
-    {
-      "id": "macos_pinned_real_godot",
-      "status": "passed",
-      "command": "tools/judge_doctor.py --mode real-game; run_gameplay_agent.py sim --runs 2 --weeks 4 --seed 4242",
-      "detail": "Two clean-worktree runs used the packaged study-in-germany revision 348b9fd5501e71ebc7142e10f9068fc1490b5124 and pinned native Godot 4.4."
-    }
-  ],
   "artifact_digests": [
     {
       "name": "doctor-dashboard-native.json",
-      "sha256": "4a513f981da4620f76ab8ab3b3a4d19b954633c20471b32fbd3a5664c7ec62cf"
+      "sha256": "47251a9c6bb0873850f89a6f13a5fa14895c200c5fa10b60e99d6e8b83a070f7"
     },
     {
       "name": "doctor-inspect.json",
-      "sha256": "6b1b5f7d7c4cde83f755b6d338c5340fdd163bce4424b6d6afb02a5fd61cf6f4"
+      "sha256": "b267d5d2b5c699196e54dac2fa798ef94cebc7c1463be9a00d95eea0de103512"
     },
     {
       "name": "doctor-real-game.json",
-      "sha256": "c437a8c038962d6ed8894f19a76ea04798d6ecd35a36263a199852e067e73149"
+      "sha256": "2b1af9543439f9b12c020669900951ded5a48a361d7b9757c46c87087b68e04f"
     },
     {
-      "name": "judge-inspect.json",
-      "sha256": "fc324e42b3b2b0cdfbd12a8fb7dbd2f200803c9472756a5aea511a9970a9be3b"
-    },
-    {
-      "name": "judge-replay.json",
-      "sha256": "7725e97f43569938cb1175d858f4d79de6ff4277ab128b827d12cdb284e2828d"
+      "name": "experiment.json",
+      "sha256": "06b4934f0702f7221070752c2b62579955a218adfac9ac09403078b174e5e419"
     },
     {
       "name": "fresh-godot/raw_runs.jsonl",
@@ -75,15 +22,60 @@
     },
     {
       "name": "fresh-godot/report_manifest.json",
-      "sha256": "7875244f926b173e733a54aec38d352ddd6d0e2232489016a12a43cb046034d4"
+      "sha256": "8549e666c3df1f1ea866bb1ee3a34a2c7ad6da75785341724a7b029102eb3389"
+    },
+    {
+      "name": "judge-inspect.json",
+      "sha256": "7ee3634417dfa2a0453e2ae18704653b199bd998ae07905208754d8ac07b3d9f"
+    },
+    {
+      "name": "judge-replay.json",
+      "sha256": "6955290e1003ca743a0cf6e46fefd7a4d3d6ecb4b8988b15807386ceebdc09d3"
     },
     {
       "name": "provider-status.json",
       "sha256": "bbbc03a35a2ffc826768119b47c58c77d5c2942e825512b6f0080a6c75250ac4"
     },
     {
-      "name": "experiment.json",
-      "sha256": "06b4934f0702f7221070752c2b62579955a218adfac9ac09403078b174e5e419"
+      "name": "root.html",
+      "sha256": "7a81ace46ce5dcea91a719762c736b8fa8c9aefa65f0700e17d3d4ff026f5047"
     }
-  ]
+  ],
+  "checks": [
+    {
+      "id": "macos_system_python_inspect",
+      "status": "passed"
+    },
+    {
+      "id": "macos_locked_replay",
+      "status": "passed"
+    },
+    {
+      "id": "macos_idempotent_setup",
+      "status": "passed"
+    },
+    {
+      "id": "macos_native_ui_api",
+      "status": "passed"
+    },
+    {
+      "id": "macos_pinned_real_godot",
+      "status": "passed"
+    }
+  ],
+  "executed_at": "2026-07-16T18:11:56.002696+00:00",
+  "game_revision": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+  "mode": "macos",
+  "platform": {
+    "architecture": "arm64",
+    "system": "macOS"
+  },
+  "schema_version": "build-week-platform-evidence-v1",
+  "source_contract_sha256": "dd39532dbd0134488984d8513d5d2d6bcb67036ee652ab0c371fdd74d6187c1c",
+  "source_dirty": false,
+  "source_revision": "47ba3180ada4983d86a78940b21c7a7f9817194e",
+  "status": "passed",
+  "toolchain": {
+    "godot": "4.4.stable.official.4c311cbee"
+  }
 }
