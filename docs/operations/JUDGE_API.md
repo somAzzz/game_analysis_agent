@@ -14,6 +14,17 @@ Or use the default CPU-only container:
 docker compose up -d dashboard
 ```
 
+Before startup, inspect the exact delivery path:
+
+```bash
+uv run python tools/judge_doctor.py --mode dashboard-native --json
+uv run python tools/judge_doctor.py --mode dashboard-container --json
+```
+
+The doctor reports platform/architecture, source revision and dirty state,
+tool availability, Godot and Docker status, report writability, and boolean
+provider configuration. Secret values are never included.
+
 ## Provider configuration
 
 Replay needs no configuration. To enable the live provider test, set a

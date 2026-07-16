@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+set -eu
+
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+OFFLINE_FLAG=""
+NPM_OFFLINE=""
+if [ "${EVALUATOR_OFFLINE:-0}" = "1" ]; then
+  OFFLINE_FLAG="--offline"
+  NPM_OFFLINE="--offline"
+fi
+
+command -v uv >/dev/null 2>&1 || {
+  echo "setup-evaluator: uv is required; see https://docs.astral.sh/uv/" >&2
+  exit 2
+}
+command -v npm >/dev/null 2>&1 || {
+  echo "setup-evaluator: npm is required for the human UI; offline ./judge remains available" >&2
+  exit 2
+}
+
+cd "$ROOT"
+# shellcheck disable=SC2086
+uv sync --frozen --extra dev $OFFLINE_FLAG
+(
+  cd frontend
+  # shellcheck disable=SC2086
+  npm ci $NPM_OFFLINE
+)
+uv run python tools/build_judge_frontend_demo.py
+(
+  cd frontend
+  npm run build:public
+)
+./judge --mode inspect --offline --json --output-dir - >/dev/null
+./judge --mode replay --offline --json --output-dir - >/dev/null
+echo "setup-evaluator: ready; run uv run python tools/judge_doctor.py --mode dashboard-native"

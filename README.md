@@ -22,6 +22,12 @@ fixed and holdout cohorts both failed to improve the target cluster. It is not
 presented as a fresh OpenAI call or a successful game fix. See [JUDGE.md](JUDGE.md)
 for the evidence map, commands, exit codes, and limitations.
 
+To prepare the complete evaluator UI from locked dependencies, run
+`scripts/setup-evaluator`; use `EVALUATOR_OFFLINE=1 scripts/setup-evaluator`
+when dependency caches are already populated. `tools/judge_doctor.py` reports
+whether a selected native, container, real-game, or live-OpenAI mode is ready
+without printing environment secrets.
+
 Development-side AI agent pipeline for simulation games. The current reference
 integration is the Godot `study-in-germany` demo, but the project is structured
 as a reusable game QA agent framework for balance testing, boundary probing,

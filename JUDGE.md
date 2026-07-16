@@ -9,6 +9,23 @@ From a repository checkout:
 ./judge --mode replay --offline --json --output-dir -
 ```
 
+For an idempotent source setup including the UI, run
+`scripts/setup-evaluator`. Set `EVALUATOR_OFFLINE=1` to require dependency
+caches and prohibit package downloads. The setup is non-root, uses both
+lockfiles, regenerates the public fixture, builds the UI, and runs both Judge
+checks.
+
+Preflight one intended mode without exposing secrets:
+
+```bash
+/usr/bin/python3 tools/judge_doctor.py --mode inspect --json
+uv run python tools/judge_doctor.py --mode dashboard-native --json
+uv run python tools/judge_doctor.py --mode dashboard-container --json
+```
+
+The doctor distinguishes native and container dashboards and returns exit 10
+for a missing required capability. Optional missing tools are warnings.
+
 Expected result for both commands is a single JSON object with
 `"schema_version":"judge-result-v1"` and `"status":"passed"` on stdout.
 Logs and failures use stderr unless `--stdout-only` is supplied. Passing
