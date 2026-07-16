@@ -30,17 +30,18 @@ for a missing required capability. Optional missing tools are warnings.
 
 | Delivery path | Dated result | Claim level |
 | --- | --- | --- |
-| macOS 26.5.2 arm64, native Inspect/Replay/UI | Passed 2026-07-16 | Verified locally |
+| macOS 26.5.2 arm64, native Inspect/Replay/UI | Passed on pre-embed revision; refresh required | Historical evidence only |
 | macOS arm64, Docker dashboard/Replay | Optional; Docker absent | Not required for release |
-| macOS arm64, fresh pinned Godot 4.4 | Passed 2026-07-16 | Verified locally |
-| Linux amd64 native/container | Workflow implemented, execution pending | Target only until CI artifact exists |
+| macOS arm64, fresh pinned Godot 4.4 | Passed on pre-embed revision; refresh required | Historical evidence only |
+| Linux amd64 native/container | Passed on pre-embed revision; refresh required | Historical evidence only |
 | Linux amd64, fresh pinned Godot 4.4 | Manual/scheduled workflow implemented, execution pending | Target only until CI artifact exists |
-| Linux arm64 container | Multi-arch source target, not executed | Target only |
+| Linux arm64 container | Passed on pre-embed image; refresh required | Historical evidence only |
+| Published amd64/arm64 image | Previous image fingerprint is stale | Rebuild and republish required |
 | Live OpenAI campaign | Not run; no server key | Optional capability only |
 
 See `docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json` for
-the machine-readable checks. “Target” and “workflow implemented” do not mean
-tested or supported.
+the machine-readable checks. “Historical,” “target,” and “workflow
+implemented” do not mean the current delivery revision is release-ready.
 
 For exact native Linux amd64, pinned-Godot, native arm64 image, registry,
 evidence-import, and G4 closeout commands, follow
