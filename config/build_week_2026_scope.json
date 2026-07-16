@@ -1,0 +1,45 @@
+{
+  "schema_version": "build-week-scope-v1",
+  "project_name": "Playtest Forge",
+  "track": "Developer Tools",
+  "competition": "OpenAI Build Week 2026",
+  "golden_demo": {
+    "primary_issue": "normal-difficulty non-failure personas converge on burnout or cashflow collapse through a hard-to-recover stress attractor",
+    "fallback_rule": "use one previously observed reproducible invariant defect; never inject a demonstration bug"
+  },
+  "repositories": [
+    {
+      "id": "analysis",
+      "source": "repository_root",
+      "required": true,
+      "license_status": "review_required"
+    },
+    {
+      "id": "game",
+      "source": "GAME_PROJECT_PATH or --game-project-path",
+      "required": true,
+      "license_status": "review_required"
+    }
+  ],
+  "required_game_files": [
+    "project.godot",
+    "scripts/tools/RunSimulation.gd",
+    "scripts/tools/RunInteractiveProbe.gd",
+    "scripts/tools/RunBoundaryProbe.gd",
+    "scripts/tools/ExportEventGraph.gd"
+  ],
+  "submission_includes": [
+    "analysis source",
+    "pinned game source or competition bundle",
+    "sanitized reference evidence",
+    "offline evaluator",
+    "Judge API and dashboard",
+    "repository-scoped Codex Skill"
+  ],
+  "submission_excludes": [
+    "MCP adapter",
+    "automatic merge",
+    "NVIDIA local inference as a judge requirement",
+    "artificially injected demo defects"
+  ]
+}
