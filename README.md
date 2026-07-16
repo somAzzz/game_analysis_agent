@@ -9,7 +9,7 @@ The primary review path is repository-only and offline:
 ./judge --mode replay --offline --json --output-dir -
 ```
 
-Inspect needs only Python 3.10+ and validates 22 committed artifact hashes,
+Inspect needs only Python 3.9+ and validates 22 committed artifact hashes,
 schemas, provenance gates, and six exact public claim references. Replay adds
 the locked `uv` environment and consumes hash-pinned persona fixtures; it does
 not need Godot, Docker, a GPU, network, an API key, a browser, or the private

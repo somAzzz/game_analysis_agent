@@ -95,6 +95,17 @@ def test_inspect_fails_closed_on_artifact_tampering(tmp_path: Path) -> None:
     assert payload["error_code"] == "artifact_integrity_failed"
 
 
+def test_inspect_fails_closed_on_missing_artifact(tmp_path: Path) -> None:
+    manifest = _fixture(tmp_path)
+    (tmp_path / "evidence.json").unlink()
+
+    result = _run(manifest, "--stdout-only")
+    payload = json.loads(result.stdout)
+
+    assert result.returncode == 1
+    assert payload["error_code"] == "artifact_missing"
+
+
 def test_inspect_fails_when_public_claim_does_not_match_evidence(tmp_path: Path) -> None:
     result = _run(_fixture(tmp_path, expected=12))
     payload = json.loads(result.stdout)

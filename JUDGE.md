@@ -42,7 +42,7 @@ then checks:
 3. six public claims against exact RFC 6901 JSON pointers;
 4. committed campaign, repair, and independent G2/G3 review evidence.
 
-It requires Python 3.10+ only. It does not import the project package and does
+It requires Python 3.9+ only. It does not import the project package and does
 not need `uv`, Docker, Godot, network, secrets, GPU, TTY, browser, port, or a
 sibling `study-in-germany` checkout.
 
@@ -111,6 +111,8 @@ To retain a result atomically instead of stdout-only output:
 - `replay_worker_failed`: run `uv sync --frozen`, then retry offline Replay.
 - `replay_timeout`: inspect the committed evidence, then diagnose the locked
   environment; a timeout is not success.
+- `python_unsupported`: use Python 3.9+ for Inspect; Replay continues to use
+  the repository's locked Python through `uv`.
 
 Docker, browser UI, live OpenAI, and fresh real-Godot runs are deeper optional
 paths. Their absence must not block these repository-only checks.

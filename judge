@@ -33,6 +33,10 @@ class InspectError(RuntimeError):
         self.remediation = remediation
 
 
+class ReplayInterrupted(RuntimeError):
+    """Raised after forwarding an evaluator interrupt to the worker group."""
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=("inspect", "replay"), default="inspect")
@@ -46,15 +50,41 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--stdout-only", action="store_true")
     parser.add_argument("--timeout-seconds", type=float, default=120.0)
+    parser.add_argument(
+        "--replay-worker",
+        default="tools/judge_replay.py",
+        help="reviewed repository-relative worker (used by failure-injection tests)",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     started = time.monotonic()
+    if sys.version_info < (3, 9):  # noqa: UP036 - standalone judge supports system Python
+        print(
+            json.dumps(
+                _result(
+                    status="unsupported",
+                    stage="bootstrap",
+                    started=started,
+                    checks=[],
+                    artifacts=[],
+                    limitations=["This evaluator requires Python 3.9 or newer."],
+                    error_code="python_unsupported",
+                    error="Python 3.9 or newer is required",
+                    remediation="Use Python 3.9+ or inspect judge-manifest.json manually.",
+                ),
+                sort_keys=True,
+            )
+        )
+        return EXIT_UNSUPPORTED
     args = build_parser().parse_args(argv)
     if args.mode == "replay":
         result, exit_code = run_replay(
-            args.manifest, started=started, timeout_seconds=args.timeout_seconds
+            args.manifest,
+            started=started,
+            timeout_seconds=args.timeout_seconds,
+            replay_worker=args.replay_worker,
         )
         _emit(result, args)
         return exit_code
@@ -227,7 +257,11 @@ def inspect_manifest(manifest_path: Path, *, started: float) -> dict[str, Any]:
 
 
 def run_replay(
-    manifest_path: Path, *, started: float, timeout_seconds: float
+    manifest_path: Path,
+    *,
+    started: float,
+    timeout_seconds: float,
+    replay_worker: str,
 ) -> tuple[dict[str, Any], int]:
     root = manifest_path.resolve().parent
     uv = shutil.which("uv")
@@ -235,6 +269,42 @@ def run_replay(
         "Replay consumes committed fixtures and evidence; it does not call OpenAI.",
         "Replay does not rebuild or rerun the Godot game.",
     ]
+    if timeout_seconds <= 0:
+        return (
+            _result(
+                status="failed",
+                stage="replay",
+                started=started,
+                checks=[],
+                artifacts=[],
+                limitations=limitations,
+                error_code="replay_timeout",
+                error="Replay timeout must be greater than zero",
+                remediation="Use a timeout up to the documented 120-second limit.",
+            ),
+            EXIT_FAILED,
+        )
+    worker_path = PurePosixPath(replay_worker.replace("\\", "/"))
+    if (
+        worker_path.is_absolute()
+        or ".." in worker_path.parts
+        or str(worker_path) != replay_worker
+        or not (root / replay_worker).is_file()
+    ):
+        return (
+            _result(
+                status="failed",
+                stage="replay",
+                started=started,
+                checks=[],
+                artifacts=[],
+                limitations=limitations,
+                error_code="replay_worker_unsafe",
+                error="Replay worker must be a reviewed repository-relative file",
+                remediation="Use the default tools/judge_replay.py worker.",
+            ),
+            EXIT_FAILED,
+        )
     if uv is None:
         return (
             _result(
@@ -256,7 +326,7 @@ def run_replay(
         "--offline",
         "--frozen",
         "python",
-        "tools/judge_replay.py",
+        replay_worker,
         "--project-root",
         str(root),
     ]
@@ -278,6 +348,14 @@ def run_replay(
         stderr=subprocess.PIPE,
         start_new_session=True,
     )
+    previous_handlers: dict[int, Any] = {}
+
+    def _forward_interrupt(signum: int, _frame: object) -> None:
+        _terminate_process_group(process)
+        raise ReplayInterrupted(str(signum))
+
+    for signum in (signal.SIGINT, signal.SIGTERM):
+        previous_handlers[signum] = signal.signal(signum, _forward_interrupt)
     try:
         stdout, stderr = process.communicate(timeout=max(0.1, min(timeout_seconds, 120.0)))
     except subprocess.TimeoutExpired:
@@ -296,11 +374,29 @@ def run_replay(
             ),
             EXIT_FAILED,
         )
+    except ReplayInterrupted:
+        return (
+            _result(
+                status="failed",
+                stage="replay",
+                started=started,
+                checks=[],
+                artifacts=[],
+                limitations=limitations,
+                error_code="replay_interrupted",
+                error="Replay was interrupted and its process group was terminated",
+                remediation="Rerun Replay when the evaluator can complete uninterrupted.",
+            ),
+            EXIT_FAILED,
+        )
+    finally:
+        for signum, handler in previous_handlers.items():
+            signal.signal(signum, handler)
     try:
         worker = json.loads(stdout)
     except json.JSONDecodeError:
         worker = None
-    if process.returncode != 0 or not isinstance(worker, dict):
+    if not isinstance(worker, dict):
         detail = stderr.strip()[-800:] or stdout.strip()[-800:] or "worker produced no result"
         return (
             _result(
@@ -328,6 +424,21 @@ def run_replay(
                 error_code=str(worker.get("error_code") or "replay_evidence_failed"),
                 error=str(worker.get("error") or "Replay evidence gate failed"),
                 remediation=str(worker.get("remediation") or "Restore the reviewed fixtures."),
+            ),
+            EXIT_FAILED,
+        )
+    if process.returncode != 0:
+        return (
+            _result(
+                status="failed",
+                stage="replay",
+                started=started,
+                checks=list(worker.get("checks", [])),
+                artifacts=list(worker.get("artifacts", [])),
+                limitations=limitations,
+                error_code="replay_worker_failed",
+                error=f"Replay worker exited {process.returncode} after claiming success",
+                remediation="Inspect the worker and locked environment before retrying.",
             ),
             EXIT_FAILED,
         )
