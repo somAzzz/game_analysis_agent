@@ -7,6 +7,7 @@ Read in date order, not position order. Newest first.
 
 ## 2026-07-16
 
+- [openai_build_week_2026/P3-skill-transfer.md](openai_build_week_2026/P3-skill-transfer.md) — *passed* — fresh-context Unity scenario validates transferable automated/persona evidence-to-change reasoning without claiming runtime support
 - [openai_build_week_2026/G4-evaluator.md](openai_build_week_2026/G4-evaluator.md) — *failed closed* — evaluator and UI pass; platform execution and published multi-arch image remain blockers
 - [openai_build_week_2026/P4-platform-delivery.md](openai_build_week_2026/P4-platform-delivery.md) — *partial* — macOS native path verified; Docker/Linux/live rows explicitly pending or not run
 - [G1-providers.md](G1-providers.md) — *passed* — provider correctness, failure truthfulness, shared contract, and secret-boundary gate; live smoke recorded as `not_run`

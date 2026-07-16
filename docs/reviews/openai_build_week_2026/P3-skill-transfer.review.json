@@ -1,0 +1,35 @@
+{
+  "schema_version": "playtest-forge-transfer-review-v1",
+  "reviewed_at": "2026-07-16T20:05:00+02:00",
+  "status": "passed",
+  "method": "fresh-context read-only Codex forward test",
+  "target": "hypothetical Unity city-builder",
+  "source_skill": ".agents/skills/playtest-forge",
+  "input": {
+    "automated_baseline": "four policies x seeds 10-14; energy lock day 12 in 20/20 cells; validity 100%; invariant failures zero",
+    "live_personas": "builder, optimizer, and explorer diverge early but each sees only generator-repair actions after day 10",
+    "candidate": "starting energy 100 to 140; focused Unity test passed",
+    "fixed_result": "lock moves to day 15 but remains 20/20",
+    "holdout_result": "seeds 110-114 remain day 12 and 20/20"
+  },
+  "checks": [
+    {"id": "truth_labels", "status": "passed", "evidence": "Separated automated, live, focused, and absent Replay evidence."},
+    {"id": "facts_vs_inference", "status": "passed", "evidence": "Treated persona reports as behavioral evidence and required engine telemetry for legal-action state truth."},
+    {"id": "candidate_decision", "status": "passed", "evidence": "Rejected the candidate because membership did not improve and holdouts did not confirm timing direction."},
+    {"id": "next_experiment", "status": "passed", "evidence": "Selected one causally closer recurring net-energy sensitivity experiment instead of widening starting stock."},
+    {"id": "fixed_holdout_gates", "status": "passed", "evidence": "Kept identical cohorts, focused test order, validity, invariants, persona separation, designed failure, completeness, and provider health."},
+    {"id": "migration_gaps", "status": "passed", "evidence": "Requested pinned Unity runtime/source, typed reset-observe-step, design thresholds, units, report schemas, verifier, change budget, privacy, and provider provenance."}
+  ],
+  "references_used": [
+    "test-strategy.md",
+    "automated-testing.md",
+    "subagent-playthrough.md",
+    "evidence-to-parameters.md",
+    "scenario-balance-economy.md",
+    "scenario-boundary-robustness.md",
+    "repair-protocol.md",
+    "evidence-contract.md",
+    "migration-guide.md"
+  ],
+  "limitation": "This validates fresh-context reasoning and reference routing against raw cross-engine evidence. It does not claim that a Unity runtime adapter or Unity execution exists."
+}

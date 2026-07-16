@@ -1,56 +1,98 @@
 ---
 name: playtest-forge
-description: Diagnose the committed Playtest Forge persona campaign, form one evidence-cited causal hypothesis, make one budgeted game-mechanism change in an isolated worktree, and accept or reject it using fixed-seed and unseen-holdout proof. Use for Build Week game balance repair, campaign failure analysis, causal patch experiments, or verification of a candidate study-in-germany gameplay fix.
+description: Turn automated game tests and persona/subagent playthrough evidence into bounded, auditable game changes, then accept or reject them with fixed and unseen-holdout proof. Use when Codex needs to review game balance, economy, progression, content routes, choices, endings, boundary behavior, invariants, player-persona divergence, parameter tuning, causal repair experiments, or migration of the testing-and-repair workflow to another game or engine.
 ---
 
 # Playtest Forge
 
-Run one auditable repair experiment. Preserve the distinction between observed
-facts, inference, and verified outcomes. Never optimize a patch only for the
-recorded seeds or force acceptance.
+Act as the main game-review and repair agent. Let automated tests establish
+state truth, let persona workers expose behavioral intent, and let deterministic
+gates decide whether a change survives. Never optimize toward acceptance.
 
-## Required workflow
+## Route the task
 
-1. Run `scripts/preflight`. Stop if it fails.
-2. Read `references/design-contract.md` before inspecting candidate game source.
-3. Read `references/evidence-contract.md`, then inspect the public campaign and
-   cite exact artifact paths, rows, fields, and hashes.
-4. State one falsifiable hypothesis and one predicted effect. Do not name a
-   source change until the evidence facts are explicit.
-5. Read `references/repair-protocol.md` before editing.
-6. Create the typed experiment plan before the patch. Select exactly one
-   allowed mechanism class and copy the frozen fixed and holdout seeds.
-7. Create an isolated game worktree from the pinned baseline commit. Never edit
-   the canonical baseline bundle in place.
-8. Restrict edits to the plan allowlist and change budget. Do not modify tests,
-   gates, personas, prompts, evidence, or target thresholds.
-9. Save `patch.diff` before verification. Fail if its paths, file count, line
-   count, or mechanism differ from the plan.
-10. Run focused deterministic tests first.
-11. Run baseline and patch with identical fixed seeds, then baseline and patch
-    with the frozen unseen holdouts. Use the same persona policy and schemas in
-    all four cohorts.
-12. Run `scripts/verify-repair`. Evaluate target, critical invariant, persona,
-    designed-failure, validity, fallback, and provider-error gates.
-13. Write `accepted` only when every required gate passes. Otherwise preserve
-    all evidence and write `rejected` with the exact reason.
+Read only the references required for the request:
 
-## Non-negotiable boundaries
+- Choose test layers or distinguish Replay/live evidence: `references/test-strategy.md`.
+- Run deterministic matrices, simulations, sweeps, or regression tests:
+  `references/automated-testing.md`.
+- Run live LLM/Codex persona playthroughs: `references/subagent-playthrough.md`.
+- Convert observed metrics into a parameter or mechanism change:
+  `references/evidence-to-parameters.md`.
+- Review economy, resource pressure, difficulty, or progression:
+  `references/scenario-balance-economy.md`.
+- Review events, choices, routes, quests, or endings:
+  `references/scenario-content-flow.md`.
+- Review limits, invalid state, exploit, or invariant behavior:
+  `references/scenario-boundary-robustness.md`.
+- Plan and verify a source/parameter change: `references/repair-protocol.md`.
+- Define citations, artifacts, schemas, and public evidence:
+  `references/evidence-contract.md`.
+- Adapt the Skill to another project or engine: `references/migration-guide.md`.
+- Work on this repository's Build Week case: `references/design-contract.md`.
+- Explain the retained cashflow repair example: `references/session-case-study.md`.
 
-- Treat designed failure endings as valid outcomes; the `slacker` persona is
-  intentionally failure-seeking and is not required to win.
-- Never weaken a test, gate, persona, prompt, or evidence threshold.
-- Never use patched results to revise the hypothesis, holdouts, or acceptance
-  thresholds for the same experiment.
-- Never present Replay as an OpenAI live result or a partial cohort as proof.
-- Never automatically merge or silently copy an accepted patch into baseline.
-- Do not build an MCP adapter and do not expose argparse `cmd_*` functions as
-  tools. This Skill orchestrates repository scripts and typed services only.
-- Retain the Codex task reference, actual model identifier, and `/feedback`
-  Session ID. Never invent missing provenance.
+## Core workflow
 
-## Outputs
+1. Discover the game adapter, runtime, contracts, source revision, tests,
+   telemetry, and writable report locations. Do not assume Godot or this repo.
+2. Freeze a test contract before interpreting results: scenarios, personas,
+   seeds, duration, parameters, outcomes, invariants, designed failures,
+   protected metrics, completeness rules, and provider truth labels.
+3. Establish a deterministic baseline first. Use automated testing for state
+   coverage, reproducibility, sensitivity, and regression truth.
+4. Add persona/subagent playthroughs when semantic choice quality, exploration,
+   or distinct player intent matters. Keep the action schema and game runtime
+   shared with automation. Label live, Replay, partial, and failed runs.
+5. Reject incomplete, stale, schema-invalid, fallback-obscured, or
+   provider-error evidence before diagnosis.
+6. Separate observed facts, interpretation, and hypothesis. Cite the exact
+   run/seed/week/field or row hash behind every repair-driving fact.
+7. Select one failure cluster or protected objective. Prefer cross-persona and
+   cross-seed evidence; preserve intentionally difficult or failing styles.
+8. Map the symptom to the closest controllable mechanic and parameter. State
+   one falsifiable hypothesis and predicted metric direction before editing.
+9. Freeze fixed seeds, unseen holdouts, thresholds, change allowlist, file/line
+   budget, and one mechanism class. Create an isolated game worktree.
+10. Make the smallest change that tests the mechanism. Never modify prompts,
+    personas, tests, gates, evidence, seeds, or target thresholds to manufacture
+    improvement.
+11. Run focused deterministic tests, fixed baseline/patch A/B, unseen holdout
+    baseline/patch A/B, critical invariants, persona preservation, designed
+    failure, and provider-health gates—in that order.
+12. Write `accepted` only when every frozen gate passes. Otherwise preserve the
+    evidence and write `rejected` with the failed causal or safety gates.
 
-Produce the complete experiment artifacts defined in
-`references/evidence-contract.md`. End with a concise facts → hypothesis → diff
-→ fixed proof → holdout proof → accepted/rejected summary.
+## Evidence-to-edit rules
+
+- Convergence across unlike personas suggests a shared game mechanic before a
+  persona prompt problem.
+- One-persona failure suggests strategy, affordance, or route-specific logic
+  before a global parameter change.
+- Broken invariants outrank balance tuning. Repair correctness first.
+- A symptom metric improving while the target outcome is unchanged is not a
+  successful repair; reject and revisit the causal chain.
+- Fixed improvement without holdout confirmation is overfit.
+- Eliminating designed-failure outcomes is overcorrection.
+- Unreachable content suggests trigger/graph conditions before reward tuning.
+- Floor/ceiling saturation suggests scale, clamp, or update-order analysis.
+- Non-monotonic responses require a sensitivity sweep before a direct patch.
+
+## Boundaries
+
+- Persona workers may choose actions and explain intent; only the main Codex
+  agent may inspect private source, plan edits, change code, and judge release.
+- Replay proves reproducibility, not a fresh model call. Never relabel it live.
+- Never accept a partial cohort, silently fall back after a provider failure,
+  or merge a patch automatically.
+- Do not build an MCP adapter or wrap argparse `cmd_*` functions. Use typed,
+  transport-independent services and repository scripts.
+- Retain actual provider/model/runtime/source provenance. Never invent a key,
+  token count, cost, session ID, platform result, or live execution.
+
+## Output
+
+End with: test contract → cited facts → interpretation → one hypothesis →
+bounded diff → focused test → fixed proof → holdout proof → protected gates →
+accepted/rejected decision → next experiment. State which results came from
+automation, live persona workers, or Replay.

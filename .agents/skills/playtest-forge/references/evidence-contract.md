@@ -1,6 +1,33 @@
 # Evidence contract
 
-Use only committed, hash-verified campaign evidence for baseline facts:
+## General contract
+
+Every campaign must record:
+
+- campaign/test contract and source/runtime/config revisions;
+- cell matrix and terminal completeness state;
+- per-step typed state, legal actions/choices, selected IDs, and outcomes;
+- provider/model or deterministic-policy provenance;
+- aggregate metrics, failure clusters, invariants, and gate results;
+- exact citations from repair-driving facts to fields or rows.
+
+Every repair must record the frozen plan, design-contract fingerprint, cited
+facts, hypothesis, predicted effect, fixed/holdout cohorts, change allowlist
+and budget, patch diff/hash, focused tests, comparisons, protected gates,
+provider health, Codex provenance, and accepted/rejected decision.
+
+Hash immutable artifacts and canonical JSONL rows. Hashes detect later mutation
+and bind citations to exact evidence; they do not make bad data correct. Verify
+schema, completeness, provenance, and design meaning separately.
+
+Do not publish prompts, raw model responses, secrets, private game text, host
+paths, or private traces. Create a sanitized bundle with the same aggregate and
+citation identities.
+
+## Current repository adapter
+
+For the retained Build Week campaign, verify these committed artifacts before
+citing them:
 
 - `examples/build_week_2026/campaign-v1/campaign_manifest.json`
 - `examples/build_week_2026/campaign-v1/campaign_summary.json`
@@ -11,20 +38,7 @@ Use only committed, hash-verified campaign evidence for baseline facts:
 - `examples/build_week_2026/campaign-v1/gate_report.json`
 - `config/build_week_2026_target.json`
 
-Run `tools/review_build_week_g2.py --skip-commands` or the Skill preflight
-before citing these files. Each factual claim must identify an artifact and a
-field or JSONL line. For row claims, verify the citation's canonical row hash.
-
-The final experiment directory must contain:
-
-- `repair_experiment.json`: typed plan, patch, all four metric snapshots,
-  comparison, gates, decision, and Codex provenance.
-- `repair_summary.md`: facts, inference, predicted effect, actual results, and
-  accepted/rejected reason.
-- `baseline/fixed.json` and `baseline/holdout.json`.
-- `patched/fixed.json` and `patched/holdout.json`.
-- `comparison.json`.
-- `patch.diff` and its SHA-256.
-
-Do not commit prompts, model response bodies, secrets, private game text, host
-paths, or raw private traces into a public experiment bundle.
+Run `tools/review_build_week_g2.py --skip-commands` or `scripts/preflight`.
+The final current-project experiment contains `repair_experiment.json`,
+`repair_summary.md`, baseline/patched fixed and holdout snapshots,
+`comparison.json`, and `patch.diff`.

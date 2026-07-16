@@ -559,6 +559,15 @@ complete.
 .agents/skills/playtest-forge/references/design-contract.md
 .agents/skills/playtest-forge/references/evidence-contract.md
 .agents/skills/playtest-forge/references/repair-protocol.md
+.agents/skills/playtest-forge/references/test-strategy.md
+.agents/skills/playtest-forge/references/automated-testing.md
+.agents/skills/playtest-forge/references/subagent-playthrough.md
+.agents/skills/playtest-forge/references/evidence-to-parameters.md
+.agents/skills/playtest-forge/references/scenario-balance-economy.md
+.agents/skills/playtest-forge/references/scenario-content-flow.md
+.agents/skills/playtest-forge/references/scenario-boundary-robustness.md
+.agents/skills/playtest-forge/references/migration-guide.md
+.agents/skills/playtest-forge/references/session-case-study.md
 .agents/skills/playtest-forge/scripts/preflight
 .agents/skills/playtest-forge/scripts/run-campaign
 .agents/skills/playtest-forge/scripts/verify-repair
@@ -604,6 +613,33 @@ accept/reject. It must not wrap CLI `cmd_*` functions as MCP tools.
 - Do not coach the task toward acceptance.
 - Retain task/session reference, commit range, artifacts, and `/feedback`
   Session ID.
+
+### P3.6a Generalize the Skill from retained test/repair evidence
+
+**Depends on:** P3.6 and the completed fixed/holdout experiment.
+
+**Actions**
+
+- Encode how deterministic automation, live persona/subagent playthroughs, and
+  Replay contribute different evidence without mixing truth labels.
+- Encode symptom → causal mechanic → parameter selection, including when not
+  to change a global parameter.
+- Add routed scenarios for balance/economy, content flow, and
+  boundary/invariant review.
+- Preserve the rejected cashflow repair as a concrete lesson: a focused test
+  and improved cash metric did not prove target repair.
+- Move game/engine-specific assumptions into a project profile and define the
+  adapter contract for migration to another game.
+- Validate the Skill structure, metadata, reference routing, project scripts,
+  and one fresh-context transfer task.
+
+**Completion checkpoint (2026-07-16): complete.** The Skill now provides a
+generic test-to-change controller with scenario references while retaining
+`study-in-germany` only as the current project profile and case study. A
+fresh-context, read-only Unity city-builder test passed truth-label separation,
+candidate rejection, next-experiment selection, fixed/holdout gates, and
+migration-gap detection. This validates reasoning transfer, not Unity runtime
+support; the limitation is retained in the transfer review.
 
 ### P3.7 Gate G3 — Causal repair and Codex-centrality review
 

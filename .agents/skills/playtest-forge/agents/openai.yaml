@@ -1,4 +1,4 @@
 interface:
   display_name: "Playtest Forge"
-  short_description: "Run evidence-gated game repair experiments"
-  default_prompt: "Use $playtest-forge to diagnose the committed campaign, make one bounded game repair, and accept or reject it with fixed and holdout proof."
+  short_description: "Turn playtest evidence into proven game changes"
+  default_prompt: "Use $playtest-forge to combine automated and persona playtests, make one evidence-bounded game change, and accept or reject it with holdout proof."

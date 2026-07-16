@@ -585,10 +585,20 @@ environment.
 ```text
 .agents/skills/playtest-forge/
   SKILL.md
+  agents/openai.yaml
   references/
     design-contract.md
     evidence-contract.md
     repair-protocol.md
+    test-strategy.md
+    automated-testing.md
+    subagent-playthrough.md
+    evidence-to-parameters.md
+    scenario-balance-economy.md
+    scenario-content-flow.md
+    scenario-boundary-robustness.md
+    migration-guide.md
+    session-case-study.md
   scripts/
     preflight
     run-campaign
@@ -623,7 +633,29 @@ The `$playtest-forge` Skill must instruct Codex to:
 14. Accept or reject the patch with an explicit reason.
 15. Generate the final experiment record and human-readable summary.
 
-### 9.3 Three locks against unsafe optimization
+### 9.3 Transferable test-to-change guidance
+
+The Skill is a reusable game-review method, not only a wrapper around the
+retained Build Week campaign. Its core routes Codex among deterministic
+automation, live persona/subagent playthroughs, Replay, evidence-to-parameter
+reasoning, balance/economy review, content-flow review, and
+boundary/invariant review. Engine- and game-specific commands, personas,
+paths, and thresholds live in a project profile.
+
+The default causal sequence is automation discovers → persona workers expose
+intent → Codex cites and hypothesizes → one parameter/mechanism changes →
+focused tests establish legality → fixed and holdout automation decides →
+persona/design gates preserve intended behavior. Persona workers never inspect
+private source or modify code. Replay remains a reproducibility mode, not a
+fresh subagent result.
+
+Migration to another game requires only an adapter for reset/observe/step,
+catalog export, validators, isolated reports, focused tests, and diffs plus a
+new project profile. Acceptance requires at least one baseline, one behavioral
+or explicitly automation-only campaign, one rejected candidate, unseen
+holdouts, and invariant-preserving evidence.
+
+### 9.4 Three locks against unsafe optimization
 
 **Intent lock**
 

@@ -2,43 +2,47 @@
 
 ## Before editing
 
-1. Verify G2 and the design contract.
-2. Record at least two cross-persona baseline citations.
-3. State one causal hypothesis and predicted measurable direction.
-4. Select one mechanism class and a strict subset of the design allowlist.
-5. Freeze the plan, source revisions, thresholds, fixed seeds, and holdouts.
-6. Create an isolated worktree at the pinned baseline game commit.
+1. Verify the test/evidence bundle and design intent independently.
+2. Record cross-seed and, when relevant, cross-persona citations.
+3. State one causal hypothesis, predicted direction, protected metrics, and
+   explicit rejection evidence.
+4. Select one mechanism class and the smallest source/parameter allowlist.
+5. Freeze source revision, fixed seeds, unseen holdouts, thresholds, file/line
+   budget, runtime/provider contract, and artifact locations.
+6. Create an isolated worktree at the pinned baseline revision.
 
 ## Change validation
 
-- Generate the diff from the pinned baseline commit.
-- Reject paths not in the plan allowlist.
-- Reject forbidden path prefixes and symbolic-link escapes.
-- Count added plus deleted lines from `git diff --numstat`.
-- Reject more files or lines than the frozen budget.
-- Reject changes containing seed-specific branches or the frozen seed values.
-- Reject changes to tests, validators' expected values, gates, personas,
-  prompts, ending classifications, or evidence files.
-- Reject a diff whose actual mechanism differs from the plan.
-- Save and hash `patch.diff` before any outcome verification.
+- Generate the diff from the pinned baseline and hash it before outcome tests.
+- Reject paths outside the plan or through symlink/traversal escapes.
+- Reject excess files/lines and changes to forbidden verification areas.
+- Reject seed-specific branches and literal use of frozen test seeds.
+- Reject changes to tests, gates, personas, prompts, evidence, outcome labels,
+  or thresholds made to help the candidate.
+- Reject a diff whose actual mechanism differs from the frozen plan.
 
 ## Verification order
 
-1. Focused Godot test for the selected mechanism.
+1. Focused engine/unit test for the selected mechanism.
 2. Baseline fixed cohort.
 3. Patched fixed cohort.
 4. Baseline holdout cohort.
 5. Patched holdout cohort.
-6. Critical invariant and content validators.
-7. Target, persona preservation, designed-failure, and provider gates.
+6. Critical invariants and content/contract validators.
+7. Target, persona/strategy preservation, designed-failure, validity,
+   fallback, and provider gates.
 
-Run all four cohorts with identical personas, difficulty, scenario, weeks, and
-deterministic policy. Only game source revision and seed cohort may differ.
+Use identical scenario, difficulty, duration, persona/action policy, schemas,
+and aggregation in all four cohorts. Only revision and declared seed cohort may
+differ.
 
 ## Decision
 
 Accept only if fixed improvement reaches the frozen threshold, holdouts confirm
-the direction, every critical invariant remains zero, protected metrics stay
-inside bounds, all focused tests pass, and every artifact reparses and hashes.
-Otherwise reject. A rejection is a valid experiment outcome and must keep the
-failed evidence.
+direction, focused tests pass, critical invariants remain clean, protected
+metrics stay bounded, intentional failure remains possible, and all artifacts
+reparse and hash. Otherwise reject and retain the failed experiment.
+
+For this repository, run `scripts/verify-repair`. On another project, use the
+typed verifier declared in its project profile; never assume this wrapper is
+portable.
