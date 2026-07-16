@@ -19,7 +19,12 @@ def test_judge_dockerfile_pins_multiarch_base_and_runs_unprivileged() -> None:
     assert "--platform=" not in dockerfile
     assert "USER judge" in dockerfile
     assert 'ENTRYPOINT ["./judge"]' in dockerfile
-    for required in ("judge-manifest.json", "fixtures/", "examples/build_week_2026/"):
+    for required in (
+        "judge-manifest.json",
+        "COPY .agents/ ./.agents/",
+        "fixtures/",
+        "examples/build_week_2026/",
+    ):
         assert required in dockerfile
 
 
