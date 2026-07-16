@@ -139,7 +139,7 @@ def test_committed_judge_manifest_passes_dependency_free_inspect() -> None:
             encoding="utf-8"
         )
     )
-    assert len(payload["artifacts"]) == 40 + marker["file_count"] + 1
+    assert len(payload["artifacts"]) == 42 + marker["file_count"] + 1
     assert payload["checks"][2]["detail"] == (
         "6 public claims resolved to exact JSON values"
     )
