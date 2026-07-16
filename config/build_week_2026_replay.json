@@ -1,0 +1,5 @@
+{
+  "schema_version": "persona-replay-manifest-v1",
+  "fixture": "tests/fixtures/persona_replay/basic_v1.json",
+  "sha256": "c180208d4c3bb6278e68b03d3c23c22e204ab526339f2b93a0ad6f55d218dea8"
+}

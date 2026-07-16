@@ -233,6 +233,54 @@ def context_state_hash(context: WeekContext) -> str:
     return _json_sha256(payload)
 
 
+def validate_player_decision(
+    decision: PlayerDecision, context: WeekContext
+) -> list[str]:
+    """Apply the one legal-action/event-choice policy shared by all providers."""
+
+    errors: list[str] = []
+    valid_actions = {action.id for action in context.available_actions}
+    for action_id in decision.actions:
+        if action_id not in valid_actions:
+            errors.append(f"Unknown action_id: {action_id}")
+    if len(decision.actions) > context.max_action_slots:
+        errors.append(f"Too many actions: {len(decision.actions)}")
+    if decision.week != context.state.week:
+        errors.append(f"Decision week mismatch: {decision.week}")
+    if decision.persona != context.persona:
+        errors.append(f"Decision persona mismatch: {decision.persona}")
+    if context.event_choices and not decision.event_choice_id:
+        errors.append("Missing event_choice_id")
+    if context.event_choices and decision.event_choice_id:
+        valid_choices = {choice.choice_id for choice in context.event_choices}
+        if decision.event_choice_id not in valid_choices:
+            errors.append(f"Invalid event_choice_id: {decision.event_choice_id}")
+    if not decision.strategic_goal.strip():
+        errors.append("Missing strategic_goal")
+    if not decision.expected_tradeoff.strip():
+        errors.append("Missing expected_tradeoff")
+    return errors
+
+
+def validate_event_choice(
+    choice: PersonaEventChoice, request: PersonaEventChoiceRequest
+) -> list[str]:
+    """Validate the separate event phase against the same WeekContext."""
+
+    errors = []
+    context = request.context
+    if choice.week != context.state.week:
+        errors.append(f"Event choice week mismatch: {choice.week}")
+    if choice.persona != context.persona:
+        errors.append(f"Event choice persona mismatch: {choice.persona}")
+    if choice.event_id != context.current_event_id:
+        errors.append(f"Event id mismatch: {choice.event_id}")
+    valid_choices = {item.choice_id for item in context.event_choices}
+    if choice.event_choice_id not in valid_choices:
+        errors.append(f"Invalid event_choice_id: {choice.event_choice_id}")
+    return errors
+
+
 def request_fingerprint(
     *,
     kind: str,
