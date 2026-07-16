@@ -1,7 +1,7 @@
 {
   "codex": {
     "decision_owned_by_codex": true,
-    "feedback_session_id": "pending-user-feedback",
+    "feedback_session_id": "019f6816-fe0d-78a2-9001-1890b32ef820",
     "hypothesis_owned_by_codex": true,
     "model": "codex-gpt-5-runtime-exact-revision-undisclosed",
     "patch_owned_by_codex": true,
