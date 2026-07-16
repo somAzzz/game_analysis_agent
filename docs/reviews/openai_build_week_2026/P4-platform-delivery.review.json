@@ -1,8 +1,8 @@
 {
   "schema_version": "build-week-platform-review-v1",
-  "reviewed_at": "2026-07-16T19:18:32.876590+00:00",
-  "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
-  "contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5",
+  "reviewed_at": "2026-07-16T19:49:22.471629+00:00",
+  "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
+  "contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970",
   "status": "partial",
   "platform": {
     "system": "macOS",
@@ -26,29 +26,29 @@
       "id": "macos_system_python_inspect",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
-      "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5"
+      "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
+      "source_contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970"
     },
     {
       "id": "macos_locked_replay",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
-      "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5"
+      "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
+      "source_contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970"
     },
     {
       "id": "macos_idempotent_setup",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
-      "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5"
+      "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
+      "source_contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970"
     },
     {
       "id": "macos_native_ui_api",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
-      "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5"
+      "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
+      "source_contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970"
     },
     {
       "id": "macos_container_dashboard_optional",
@@ -60,8 +60,8 @@
       "id": "macos_pinned_real_godot",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
-      "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5"
+      "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
+      "source_contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970"
     },
     {
       "id": "live_openai_campaign",
@@ -71,29 +71,33 @@
     },
     {
       "id": "linux_amd64_native_and_container",
-      "status": "passed",
+      "status": "stale",
       "evidence": "platform-evidence/linux-amd64.json",
       "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
       "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
       "workflow_run_url": "https://github.com/somAzzz/game_analysis_agent/actions/runs/29523961052",
-      "workflow_job_id": 87707559079
+      "workflow_job_id": 87707559079,
+      "reason": "Evidence was produced for a different delivery contract.",
+      "remediation": "Run scripts/run-p4-linux-amd64 or the Linux amd64 CI job at the current revision."
     },
     {
       "id": "linux_pinned_real_godot",
       "status": "pending_ci",
       "workflow": ".github/workflows/test.yml#godot-contract",
       "reason": "The real-Godot job has not run at this revision with the competition-pinned 4.4-stable release.",
-      "remediation": "Manually dispatch the Test workflow with godot_version=4.4-stable; the embedded demo requires no repository token. Retain the contract artifact and run URL."
+      "remediation": "Manually dispatch the Test workflow with godot_version=4.4-stable; the embedded demo requires no repository token."
     },
     {
       "id": "linux_arm64_container",
-      "status": "passed",
+      "status": "stale",
       "evidence": "platform-evidence/linux-arm64.json",
       "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
       "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
       "workflow_run_url": "https://github.com/somAzzz/game_analysis_agent/actions/runs/29523961052",
-      "workflow_job_id": 87708003271
+      "workflow_job_id": 87708003271,
+      "reason": "Evidence was produced for a different delivery contract.",
+      "remediation": "Publish the current multi-architecture image and run scripts/run-p4-linux-arm64-image on native arm64."
     }
   ],
-  "decision": "Platform delivery remains incomplete: ['linux_pinned_real_godot', 'live_openai_campaign']."
+  "decision": "Platform delivery remains incomplete: ['linux_amd64_native_and_container', 'linux_arm64_container', 'linux_pinned_real_godot', 'live_openai_campaign']."
 }

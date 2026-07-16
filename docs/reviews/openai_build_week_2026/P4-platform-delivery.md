@@ -6,7 +6,9 @@ Date: 2026-07-16
 
 Machine: macOS 26.5.2, Apple Silicon arm64
 
-Reviewed source: `2b6cf16978065759c81b8f6937eaa71ce685bc48`
+Reviewed source: `5b0cce6d384e269f06c71e10f6e184b7709b0aa8`
+
+Delivery contract: `519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970`
 
 The macOS-native evaluator path is now real: standard-library Inspect, locked
 Replay, twice-repeated offline setup, production frontend build, and the
@@ -14,9 +16,10 @@ same-origin Judge UI/API all passed. The doctor correctly separates the native
 dashboard from its Docker delivery and returns an unsupported exit for the
 latter on this host.
 
-The release-revision macOS rerun now also proves the project-local,
+The post-audit macOS rerun now also proves the project-local,
 SHA-512-pinned Godot 4.4 runtime with a clean-worktree two-run/four-week fresh
-trace. The exact command set and result digests are retained in
+trace. It binds the exact embedded game commit/content tree, audited runtime
+overlay, and game/runtime/execution source fingerprints. The exact command set and result digests are retained in
 `platform-evidence/macos-native.json`.
 
 This is not yet a cross-platform pass. Docker is absent and no OpenAI key is

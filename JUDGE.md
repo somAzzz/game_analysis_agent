@@ -30,9 +30,9 @@ for a missing required capability. Optional missing tools are warnings.
 
 | Delivery path | Dated result | Claim level |
 | --- | --- | --- |
-| macOS 26.5.2 arm64, native Inspect/Replay/UI | Passed on pre-embed revision; refresh required | Historical evidence only |
+| macOS 26.5.2 arm64, native Inspect/Replay/UI | Passed at `5b0cce6` / contract `519926ef` | Current evidence |
 | macOS arm64, Docker dashboard/Replay | Optional; Docker absent | Not required for release |
-| macOS arm64, fresh pinned Godot 4.4 | Passed on pre-embed revision; refresh required | Historical evidence only |
+| macOS arm64, fresh pinned Godot 4.4 | Passed at `5b0cce6` with exact embedded runtime fingerprints | Current evidence |
 | Linux amd64 native/container | Passed on pre-embed revision; refresh required | Historical evidence only |
 | Linux amd64, fresh pinned Godot 4.4 | Manual/scheduled workflow implemented, execution pending | Target only until CI artifact exists |
 | Linux arm64 container | Passed on pre-embed image; refresh required | Historical evidence only |

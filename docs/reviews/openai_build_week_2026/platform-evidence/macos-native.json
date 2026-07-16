@@ -2,15 +2,15 @@
   "artifact_digests": [
     {
       "name": "doctor-dashboard-native.json",
-      "sha256": "96660f352fdd586e3c4e8bc517cf93b1a7f3d9fb54902b339c0abf98e9f6658b"
+      "sha256": "1eb753582eccb2bea9d76b50d6b0a7ebb61bba41c1244e519608debf2dcb0e98"
     },
     {
       "name": "doctor-inspect.json",
-      "sha256": "73081b846de553957e865ce0f7c312933a80a4499da7dac318fa3ca2b83d1128"
+      "sha256": "b8e27be838bd5d15534c5102df2cb488f33d513e84573d586f61d5e13bd77650"
     },
     {
       "name": "doctor-real-game.json",
-      "sha256": "4e639c8b8a9140dd22e7e43671b1045d52942888ac2d9fb3df472a4e8eaa97e3"
+      "sha256": "bbd1d26f118589fafea6b31408b13e88307de5acc34ec4e0cda025ba45a20cbe"
     },
     {
       "name": "experiment.json",
@@ -22,15 +22,15 @@
     },
     {
       "name": "fresh-godot/report_manifest.json",
-      "sha256": "035e7e66106fb74449652f22902c2c9947c5a70ea5d5a83e7f664bfe03ee1564"
+      "sha256": "f7e34bef609926b751f0c25de92cff873959b988ff46bf573795c6657dbac700"
     },
     {
       "name": "judge-inspect.json",
-      "sha256": "748488981532579c1ff6963db2adfb7cd191f1bc4c4d2b32cb3a5509f60500e7"
+      "sha256": "129f755c3b03cfe2b2961f2a69c49875dd3325437ed38d6b51db6d0076da6ca5"
     },
     {
       "name": "judge-replay.json",
-      "sha256": "c1df31e22706b82c19735e02700aa33d9bb10358c0534d26bad5c3f876e5a834"
+      "sha256": "5263abdaf260f2050e2274093b932722758319966a99ef8f8562e9e336caa0f8"
     },
     {
       "name": "provider-status.json",
@@ -38,7 +38,7 @@
     },
     {
       "name": "root.html",
-      "sha256": "96b1451a7d6da69789b8aa37fd56200a78d55ed9e63bd2b087bea73ad87b4e19"
+      "sha256": "7efa78fce93ab5c211106fd9a1b5d792444c1e1583c109de40dd177204294e71"
     }
   ],
   "checks": [
@@ -63,7 +63,7 @@
       "status": "passed"
     }
   ],
-  "executed_at": "2026-07-16T19:18:32.875817+00:00",
+  "executed_at": "2026-07-16T19:49:22.460368+00:00",
   "game_revision": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
   "mode": "macos",
   "platform": {
@@ -71,9 +71,9 @@
     "system": "macOS"
   },
   "schema_version": "build-week-platform-evidence-v1",
-  "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5",
+  "source_contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970",
   "source_dirty": false,
-  "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
+  "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
   "status": "passed",
   "toolchain": {
     "godot": "4.4.stable.official.4c311cbee"
