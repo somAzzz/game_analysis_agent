@@ -7,6 +7,7 @@ Read in date order, not position order. Newest first.
 
 ## 2026-07-16
 
+- [G1-providers.md](G1-providers.md) — *passed* — provider correctness, failure truthfulness, shared contract, and secret-boundary gate; live smoke recorded as `not_run`
 - [G0-baseline.md](G0-baseline.md) — *passed* — OpenAI Build Week canonical baseline, reproducibility, provenance, and clean-room gate
 
 ## 2026-07-13
