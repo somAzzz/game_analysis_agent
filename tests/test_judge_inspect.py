@@ -115,3 +115,15 @@ def test_inspect_rejects_parent_path_escape(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert response["error_code"] == "path_unsafe"
+
+
+def test_committed_judge_manifest_passes_dependency_free_inspect() -> None:
+    result = _run(ROOT / "judge-manifest.json")
+    payload = json.loads(result.stdout)
+
+    assert result.returncode == 0
+    assert payload["status"] == "passed"
+    assert len(payload["artifacts"]) == 18
+    assert payload["checks"][2]["detail"] == (
+        "6 public claims resolved to exact JSON values"
+    )

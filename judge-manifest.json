@@ -1,0 +1,250 @@
+{
+  "artifacts": [
+    {
+      "bytes": 10389,
+      "path": "examples/build_week_2026/campaign-v1/campaign_manifest.json",
+      "role": "campaign",
+      "schema_version": "persona-campaign-manifest-v1",
+      "sha256": "987838755504593d677d53bd9c57ffb022934573ddd37160068b13b7e4bd8437"
+    },
+    {
+      "bytes": 48461,
+      "path": "examples/build_week_2026/campaign-v1/campaign_summary.json",
+      "role": "campaign",
+      "schema_version": "campaign-aggregation-v1",
+      "sha256": "ab8f6b7389cf3631fbfad03dd24cc0d48ceb901bda6c3cab6dbdb47b1d698674"
+    },
+    {
+      "bytes": 128871,
+      "path": "examples/build_week_2026/campaign-v1/persona_runs.jsonl",
+      "role": "campaign-rows",
+      "sha256": "a8f9dba727ae5b70f3608839b1316584933a5eb7d7b68efcfe6ac69d6e50af11"
+    },
+    {
+      "bytes": 7403,
+      "path": "examples/build_week_2026/campaign-v1/agent_eval.jsonl",
+      "role": "campaign-evaluation",
+      "sha256": "aaaf03c0724a9e1faae63fcc20c321bfc04640c516377d4e60a74fdf15992e99"
+    },
+    {
+      "bytes": 352296,
+      "path": "examples/build_week_2026/campaign-v1/llm_calls.jsonl",
+      "role": "replay-calls",
+      "sha256": "aeddc2f9f885403f06bb36b1214bce8c5c52640df2fca42eca03fcbf419d31dd"
+    },
+    {
+      "bytes": 17601,
+      "path": "examples/build_week_2026/campaign-v1/failure_clusters.json",
+      "role": "campaign-clusters",
+      "schema_version": "public-failure-clusters-v1",
+      "sha256": "8722e4300372f79fb249b0f8897a27f5cbaec95379fcc11ff78502926d9589c7"
+    },
+    {
+      "bytes": 2056,
+      "path": "examples/build_week_2026/campaign-v1/gate_report.json",
+      "role": "campaign-gate",
+      "schema_version": "campaign-bundle-gate-v1",
+      "sha256": "6e5adc83f0640f651f0cb91c7aa26a879cada2aa026e7335da3c268a88864ad5"
+    },
+    {
+      "bytes": 11191,
+      "path": "examples/build_week_2026/experiment-v1/repair_experiment.json",
+      "role": "repair-record",
+      "schema_version": "repair-experiment-record-v1",
+      "sha256": "9bd9c67e94c2318e38edeb86b3c06066b719d2f11d4631bc124cfef9908b855f"
+    },
+    {
+      "bytes": 1136,
+      "path": "examples/build_week_2026/experiment-v1/repair_summary.md",
+      "role": "repair-summary",
+      "sha256": "33f8a65f3ab4d0f8db8822b537c5d374892dbd9ff21e2f95aa17eb74e1ac0764"
+    },
+    {
+      "bytes": 213,
+      "path": "examples/build_week_2026/experiment-v1/comparison.json",
+      "role": "repair-comparison",
+      "sha256": "0766cd6bb3e1d200317b59937198d9ec7c3587fd3aa9f68091dc0639e90f867c"
+    },
+    {
+      "bytes": 4271,
+      "path": "examples/build_week_2026/experiment-v1/patch.diff",
+      "role": "candidate-patch",
+      "sha256": "bacc310c1a2490af7f5833c526cb5e052c3436a9d60400df6588698f6f8c4d2d"
+    },
+    {
+      "bytes": 13782,
+      "path": "examples/build_week_2026/experiment-v1/baseline/fixed.json",
+      "role": "baseline-fixed",
+      "schema_version": "repair-cohort-evidence-v1",
+      "sha256": "a2cb9d3024fbf4c6795494cbdc52811845952074ff0b9dea95e637d6e9790cd2"
+    },
+    {
+      "bytes": 13814,
+      "path": "examples/build_week_2026/experiment-v1/baseline/holdout.json",
+      "role": "baseline-holdout",
+      "schema_version": "repair-cohort-evidence-v1",
+      "sha256": "0cd4ec4be3ea1f4dd35c4ca9d579ac10016250e9ad34cfae07759f7c6375a6c5"
+    },
+    {
+      "bytes": 13782,
+      "path": "examples/build_week_2026/experiment-v1/patched/fixed.json",
+      "role": "patched-fixed",
+      "schema_version": "repair-cohort-evidence-v1",
+      "sha256": "2b6f55cda6dfa37a502c2e24d0a0ab4fca485d02e36e575579aa5a72aa54c832"
+    },
+    {
+      "bytes": 13824,
+      "path": "examples/build_week_2026/experiment-v1/patched/holdout.json",
+      "role": "patched-holdout",
+      "schema_version": "repair-cohort-evidence-v1",
+      "sha256": "d09866309914bf9571320a6231f880d4babbea9e9756ae76eb7dc9f5573fb80c"
+    },
+    {
+      "bytes": 1566,
+      "path": "examples/build_week_2026/experiment-v1/gate_report.json",
+      "role": "repair-gate",
+      "schema_version": "repair-bundle-gate-v1",
+      "sha256": "92a8cb56c3ef16ed84ca3748b2d26f722e7dbca2b6581ab0a61c0b2e471405b4"
+    },
+    {
+      "bytes": 3470,
+      "path": "docs/reviews/openai_build_week_2026/G2-campaign.review.json",
+      "role": "independent-campaign-review",
+      "schema_version": "build-week-g2-review-v1",
+      "sha256": "bdadb9fec83f94cc2ebe87a49610b4afec555cc1010dfd03e2e0df60fc0490f2"
+    },
+    {
+      "bytes": 4621,
+      "path": "docs/reviews/openai_build_week_2026/G3-repair.review.json",
+      "role": "independent-repair-review",
+      "schema_version": "build-week-g3-review-v1",
+      "sha256": "0e0f57f8bf7b0b9188f7eac32f4cfaf5b4dc8aefe5ab8dfd1d368cd1816164cf"
+    }
+  ],
+  "claims": [
+    {
+      "evidence": [
+        {
+          "equals": 18,
+          "json_pointer": "/metrics/completed_cells",
+          "path": "examples/build_week_2026/campaign-v1/campaign_summary.json"
+        },
+        {
+          "equals": 342,
+          "json_pointer": "/metrics/total_weeks",
+          "path": "examples/build_week_2026/campaign-v1/campaign_summary.json"
+        }
+      ],
+      "id": "campaign_scale",
+      "statement": "The committed Replay campaign contains 18 real-Godot cells and 342 gameplay weeks."
+    },
+    {
+      "evidence": [
+        {
+          "equals": 1.0,
+          "json_pointer": "/metrics/valid_rate",
+          "path": "examples/build_week_2026/campaign-v1/campaign_summary.json"
+        },
+        {
+          "equals": 0.0,
+          "json_pointer": "/metrics/fallback_rate",
+          "path": "examples/build_week_2026/campaign-v1/campaign_summary.json"
+        },
+        {
+          "equals": 0.0,
+          "json_pointer": "/metrics/provider_error_rate",
+          "path": "examples/build_week_2026/campaign-v1/campaign_summary.json"
+        }
+      ],
+      "id": "campaign_provider_health",
+      "statement": "Committed Replay decisions are valid with zero fallback and provider errors."
+    },
+    {
+      "evidence": [
+        {
+          "equals": "cashflow-stress-attractor",
+          "json_pointer": "/clusters/0/cluster_id",
+          "path": "examples/build_week_2026/campaign-v1/failure_clusters.json"
+        },
+        {
+          "equals": 18,
+          "json_pointer": "/clusters/0/member_count",
+          "path": "examples/build_week_2026/campaign-v1/failure_clusters.json"
+        }
+      ],
+      "id": "observed_failure_cluster",
+      "statement": "All 18 fixed cells enter the selected cashflow/stress failure cluster."
+    },
+    {
+      "evidence": [
+        {
+          "equals": "rejected",
+          "json_pointer": "/decision",
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json"
+        },
+        {
+          "equals": 0.0,
+          "json_pointer": "/fixed_relative_reduction",
+          "path": "examples/build_week_2026/experiment-v1/comparison.json"
+        },
+        {
+          "equals": 0.0,
+          "json_pointer": "/holdout_relative_reduction",
+          "path": "examples/build_week_2026/experiment-v1/comparison.json"
+        }
+      ],
+      "id": "candidate_rejected",
+      "statement": "Codex rejected the candidate because fixed and holdout target membership did not improve."
+    },
+    {
+      "evidence": [
+        {
+          "equals": true,
+          "json_pointer": "/codex/hypothesis_owned_by_codex",
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json"
+        },
+        {
+          "equals": true,
+          "json_pointer": "/codex/patch_owned_by_codex",
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json"
+        },
+        {
+          "equals": true,
+          "json_pointer": "/codex/decision_owned_by_codex",
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json"
+        }
+      ],
+      "id": "codex_centrality",
+      "statement": "Codex owned the hypothesis, patch, and accept/reject judgment in the retained core session."
+    },
+    {
+      "evidence": [
+        {
+          "equals": "passed",
+          "json_pointer": "/status",
+          "path": "docs/reviews/openai_build_week_2026/G2-campaign.review.json"
+        },
+        {
+          "equals": "passed",
+          "json_pointer": "/status",
+          "path": "docs/reviews/openai_build_week_2026/G3-repair.review.json"
+        }
+      ],
+      "id": "independent_reviews",
+      "statement": "The campaign and causal repair experiment pass independent evidence reviews."
+    }
+  ],
+  "evidence_revision": "build-week-2026-p3-g3-v1",
+  "limitations": [
+    "Inspect validates committed evidence; it does not perform a fresh model or Godot run.",
+    "The committed persona decisions are Replay fixtures, not fresh OpenAI responses.",
+    "The candidate repair was rejected and is not merged into the game baseline.",
+    "Live OpenAI Judge Mode requires a separately supplied server-side API key."
+  ],
+  "primary_commands": {
+    "inspect": "./judge --mode inspect --offline --json --output-dir -",
+    "replay": "./judge --mode replay --offline --json --output-dir -"
+  },
+  "project": "Playtest Forge",
+  "schema_version": "judge-manifest-v1"
+}
