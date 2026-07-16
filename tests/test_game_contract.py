@@ -157,7 +157,9 @@ def test_trace_catalog_consistency_rejects_unknown_action(tmp_path: Path) -> Non
 
 def _game_project() -> Path:
     configured = os.getenv("GAME_PROJECT_PATH")
-    game_project = Path(configured) if configured else ROOT.parent / "study-in-germany"
+    if not configured:
+        pytest.skip("set GAME_PROJECT_PATH explicitly for the real-game contract smoke")
+    game_project = Path(configured)
     if not game_project.exists():
         pytest.skip(
             "study-in-germany checkout is unavailable; set GAME_PROJECT_PATH for contract smoke"
@@ -177,7 +179,7 @@ def _required_artifact(game_project: Path, env_name: str, relative_path: str) ->
 
 @pytest.mark.game_contract
 def test_study_in_germany_artifacts_match_contract() -> None:
-    """Smoke-test real exports when the adjacent/private game checkout is present."""
+    """Smoke-test real exports only when their game runtime is explicitly configured."""
 
     game_project = _game_project()
     reports = game_project / "reports"

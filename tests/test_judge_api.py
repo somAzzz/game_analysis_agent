@@ -217,7 +217,9 @@ def test_http_surface_status_replay_events_and_experiment() -> None:
             experiment = json.load(response)
         with urllib.request.urlopen(f"{base}/") as response:
             index = response.read().decode()
-        asset_path = re.search(r'src="(/game_analysis_agent/assets/[^"]+\.js)"', index)
+        asset_path = re.search(
+            r'src="(/(?:game_analysis_agent/)?assets/[^"]+\.js)"', index
+        )
         assert asset_path is not None
         with urllib.request.urlopen(f"{base}{asset_path.group(1)}") as response:
             javascript = response.read()
