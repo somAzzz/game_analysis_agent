@@ -19,6 +19,8 @@ SCHEMA_VERSION = "build-week-game-pin-v1"
 VERIFICATION_SCHEMA_VERSION = "build-week-game-verification-v1"
 MATERIALIZED_PROVENANCE_FILE = ".playtest-forge-source.json"
 MATERIALIZED_SCHEMA_VERSION = "build-week-game-materialized-v1"
+RUNTIME_OVERLAY_FILE = ".playtest-forge-runtime-overlay.json"
+RUNTIME_OVERLAY_SCHEMA_VERSION = "build-week-game-runtime-overlay-v1"
 _SHA1 = re.compile(r"^[0-9a-f]{40}$")
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
@@ -328,6 +330,88 @@ def verify_materialized_game_tree(
     }
 
 
+def prepare_embedded_game_runtime(
+    project_root: str | Path,
+    destination: str | Path,
+    *,
+    replace: bool = False,
+) -> dict[str, Any]:
+    """Create a writable runtime copy from the verified embedded demo.
+
+    The canonical demo remains byte-for-byte identical to the pinned upstream
+    tree. Runtime-only adapters are copied from this repository and recorded in
+    a separate overlay marker so they cannot be mistaken for game-source edits.
+    """
+
+    project = Path(project_root).expanduser().resolve()
+    manifest = load_game_pin(project / "config/build_week_2026_game_pin.json")
+    embedded_path = str(_mapping(manifest, "packaging").get("embedded_path", ""))
+    source = (project / embedded_path).resolve()
+    verification = verify_materialized_game_tree(source, manifest)
+    output = Path(destination).expanduser().resolve()
+    if output == source or output in source.parents or source in output.parents:
+        raise GamePinError("runtime game destination overlaps the embedded source")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    if output.exists():
+        if not replace:
+            raise GamePinError("runtime game destination already exists; use --replace")
+        _require_managed_runtime_destination(output, expected_commit=verification["commit"])
+
+    overlay_source = project / "scripts/tools/RunInteractiveProbe.gd"
+    if not overlay_source.is_file():
+        raise GamePinError("runtime interactive probe is unavailable")
+    overlay_relative = "scripts/tools/RunInteractiveProbe.gd"
+    temporary = Path(tempfile.mkdtemp(prefix=f".{output.name}.", dir=output.parent))
+    backup: Path | None = None
+    try:
+        shutil.copytree(source, temporary, dirs_exist_ok=True)
+        overlay_target = temporary / overlay_relative
+        canonical_sha256 = hashlib.sha256(overlay_target.read_bytes()).hexdigest()
+        shutil.copy2(overlay_source, overlay_target)
+        runtime_sha256 = hashlib.sha256(overlay_target.read_bytes()).hexdigest()
+        overlay = {
+            "schema_version": RUNTIME_OVERLAY_SCHEMA_VERSION,
+            "base_commit": verification["commit"],
+            "base_tree": verification["tree"],
+            "base_content_tree_sha256": verification["content_tree_sha256"],
+            "overlays": [
+                {
+                    "path": overlay_relative,
+                    "source": "scripts/tools/RunInteractiveProbe.gd",
+                    "canonical_sha256": canonical_sha256,
+                    "runtime_sha256": runtime_sha256,
+                }
+            ],
+        }
+        (temporary / RUNTIME_OVERLAY_FILE).write_text(
+            json.dumps(overlay, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        if output.exists():
+            backup = output.with_name(f".{output.name}.previous")
+            if backup.exists():
+                raise GamePinError("runtime game backup path already exists")
+            os.replace(output, backup)
+        os.replace(temporary, output)
+        if backup is not None:
+            shutil.rmtree(backup)
+        return {
+            "schema_version": RUNTIME_OVERLAY_SCHEMA_VERSION,
+            "status": "prepared",
+            "path": f"<runtime>/{output.name}",
+            "base": verification,
+            "overlays": overlay["overlays"],
+            "provenance_file": RUNTIME_OVERLAY_FILE,
+        }
+    except Exception:
+        if backup is not None and backup.exists() and not output.exists():
+            os.replace(backup, output)
+        raise
+    finally:
+        if temporary.exists():
+            shutil.rmtree(temporary)
+
+
 def _mapping(payload: Mapping[str, Any], key: str) -> Mapping[str, Any]:
     value = payload.get(key)
     if not isinstance(value, Mapping):
@@ -415,6 +499,19 @@ def _require_managed_destination(path: Path, *, expected_commit: str) -> None:
         or payload.get("commit") != expected_commit
     ):
         raise GamePinError("refusing to replace a materialized game with different provenance")
+
+
+def _require_managed_runtime_destination(path: Path, *, expected_commit: str) -> None:
+    marker = path / RUNTIME_OVERLAY_FILE
+    try:
+        payload = json.loads(marker.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError, OSError) as exc:
+        raise GamePinError("refusing to replace an unmanaged runtime game destination") from exc
+    if (
+        payload.get("schema_version") != RUNTIME_OVERLAY_SCHEMA_VERSION
+        or payload.get("base_commit") != expected_commit
+    ):
+        raise GamePinError("refusing to replace a runtime game with different provenance")
 
 
 def _safe_git_path(value: Any, *, index: int) -> str:

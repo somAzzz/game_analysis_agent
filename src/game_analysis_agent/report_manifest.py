@@ -25,6 +25,8 @@ REPORT_INDEX_FILE = "report_index.json"
 SCHEMA_VERSION = "trace-manifest-v2"
 MATERIALIZED_GAME_MARKER = ".playtest-forge-source.json"
 MATERIALIZED_GAME_SCHEMA = "build-week-game-materialized-v1"
+RUNTIME_OVERLAY_MARKER = ".playtest-forge-runtime-overlay.json"
+RUNTIME_OVERLAY_SCHEMA = "build-week-game-runtime-overlay-v1"
 
 
 def write_report_manifest(
@@ -341,16 +343,25 @@ def _git_provenance(path: Path, *, display_path: str) -> dict[str, Any]:
 def _game_provenance(path: Path) -> dict[str, Any]:
     marker = _read_json(path / MATERIALIZED_GAME_MARKER)
     if marker.get("schema_version") == MATERIALIZED_GAME_SCHEMA:
+        overlay = _read_json(path / RUNTIME_OVERLAY_MARKER)
+        runtime_overlays = (
+            overlay.get("overlays", [])
+            if overlay.get("schema_version") == RUNTIME_OVERLAY_SCHEMA
+            else []
+        )
         return {
             "path": "<game>",
             "available": True,
-            "source_type": "materialized_bundle",
+            "source_type": (
+                "embedded_runtime_overlay" if runtime_overlays else "materialized_bundle"
+            ),
             "commit": str(marker.get("commit", "")),
             "tree": str(marker.get("tree", "")),
             "archive_sha256": str(marker.get("archive_sha256", "")),
             "content_tree_sha256": str(marker.get("content_tree_sha256", "")),
             "file_count": marker.get("file_count", 0),
-            "dirty": False,
+            "runtime_overlays": runtime_overlays,
+            "dirty": bool(runtime_overlays),
         }
     return _git_provenance(path, display_path="<game>")
 
