@@ -84,6 +84,7 @@ def _snapshot(cohort: RepairCohort, *, patched: bool) -> RepairMetricSnapshot:
         persona_alignment_rate=0.5,
         critical_invariants={"pipeline_stalled": 0},
         designed_failure_endings=("cashflow_collapse",),
+        ending_counts={"cashflow_collapse": 18},
         artifact_path=f"reports/{cohort.value}.json",
         artifact_sha256="f" * 64,
     )
@@ -126,12 +127,26 @@ def _record(*, decision: str = "accepted", failed_gate: bool = False, lines: int
             fixed_persona_alignment_delta=0,
             holdout_persona_alignment_delta=0,
         ),
-        "gates": (
+        "gates": tuple(
             RepairGateResult(
-                gate_id="critical",
-                status="failed" if failed_gate else "passed",
+                gate_id=gate_id,
+                status=(
+                    "failed"
+                    if failed_gate and gate_id == "critical_invariants"
+                    else "passed"
+                ),
                 detail="checked",
-            ),
+            )
+            for gate_id in (
+                "fixed_target",
+                "holdout_target",
+                "critical_invariants",
+                "decision_validity",
+                "provider_health",
+                "persona_preservation",
+                "no_new_invalid_endings",
+                "designed_failure_preserved",
+            )
         ),
         "decision": decision,
         "decision_reason": "All fixed and holdout evidence was evaluated explicitly.",

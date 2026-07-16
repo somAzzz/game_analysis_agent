@@ -17,6 +17,18 @@ from .campaign_contract import CampaignCitation
 
 REPAIR_PLAN_SCHEMA = "repair-experiment-plan-v1"
 REPAIR_RECORD_SCHEMA = "repair-experiment-record-v1"
+REQUIRED_REPAIR_GATES = frozenset(
+    {
+        "fixed_target",
+        "holdout_target",
+        "critical_invariants",
+        "decision_validity",
+        "provider_health",
+        "persona_preservation",
+        "no_new_invalid_endings",
+        "designed_failure_preserved",
+    }
+)
 
 
 class RepairDecision(StrEnum):
@@ -124,6 +136,9 @@ class RepairMetricSnapshot(BaseModel):
 
     cohort: RepairCohort
     game_commit: str = Field(pattern=r"^[0-9a-f]{40}$")
+    decision_policy: Literal["fixture-authoring-policy-v1"] = (
+        "fixture-authoring-policy-v1"
+    )
     seeds: tuple[int, ...] = Field(min_length=1)
     cells: int = Field(ge=1)
     weeks: int = Field(ge=1)
@@ -137,6 +152,7 @@ class RepairMetricSnapshot(BaseModel):
     persona_alignment_rate: float | None = Field(default=None, ge=0, le=1)
     critical_invariants: dict[str, int]
     designed_failure_endings: tuple[str, ...]
+    ending_counts: dict[str, int]
     artifact_path: str
     artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -227,13 +243,62 @@ class RepairExperimentRecord(BaseModel):
             or by_cohort[RepairCohort.PATCHED_HOLDOUT].seeds != self.plan.holdout_seeds
         ):
             raise ValueError("repair snapshot seeds differ from locked cohorts")
+        if (
+            by_cohort[RepairCohort.BASELINE_FIXED].game_commit
+            != self.plan.baseline_game_commit
+            or by_cohort[RepairCohort.BASELINE_HOLDOUT].game_commit
+            != self.plan.baseline_game_commit
+            or by_cohort[RepairCohort.PATCHED_FIXED].game_commit
+            != self.patch.patched_commit
+            or by_cohort[RepairCohort.PATCHED_HOLDOUT].game_commit
+            != self.patch.patched_commit
+        ):
+            raise ValueError("repair snapshot game commits differ from plan/patch")
+        self._validate_comparison(by_cohort)
         if self.decision == RepairDecision.ACCEPTED:
             self._require_acceptance(by_cohort)
         return self
 
+    def _validate_comparison(
+        self, by_cohort: dict[RepairCohort, RepairMetricSnapshot]
+    ) -> None:
+        baseline_fixed = by_cohort[RepairCohort.BASELINE_FIXED]
+        patched_fixed = by_cohort[RepairCohort.PATCHED_FIXED]
+        baseline_holdout = by_cohort[RepairCohort.BASELINE_HOLDOUT]
+        patched_holdout = by_cohort[RepairCohort.PATCHED_HOLDOUT]
+        expected = (
+            patched_fixed.target_members - baseline_fixed.target_members,
+            _reduction(baseline_fixed.target_members, patched_fixed.target_members),
+            patched_holdout.target_members - baseline_holdout.target_members,
+            _reduction(
+                baseline_holdout.target_members, patched_holdout.target_members
+            ),
+            _delta(
+                baseline_fixed.persona_alignment_rate,
+                patched_fixed.persona_alignment_rate,
+            ),
+            _delta(
+                baseline_holdout.persona_alignment_rate,
+                patched_holdout.persona_alignment_rate,
+            ),
+        )
+        observed = (
+            self.comparison.fixed_member_delta,
+            self.comparison.fixed_relative_reduction,
+            self.comparison.holdout_member_delta,
+            self.comparison.holdout_relative_reduction,
+            self.comparison.fixed_persona_alignment_delta,
+            self.comparison.holdout_persona_alignment_delta,
+        )
+        if observed != expected:
+            raise ValueError("repair comparison does not recompute from snapshots")
+
     def _require_acceptance(
         self, by_cohort: dict[RepairCohort, RepairMetricSnapshot]
     ) -> None:
+        gate_ids = {item.gate_id for item in self.gates}
+        if gate_ids != REQUIRED_REPAIR_GATES or len(self.gates) != len(gate_ids):
+            raise ValueError("accepted repair lacks the exact required gate set")
         if any(item.exit_code != 0 for item in self.focused_tests):
             raise ValueError("accepted repair has a failed focused test")
         if any(item.status != GateStatus.PASSED for item in self.gates):
@@ -247,6 +312,16 @@ class RepairExperimentRecord(BaseModel):
             < thresholds.minimum_holdout_relative_reduction
         ):
             raise ValueError("accepted repair misses holdout target threshold")
+        alignment_deltas = (
+            self.comparison.fixed_persona_alignment_delta,
+            self.comparison.holdout_persona_alignment_delta,
+        )
+        if any(
+            value is None
+            or value < -thresholds.maximum_persona_alignment_decline
+            for value in alignment_deltas
+        ):
+            raise ValueError("accepted repair exceeds persona alignment decline")
         for snapshot in (
             patched_fixed,
             by_cohort[RepairCohort.PATCHED_HOLDOUT],
@@ -300,11 +375,24 @@ def _canonical_sha256(payload: object) -> str:
     ).hexdigest()
 
 
+def _reduction(baseline: int, patched: int) -> float:
+    if baseline == 0:
+        return 0.0 if patched == 0 else -1.0
+    return round((baseline - patched) / baseline, 6)
+
+
+def _delta(baseline: float | None, patched: float | None) -> float | None:
+    if baseline is None or patched is None:
+        return None
+    return round(patched - baseline, 6)
+
+
 __all__ = [
     "CodexProvenance",
     "FocusedTestResult",
     "GateStatus",
     "PatchEvidence",
+    "REQUIRED_REPAIR_GATES",
     "REPAIR_PLAN_SCHEMA",
     "REPAIR_RECORD_SCHEMA",
     "RepairCohort",
