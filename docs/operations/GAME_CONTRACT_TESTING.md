@@ -39,14 +39,20 @@ To run only the committed contract fixtures:
 uv run pytest tests/test_game_contract.py -m "not game_contract"
 ```
 
-If an adjacent `../study-in-germany` checkout exists, the marked smoke test also
-validates its real generated reports. A checkout elsewhere can be selected
-explicitly:
+Prepare the exact-pinned embedded demo into a writable runtime before a real
+producer smoke. The canonical embedded tree is never used as a writable Godot
+project:
 
 ```bash
-GAME_PROJECT_PATH=/path/to/study-in-germany \
-  uv run pytest tests/test_game_contract.py -m game_contract -ra
+uv run python tools/prepare_embedded_demo.py \
+  --output reports/contract-game-runtime --replace --json
+export GAME_PROJECT_PATH="$PWD/reports/contract-game-runtime"
+export GODOT_BIN=godot4
+uv run pytest tests/test_game_contract.py -m game_contract -ra
 ```
+
+An external checkout may still be supplied as a developer override, but it is
+not part of the evaluator or CI contract.
 
 Individual artifacts can be checked without pytest:
 
@@ -68,7 +74,8 @@ uv run python tools/run_gameplay_agent.py interactive-probe \
   build.
 
 The real Godot contract job runs nightly and through `workflow_dispatch`. It
-checks out a pinned game revision, downloads an official Godot build, verifies
+verifies the embedded game against the pinned upstream content-tree digest,
+creates a writable runtime, downloads an official Godot build, verifies
 the published SHA-512 before installing it, and then generates and analyzes a
 fresh deterministic trace. It exports the catalogs, runs all six Godot
 validators with fresh route/demo prerequisites, enforces
@@ -79,11 +86,10 @@ Agent and game evidence is uploaded
 even when validation fails. The job never treats reports already present in
 the game checkout as test results.
 
-Because `somAzzz/study-in-germany` is private, the repository must define the
-`STUDY_IN_GERMANY_TOKEN` Actions secret with read access to that repository.
-The default game ref is pinned to
-`348b9fd5501e71ebc7142e10f9068fc1490b5124`; manual runs can deliberately test
-another repository, ref, or official Godot build tag through workflow inputs.
+The current game ref is pinned to
+`348b9fd5501e71ebc7142e10f9068fc1490b5124`. No game-repository token or sibling
+checkout is required. Manual runs may select another official Godot build tag;
+changing the embedded game pin is a reviewed source change, not a workflow input.
 
 ## Environment boundary
 

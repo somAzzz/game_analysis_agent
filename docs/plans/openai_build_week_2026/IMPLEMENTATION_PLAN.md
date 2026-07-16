@@ -13,6 +13,12 @@ Execution companion:
 [EXECUTION_PLAN.md](EXECUTION_PLAN.md) translates this strategy into ordered
 steps, review packets, gate criteria, failure handling, and release decisions.
 
+> Current truth label: the retained 18-cell campaign is real Godot evidence
+> driven by a deterministic persona-policy authoring fixture, not a recorded
+> OpenAI/LLM playthrough. The OpenAI GPT-5.6 persona path is implemented as a
+> separate bounded live mode and remains a release blocker until live evidence
+> is imported. See the [reviewer hub](README.md).
+
 ## 1. Executive decision
 
 The project will enter the **Developer Tools** track under the working name

@@ -31,5 +31,5 @@ ignore = ["B007", "SIM108", "E501"]
 testpaths = ["tests"]
 pythonpath = ["src", "."]
 markers = [
-    "game_contract: requires a real study-in-germany checkout and generated artifacts",
+    "game_contract: requires Godot and generated artifacts from a writable Study in Germany runtime",
 ]

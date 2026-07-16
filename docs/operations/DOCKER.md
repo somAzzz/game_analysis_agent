@@ -14,9 +14,9 @@ an evaluator never downloads a model or reserves a GPU by running bare
   older.
 - ~70 GB of free disk for the Qwen3.6 27B NVFP4 weights (cached under
   `~/.cache/huggingface/`).
-- A working `study-in-germany` Godot project for `sim`, `probe`, `export`,
-  `validate`, `interactive-probe`, or `play`. Pure `analyze`, recorded `eval`,
-  and report QA do not invoke Godot.
+- The embedded `study-in-germany` demo is included. Godot commands prepare a
+  writable copy under `reports/`; pure `analyze`, recorded `eval`, and report
+  QA do not invoke Godot.
 
 ## 2. CPU-only Judge dashboard and Replay
 
@@ -41,8 +41,7 @@ cp .env.example .env
 # Edit .env:
 #   - HF_TOKEN (if your model is auth-gated — the official NVFP4 quant
 #     does not require a token at the moment).
-#   - GAME_PROJECT_PATH=/abs/path/to/study-in-germany
-#   - GODOT_DOCKER_MOUNT_ROOT=/shared/parent/of/both/checkouts
+#   - GODOT_DOCKER_MOUNT_ROOT=/absolute/parent/of/this/repository
 #   - VLLM_BIND_PORT=8000 (already the default).
 ```
 
@@ -75,7 +74,9 @@ Run gameplay commands from the host and point `GODOT_BIN` at the wrapper. It
 reuses the compose sidecar and reaches vLLM through the published host port:
 
 ```bash
-export GAME_PROJECT_PATH=/abs/path/to/study-in-germany
+uv run python tools/prepare_embedded_demo.py \
+  --output reports/docker-game-runtime --replace --json
+export GAME_PROJECT_PATH="$PWD/reports/docker-game-runtime"
 export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
 
 uv run python tools/run_gameplay_agent.py interactive-probe \
@@ -124,8 +125,8 @@ All knobs live in `.env`:
 | `VLLM_BIND_PORT` | Host port the container binds to | `8000` |
 | `CUDA_VISIBLE_DEVICES` | GPU index (or `all`) | `0` |
 | `GODOT_DOCKER_IMAGE` | Godot sidecar/fallback image | `barichello/godot-ci:4.4` |
-| `GAME_PROJECT_PATH` | Absolute checkout mounted at the identical container path | `/home/bo/projects/python/study-in-germany` |
-| `GODOT_DOCKER_MOUNT_ROOT` | Shared parent of Agent and game checkouts, mounted at the same path | `/home/bo/projects/python` |
+| `GAME_PROJECT_PATH` | Writable prepared demo runtime mounted at the identical container path | `reports/docker-game-runtime` after preparation |
+| `GODOT_DOCKER_MOUNT_ROOT` | Parent of this repository, mounted at the same absolute path | wrapper-detected repository parent |
 
 ## 8. Version pinning
 

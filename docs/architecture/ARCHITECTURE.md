@@ -104,6 +104,15 @@ reports/
 
 ## 5. 安全策略
 
+### Build Week bounded repair exception
+
+The default product remains read/report/propose. The Build Week workflow adds
+one governed implementation experiment: Codex may edit only allowlisted files
+inside an isolated worktree, under an explicit line/file budget, after freezing
+one mechanism. Fixed and unseen-holdout evidence decide acceptance. The system
+never edits the canonical embedded demo in place and never automatically merges
+a candidate. The retained example was rejected and remains unmerged.
+
 - 默认不自动写游戏项目文件。
 - Agent 输出 proposal，不直接 patch。
 - raw log 不进模型，只进统计层。

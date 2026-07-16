@@ -14,6 +14,7 @@ appropriate `status` (active / superseded / archived).
 
 - [interactive_playtest/](interactive_playtest/) — interactive playtest design rulebook + a snapshot run
 - [playability_fix/](playability_fix/) — explainable-failure v0.3 design plan
+- [openai_build_week_2026/README.md](openai_build_week_2026/README.md) — authoritative Build Week reviewer and execution hub
 - [openai_build_week_2026/IMPLEMENTATION_PLAN.md](openai_build_week_2026/IMPLEMENTATION_PLAN.md) — Playtest Forge competition implementation, judge experience, and review record
 - [openai_build_week_2026/EXECUTION_PLAN.md](openai_build_week_2026/EXECUTION_PLAN.md) — stepwise delivery order, evidence requirements, and P0-P5 review gates
 

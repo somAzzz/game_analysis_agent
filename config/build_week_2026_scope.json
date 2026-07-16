@@ -19,12 +19,12 @@
     },
     {
       "id": "game",
-      "source": "GAME_PROJECT_PATH or --game-project-path",
+      "source": "demo/study-in-germany (verified embedded snapshot; runtime overrides are optional)",
       "required": true,
       "license_status": "approved",
       "approval_basis": "maintainer_ownership_attestation",
       "approval_date": "2026-07-16",
-      "distribution_scope": "private_competition_bundle"
+      "distribution_scope": "public_bundle"
     }
   ],
   "required_game_files": [
@@ -36,7 +36,7 @@
   ],
   "submission_includes": [
     "analysis source",
-    "pinned game source or competition bundle",
+    "pinned embedded Study in Germany demo source",
     "sanitized reference evidence",
     "offline evaluator",
     "Judge API and dashboard",

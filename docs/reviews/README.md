@@ -1,13 +1,17 @@
 # Reviews
 
-Date-sorted audit and feedback material. Every file in this folder has YAML
-frontmatter (`status`, `date`, `audience`, `scope`).
+Date-sorted audit and feedback material. Markdown audits normally use YAML
+frontmatter; machine-readable gate records use versioned JSON schemas.
+
+For the current competition state, start with the
+[Build Week reviewer hub](../plans/openai_build_week_2026/README.md).
 
 Read in date order, not position order. Newest first.
 
 ## 2026-07-16
 
 - [openai_build_week_2026/P3-skill-transfer.md](openai_build_week_2026/P3-skill-transfer.md) — *passed* — fresh-context Unity scenario validates transferable automated/persona evidence-to-change reasoning without claiming runtime support
+- [openai_build_week_2026/BRANCH_AUDITS.md](openai_build_week_2026/BRANCH_AUDITS.md) — *active* — two independent branch reviews, remediation trace, and platform handoff
 - [openai_build_week_2026/G4-evaluator.md](openai_build_week_2026/G4-evaluator.md) — *failed closed* — evaluator and UI pass; platform execution and published multi-arch image remain blockers
 - [openai_build_week_2026/P4-platform-delivery.md](openai_build_week_2026/P4-platform-delivery.md) — *partial* — macOS native path verified; Docker/Linux/live rows explicitly pending or not run
 - [G1-providers.md](G1-providers.md) — *passed* — provider correctness, failure truthfulness, shared contract, and secret-boundary gate; live smoke recorded as `not_run`
@@ -16,7 +20,7 @@ Read in date order, not position order. Newest first.
 ## 2026-07-13
 
 - [LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md](LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md) — *active* — baseline audit of real-game + local vLLM end-to-end path
-- [REAL_TEST_GAP_ANALYSIS.md](REAL_TEST_GAP_ANALYSIS.md) — *active* — current test-system boundary with `study-in-germany`
+- [REAL_TEST_GAP_ANALYSIS.md](REAL_TEST_GAP_ANALYSIS.md) — *superseded* — pre-embedded-game test-system snapshot
 
 ## 2026-07-06 (initial review remediation cycle)
 

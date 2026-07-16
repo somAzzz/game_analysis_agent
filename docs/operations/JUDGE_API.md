@@ -3,6 +3,12 @@
 The minimal Judge API serves the built frontend and a bounded `/api` surface
 from one origin:
 
+> Deployment scope: localhost demonstration only. The public evaluator is the
+> static Judge UI. Do not expose this native API directly to the internet; a
+> hosted multi-tenant service would additionally require authentication,
+> per-user/provider quotas, job TTL/eviction, disk budgets, and Origin/CSRF
+> controls.
+
 ```bash
 cd frontend && npm run build:public && cd ..
 uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080
@@ -27,7 +33,8 @@ provider configuration. Secret values are never included.
 
 ## Provider configuration
 
-Replay needs no configuration. To enable the live provider test, set a
+Replay is a deterministically authored persona-policy fixture, not a recorded
+LLM playthrough, and needs no configuration. To enable the live provider test, set a
 restricted server-side environment variable before process startup:
 
 ```bash

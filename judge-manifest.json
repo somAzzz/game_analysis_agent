@@ -1,11 +1,11 @@
 {
   "artifacts": [
     {
-      "bytes": 1828,
+      "bytes": 1923,
       "path": "config/build_week_2026_game_pin.json",
       "role": "embedded-demo-pin",
       "schema_version": "build-week-game-pin-v1",
-      "sha256": "272b80cb66abf6006a0943b18a6f21a1ebb52dd0d89c80e84df87257f884a556"
+      "sha256": "c62d09abe673790ff550790b467b8760ceff0b9b69d9d7d6d362045ae45f67a2"
     },
     {
       "bytes": 187,
@@ -279,7 +279,7 @@
       "bytes": 13498,
       "path": "demo/study-in-germany/.playtest-forge-source.json",
       "role": "embedded-demo-source",
-      "sha256": "5aefc939243c47614e30dca0193887a9d73dba0841707dfba1294db31e53a768"
+      "sha256": "b62bb04cd66a715c7484f8e4d08db5a21c8fe04fb65a2a64e27822dca56bd2aa"
     },
     {
       "bytes": 91756,
@@ -780,7 +780,7 @@
         }
       ],
       "id": "campaign_provider_health",
-      "statement": "Committed Replay decisions are valid with zero fallback and provider errors."
+      "statement": "Committed deterministic persona-policy Replay decisions are valid with zero fallback and provider errors."
     },
     {
       "evidence": [
@@ -868,7 +868,7 @@
   "evidence_revision": "build-week-2026-p3-g3-v1",
   "limitations": [
     "Inspect validates committed evidence; it does not perform a fresh model or Godot run.",
-    "The committed persona decisions are Replay fixtures, not fresh OpenAI responses.",
+    "The committed persona decisions are deterministic policy-authored Replay fixtures, not recorded or fresh OpenAI responses.",
     "The candidate repair was rejected and is not merged into the game baseline.",
     "Live OpenAI Judge Mode requires a separately supplied server-side API key.",
     "The embedded Study in Germany source is a competition demo, not a complete game."

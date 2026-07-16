@@ -76,7 +76,7 @@ CLAIMS = [
     },
     {
         "id": "campaign_provider_health",
-        "statement": "Committed Replay decisions are valid with zero fallback and provider errors.",
+        "statement": "Committed deterministic persona-policy Replay decisions are valid with zero fallback and provider errors.",
         "evidence": [
             {
                 "path": "examples/build_week_2026/campaign-v1/campaign_summary.json",
@@ -209,7 +209,7 @@ def build_manifest() -> dict[str, object]:
         "claims": CLAIMS,
         "limitations": [
             "Inspect validates committed evidence; it does not perform a fresh model or Godot run.",
-            "The committed persona decisions are Replay fixtures, not fresh OpenAI responses.",
+            "The committed persona decisions are deterministic policy-authored Replay fixtures, not recorded or fresh OpenAI responses.",
             "The candidate repair was rejected and is not merged into the game baseline.",
             "Live OpenAI Judge Mode requires a separately supplied server-side API key.",
             "The embedded Study in Germany source is a competition demo, not a complete game.",

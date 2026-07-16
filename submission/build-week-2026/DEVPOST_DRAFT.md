@@ -26,7 +26,8 @@ the final accept/reject judgment. The action-provider boundary supports
 deterministic Replay evidence and a bounded OpenAI Responses API persona mode;
 the browser never receives the server key.
 
-The committed demonstration is deliberately labeled prerecorded, not live.
+The committed demonstration is deliberately labeled a deterministically
+authored persona-policy Replay fixture, not a recorded LLM run or live call.
 18 persona/seed cells produced 342 real-Godot gameplay weeks. All 18 campaign
 cells entered the selected cashflow/stress failure cluster. The committed
 campaign recorded 100% valid decisions, 0% fallback, and 0% provider errors.
@@ -63,8 +64,8 @@ server key or real game runtime is absent.
 - OpenAI Responses API persona provider: optional live action subagent behind
   the same bounded decision contract. It is implemented but not claimed as a
   completed live campaign in the current evidence.
-- Replay provider: deterministic evaluator path for unknown/restricted judges;
-  never relabeled as a fresh model call.
+- Replay provider: deterministic persona-policy fixture for unknown/restricted
+  judges; never relabeled as a recorded or fresh model call.
 
 Core Codex task: 019f6816-fe0d-78a2-9001-1890b32ef820.
 

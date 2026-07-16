@@ -7,6 +7,12 @@ scope: canonical Build Week baseline and G0 reproducibility gate
 
 # G0 review — canonical Build Week baseline
 
+> Historical execution record. The original commands and ownership wording
+> below describe the G0 run. The current replacement is a public, exact-pinned
+> embedded demo under `demo/study-in-germany`; no sibling checkout or repository
+> token is required. See the
+> [Build Week reviewer hub](../plans/openai_build_week_2026/README.md).
+
 **Decision:** Passed on 2026-07-16.
 
 The P0 baseline is reproducible, provenance-complete, contract-valid, and

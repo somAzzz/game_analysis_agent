@@ -34,8 +34,9 @@ Read these in order:
 
 ## For reviewers / auditors
 
-1. [../JUDGE.md](../JUDGE.md) — canonical offline commands and evidence map
-2. [reviews/README.md](reviews/README.md) — date-sorted audit index
+1. [plans/openai_build_week_2026/README.md](plans/openai_build_week_2026/README.md) — authoritative Build Week reviewer hub
+2. [../JUDGE.md](../JUDGE.md) — canonical offline commands and evidence map
+3. [reviews/README.md](reviews/README.md) — date-sorted audit index
 3. [reviews/REVIEW_FEEDBACK.md](reviews/REVIEW_FEEDBACK.md) — original feedback
 4. [reviews/ACTION_PLAN.md](reviews/ACTION_PLAN.md) — T01–T13 task plan
 5. [reviews/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md](reviews/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md) — latest real-game audit
@@ -47,4 +48,4 @@ Dated docs in `reviews/` and `plans/` have YAML frontmatter
 ## About this index
 
 `legacy/` contains superseded docs and is intentionally not linked.
-Last updated: 2026-07-13.
+Last updated: 2026-07-16.

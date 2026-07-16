@@ -17,7 +17,8 @@ game checkout. The complete demo source is embedded and hash-inventoried under
 `demo/study-in-germany`. Both commands print one `judge-result-v1` JSON object. Expected
 status is `passed`; `failed` and `unsupported` are never fallback successes.
 
-The committed case is explicitly **prerecorded Replay evidence**: Codex formed
+The committed case is explicitly **prerecorded Replay evidence** driven by a
+deterministic persona-policy fixture, not a recorded LLM playthrough: Codex formed
 and implemented a bounded repair hypothesis, then rejected the candidate after
 fixed and holdout cohorts both failed to improve the target cluster. It is not
 presented as a fresh OpenAI call or a successful game fix. See [JUDGE.md](JUDGE.md)
@@ -146,17 +147,15 @@ endpoints.
 
 ## Requirements
 
-For the full end-to-end workflow:
+The evaluator paths have progressively larger requirements:
 
-- Python 3.10 or newer.
-- `uv` or a standard virtualenv/pip setup.
-- Godot 4 headless CLI (`godot4`) for real game runs.
-- A checkout of the target game project, for example:
-  `/home/bo/projects/python/study-in-germany`.
-- One LLM endpoint:
-  - local vLLM,
-  - local SGLang,
-  - or DeepSeek-compatible cloud endpoint.
+- Inspect: Python 3.9+ only.
+- Replay: `uv` and the committed lockfile; no model or game rebuild.
+- Embedded real-Godot run: Godot 4.4 or the Docker wrapper; the demo is already
+  under `demo/study-in-germany` and is copied to a writable runtime.
+- Live persona run: a server-side OpenAI key and a configured Godot runtime.
+- External game checkouts and local/DeepSeek-compatible endpoints are optional
+  development adapters, not Judge requirements.
 
 The pure Python analyzers and tests can run without Godot or a live LLM.
 
@@ -218,8 +217,8 @@ Prepare the embedded target game and set the Godot CLI:
 ```bash
 uv run python tools/prepare_embedded_demo.py \
   --output reports/local-game-runtime --replace --json
-GAME_PROJECT_PATH="$PWD/reports/local-game-runtime"
-GODOT_BIN=godot4
+export GAME_PROJECT_PATH="$PWD/reports/local-game-runtime"
+export GODOT_BIN=godot4
 ```
 
 Run the main CLI help:
@@ -597,8 +596,8 @@ npm run build
 
 Pull requests and pushes run the Python suite, full-repository Ruff, frontend
 coverage floors, the public production build, and a strict dry-run of all 140
-matrix cells. The scheduled/manual real-Godot job checks out a pinned private
-`study-in-germany` revision, verifies the official Godot archive checksum,
+matrix cells. The scheduled/manual real-Godot job verifies the embedded demo
+against its pinned upstream content tree, verifies the official Godot archive checksum,
 generates and analyzes a fresh trace, runs all six validators with fresh
 prerequisites, enforces deterministic smoke gates, validates the cross-repo
 contracts, captures canonical interactive risk guidance, and uploads the
@@ -737,6 +736,7 @@ Start at [docs/README.md](docs/README.md) — audience-keyed index.
 
 Selected entry points:
 
+- [Build Week 2026 reviewer hub](docs/plans/openai_build_week_2026/README.md)
 - [Architecture](docs/architecture/ARCHITECTURE.md)
 - [Data Contracts](docs/architecture/DATA_CONTRACTS.md)
 - [Gameplay Agent](docs/architecture/GAMEPLAY_AGENT.md)

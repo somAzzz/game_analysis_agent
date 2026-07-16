@@ -1,11 +1,16 @@
 ---
-status: active
+status: superseded
 date: 2026-07-13
 audience: maintainers
 scope: 与 study-in-germany 的真实测试能力差距分析
 ---
 
 # Real Test System Status
+
+> Superseded snapshot. This file describes the pre-embedded-game boundary as
+> it existed on 2026-07-13. Do not use its private-checkout or token steps for
+> current evaluation. Start at the
+> [Build Week reviewer hub](../plans/openai_build_week_2026/README.md).
 
 Date: 2026-07-13
 

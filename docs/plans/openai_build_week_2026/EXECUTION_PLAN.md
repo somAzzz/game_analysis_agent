@@ -58,6 +58,25 @@ Verification completed on this revision family:
 - `live_openai_campaign` still requires a restricted server-side OpenAI key;
 - the final repository license remains a G5 maintainer decision.
 
+### 2026-07-16 dual-audit remediation update
+
+Two independent full-branch reviews are recorded in
+[`BRANCH_AUDITS.md`](../../reviews/openai_build_week_2026/BRANCH_AUDITS.md).
+They found and closed stale-row platform proof, self-attested full-demo pinning,
+unsafe runtime replacement, incomplete runtime provenance, canonical write
+risk, unbounded Replay semantics, misleading Replay origin labels, and missing
+GPT-5.6 release evidence gates. Commits `d88158f`, `4749467`, `3be84c2`,
+`afac6b3`, `733e4e1`, and `88537b6` implement those changes with focused tests.
+
+The remaining execution order is now:
+
+1. regenerate the Judge manifest and macOS P4 evidence from a clean revision;
+2. push PR #5 and make required PR checks green;
+3. dispatch the Linux official-Godot job and import same-contract artifacts;
+4. publish and execute the digest-pinned multi-architecture image;
+5. run live OpenAI only with GPT-5.6-family evidence;
+6. close the human/license/video/URL items in G5.
+
 ## 1. Purpose
 
 This document turns the competition strategy in
@@ -87,6 +106,10 @@ feature breadth. MCP, multiple games, automatic merge, and general automatic
 balancing remain out of scope.
 
 ## 2. Status at plan creation
+
+> Historical planning snapshot. It is retained to show delivery order, not the
+> current implementation state. Use [this plan's current update](#0-current-implementation-update--embedded-demo-and-change-visibility)
+> and the [reviewer hub](README.md) for present status.
 
 | Phase | Current state | Immediate blocker |
 | --- | --- | --- |

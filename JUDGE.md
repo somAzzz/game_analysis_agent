@@ -61,7 +61,7 @@ guarantees.
 
 | Label | Meaning | Current evidence |
 | --- | --- | --- |
-| Prerecorded | Hash-pinned Replay decisions and committed Godot-derived rows | Default Inspect and Replay paths |
+| Prerecorded | Deterministically authored persona-policy decisions and committed Godot-derived rows; not a recorded LLM run | Default Inspect and Replay paths |
 | Live | A fresh request to a model or fresh execution of the game | Not performed by the offline commands |
 | Unsupported | A capability is unavailable in the current environment | Must return non-zero and must not be presented as pass |
 | Failed | Inputs, hashes, schemas, claims, dependencies, timeout, or gates failed | Must return non-zero with remediation |

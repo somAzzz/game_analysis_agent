@@ -16,7 +16,7 @@ requires fixed plus unseen holdout proof before accepting its own work.”
 Screen: run Inspect, then Replay; zoom on `status: passed` and limitations.
 
 Voice: “An automated judge starts here. Inspect needs only system Python;
-Replay is locked, offline, and explicitly prerecorded. Neither needs a GPU,
+Replay is a locked, offline persona-policy fixture—not a recorded LLM run. Neither needs a GPU,
 API key, browser, or private game checkout.”
 
 ## 0:35–1:02 — Campaign
@@ -26,7 +26,7 @@ Replay/OpenAI provider choice.
 
 Voice: “18 persona/seed cells produced 342 real-Godot gameplay weeks. All 18
 campaign cells entered the selected cashflow/stress failure cluster. Replay is
-the deterministic judge path; the same contract can use an OpenAI live persona
+the deterministic policy-fixture judge path; the same contract can use an OpenAI live persona
 subagent when the server is configured.”
 
 ## 1:02–1:32 — Repair
