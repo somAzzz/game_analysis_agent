@@ -2,35 +2,35 @@
   "artifact_digests": [
     {
       "name": "container-inspect.json",
-      "sha256": "ed7751476999e1d395eaaf89bedfe4ec94855cc5119bde5a81c74b9914bd619d"
+      "sha256": "72a01c04e3bc1e005fa0e4b5076d82986e556b7d494a0f693e06976e153be7b4"
     },
     {
       "name": "container-replay.json",
-      "sha256": "c5d22d2506c3f4925fee5ac5238a9ba5403b5db2a12a994a1ff9bb0cff6e4093"
+      "sha256": "5fcf0bd4beb392fc75c1765379bfbfa8528ddd778235d6e1a8a78667230b70d9"
     },
     {
       "name": "docker-image.json",
-      "sha256": "d8c9f06d6624ade94cb219e77772c34673319d2c46dead266cee6fa1cfcc560e"
+      "sha256": "877d157db6857f8c11ffee07879b340910f650966c5934ca3bacc3081ce6e966"
     },
     {
       "name": "doctor-dashboard-native.json",
-      "sha256": "8f6b15bdd8e514c2af91cfe3d9851f3fb745e42f5fe201de426ca3b4c3a4a6c0"
+      "sha256": "0e01a664d22864239124d3afeae5df00be95efa89baca385b4228fc87d46aa05"
     },
     {
       "name": "doctor-inspect.json",
-      "sha256": "76ab47aaec2dc36fe49b9652b8964adbee60453358c795117d8730a61c170ef3"
+      "sha256": "6a79fbe81be6f4a05e2cf9dfcb952aa808c6bd03b8a3322f9b38e6baa1b6c035"
     },
     {
       "name": "doctor-replay.json",
-      "sha256": "4043773399fc8a6e553d9a019e1a21f4f6243a779bf9211d921d7f427a6f62cf"
+      "sha256": "d5e7393a4372c6221245806b7f81a673913d2f8db0686d6bc52149a4a001fc2b"
     },
     {
       "name": "judge-inspect.json",
-      "sha256": "7dd5386093a6bfd988c5abde710bb9870cd7f5ea6c9e51f6738d14f24daca1f8"
+      "sha256": "8eaadfb90b5705633533ad76323350a4736e60b31ecbb13252767203da4f3c6b"
     },
     {
       "name": "judge-replay.json",
-      "sha256": "56b4ae6486bb26a86f2e889592d433904419bf493f95daedc94cc65b7e9a9d0e"
+      "sha256": "10748be7696804ca481b208843384336240515d0dac5c9b29461d28425a7ed6e"
     },
     {
       "name": "provider-status.json",
@@ -43,7 +43,7 @@
       "status": "passed"
     }
   ],
-  "executed_at": "2026-07-16T20:02:12.083003+00:00",
+  "executed_at": "2026-07-16T20:15:03.308029+00:00",
   "mode": "linux-amd64",
   "platform": {
     "architecture": "amd64",
@@ -52,6 +52,6 @@
   "schema_version": "build-week-platform-evidence-v1",
   "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a",
   "source_dirty": false,
-  "source_revision": "18bc467d0f5de821552f66a323271bc5609c592a",
+  "source_revision": "60abfa2a46c22bb2eb1848c16bec69dc399d89f5",
   "status": "passed"
 }

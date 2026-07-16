@@ -41,17 +41,16 @@ product into a game submission.
 
 ## Deliberately unresolved or external
 
-- Docker is unavailable on the audited macOS host. Linux CI must prove native
-  amd64/container, pinned official Godot, native arm64, and the published image
-  manifest at the final delivery fingerprint.
+- Docker is unavailable on the audited macOS host. Workflow run `29531033847`
+  closed native amd64/container, pinned official Godot, native arm64, and the
+  published image manifest at the final delivery fingerprint.
 - Live OpenAI is not run without a restricted server-side key. DeepSeek does
   not substitute for this claim.
 - The local API is not a hosted multi-tenant service. Public static Judge Mode
   is safe; hosted execution requires authentication, quotas, retention limits,
   Origin/CSRF controls, and billing governance beyond the competition scope.
 - G5 correctly remains blocked for license selection, independent review,
-  manual comparison, final video/URLs, live GPT-5.6 evidence, and refreshed
-  registry assets.
+  manual comparison, final video/URLs, and live GPT-5.6 evidence.
 - The current secret scan is a bounded repository check, not a replacement for
   a mature credential scanner. The final release should add a hosted scanner.
 

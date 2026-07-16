@@ -6,7 +6,7 @@
     },
     {
       "name": "balance/ci-smoke/report_manifest.json",
-      "sha256": "53b3682b04d7689fceba7069a0d0bc16be940c3a6f024be466d3c82d408ff00c"
+      "sha256": "87377836b3e8b505ed674bb26de3c3700610fc91c8309d9148214014f545db0b"
     },
     {
       "name": "expected-demo-findings.json",
@@ -19,7 +19,7 @@
       "status": "passed"
     }
   ],
-  "executed_at": "2026-07-16T20:01:21.913141+00:00",
+  "executed_at": "2026-07-16T20:12:19.051285+00:00",
   "game_revision": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
   "mode": "linux-godot",
   "platform": {
@@ -29,7 +29,7 @@
   "schema_version": "build-week-platform-evidence-v1",
   "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a",
   "source_dirty": false,
-  "source_revision": "6f9f6b801d1c9e343fb552c2fdf8a12d990af620",
+  "source_revision": "60abfa2a46c22bb2eb1848c16bec69dc399d89f5",
   "status": "passed",
   "toolchain": {
     "godot": "4.4.stable.official.4c311cbee"

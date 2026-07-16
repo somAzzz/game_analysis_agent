@@ -23,19 +23,19 @@ overlay, and game/runtime/execution source fingerprints. The exact command set a
 `platform-evidence/macos-native.json`.
 
 At the same `6fd5874d` contract, Linux amd64 native/container acceptance passed in workflow run
-`29530325297`. Official Linux Godot 4.4 also passed in run `29530260522`: five
+`29531033847`. Official Linux Godot 4.4 also passed in that run: five
 contract validators were clean, and the three declared demo balance findings
 matched the exact pin-bound expected-failure contract. The generated evidence
 is retained in `platform-evidence/linux-amd64.json` and
 `platform-evidence/linux-godot.json`.
 
-This is not yet a complete cross-platform pass. Docker is absent locally and no
-OpenAI key is configured. Docker evidence is therefore assigned to the proven
-Linux amd64 CI path. Linux arm64 and the published multi-architecture registry
-manifest remain release gates rather than tested claims; the live OpenAI path
-also remains unproven.
+The same run published the amd64/arm64 GHCR image at index digest
+`sha256:59601230928f6da17f88dda1dd869cfee9a8a1b87323c442297bddad97f5a8c2`
+and executed that digest on a native Linux arm64 runner. Docker is absent
+locally, so the Linux jobs own the proven container path. The only remaining
+required platform row is the separately authorized live OpenAI campaign.
 
 Machine-readable details and remediation are in
-`P4-platform-delivery.review.json`. G4 remains open until arm64, registry, and
-the separately authorized live OpenAI evidence are replaced by dated run
-records rather than source inspection.
+`P4-platform-delivery.review.json`. G4 remains open until the separately
+authorized live OpenAI evidence is replaced by a dated run record rather than
+source inspection.

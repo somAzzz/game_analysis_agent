@@ -1,9 +1,9 @@
 # G4 Evaluator and Judge Experience Review
 
 - Decision: **failed**
-- Reviewed commit: `be56673fea66155e5eec93d2bcfa5a7a76ce10e0`
+- Reviewed commit: `03b1b7cfa745d5f168847438e55e4f445c9d9ae1`
 - Checks: 4
-- Failures: 2
+- Failures: 1
 
 ## Checks
 
@@ -11,8 +11,8 @@
 | --- | --- | --- |
 | restricted_evaluator | passed |  |
 | human_judge_ui | passed |  |
-| platform_delivery | failed | platform evidence incomplete or stale: ['linux_arm64_container', 'live_openai_campaign'] |
-| published_multiarch_image | failed | published image was not built from the current delivery contract |
+| platform_delivery | failed | platform evidence incomplete or stale: ['live_openai_campaign'] |
+| published_multiarch_image | passed |  |
 
 ## Decision
 

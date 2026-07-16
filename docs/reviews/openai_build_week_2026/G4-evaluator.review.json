@@ -21,27 +21,34 @@
       "status": "passed"
     },
     {
-      "error": "platform evidence incomplete or stale: ['linux_arm64_container', 'live_openai_campaign']",
+      "error": "platform evidence incomplete or stale: ['live_openai_campaign']",
       "evidence": {},
       "id": "platform_delivery",
       "status": "failed"
     },
     {
-      "error": "published image was not built from the current delivery contract",
-      "evidence": {},
+      "error": "",
+      "evidence": {
+        "index_digest": "sha256:59601230928f6da17f88dda1dd869cfee9a8a1b87323c442297bddad97f5a8c2",
+        "platforms": [
+          "linux/amd64",
+          "linux/arm64"
+        ],
+        "reference": "ghcr.io/somazzz/playtest-forge-judge:build-week-2026-60abfa2a46c22bb2eb1848c16bec69dc399d89f5",
+        "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a"
+      },
       "id": "published_multiarch_image",
-      "status": "failed"
+      "status": "passed"
     }
   ],
   "decision": "G4 failed closed; do not claim cross-platform Judge release readiness.",
-  "failure_count": 2,
+  "failure_count": 1,
   "failures": [
-    "platform_delivery",
-    "published_multiarch_image"
+    "platform_delivery"
   ],
   "gate": "G4",
-  "generated_at": "2026-07-16T20:11:15.394750+00:00",
-  "reviewed_commit": "be56673fea66155e5eec93d2bcfa5a7a76ce10e0",
+  "generated_at": "2026-07-16T20:21:04.242146+00:00",
+  "reviewed_commit": "03b1b7cfa745d5f168847438e55e4f445c9d9ae1",
   "schema_version": "build-week-g4-review-v1",
   "status": "failed"
 }

@@ -33,10 +33,10 @@ for a missing required capability. Optional missing tools are warnings.
 | macOS 26.5.2 arm64, native Inspect/Replay/UI | Passed at `be56673` / contract `6fd5874d` | Current evidence |
 | macOS arm64, Docker dashboard/Replay | Optional; Docker absent | Not required for release |
 | macOS arm64, fresh pinned Godot 4.4 | Passed at `be56673` / contract `6fd5874d` | Current evidence |
-| Linux amd64 native/container | Passed in run `29530325297` / contract `6fd5874d` | Current evidence |
-| Linux amd64, fresh pinned Godot 4.4 | Passed in run `29530260522`; five validators passed and three declared demo findings matched exactly | Current evidence |
-| Linux arm64 container | Passed on pre-embed image; refresh required | Historical evidence only |
-| Published amd64/arm64 image | Previous image fingerprint is stale | Rebuild and republish required |
+| Linux amd64 native/container | Passed in run `29531033847` / contract `6fd5874d` | Current evidence |
+| Linux amd64, fresh pinned Godot 4.4 | Passed in run `29531033847`; five validators passed and three declared demo findings matched exactly | Current evidence |
+| Linux arm64 container | Passed natively in run `29531033847` by registry index digest | Current evidence |
+| Published amd64/arm64 image | GHCR index `sha256:59601230928f…` from run `29531033847` | Current evidence |
 | Live OpenAI campaign | Not run; no server key | Optional capability only |
 
 See `docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json` for

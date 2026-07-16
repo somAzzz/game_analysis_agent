@@ -74,9 +74,9 @@ needs network, Docker, Godot, a model key, or a sibling game checkout.
 
 ## Platform handoff
 
-macOS can complete offline Judge, native API/UI, embedded runtime preparation,
-and pinned Godot 4.4 execution. This host has no Docker executable, so native
-Linux amd64, Docker clean-room, official Linux Godot, native arm64, and registry
-manifest proof are completed by GitHub Actions/Linux using the closeout runbook.
-Missing external evidence remains a failed or stale gate; it is never promoted
-from source inspection.
+macOS completed offline Judge, native API/UI, embedded runtime preparation, and
+pinned Godot 4.4 execution. This host has no Docker executable, so workflow run
+`29531033847` completed native Linux amd64, Docker clean-room, official Linux
+Godot, native arm64, and the registry manifest proof. Live OpenAI still needs a
+restricted server-side key. Missing external evidence remains a failed or stale
+gate; it is never promoted from source inspection.

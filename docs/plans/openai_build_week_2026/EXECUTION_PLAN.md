@@ -51,10 +51,10 @@ Verification completed on this revision family:
 - Python Judge/API/runtime tests and all 15 frontend tests passed;
 - the public frontend build passed and the same-origin route was visually
   checked at desktop and 390px width;
-- Docker could not be rerun on this macOS host because the executable is
-  unavailable. Because the delivery fingerprint changed, macOS acceptance,
-  Linux amd64/Godot, Linux arm64, and the published multi-arch image evidence
-  must be refreshed before G4 can pass;
+- final macOS native/Godot evidence passed at delivery contract `6fd5874d`;
+- workflow run `29531033847` passed Python/Ruff, frontend, Linux amd64
+  native/container, official Godot 4.4, multi-architecture GHCR publication,
+  and native Linux arm64 execution at the same contract;
 - `live_openai_campaign` still requires a restricted server-side OpenAI key;
 - the final repository license remains a G5 maintainer decision.
 
@@ -70,12 +70,9 @@ GPT-5.6 release evidence gates. Commits `d88158f`, `4749467`, `3be84c2`,
 
 The remaining execution order is now:
 
-1. regenerate the Judge manifest and macOS P4 evidence from a clean revision;
-2. push PR #5 and make required PR checks green;
-3. dispatch the Linux official-Godot job and import same-contract artifacts;
-4. publish and execute the digest-pinned multi-architecture image;
-5. run live OpenAI only with GPT-5.6-family evidence;
-6. close the human/license/video/URL items in G5.
+1. run live OpenAI only with GPT-5.6-family evidence and a restricted key;
+2. regenerate G4 after that evidence is imported;
+3. close the human/license/video/URL items in G5.
 
 ## 1. Purpose
 
@@ -878,15 +875,13 @@ substitute for native Linux container evidence.
 Compare artifact contracts and fixed-seed results across platforms; document
 legitimate platform metadata differences.
 
-**Implementation checkpoint (2026-07-16): partial.** macOS arm64 native
-Inspect, Replay, idempotent offline setup, static build, and Judge UI/API are
-verified. The repository-local pinned Godot 4.4 toolchain is installed, but its
-P4 acceptance row still needs a fresh release-revision run. A Linux amd64 job
-now exercises native and hardened container paths and uploads evidence, but it
-has not run for the local unpushed commit. Linux pinned-Godot 4.4, Linux arm64,
-and a server OpenAI campaign are also untested. See the P4 platform delivery
-review. P4.8 and G4 remain open until dated run evidence replaces the pending
-rows.
+**Implementation checkpoint (2026-07-16): platform-complete except live
+OpenAI.** macOS arm64 native Inspect, Replay, idempotent offline setup, Judge
+UI/API, and pinned Godot 4.4 are verified. Workflow run `29531033847` proves
+Linux amd64 native/container, official Godot 4.4, the published amd64/arm64
+registry index, and native arm64 execution at the same delivery contract. P4.8
+and G4 remain open only because the server OpenAI campaign requires a separately
+supplied restricted key.
 
 ### P4.9 Gate G4 — Automated evaluator and judge-experience review
 
@@ -914,21 +909,20 @@ rows.
 - macOS and Linux supported paths are evidenced.
 - Human UI makes the central claim and limitations clear.
 
-**Gate execution (2026-07-16): failed closed.** Six of eight checks passed:
-the restricted evaluator, human Judge UI contract, both offline modes,
-frontend tests, and public build. `platform_delivery` and
-`published_multiarch_image` failed because dated container/Linux evidence and
-a registry image-index digest do not exist yet. The generated G4 JSON is the
-authoritative blocker list; P5 release claims must not advance as though G4
-passed.
+**Latest gate execution (2026-07-16): failed closed only on live OpenAI.** The
+restricted evaluator, human Judge UI contract, offline modes, frontend checks,
+macOS/Linux delivery, and the current published image all pass. The platform
+review remains partial solely because `live_openai_campaign` has no authorized
+GPT-5.6 run. The generated G4 JSON is the authoritative blocker list; P5
+release claims must not advance as though G4 passed.
 
 ## 12. P5 — Produce submission evidence and release
 
 **Pre-release preparation (2026-07-16): complete but blocked.** A Devpost
 draft, 2:40 video script, release checklist, and machine-verified claim ledger
-now use only exact committed evidence. Unknown URLs, live runs, platform/image
-proof, manual timing, and clean-room review remain explicit placeholders or
-pending claims. The submission-asset reviewer passes the draft while returning
+now use only exact committed evidence. Unknown URLs, the live OpenAI run,
+manual timing, and clean-room review remain explicit placeholders or pending
+claims. The submission-asset reviewer passes the draft while returning
 `release_status: blocked`; this preparation does not satisfy the G4 dependency
 or authorize P5 release claims.
 

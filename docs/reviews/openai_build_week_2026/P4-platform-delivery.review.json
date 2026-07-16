@@ -1,7 +1,7 @@
 {
   "schema_version": "build-week-platform-review-v1",
-  "reviewed_at": "2026-07-16T20:08:27.014036+00:00",
-  "source_revision": "be56673fea66155e5eec93d2bcfa5a7a76ce10e0",
+  "reviewed_at": "2026-07-16T20:15:03.395242+00:00",
+  "source_revision": "60abfa2a46c22bb2eb1848c16bec69dc399d89f5",
   "contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a",
   "status": "partial",
   "platform": {
@@ -73,31 +73,25 @@
       "id": "linux_amd64_native_and_container",
       "status": "passed",
       "evidence": "platform-evidence/linux-amd64.json",
-      "source_revision": "18bc467d0f5de821552f66a323271bc5609c592a",
-      "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a",
-      "workflow_run_url": "https://github.com/somAzzz/game_analysis_agent/actions/runs/29530325297",
-      "workflow_job_id": 87728817644
+      "source_revision": "60abfa2a46c22bb2eb1848c16bec69dc399d89f5",
+      "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a"
     },
     {
       "id": "linux_pinned_real_godot",
       "status": "passed",
       "evidence": "platform-evidence/linux-godot.json",
-      "source_revision": "6f9f6b801d1c9e343fb552c2fdf8a12d990af620",
+      "source_revision": "60abfa2a46c22bb2eb1848c16bec69dc399d89f5",
       "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a",
-      "workflow_run_url": "https://github.com/somAzzz/game_analysis_agent/actions/runs/29530260522",
-      "workflow_job_id": 87728616677
+      "workflow_run_url": "https://github.com/somAzzz/game_analysis_agent/actions/runs/29531033847",
+      "workflow_job_id": 87731122139
     },
     {
       "id": "linux_arm64_container",
-      "status": "stale",
+      "status": "passed",
       "evidence": "platform-evidence/linux-arm64.json",
-      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
-      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
-      "workflow_run_url": "https://github.com/somAzzz/game_analysis_agent/actions/runs/29523961052",
-      "workflow_job_id": 87708003271,
-      "reason": "Evidence was produced for a different delivery contract.",
-      "remediation": "Publish the current multi-architecture image and run scripts/run-p4-linux-arm64-image on native arm64."
+      "source_revision": "60abfa2a46c22bb2eb1848c16bec69dc399d89f5",
+      "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a"
     }
   ],
-  "decision": "Platform delivery remains incomplete: ['linux_arm64_container', 'live_openai_campaign']."
+  "decision": "Platform delivery remains incomplete: ['live_openai_campaign']."
 }

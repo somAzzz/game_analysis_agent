@@ -4,6 +4,11 @@ This runbook closes only evidence that was actually executed. Source inspection,
 emulation, a feature-branch push without a PR, and a DeepSeek-compatible smoke
 must not be recorded as passing Linux or OpenAI evidence.
 
+Current closeout record: workflow run `29531033847` passed Linux amd64,
+official Godot 4.4, multi-architecture publication, and native Linux arm64 at
+delivery contract `6fd5874d`. Only the separately authorized live OpenAI row
+remains open in P4/G4.
+
 ## 1. Freeze the delivery revision
 
 Use the exact revision that will be judged and keep its worktree clean:
