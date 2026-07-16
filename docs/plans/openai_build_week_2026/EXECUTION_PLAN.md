@@ -708,6 +708,11 @@ support; the limitation is retained in the transfer review.
 - Label prerecorded evidence, live capability, unsupported capability, and
   failure distinctly.
 - Ensure no evaluator must infer commands from historical docs.
+- Put mandatory `$playtest-forge` routing in the root `AGENTS.md`, which Codex
+  loads before work, and the exact explicit prompt in README.
+- Hash the complete repository Skill in `judge-manifest.json`. If Skill
+  injection is unavailable, require direct `SKILL.md` reading as the evaluator
+  fallback instead of silently skipping the workflow.
 
 ### P4.4 Test the restricted environment and injected failures
 

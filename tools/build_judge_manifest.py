@@ -33,6 +33,23 @@ ARTIFACTS = {
     "examples/build_week_2026/experiment-v1/gate_report.json": ("repair-gate", "repair-bundle-gate-v1"),
     "docs/reviews/openai_build_week_2026/G2-campaign.review.json": ("independent-campaign-review", "build-week-g2-review-v1"),
     "docs/reviews/openai_build_week_2026/G3-repair.review.json": ("independent-repair-review", "build-week-g3-review-v1"),
+    ".agents/skills/playtest-forge/SKILL.md": ("codex-skill", None),
+    ".agents/skills/playtest-forge/agents/openai.yaml": ("codex-skill-metadata", None),
+    ".agents/skills/playtest-forge/references/automated-testing.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/design-contract.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/evidence-contract.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/evidence-to-parameters.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/migration-guide.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/repair-protocol.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/scenario-balance-economy.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/scenario-boundary-robustness.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/scenario-content-flow.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/session-case-study.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/subagent-playthrough.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/test-strategy.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/scripts/preflight": ("codex-skill-script", None),
+    ".agents/skills/playtest-forge/scripts/run-campaign": ("codex-skill-script", None),
+    ".agents/skills/playtest-forge/scripts/verify-repair": ("codex-skill-script", None),
 }
 
 CLAIMS = [
@@ -170,6 +187,18 @@ def build_manifest() -> dict[str, object]:
         "primary_commands": {
             "inspect": "./judge --mode inspect --offline --json --output-dir -",
             "replay": "./judge --mode replay --offline --json --output-dir -",
+        },
+        "codex_skill": {
+            "name": "playtest-forge",
+            "path": ".agents/skills/playtest-forge/SKILL.md",
+            "discovery_root": ".agents/skills",
+            "explicit_invocation": "$playtest-forge",
+            "fallback": "Read .agents/skills/playtest-forge/SKILL.md directly.",
+            "review_prompt": (
+                "Use $playtest-forge to review the committed automated and "
+                "persona-playthrough evidence, explain the rejected candidate, "
+                "and propose the next bounded experiment."
+            ),
         },
         "artifacts": artifacts,
         "claims": CLAIMS,

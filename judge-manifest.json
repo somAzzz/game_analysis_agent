@@ -147,6 +147,108 @@
       "role": "independent-repair-review",
       "schema_version": "build-week-g3-review-v1",
       "sha256": "0e0f57f8bf7b0b9188f7eac32f4cfaf5b4dc8aefe5ab8dfd1d368cd1816164cf"
+    },
+    {
+      "bytes": 5702,
+      "path": ".agents/skills/playtest-forge/SKILL.md",
+      "role": "codex-skill",
+      "sha256": "4eaaf728c05a860150e7930c548c503320e4e92dc35c95eb5af746bb7eb0af6f"
+    },
+    {
+      "bytes": 282,
+      "path": ".agents/skills/playtest-forge/agents/openai.yaml",
+      "role": "codex-skill-metadata",
+      "sha256": "345d487be72fd7d842e0a6321f9410fcfb0872c9986428af8dc9a2f35cc1a7ba"
+    },
+    {
+      "bytes": 1681,
+      "path": ".agents/skills/playtest-forge/references/automated-testing.md",
+      "role": "codex-skill-reference",
+      "sha256": "1a2b531d12328383e2ef82167036eabde43c50d21b2d51acd4a6823e97f58ebe"
+    },
+    {
+      "bytes": 1415,
+      "path": ".agents/skills/playtest-forge/references/design-contract.md",
+      "role": "codex-skill-reference",
+      "sha256": "6fab3b7b86b2f9be412e4b6b5e3afaa9c9e14a04a7292b6cffa6f5b431b01d41"
+    },
+    {
+      "bytes": 1981,
+      "path": ".agents/skills/playtest-forge/references/evidence-contract.md",
+      "role": "codex-skill-reference",
+      "sha256": "3a712d02b20ecead813d0b7402a6038fd8ebe229f9596aa39c5addcf472c277d"
+    },
+    {
+      "bytes": 2072,
+      "path": ".agents/skills/playtest-forge/references/evidence-to-parameters.md",
+      "role": "codex-skill-reference",
+      "sha256": "b3ec9f7dc1dcb8d70f7dffc7f95378ce09200cd0467851d11951a5f23661ac8c"
+    },
+    {
+      "bytes": 1755,
+      "path": ".agents/skills/playtest-forge/references/migration-guide.md",
+      "role": "codex-skill-reference",
+      "sha256": "f5160126da4addd13ad9c05fb340dffc34844d60edd12f22c915b60791069b34"
+    },
+    {
+      "bytes": 2061,
+      "path": ".agents/skills/playtest-forge/references/repair-protocol.md",
+      "role": "codex-skill-reference",
+      "sha256": "34db0b69d373ab1334083aa30d4c64a0e69ebaed3efa8d98315d9aad7e1cad74"
+    },
+    {
+      "bytes": 1088,
+      "path": ".agents/skills/playtest-forge/references/scenario-balance-economy.md",
+      "role": "codex-skill-reference",
+      "sha256": "a764f863856505ae9fbabd8a3fd842d7334c9262cbbf5a4f85f26ebd82ed0949"
+    },
+    {
+      "bytes": 996,
+      "path": ".agents/skills/playtest-forge/references/scenario-boundary-robustness.md",
+      "role": "codex-skill-reference",
+      "sha256": "ac532001c05c52c382b29b690cc8812493e65a1cdd9cbcae24bad621fd243f0f"
+    },
+    {
+      "bytes": 890,
+      "path": ".agents/skills/playtest-forge/references/scenario-content-flow.md",
+      "role": "codex-skill-reference",
+      "sha256": "4eea3936cd0dd76a8eaa271fd8e925dd89d8ab172bcacaf802fdc735b35816b8"
+    },
+    {
+      "bytes": 2035,
+      "path": ".agents/skills/playtest-forge/references/session-case-study.md",
+      "role": "codex-skill-reference",
+      "sha256": "c068eaf9f60402d266b11b56c5f35b431d98ff0956a8625679260ffa9c73aaab"
+    },
+    {
+      "bytes": 1915,
+      "path": ".agents/skills/playtest-forge/references/subagent-playthrough.md",
+      "role": "codex-skill-reference",
+      "sha256": "e6ab47812a54f560ecf40e07f020ba38986aa3ae0dec275f362ff95ee9d5d975"
+    },
+    {
+      "bytes": 1606,
+      "path": ".agents/skills/playtest-forge/references/test-strategy.md",
+      "role": "codex-skill-reference",
+      "sha256": "c8cb5309d0658beefdbd3864b0931329420259f223aae6395a758f25c1c9c847"
+    },
+    {
+      "bytes": 209,
+      "path": ".agents/skills/playtest-forge/scripts/preflight",
+      "role": "codex-skill-script",
+      "sha256": "d1b658c0c7aa97206cdeeb0a9480623daf78fd8b370f74c207943bda12505f33"
+    },
+    {
+      "bytes": 148,
+      "path": ".agents/skills/playtest-forge/scripts/run-campaign",
+      "role": "codex-skill-script",
+      "sha256": "fcda14a75edab4b4524e780e013c8aef3861fa9a45c8640aae6f28e0dac87c62"
+    },
+    {
+      "bytes": 257,
+      "path": ".agents/skills/playtest-forge/scripts/verify-repair",
+      "role": "codex-skill-script",
+      "sha256": "bd7f3284ac502cfdeb44a529a713bc12a73212c2a8ad9dcf7490ebf412453f0d"
     }
   ],
   "claims": [
@@ -262,6 +364,14 @@
       "statement": "The campaign and causal repair experiment pass independent evidence reviews."
     }
   ],
+  "codex_skill": {
+    "discovery_root": ".agents/skills",
+    "explicit_invocation": "$playtest-forge",
+    "fallback": "Read .agents/skills/playtest-forge/SKILL.md directly.",
+    "name": "playtest-forge",
+    "path": ".agents/skills/playtest-forge/SKILL.md",
+    "review_prompt": "Use $playtest-forge to review the committed automated and persona-playthrough evidence, explain the rejected candidate, and propose the next bounded experiment."
+  },
   "evidence_revision": "build-week-2026-p3-g3-v1",
   "limitations": [
     "Inspect validates committed evidence; it does not perform a fresh model or Godot run.",

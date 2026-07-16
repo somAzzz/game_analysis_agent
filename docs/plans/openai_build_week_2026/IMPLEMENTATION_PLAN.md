@@ -531,6 +531,15 @@ timeouts, fixture hashes, experiment IDs, expected gate outcomes, public demo
 URL, and documentation paths. A model should not have to infer the canonical
 command from prose or search across historical reports.
 
+For Codex-based review, the root `AGENTS.md` must route matching game-test and
+repair tasks to the repository-scoped `$playtest-forge` Skill after offline
+Inspect/Replay. README must provide the exact explicit invocation. The manifest
+must name and hash the Skill directory. Because the external judging surface is
+not guaranteed to expose Codex Skill selectors, the same instructions must
+require direct reading of `.agents/skills/playtest-forge/SKILL.md` as a
+functionally equivalent fallback; do not claim universal auto-loading outside
+documented Codex environments.
+
 ### 8.8 Automated-deployment failure protocol
 
 The root entrypoint writes `artifacts/judge-result.json` atomically when the

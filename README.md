@@ -9,7 +9,7 @@ The primary review path is repository-only and offline:
 ./judge --mode replay --offline --json --output-dir -
 ```
 
-Inspect needs only Python 3.9+ and validates 22 committed artifact hashes,
+Inspect needs only Python 3.9+ and validates 39 committed artifact hashes,
 schemas, provenance gates, and six exact public claim references. Replay adds
 the locked `uv` environment and consumes hash-pinned persona fixtures; it does
 not need Godot, Docker, a GPU, network, an API key, a browser, or the private
@@ -27,6 +27,37 @@ To prepare the complete evaluator UI from locked dependencies, run
 when dependency caches are already populated. `tools/judge_doctor.py` reports
 whether a selected native, container, real-game, or live-OpenAI mode is ready
 without printing environment secrets.
+
+## Codex Skill discovery and evaluator route
+
+The complete reusable workflow is checked in at
+[`.agents/skills/playtest-forge/SKILL.md`](.agents/skills/playtest-forge/SKILL.md).
+When Codex starts from the repository root, it scans `.agents/skills` and sees
+the Skill metadata automatically. Codex can then select it implicitly from the
+task description; explicit `$playtest-forge` invocation is more deterministic
+for judging.
+
+Recommended AI-review sequence:
+
+1. Run the two offline Judge commands above.
+2. Invoke:
+
+   ```text
+   Use $playtest-forge to review the committed automated and persona-playthrough
+   evidence, explain the rejected candidate, and propose the next bounded experiment.
+   ```
+
+3. Verify that the response distinguishes automated, live, focused, and
+   prerecorded evidence; cites fixed and holdout results; and does not claim
+   the rejected patch was merged.
+
+If `$playtest-forge` is unavailable in the evaluator UI, read `SKILL.md`
+directly and follow its routed references. This fallback preserves the review
+workflow for non-Codex or restricted evaluators. The full Skill bundle is
+tracked by Git and hash-verified by `judge-manifest.json`; it is not excluded
+because `.agents` is a hidden directory. See the official
+[Codex Skills guide](https://learn.chatgpt.com/docs/build-skills) for repository
+discovery and explicit/implicit invocation behavior.
 
 Development-side AI agent pipeline for simulation games. The current reference
 integration is the Godot `study-in-germany` demo, but the project is structured

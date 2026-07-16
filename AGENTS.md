@@ -1,5 +1,31 @@
 # Repository agent notes
 
+## Codex Skill discovery and mandatory routing
+
+Launch Codex from this repository root. Codex scans
+`$REPO_ROOT/.agents/skills`, so the checked-in `playtest-forge` metadata is
+available for implicit selection. `AGENTS.md` is loaded before work; the full
+Skill uses progressive disclosure and is read after selection.
+
+For any request involving game testing, judging, diagnosis, balance, economy,
+content routes, boundaries, persona/subagent playthroughs, parameter tuning, or
+game repair, **use `$playtest-forge`** after the two offline evaluator commands
+below. Read `.agents/skills/playtest-forge/SKILL.md` completely, then read only
+the scenario references it routes to. A canonical explicit evaluator prompt is:
+
+```text
+Use $playtest-forge to review the committed automated and persona-playthrough
+evidence, explain the rejected candidate, and propose the next bounded experiment.
+```
+
+If the evaluator does not expose a Skill selector, does not inject a Skill
+list, or is not Codex, treat direct reading of
+`.agents/skills/playtest-forge/SKILL.md` as the mandatory fallback. Do not infer
+that the full Skill was loaded merely because this `AGENTS.md` was loaded. The
+repository guarantees a tracked, hash-verified Skill and this routing rule; it
+does not claim that an undisclosed third-party evaluator implements Codex Skill
+discovery.
+
 ## Automated evaluator: run this first
 
 From the repository root, use the offline paths before attempting Docker,
@@ -11,7 +37,7 @@ Godot, a browser, or any model provider:
 ```
 
 `inspect` uses only the Python standard library and verifies the committed
-`judge-manifest.json`, 22 artifact hashes/schemas, and six claim-to-evidence
+`judge-manifest.json`, 39 artifact hashes/schemas, and six claim-to-evidence
 references. `replay` additionally requires `uv` and the locked environment; it
 consumes exact hash-pinned persona fixtures and rechecks representative persona,
 determinism, designed-failure, and rejected-repair gates. Neither command needs
@@ -69,11 +95,10 @@ typed request/result services.
 
 ## Build Week repair workflow
 
-For a request to diagnose, repair, evaluate, or judge the committed Build Week
-persona campaign, run `.agents/skills/playtest-forge/scripts/preflight` before
-inspecting candidate game changes. Then use the repository Skill at
-`.agents/skills/playtest-forge/SKILL.md`. It requires facts before inference,
-one mechanism, an isolated game worktree, budgeted allowlisted edits, fixed and
-unseen-holdout verification, and an explicit accepted/rejected record. Never
-edit the canonical baseline bundle under `reports/build-week-2026/game-source`
-in place and never merge a repair automatically.
+For the committed Build Week persona campaign, run
+`.agents/skills/playtest-forge/scripts/preflight` before inspecting candidate
+game changes. The Skill requires facts before inference, one mechanism, an
+isolated game worktree, budgeted allowlisted edits, fixed and unseen-holdout
+verification, and an explicit accepted/rejected record. Never edit the
+canonical baseline bundle under `reports/build-week-2026/game-source` in place
+and never merge a repair automatically.
