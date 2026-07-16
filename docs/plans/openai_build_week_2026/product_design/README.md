@@ -11,13 +11,13 @@ was run.
 
 ## Evidence set
 
-- `evidence/01-judge-mode.png` — evaluator landing page and rejected decision.
-- `evidence/02-campaign-stage.png` — campaign-stage evidence presentation.
-- `evidence/03-report-archive.png` — retained report archive.
-- `evidence/04-issue-detail.png` — selected issue evidence and diagnosis.
-- `evidence/05-decision-graph-cover.png` — decision-graph entry state.
-- `evidence/06-decision-graph-canvas.png` — decision-graph exploration state.
-- `evidence/07-decision-graph-playback.png` — decision playback state.
+- `evidence/01-judge-mode.jpg` — evaluator landing page and rejected decision.
+- `evidence/02-campaign-stage.jpg` — campaign-stage evidence presentation.
+- `evidence/03-report-archive.jpg` — retained report archive.
+- `evidence/04-issue-detail.jpg` — selected issue evidence and diagnosis.
+- `evidence/05-decision-graph-cover.jpg` — decision-graph entry state.
+- `evidence/06-decision-graph-canvas.jpg` — decision-graph exploration state.
+- `evidence/07-decision-graph-playback.jpg` — decision playback state.
 
 These images are supporting material for product-design review and demo/video
 planning. Automated reviewers should start from
