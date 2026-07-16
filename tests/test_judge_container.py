@@ -98,6 +98,13 @@ def test_linux_godot_runner_creates_output_before_first_redirect() -> None:
     assert script.index('mkdir -p "$OUTPUT"') < script.index('> "$OUTPUT/embedded-demo.json"')
 
 
+def test_godot_workflow_uses_job_safe_embedded_runtime_path() -> None:
+    workflow = yaml.safe_load((ROOT / ".github/workflows/test.yml").read_text(encoding="utf-8"))
+    game_path = workflow["jobs"]["godot-contract"]["env"]["GAME_PROJECT_PATH"]
+
+    assert game_path == "${{ github.workspace }}/game-analysis-agent/reports/game-runtime"
+
+
 def test_workflow_publishes_then_executes_image_on_native_arm64() -> None:
     workflow = yaml.safe_load((ROOT / ".github/workflows/test.yml").read_text(encoding="utf-8"))
     publish = workflow["jobs"]["publish-judge-image"]

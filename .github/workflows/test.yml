@@ -301,7 +301,7 @@ jobs:
     timeout-minutes: 30
     env:
       GODOT_VERSION: ${{ inputs.godot_version || '4.4-stable' }}
-      GAME_PROJECT_PATH: ${{ runner.temp }}/study-in-germany
+      GAME_PROJECT_PATH: ${{ github.workspace }}/game-analysis-agent/reports/game-runtime
       GODOT_BIN: godot4
     steps:
       - name: Checkout analysis agent
