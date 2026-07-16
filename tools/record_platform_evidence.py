@@ -264,13 +264,18 @@ def _live_openai(directory: Path, _revision: str) -> tuple[dict[str, Any], list[
     _require(result.get("provider") == "openai", "live campaign provider is not OpenAI")
     _require(result.get("mode") == "live", "live result is not labeled live")
     evidence = result.get("provider_evidence") or {}
+    model = str(result.get("model", ""))
+    _require(
+        model == "gpt-5.6" or model.startswith("gpt-5.6-"),
+        "live campaign did not use the required GPT-5.6 model family",
+    )
     _require(int(evidence.get("call_count", 0)) > 0, "live result contains no completed provider calls")
     _require(bool(evidence.get("response_ids")), "live result contains no OpenAI response IDs")
     _require(evidence.get("outputs_recorded") is False, "live result claims raw model outputs were retained")
     return {
         "platform": {"system": platform.system(), "architecture": platform.machine()},
         "provider": "openai",
-        "model": result.get("model"),
+        "model": model,
         "checks": [{"id": MODE_CHECKS["live-openai"][0], "status": "passed"}],
     }, [path]
 

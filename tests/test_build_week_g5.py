@@ -105,6 +105,12 @@ def test_complete_synthetic_submission_can_pass_all_g5_checks(tmp_path: Path) ->
                 "raw_prompts_committed": False,
                 "raw_model_outputs_committed": False,
             },
+            "codex_model": "gpt-5.6",
+            "codex_model_evidence": {
+                "status": "verified",
+                "source": "test fixture",
+                "verified_at": "2026-07-16T00:00:00Z",
+            },
         }
     )
     metadata["repository"] = {

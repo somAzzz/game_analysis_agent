@@ -155,7 +155,7 @@ def test_live_openai_requires_completed_calls_and_rejects_secret(tmp_path: Path)
         "result": {
             "provider": "openai",
             "mode": "live",
-            "model": "gpt-test",
+            "model": "gpt-5.6-luna",
             "provider_evidence": {
                 "call_count": 2,
                 "response_ids": ["resp_1"],
@@ -171,6 +171,29 @@ def test_live_openai_requires_completed_calls_and_rejects_secret(tmp_path: Path)
     result["debug"] = "sk-should-not-be-retained"
     _write(tmp_path / "live-openai-campaign.json", result)
     with pytest.raises(PlatformEvidenceError, match="secret"):
+        build_evidence("live-openai", tmp_path)
+
+
+def test_live_openai_rejects_wrong_model_family(tmp_path: Path) -> None:
+    _write(
+        tmp_path / "live-openai-campaign.json",
+        {
+            "status": "completed",
+            "mode": "live",
+            "result": {
+                "provider": "openai",
+                "mode": "live",
+                "model": "gpt-test",
+                "provider_evidence": {
+                    "call_count": 1,
+                    "response_ids": ["resp_1"],
+                    "outputs_recorded": False,
+                },
+            },
+        },
+    )
+
+    with pytest.raises(PlatformEvidenceError, match="GPT-5.6"):
         build_evidence("live-openai", tmp_path)
 
 

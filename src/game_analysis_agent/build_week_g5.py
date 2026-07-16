@@ -137,7 +137,20 @@ def _release_metadata(project: Path) -> dict[str, Any]:
         devpost = (project / "submission/build-week-2026/DEVPOST_DRAFT.md").read_text(encoding="utf-8")
         _require(str(item["url"]) in devpost, f"{field} URL is absent from Devpost draft")
     _require(bool(value.get("codex_session_id")), "Codex feedback session id is missing")
-    return {"repository": value["repository"]["url"], "public_ui": value["public_ui"]["url"]}
+    codex_model = str(value.get("codex_model", ""))
+    _require(
+        codex_model == "gpt-5.6" or codex_model.startswith("gpt-5.6-"),
+        "Codex GPT-5.6 model evidence is missing",
+    )
+    model_evidence = value.get("codex_model_evidence") or {}
+    _require(model_evidence.get("status") == "verified", "Codex model evidence is not verified")
+    _require(bool(model_evidence.get("source")), "Codex model evidence source is missing")
+    _require(bool(model_evidence.get("verified_at")), "Codex model evidence date is missing")
+    return {
+        "repository": value["repository"]["url"],
+        "public_ui": value["public_ui"]["url"],
+        "codex_model": codex_model,
+    }
 
 
 def _manual_comparison(project: Path) -> dict[str, Any]:

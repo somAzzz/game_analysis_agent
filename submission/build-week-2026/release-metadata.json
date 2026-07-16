@@ -14,6 +14,12 @@
     "verified_at": "2026-07-16T18:19:00Z"
   },
   "codex_session_id": "019f6816-fe0d-78a2-9001-1890b32ef820",
+  "codex_model": "",
+  "codex_model_evidence": {
+    "status": "pending",
+    "source": "",
+    "verified_at": ""
+  },
   "license_path": "",
   "privacy_review": {
     "status": "pending",
