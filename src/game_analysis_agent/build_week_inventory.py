@@ -224,9 +224,11 @@ def _game_inventory(
 
 def _collect_tools(*, env: Mapping[str, str], runner: CommandRunner) -> dict[str, Any]:
     godot_override = env.get("GODOT_BIN")
+    node_override = env.get("BUILD_WEEK_NODE_BIN")
+    npm_override = env.get("BUILD_WEEK_NPM_BIN")
     tool_specs: dict[str, tuple[list[str], list[str]]] = {
-        "node": (["node"], ["--version"]),
-        "npm": (["npm"], ["--version"]),
+        "node": ([node_override] if node_override else ["node"], ["--version"]),
+        "npm": ([npm_override] if npm_override else ["npm"], ["--version"]),
         "uv": (["uv"], ["--version"]),
         "ruff": (["ruff"], ["--version"]),
         "docker": (["docker"], ["--version"]),
