@@ -203,13 +203,19 @@ def test_campaign_capacity_and_cancellation_are_enforced(tmp_path: Path) -> None
     assert second_result["status"] == "completed"
 
 
-def test_http_surface_status_replay_events_and_experiment() -> None:
+def test_http_surface_status_replay_events_and_experiment(tmp_path: Path) -> None:
     from http.server import ThreadingHTTPServer
 
     service = JudgeService(project_root=ROOT, environment={})
-    server = ThreadingHTTPServer(
-        ("127.0.0.1", 0), handler_factory(service, ROOT / "frontend/dist")
+    frontend = tmp_path / "dist"
+    asset = frontend / "assets/app.js"
+    asset.parent.mkdir(parents=True)
+    asset.write_text("/*" + "judge-fixture" * 100 + "*/\n", encoding="utf-8")
+    (frontend / "index.html").write_text(
+        '<div id="root"></div><script src="/game_analysis_agent/assets/app.js"></script>',
+        encoding="utf-8",
     )
+    server = ThreadingHTTPServer(("127.0.0.1", 0), handler_factory(service, frontend))
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     base = f"http://127.0.0.1:{server.server_port}"
