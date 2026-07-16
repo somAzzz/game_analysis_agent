@@ -10,6 +10,7 @@
     "commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
     "tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
     "archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "content_tree_sha256": "4eb4274742b4732f74102400bef4c249fcfab63da163b42e8276166944ab6e95",
     "file_count": 80
   },
   "packaging": {

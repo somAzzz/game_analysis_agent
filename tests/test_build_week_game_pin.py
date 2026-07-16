@@ -77,6 +77,7 @@ def _manifest(repo: Path, commit: str, path: Path) -> dict:
             "tree": tree,
             "archive_sha256": hashlib.sha256(archive).hexdigest(),
             "file_count": len(names),
+            "content_tree_sha256": "0" * 64,
         },
         "packaging": {
             "mode": "private_competition_bundle",
@@ -84,6 +85,27 @@ def _manifest(repo: Path, commit: str, path: Path) -> dict:
         },
         "required_files": required_files,
     }
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    output = path.parent / "pin-bootstrap"
+    archive_bytes = _git(repo, "archive", "--format=tar", commit)
+    import io
+    import tarfile
+
+    with tarfile.open(fileobj=io.BytesIO(archive_bytes), mode="r:") as bundle:
+        bundle.extractall(output)
+    inventory = []
+    for item in sorted(candidate for candidate in output.rglob("*") if candidate.is_file()):
+        inventory.append({
+            "path": item.relative_to(output).as_posix(),
+            "mode": 0o755 if item.stat().st_mode & 0o111 else 0o644,
+            "sha256": hashlib.sha256(item.read_bytes()).hexdigest(),
+        })
+    digest = hashlib.sha256()
+    for item in inventory:
+        digest.update(str(item["mode"]).encode("ascii") + b"\0")
+        digest.update(item["path"].encode() + b"\0")
+        digest.update(item["sha256"].encode("ascii") + b"\n")
+    payload["pin"]["content_tree_sha256"] = digest.hexdigest()
     path.write_text(json.dumps(payload), encoding="utf-8")
     return payload
 
@@ -187,7 +209,7 @@ def test_materialize_refuses_to_replace_unmanaged_directory(tmp_path: Path) -> N
     assert (output / "user-file.txt").read_text(encoding="utf-8") == "preserve me"
 
 
-def test_materialize_replaces_only_matching_managed_directory(tmp_path: Path) -> None:
+def test_materialize_refuses_managed_directory_with_extra_file(tmp_path: Path) -> None:
     repo, commit = _repository(tmp_path)
     pin_path = tmp_path / "pin.json"
     manifest = _manifest(repo, commit, pin_path)
@@ -195,11 +217,11 @@ def test_materialize_replaces_only_matching_managed_directory(tmp_path: Path) ->
     first = materialize_game_tree(repo, manifest, output)
     (output / "extra.txt").write_text("remove", encoding="utf-8")
 
-    second = materialize_game_tree(repo, manifest, output, replace=True)
+    with pytest.raises(GamePinError, match="unmanaged materialized"):
+        materialize_game_tree(repo, manifest, output, replace=True)
 
-    assert first["content_tree_sha256"] == second["content_tree_sha256"]
-    assert not (output / "extra.txt").exists()
-    assert not output.with_name(".materialized.previous").exists()
+    assert first["content_tree_sha256"]
+    assert (output / "extra.txt").is_file()
 
 
 def test_verify_materialized_tree_detects_source_mutation_without_upstream_git(
@@ -217,4 +239,36 @@ def test_verify_materialized_tree_detects_source_mutation_without_upstream_git(
     assert result["commit"] == commit
     (output / "project.godot").write_text("mutated\n", encoding="utf-8")
     with pytest.raises(GamePinError, match="file mismatch: project.godot"):
+        verify_materialized_game_tree(output, manifest)
+
+
+def test_verify_materialized_tree_rejects_regenerated_unpinned_inventory(
+    tmp_path: Path,
+) -> None:
+    repo, commit = _repository(tmp_path)
+    extra = repo / "data/extra.json"
+    extra.parent.mkdir()
+    extra.write_text("original\n", encoding="utf-8")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "--amend", "--no-edit", "-q")
+    commit = _git(repo, "rev-parse", "HEAD").decode().strip()
+    pin_path = tmp_path / "pin.json"
+    manifest = _manifest(repo, commit, pin_path)
+    output = tmp_path / "embedded"
+    materialize_game_tree(repo, manifest, output)
+    extra = output / "data/extra.json"
+    extra.write_text("tampered\n", encoding="utf-8")
+    marker_path = output / ".playtest-forge-source.json"
+    marker = json.loads(marker_path.read_text(encoding="utf-8"))
+    entry = next(item for item in marker["files"] if item["path"] == "data/extra.json")
+    entry["sha256"] = hashlib.sha256(extra.read_bytes()).hexdigest()
+    digest = hashlib.sha256()
+    for item in marker["files"]:
+        digest.update(str(item["mode"]).encode("ascii") + b"\0")
+        digest.update(item["path"].encode() + b"\0")
+        digest.update(item["sha256"].encode("ascii") + b"\n")
+    marker["content_tree_sha256"] = digest.hexdigest()
+    marker_path.write_text(json.dumps(marker), encoding="utf-8")
+
+    with pytest.raises(GamePinError, match="content_tree_sha256|content-tree hash"):
         verify_materialized_game_tree(output, manifest)

@@ -45,3 +45,46 @@ def test_refuses_to_replace_an_unmanaged_destination(tmp_path: Path) -> None:
         prepare_embedded_game_runtime(ROOT, output, replace=True)
 
     assert (output / "keep.txt").read_text(encoding="utf-8") == "owner data"
+
+
+def test_refuses_minimal_forged_runtime_marker(tmp_path: Path) -> None:
+    output = tmp_path / "game-runtime"
+    output.mkdir()
+    pin = load_game_pin(ROOT / "config/build_week_2026_game_pin.json")
+    (output / RUNTIME_OVERLAY_FILE).write_text(
+        json.dumps({
+            "schema_version": "build-week-game-runtime-overlay-v1",
+            "base_commit": pin["pin"]["commit"],
+        }),
+        encoding="utf-8",
+    )
+    (output / "keep.txt").write_text("owner data", encoding="utf-8")
+
+    with pytest.raises(GamePinError, match="different provenance"):
+        prepare_embedded_game_runtime(ROOT, output, replace=True)
+
+    assert (output / "keep.txt").is_file()
+
+
+def test_replaces_only_intact_runtime_with_known_generated_files(tmp_path: Path) -> None:
+    output = tmp_path / "game-runtime"
+    prepare_embedded_game_runtime(ROOT, output)
+    generated = output / ".godot/imported/cache.bin"
+    generated.parent.mkdir(parents=True)
+    generated.write_bytes(b"cache")
+
+    result = prepare_embedded_game_runtime(ROOT, output, replace=True)
+
+    assert result["status"] == "prepared"
+    assert not generated.exists()
+
+
+def test_refuses_runtime_with_unmanaged_extra_file(tmp_path: Path) -> None:
+    output = tmp_path / "game-runtime"
+    prepare_embedded_game_runtime(ROOT, output)
+    (output / "owner.txt").write_text("preserve", encoding="utf-8")
+
+    with pytest.raises(GamePinError, match="unmanaged files"):
+        prepare_embedded_game_runtime(ROOT, output, replace=True)
+
+    assert (output / "owner.txt").is_file()

@@ -56,6 +56,8 @@ def load_game_pin(path: str | Path) -> dict[str, Any]:
         raise GamePinError("game pin tree must be a full 40-character Git SHA")
     if not _SHA256.fullmatch(str(pin.get("archive_sha256", ""))):
         raise GamePinError("game pin archive_sha256 must be a SHA-256 digest")
+    if not _SHA256.fullmatch(str(pin.get("content_tree_sha256", ""))):
+        raise GamePinError("game pin content_tree_sha256 must be a SHA-256 digest")
     if not isinstance(pin.get("file_count"), int) or pin["file_count"] < 1:
         raise GamePinError("game pin file_count must be a positive integer")
     if packaging.get("mode") not in {"private_competition_bundle", "public_bundle"}:
@@ -210,7 +212,7 @@ def materialize_game_tree(
     if output.exists():
         if not replace:
             raise GamePinError("materialized game destination already exists; use --replace")
-        _require_managed_destination(output, expected_commit=verification["commit"])
+        _require_managed_destination(output, manifest=manifest)
 
     archive = _git_bytes(source, "archive", "--format=tar", verification["commit"])
     temporary = Path(tempfile.mkdtemp(prefix=f".{output.name}.", dir=output.parent))
@@ -225,6 +227,8 @@ def materialize_game_tree(
             )
         _verify_materialized_required_files(temporary, verification["required_files"])
         content_tree_sha256 = _content_tree_sha256(content_inventory)
+        if content_tree_sha256 != _mapping(manifest, "pin")["content_tree_sha256"]:
+            raise GamePinError("materialized game content tree differs from the pinned snapshot")
         provenance = {
             "schema_version": MATERIALIZED_SCHEMA_VERSION,
             "repository": verification["repository"],
@@ -289,6 +293,7 @@ def verify_materialized_game_tree(
         "commit": pin["commit"],
         "tree": pin["tree"],
         "archive_sha256": pin["archive_sha256"],
+        "content_tree_sha256": pin["content_tree_sha256"],
         "file_count": pin["file_count"],
         "public_distribution": packaging.get("public_distribution", False),
     }
@@ -313,12 +318,25 @@ def verify_materialized_game_tree(
         if not _SHA256.fullmatch(digest) or not isinstance(mode, int):
             raise GamePinError(f"invalid materialized game inventory: {relative}")
         path = root / relative
-        if not path.is_file():
+        if path.is_symlink() or not path.is_file():
             raise GamePinError(f"materialized game file missing: {relative}")
+        if _portable_mode(path) != mode:
+            raise GamePinError(f"materialized game file mode mismatch: {relative}")
         if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
             raise GamePinError(f"materialized game file mismatch: {relative}")
         normalized.append({"path": relative, "mode": mode, "sha256": digest})
-    if _content_tree_sha256(normalized) != marker.get("content_tree_sha256"):
+    actual_paths = {
+        path.relative_to(root).as_posix()
+        for path in root.rglob("*")
+        if path.is_file() or path.is_symlink()
+    }
+    expected_paths = seen | {MATERIALIZED_PROVENANCE_FILE}
+    if actual_paths != expected_paths:
+        raise GamePinError("materialized game file set differs from pinned inventory")
+    if (
+        _content_tree_sha256(normalized) != marker.get("content_tree_sha256")
+        or marker.get("content_tree_sha256") != pin["content_tree_sha256"]
+    ):
         raise GamePinError("materialized game content-tree hash mismatch")
     _verify_materialized_required_files(root, list(manifest["required_files"]))
     return {
@@ -355,7 +373,9 @@ def prepare_embedded_game_runtime(
     if output.exists():
         if not replace:
             raise GamePinError("runtime game destination already exists; use --replace")
-        _require_managed_runtime_destination(output, expected_commit=verification["commit"])
+        _require_managed_runtime_destination(
+            output, project=project, source=source, verification=verification
+        )
 
     overlay_source = project / "scripts/tools/RunInteractiveProbe.gd"
     if not overlay_source.is_file():
@@ -455,7 +475,7 @@ def _materialized_inventory(root: Path) -> list[dict[str, Any]]:
         inventory.append(
             {
                 "path": relative,
-                "mode": path.stat().st_mode & 0o777,
+                "mode": _portable_mode(path),
                 "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
             }
         )
@@ -486,32 +506,88 @@ def _verify_materialized_required_files(
             raise GamePinError(f"materialized required file mismatch: {item['path']}")
 
 
-def _require_managed_destination(path: Path, *, expected_commit: str) -> None:
-    marker = path / MATERIALIZED_PROVENANCE_FILE
+def _portable_mode(path: Path) -> int:
+    """Return a cross-platform Git-style regular-file mode."""
+
+    return 0o755 if path.stat().st_mode & 0o111 else 0o644
+
+
+def _require_managed_destination(path: Path, *, manifest: Mapping[str, Any]) -> None:
     try:
-        payload = json.loads(marker.read_text(encoding="utf-8"))
-    except (FileNotFoundError, json.JSONDecodeError, OSError) as exc:
+        verify_materialized_game_tree(path, manifest)
+    except (GamePinError, OSError) as exc:
         raise GamePinError(
             "refusing to replace an unmanaged materialized game destination"
         ) from exc
-    if (
-        payload.get("schema_version") != MATERIALIZED_SCHEMA_VERSION
-        or payload.get("commit") != expected_commit
-    ):
-        raise GamePinError("refusing to replace a materialized game with different provenance")
 
 
-def _require_managed_runtime_destination(path: Path, *, expected_commit: str) -> None:
+def _require_managed_runtime_destination(
+    path: Path,
+    *,
+    project: Path,
+    source: Path,
+    verification: Mapping[str, Any],
+) -> None:
     marker = path / RUNTIME_OVERLAY_FILE
     try:
         payload = json.loads(marker.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError, OSError) as exc:
         raise GamePinError("refusing to replace an unmanaged runtime game destination") from exc
-    if (
-        payload.get("schema_version") != RUNTIME_OVERLAY_SCHEMA_VERSION
-        or payload.get("base_commit") != expected_commit
-    ):
+    overlay_path = "scripts/tools/RunInteractiveProbe.gd"
+    overlay_source = project / overlay_path
+    expected_overlay = {
+        "path": overlay_path,
+        "source": overlay_path,
+        "canonical_sha256": hashlib.sha256((source / overlay_path).read_bytes()).hexdigest(),
+        "runtime_sha256": hashlib.sha256(overlay_source.read_bytes()).hexdigest(),
+    }
+    if payload != {
+        "schema_version": RUNTIME_OVERLAY_SCHEMA_VERSION,
+        "base_commit": verification["commit"],
+        "base_tree": verification["tree"],
+        "base_content_tree_sha256": verification["content_tree_sha256"],
+        "overlays": [expected_overlay],
+    }:
         raise GamePinError("refusing to replace a runtime game with different provenance")
+    source_marker = source / MATERIALIZED_PROVENANCE_FILE
+    runtime_marker = path / MATERIALIZED_PROVENANCE_FILE
+    if runtime_marker.read_bytes() != source_marker.read_bytes():
+        raise GamePinError("refusing to replace a runtime with a modified base marker")
+    source_inventory = json.loads(source_marker.read_text(encoding="utf-8"))["files"]
+    expected_paths = {
+        item["path"] for item in source_inventory
+    } | {MATERIALIZED_PROVENANCE_FILE, RUNTIME_OVERLAY_FILE}
+    actual_paths: set[str] = set()
+    for candidate in path.rglob("*"):
+        if candidate.is_symlink():
+            raise GamePinError("refusing to replace a runtime containing symlinks")
+        if not candidate.is_file():
+            continue
+        relative = candidate.relative_to(path).as_posix()
+        actual_paths.add(relative)
+        if relative in expected_paths:
+            continue
+        if not (
+            relative == "balance_runs.jsonl"
+            or relative.startswith(".godot/")
+            or relative.startswith("reports/")
+        ):
+            raise GamePinError("refusing to replace a runtime containing unmanaged files")
+    if not expected_paths.issubset(actual_paths):
+        raise GamePinError("refusing to replace an incomplete runtime game")
+    for item in source_inventory:
+        relative = item["path"]
+        candidate = path / relative
+        expected_digest = (
+            expected_overlay["runtime_sha256"]
+            if relative == overlay_path
+            else item["sha256"]
+        )
+        if (
+            _portable_mode(candidate) != item["mode"]
+            or hashlib.sha256(candidate.read_bytes()).hexdigest() != expected_digest
+        ):
+            raise GamePinError("refusing to replace a modified runtime game")
 
 
 def _safe_git_path(value: Any, *, index: int) -> str:
