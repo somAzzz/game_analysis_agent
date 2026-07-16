@@ -2,19 +2,19 @@
   "artifact_digests": [
     {
       "name": "doctor-dashboard-native.json",
-      "sha256": "d448050fed7de255809592b5d3f9288d98ec4fccb82e966fe2acba5609304f30"
+      "sha256": "96660f352fdd586e3c4e8bc517cf93b1a7f3d9fb54902b339c0abf98e9f6658b"
     },
     {
       "name": "doctor-inspect.json",
-      "sha256": "679c1ba068ba11ec303e3030395250b7ff9f4930f039ba53a96451f1e8bcddea"
+      "sha256": "73081b846de553957e865ce0f7c312933a80a4499da7dac318fa3ca2b83d1128"
     },
     {
       "name": "doctor-real-game.json",
-      "sha256": "4fac23dbc331ae2fd29bbd78afd5d813aac1d70ec28fd6fb667b0c833307ab86"
+      "sha256": "4e639c8b8a9140dd22e7e43671b1045d52942888ac2d9fb3df472a4e8eaa97e3"
     },
     {
       "name": "experiment.json",
-      "sha256": "06b4934f0702f7221070752c2b62579955a218adfac9ac09403078b174e5e419"
+      "sha256": "a5b074f1abd19bea99ba1374982e11b4e1f2890407c6b3dd9c545800de7eb830"
     },
     {
       "name": "fresh-godot/raw_runs.jsonl",
@@ -22,15 +22,15 @@
     },
     {
       "name": "fresh-godot/report_manifest.json",
-      "sha256": "c06a55697cc6796483ca080ddf237e3dc1ae8040e06013edc7e0d335e58f2848"
+      "sha256": "035e7e66106fb74449652f22902c2c9947c5a70ea5d5a83e7f664bfe03ee1564"
     },
     {
       "name": "judge-inspect.json",
-      "sha256": "9bf8f9260017dc49a4c7c902cfc946eada965c4ac625b5abed045e3bcbca829d"
+      "sha256": "748488981532579c1ff6963db2adfb7cd191f1bc4c4d2b32cb3a5509f60500e7"
     },
     {
       "name": "judge-replay.json",
-      "sha256": "a7876365be53190fd88cf3f0849e27b7d7e0c73baa550fc77245b4c2877af778"
+      "sha256": "c1df31e22706b82c19735e02700aa33d9bb10358c0534d26bad5c3f876e5a834"
     },
     {
       "name": "provider-status.json",
@@ -38,7 +38,7 @@
     },
     {
       "name": "root.html",
-      "sha256": "7a81ace46ce5dcea91a719762c736b8fa8c9aefa65f0700e17d3d4ff026f5047"
+      "sha256": "96b1451a7d6da69789b8aa37fd56200a78d55ed9e63bd2b087bea73ad87b4e19"
     }
   ],
   "checks": [
@@ -63,7 +63,7 @@
       "status": "passed"
     }
   ],
-  "executed_at": "2026-07-16T18:27:13.418997+00:00",
+  "executed_at": "2026-07-16T19:18:32.875817+00:00",
   "game_revision": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
   "mode": "macos",
   "platform": {
@@ -71,9 +71,9 @@
     "system": "macOS"
   },
   "schema_version": "build-week-platform-evidence-v1",
-  "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
+  "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5",
   "source_dirty": false,
-  "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+  "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
   "status": "passed",
   "toolchain": {
     "godot": "4.4.stable.official.4c311cbee"

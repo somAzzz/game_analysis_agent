@@ -1,8 +1,8 @@
 {
   "schema_version": "build-week-platform-review-v1",
-  "reviewed_at": "2026-07-16T18:30:19.461436+00:00",
-  "source_revision": "e7ffcf4752dc0f1960ab00a474063b811018a202",
-  "contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
+  "reviewed_at": "2026-07-16T19:18:32.876590+00:00",
+  "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
+  "contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5",
   "status": "partial",
   "platform": {
     "system": "macOS",
@@ -26,29 +26,29 @@
       "id": "macos_system_python_inspect",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
-      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983"
+      "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
+      "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5"
     },
     {
       "id": "macos_locked_replay",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
-      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983"
+      "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
+      "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5"
     },
     {
       "id": "macos_idempotent_setup",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
-      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983"
+      "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
+      "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5"
     },
     {
       "id": "macos_native_ui_api",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
-      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983"
+      "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
+      "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5"
     },
     {
       "id": "macos_container_dashboard_optional",
@@ -60,8 +60,8 @@
       "id": "macos_pinned_real_godot",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
-      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983"
+      "source_revision": "02b09e13da2ecb7d8cb2caf9dfa38fa9b24e442b",
+      "source_contract_sha256": "14a9ea9b8ddf13fa3f9ffe8e3d8ec131f870b0b3b05635b7b25f5c912f580fa5"
     },
     {
       "id": "live_openai_campaign",
@@ -83,7 +83,7 @@
       "status": "pending_ci",
       "workflow": ".github/workflows/test.yml#godot-contract",
       "reason": "The real-Godot job has not run at this revision with the competition-pinned 4.4-stable release.",
-      "remediation": "Configure STUDY_IN_GERMANY_TOKEN and manually dispatch the Test workflow with godot_version=4.4-stable; retain the contract artifact and run URL."
+      "remediation": "Manually dispatch the Test workflow with godot_version=4.4-stable; the embedded demo requires no repository token. Retain the contract artifact and run URL."
     },
     {
       "id": "linux_arm64_container",
