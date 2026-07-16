@@ -1,0 +1,59 @@
+"""Static portability and profile-isolation tests for Judge containers."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_judge_dockerfile_pins_multiarch_base_and_runs_unprivileged() -> None:
+    dockerfile = (ROOT / "Dockerfile.judge").read_text(encoding="utf-8")
+
+    assert re.search(r"python:3\.12\.10-slim-bookworm@sha256:[0-9a-f]{64}", dockerfile)
+    assert "--platform=" not in dockerfile
+    assert "USER judge" in dockerfile
+    assert 'ENTRYPOINT ["./judge"]' in dockerfile
+    for required in ("judge-manifest.json", "fixtures/", "examples/build_week_2026/"):
+        assert required in dockerfile
+
+
+def test_compose_default_is_cpu_dashboard_and_nvidia_is_opt_in() -> None:
+    compose = yaml.safe_load((ROOT / "docker-compose.yml").read_text(encoding="utf-8"))
+    services = compose["services"]
+    default_services = {
+        name for name, service in services.items() if not service.get("profiles")
+    }
+
+    assert default_services == {"dashboard"}
+    assert services["vllm"]["profiles"] == ["local-nvidia"]
+    assert services["godot"]["profiles"] == ["game-tools"]
+    assert "depends_on" not in services["agent"]
+    assert services["replay"]["network_mode"] == "none"
+    assert services["replay"]["read_only"] is True
+    assert services["replay"]["cap_drop"] == ["ALL"]
+
+
+def test_portable_smoke_fixture_is_hash_pinned_outside_tests() -> None:
+    manifest = json.loads(
+        (ROOT / "config/build_week_2026_replay.json").read_text(encoding="utf-8")
+    )
+    fixture = ROOT / manifest["fixture"]
+
+    assert fixture == ROOT / "fixtures/persona_replay/smoke_v1.json"
+    assert hashlib.sha256(fixture.read_bytes()).hexdigest() == manifest["sha256"]
+
+
+def test_multiarch_builder_requires_explicit_registry_and_both_native_platforms() -> None:
+    script = (ROOT / "tools/build_judge_image.sh").read_text(encoding="utf-8")
+
+    assert "JUDGE_IMAGE_REF:?" in script
+    assert "linux/amd64,linux/arm64" in script
+    assert "--push" in script
+    assert "imagetools inspect" in script
+    assert "built_and_pushed" in script

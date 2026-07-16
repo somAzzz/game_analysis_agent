@@ -195,7 +195,7 @@ Start the local vLLM service and persistent Godot sidecar:
 cp .env.example .env
 # Edit .env: HF_TOKEN, GAME_PROJECT_PATH, CUDA_VISIBLE_DEVICES, etc.
 docker compose pull vllm
-docker compose up -d vllm godot
+docker compose --profile local-nvidia --profile game-tools up -d vllm godot
 docker compose logs -f vllm
 docker compose ps
 ```
@@ -449,7 +449,7 @@ user, so reports are not root-owned:
 ```bash
 export GAME_PROJECT_PATH=/home/bo/projects/python/study-in-germany
 export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
-docker compose up -d godot vllm
+docker compose --profile game-tools --profile local-nvidia up -d godot vllm
 "$GODOT_BIN" --version
 
 uv run python tools/run_gameplay_agent.py interactive-probe \
@@ -468,7 +468,7 @@ real Godot project advances. First verify the producer-native game contract
 without contacting the model:
 
 ```bash
-docker compose up -d vllm godot
+docker compose --profile local-nvidia --profile game-tools up -d vllm godot
 docker compose ps
 
 uv run python tools/run_gameplay_agent.py interactive-probe \

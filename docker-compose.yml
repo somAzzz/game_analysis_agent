@@ -1,9 +1,7 @@
 # Orchestration for game_analysis_agent.
 #
-# Three services:
-#   - vllm   — local Qwen3.6 27B NVFP4 inference server (OpenAI-compatible).
-#   - godot  — persistent headless Godot tool container used through the wrapper.
-#   - agent  — Python CLI one-off container (use `docker compose run agent ...`).
+# Default startup is the CPU-only static dashboard. Optional profiles provide
+# Replay, Godot tools, the legacy CLI, and NVIDIA local inference.
 #
 # Notes (mirrored from fintext_llm/docker-compose.yml for consistency):
 #   * vLLM v0.25.0 is the latest stable image with NVFP4 + MTP support
@@ -86,6 +84,8 @@ services:
       retries: 20
       start_period: 600s
     restart: unless-stopped
+    profiles:
+      - local-nvidia
 
   godot:
     # Long-running tool sidecar. scripts/godot-docker-wrapper uses
@@ -115,6 +115,46 @@ services:
       retries: 3
       start_period: 5s
     restart: unless-stopped
+    profiles:
+      - game-tools
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.judge
+    entrypoint: ["python", "-m", "http.server"]
+    command: ["8080", "--bind", "0.0.0.0", "--directory", "/app/frontend/dist"]
+    ports:
+      - "${JUDGE_PORT:-8080}:8080"
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  replay:
+    build:
+      context: .
+      dockerfile: Dockerfile.judge
+    command: ["--mode", "replay", "--offline", "--json", "--output-dir", "-"]
+    network_mode: none
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    profiles:
+      - judge
 
   agent:
     # Built from the Dockerfile in this repo. This container is intended for
@@ -123,8 +163,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - .env
     environment:
       # The agent inside the container reaches vLLM through the
       # compose-network DNS name ``vllm`` on port 8000. The host-side
@@ -139,16 +177,11 @@ services:
       - ${GAME_PROJECT_PATH:-/data/game_project}:/data/game_project:ro
       # Reports are persisted back onto the host for inspection.
       - ./reports:/app/reports
-    depends_on:
-      vllm:
-        condition: service_healthy
     profiles:
       - cli
     # No long-running process — the CLI exits when it finishes.
     command: ["python", "tools/run_gameplay_agent.py", "--help"]
 
-# NB: the agent is opt-in via ``--profile cli``. A bare
-# ``docker compose up`` starts both vLLM and the Godot tool sidecar; use
-# ``docker compose --profile cli run agent <analysis-subcommand>`` to invoke
-# the containerized Python analysis CLI on demand. Host gameplay commands should
-# use scripts/godot-docker-wrapper so they execute inside the Godot sidecar.
+# A bare ``docker compose up`` starts only the CPU dashboard. Use profile
+# ``judge`` for offline Replay, ``game-tools`` for Godot, ``cli`` for the legacy
+# agent, and ``local-nvidia`` only on a compatible NVIDIA host.

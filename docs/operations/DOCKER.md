@@ -1,17 +1,15 @@
 # Docker setup
 
-The pipeline comes with a `docker-compose.yml` that orchestrates three
-services: a vLLM inference server (GPU), a persistent headless Godot tool
-sidecar (CPU-only), and an opt-in agent analysis CLI container (CPU-only).
-Everything wires together through
-`docker-compose.yml` + `.env`, mirroring the well-tested setup in
-[fintext_llm/docker-compose.yml](../../fintext_llm/docker-compose.yml)
-so the two projects can share a machine without port collisions.
+The default Compose path is a CPU-only, read-only dashboard. Offline Replay,
+Godot tooling, the legacy CLI, and NVIDIA vLLM are separate opt-in profiles, so
+an evaluator never downloads a model or reserves a GPU by running bare
+`docker compose up`.
 
 ## 1. Prerequisites
 
-- Docker Engine 24+ with the `nvidia-container-toolkit` installed.
-- An NVIDIA Blackwell card (RTX PRO 6000 / RTX 5070 / B200). NVFP4
+- Docker Engine 24+ for the dashboard or Judge image.
+- NVIDIA Container Toolkit and a Blackwell card only for the optional
+  `local-nvidia` profile. NVFP4
   requires `sm_100` or `sm_120` — it **will not** run on H100 / A100 /
   older.
 - ~70 GB of free disk for the Qwen3.6 27B NVFP4 weights (cached under
@@ -20,7 +18,23 @@ so the two projects can share a machine without port collisions.
   `validate`, `interactive-probe`, or `play`. Pure `analyze`, recorded `eval`,
   and report QA do not invoke Godot.
 
-## 2. One-time setup
+## 2. CPU-only Judge dashboard and Replay
+
+```bash
+docker compose up -d dashboard
+docker compose --profile judge run --rm replay
+```
+
+The dashboard listens on `http://127.0.0.1:8080` by default. Replay has no
+network, runs read-only as an unprivileged user, and needs no API key. The
+multi-architecture source is `Dockerfile.judge`; its official Python base is
+pinned by image-index digest and does not force an amd64 platform on Apple
+Silicon.
+
+The image is not claimed as published until `tools/build_judge_image.sh` has
+produced registry metadata for both `linux/amd64` and `linux/arm64`.
+
+## 3. Optional local game and model setup
 
 ```bash
 cp .env.example .env
@@ -32,17 +46,17 @@ cp .env.example .env
 #   - VLLM_BIND_PORT=8000 (already the default).
 ```
 
-## 3. Start vLLM and Godot
+## 4. Start optional vLLM and Godot
 
 ```bash
-docker compose up -d vllm godot
+docker compose --profile local-nvidia --profile game-tools up -d vllm godot
 docker compose logs -f vllm     # tail the server boot
 docker compose ps                # confirm ``vllm`` and ``godot`` are healthy
 ```
 
 The Godot service is an idle tool sidecar; the repository wrapper executes
 commands inside it. To use only Godot without reserving the GPU, run
-`docker compose up -d godot`.
+`docker compose --profile game-tools up -d godot`.
 
 Once the container reports `Application startup complete`, the
 endpoint is `http://localhost:8000/v1`. Sanity check:
@@ -55,7 +69,7 @@ curl http://localhost:8000/v1/models \
 You should see `nvidia/Qwen3.6-27B-NVFP4` (or whatever you set
 `LLM_MODEL=` to).
 
-## 4. Run the agent CLI
+## 5. Run the agent CLI
 
 Run gameplay commands from the host and point `GODOT_BIN` at the wrapper. It
 reuses the compose sidecar and reaches vLLM through the published host port:
@@ -85,7 +99,7 @@ docker compose --profile cli run --rm agent \
 The agent container binds `./reports` back to the host so artifacts
 land under `reports/<subdir>/` on your machine for inspection.
 
-## 5. Without Docker (host-native)
+## 6. Without Docker (host-native)
 
 The pipeline still runs natively if you have the Python deps installed
 and a vLLM server reachable at `VLLM_BASE_URL`:
@@ -97,7 +111,7 @@ python3 tools/run_gameplay_agent.py all --runs 100 --policy balanced
 The Docker setup keeps both external runtimes available while the Python CLI
 remains easy to run and debug on the host.
 
-## 6. Configurable knobs
+## 7. Configurable knobs
 
 All knobs live in `.env`:
 
@@ -113,13 +127,13 @@ All knobs live in `.env`:
 | `GAME_PROJECT_PATH` | Absolute checkout mounted at the identical container path | `/home/bo/projects/python/study-in-germany` |
 | `GODOT_DOCKER_MOUNT_ROOT` | Shared parent of Agent and game checkouts, mounted at the same path | `/home/bo/projects/python` |
 
-## 7. Version pinning
+## 8. Version pinning
 
 `vllm/vllm-openai:v0.25.0` is the latest stable tag (as of 2026-07-13)
 with NVFP4 + MTP validated against Qwen3.6 27B NVFP4. Bump quarterly;
 see fintext_llm for the same pinning rationale.
 
-## 8. Troubleshooting
+## 9. Troubleshooting
 
 **`error: failed to inspect docker image`** — your `vllm/vllm-openai`
 image isn't pulled yet. Run `docker compose pull vllm` first.
@@ -138,5 +152,5 @@ your checkpoint is Qwen3.5 or earlier; set `LLM_ENABLE_MTP=0` in
 authenticated model downloads.
 
 **Godot sidecar is not running** — start it with
-`docker compose up -d godot`. The wrapper automatically falls back to a
+`docker compose --profile game-tools up -d godot`. The wrapper automatically falls back to a
 one-shot `docker run --rm` when the compose service is absent.

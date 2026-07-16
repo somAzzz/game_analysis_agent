@@ -58,7 +58,7 @@ LLM agent layer (provider: vllm | sglang | deepseek)
 cp .env.example .env
 # 编辑 .env 填 HF_TOKEN / GAME_PROJECT_PATH 等
 docker compose pull vllm
-docker compose up -d vllm godot
+docker compose --profile local-nvidia --profile game-tools up -d vllm godot
 docker compose logs -f vllm           # 等待 "Application startup complete"
 docker compose ps                      # 确认 vllm / godot 都是 healthy
 
@@ -240,7 +240,7 @@ SHA-256、修改时间和 JSONL 行号索引外，`provenance` 还记录：
 ```bash
 export GAME_PROJECT_PATH=/home/bo/projects/python/study-in-germany
 export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
-docker compose up -d godot vllm
+docker compose --profile game-tools --profile local-nvidia up -d godot vllm
 "$GODOT_BIN" --version
 
 uv run python tools/run_gameplay_agent.py interactive-probe \
@@ -257,7 +257,7 @@ wrapper 会优先复用 compose 中常驻的 `godot` 服务；服务未启动时
 先做不调用 LLM 的游戏契约预检，便于区分 Godot 和模型问题：
 
 ```bash
-docker compose up -d vllm godot
+docker compose --profile local-nvidia --profile game-tools up -d vllm godot
 docker compose ps
 
 uv run python tools/run_gameplay_agent.py interactive-probe \

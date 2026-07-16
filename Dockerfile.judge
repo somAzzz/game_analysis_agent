@@ -1,0 +1,37 @@
+# syntax=docker/dockerfile:1.7
+# Official multi-architecture Python index, resolved from Docker Hub on 2026-07-16.
+ARG PYTHON_IMAGE=python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+FROM ${PYTHON_IMAGE}
+
+ARG UV_VERSION=0.11.23
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1 \
+    NO_PROXY="*" \
+    no_proxy="*"
+
+WORKDIR /app
+
+RUN python -m pip install --no-cache-dir "uv==${UV_VERSION}"
+
+COPY pyproject.toml uv.lock README.md ./
+RUN uv sync --frozen --no-dev --no-install-project
+
+COPY judge judge-manifest.json JUDGE.md ./
+COPY src/ ./src/
+COPY tools/ ./tools/
+COPY config/ ./config/
+COPY fixtures/ ./fixtures/
+COPY examples/build_week_2026/ ./examples/build_week_2026/
+COPY docs/reviews/openai_build_week_2026/ ./docs/reviews/openai_build_week_2026/
+COPY frontend/dist/ ./frontend/dist/
+
+RUN useradd --create-home --uid 10001 judge \
+ && chown -R judge:judge /app
+USER judge
+
+ENTRYPOINT ["./judge"]
+CMD ["--mode", "inspect", "--offline", "--json", "--output-dir", "-"]

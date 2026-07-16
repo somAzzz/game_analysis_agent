@@ -31,8 +31,9 @@ export GODOT_BIN=/home/bo/projects/python/game_analysis_agent/scripts/godot-dock
 "$GODOT_BIN" --version
 ```
 
-`docker compose up -d godot vllm` starts the Godot tool sidecar and LLM
-together. The wrapper first reuses that running sidecar with
+`docker compose --profile game-tools up -d godot` starts the Godot tool
+sidecar. Add `--profile local-nvidia vllm` only when local NVIDIA inference is
+explicitly required. The wrapper first reuses the running Godot sidecar with
 `docker compose exec`; if it is not running, it falls back to a one-shot
 `docker run`. Both paths keep absolute host paths identical in the container
 and execute Godot with the current UID/GID, so `--path`/`--out` arguments work

@@ -1,0 +1,40 @@
+{
+  "schema_version": "persona-replay-fixture-v1",
+  "fixture_id": "smoke-v1",
+  "entries": [
+    {
+      "entry_id": "newbie-42-w1-decision",
+      "kind": "decision",
+      "fingerprint": "ec88d9858ddf13d39fc7e8909754bb15630745c1d0b81237966d1b505828e5ec",
+      "persona": "newbie",
+      "seed": 42,
+      "week": 1,
+      "state_hash": "cb2bd9db152f9301a3af26d17d60751d13914f0beff681602c5a91cb554ea859",
+      "decision": {
+        "week": 1,
+        "persona": "newbie",
+        "strategic_goal": "protect cashflow",
+        "actions": ["budget_call"],
+        "event_choice_id": "rent_pressure.ask_extension",
+        "risk_awareness": ["money"],
+        "expected_tradeoff": "use one action slot to preserve cash",
+        "confidence": 0.8
+      }
+    },
+    {
+      "entry_id": "newbie-42-w1-event",
+      "kind": "event_choice",
+      "fingerprint": "379f45067fea9f24dcd0aa165f344f9c94783599f74b9f410afbd362cf295108",
+      "persona": "newbie",
+      "seed": 42,
+      "week": 1,
+      "state_hash": "cb2bd9db152f9301a3af26d17d60751d13914f0beff681602c5a91cb554ea859",
+      "choice": {
+        "week": 1,
+        "persona": "newbie",
+        "event_id": "rent_pressure",
+        "event_choice_id": "rent_pressure.ask_extension"
+      }
+    }
+  ]
+}

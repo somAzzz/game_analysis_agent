@@ -1,18 +1,18 @@
 {
   "artifacts": [
     {
-      "bytes": 193,
+      "bytes": 187,
       "path": "config/build_week_2026_replay.json",
       "role": "replay-smoke-manifest",
       "schema_version": "persona-replay-manifest-v1",
-      "sha256": "57475f4fa20f6d1bfb05d85ef1fbdc42facab7a2605ce2c2d076b4fc8d24896a"
+      "sha256": "472969b9bbb3312faae6f268f9051da2ba2030b50c595549e7215a255e44edb9"
     },
     {
       "bytes": 1258,
-      "path": "tests/fixtures/persona_replay/basic_v1.json",
+      "path": "fixtures/persona_replay/smoke_v1.json",
       "role": "replay-smoke-fixture",
       "schema_version": "persona-replay-fixture-v1",
-      "sha256": "c180208d4c3bb6278e68b03d3c23c22e204ab526339f2b93a0ad6f55d218dea8"
+      "sha256": "aa921c7c1860b177f55f30d5af6c95caa9e1e1dd01640a24f259e629af9dd480"
     },
     {
       "bytes": 202,
