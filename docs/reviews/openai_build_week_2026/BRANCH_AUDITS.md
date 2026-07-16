@@ -58,7 +58,8 @@ product into a game submission.
 ## Verification policy
 
 Every remediation above has a focused regression test and its own Git commit.
-After documentation is finalized, macOS P4 is rerun from a clean worktree and
-imported. The branch is then pushed to PR #5; Linux results are accepted only
-from completed jobs and downloaded artifacts at the same contract fingerprint.
+The final macOS P4 rerun passed from a clean worktree at contract `6fd5874d` and
+was imported alongside completed Linux amd64 and official-Godot job artifacts.
+PR #5 remains the delivery channel; Linux results are accepted only from
+completed jobs and downloaded artifacts at the same contract fingerprint.
 Skipped optional jobs are recorded as skipped, not passed.

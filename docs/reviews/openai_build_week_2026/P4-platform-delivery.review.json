@@ -1,7 +1,7 @@
 {
   "schema_version": "build-week-platform-review-v1",
-  "reviewed_at": "2026-07-16T19:49:22.471629+00:00",
-  "source_revision": "fe29dc988344721a4d0555a606c2a630efb9dacc",
+  "reviewed_at": "2026-07-16T20:08:27.014036+00:00",
+  "source_revision": "be56673fea66155e5eec93d2bcfa5a7a76ce10e0",
   "contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a",
   "status": "partial",
   "platform": {
@@ -24,39 +24,31 @@
   "checks": [
     {
       "id": "macos_system_python_inspect",
-      "status": "stale",
+      "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
-      "source_contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970",
-      "reason": "Evidence was produced for a different delivery contract.",
-      "remediation": "Run scripts/run-p4-macos and import current macOS evidence."
+      "source_revision": "be56673fea66155e5eec93d2bcfa5a7a76ce10e0",
+      "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a"
     },
     {
       "id": "macos_locked_replay",
-      "status": "stale",
+      "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
-      "source_contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970",
-      "reason": "Evidence was produced for a different delivery contract.",
-      "remediation": "Run scripts/run-p4-macos and import current macOS evidence."
+      "source_revision": "be56673fea66155e5eec93d2bcfa5a7a76ce10e0",
+      "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a"
     },
     {
       "id": "macos_idempotent_setup",
-      "status": "stale",
+      "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
-      "source_contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970",
-      "reason": "Evidence was produced for a different delivery contract.",
-      "remediation": "Run scripts/run-p4-macos and import current macOS evidence."
+      "source_revision": "be56673fea66155e5eec93d2bcfa5a7a76ce10e0",
+      "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a"
     },
     {
       "id": "macos_native_ui_api",
-      "status": "stale",
+      "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
-      "source_contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970",
-      "reason": "Evidence was produced for a different delivery contract.",
-      "remediation": "Run scripts/run-p4-macos and import current macOS evidence."
+      "source_revision": "be56673fea66155e5eec93d2bcfa5a7a76ce10e0",
+      "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a"
     },
     {
       "id": "macos_container_dashboard_optional",
@@ -66,12 +58,10 @@
     },
     {
       "id": "macos_pinned_real_godot",
-      "status": "stale",
+      "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "5b0cce6d384e269f06c71e10f6e184b7709b0aa8",
-      "source_contract_sha256": "519926eff940f5c360bef72d786b3afd48f2407c10b811c75c8058e9ed5c1970",
-      "reason": "Evidence was produced for a different delivery contract.",
-      "remediation": "Run scripts/run-p4-macos and import current macOS evidence."
+      "source_revision": "be56673fea66155e5eec93d2bcfa5a7a76ce10e0",
+      "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a"
     },
     {
       "id": "live_openai_campaign",
@@ -109,5 +99,5 @@
       "remediation": "Publish the current multi-architecture image and run scripts/run-p4-linux-arm64-image on native arm64."
     }
   ],
-  "decision": "Platform delivery remains incomplete: current macOS rows, linux_arm64_container, and live_openai_campaign are not all proven."
+  "decision": "Platform delivery remains incomplete: ['linux_arm64_container', 'live_openai_campaign']."
 }

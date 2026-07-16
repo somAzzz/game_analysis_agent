@@ -51,6 +51,7 @@ needs network, Docker, Godot, a model key, or a sibling game checkout.
 6. [Platform review JSON](../../reviews/openai_build_week_2026/P4-platform-delivery.review.json) — current fail-closed machine ledger.
 7. [G4 review](../../reviews/openai_build_week_2026/G4-evaluator.md) and [G5 review](../../reviews/openai_build_week_2026/G5-final-release.md) — release gates.
 8. [Submission directory](../../../submission/build-week-2026/) — claim ledger, Devpost draft, video script, and external closeout records.
+9. [Product-design evidence](product_design/README.md) — evaluator UI screenshots for visual review and demo/video planning.
 
 ## Current implementation limits
 

@@ -1,5 +1,5 @@
 {
-  "check_count": 8,
+  "check_count": 4,
   "checks": [
     {
       "error": "",
@@ -21,7 +21,7 @@
       "status": "passed"
     },
     {
-      "error": "platform evidence incomplete or stale: ['linux_amd64_native_and_container', 'linux_arm64_container', 'linux_pinned_real_godot', 'live_openai_campaign']",
+      "error": "platform evidence incomplete or stale: ['linux_arm64_container', 'live_openai_campaign']",
       "evidence": {},
       "id": "platform_delivery",
       "status": "failed"
@@ -31,69 +31,6 @@
       "evidence": {},
       "id": "published_multiarch_image",
       "status": "failed"
-    },
-    {
-      "error": "",
-      "evidence": {
-        "command": [
-          "./judge",
-          "--mode",
-          "inspect",
-          "--offline",
-          "--json",
-          "--output-dir",
-          "-"
-        ],
-        "exit_code": 0,
-        "tail": "a256\": \"d2bf020dfb50081e9ed766604b21a03b079b6a3a8120f276958484b321021cdc\"}, {\"bytes\": 7976, \"path\": \"demo/study-in-germany/scripts/tools/ValidateRouteBoundaries.gd\", \"role\": \"embedded-demo-source\", \"sha256\": \"dc8a8f5e8a8654a0f0408f421dae5d6702d5c99c26b04427900120501440bd5a\"}], \"checks\": [{\"detail\": \"judge-manifest-v1\", \"id\": \"manifest_schema\", \"status\": \"passed\"}, {\"detail\": \"121 files hash and schema verified\", \"id\": \"artifact_integrity\", \"status\": \"passed\"}, {\"detail\": \"6 public claims resolved to exact JSON values\", \"id\": \"claim_references\", \"status\": \"passed\"}], \"duration_ms\": 5.838, \"error\": null, \"error_code\": null, \"limitations\": [\"Inspect validates committed evidence; it does not perform a fresh model or Godot run.\", \"The committed persona decisions are deterministic policy-authored Replay fixtures, not recorded or fresh OpenAI responses.\", \"The candidate repair was rejected and is not merged into the game baseline.\", \"Live OpenAI Judge Mode requires a separately supplied server-side API key.\", \"The embedded Study in Germany source is a competition demo, not a complete game.\"], \"remediation\": null, \"schema_version\": \"judge-result-v1\", \"stage\": \"inspect\", \"status\": \"passed\"}"
-      },
-      "id": "offline_inspect",
-      "status": "passed"
-    },
-    {
-      "error": "",
-      "evidence": {
-        "command": [
-          "./judge",
-          "--mode",
-          "replay",
-          "--offline",
-          "--json",
-          "--output-dir",
-          "-"
-        ],
-        "exit_code": 0,
-        "tail": "\"path\": \"config/build_week_2026_full_replay.json\", \"sha256\": \"50d8aaccdd438a31090c29b4b7ff76cb5fa9a508dd3a9a1784c8b1dd90dc0119\"}, {\"path\": \"fixtures/persona_replay/build_week_2026_full_v1.json\", \"sha256\": \"865f4fb83028f7ada18b581462adef3cbb15f2b06ed4c59cb0601f97b0d5f590\"}], \"checks\": [{\"detail\": \"campaign=passed, repair=passed\", \"id\": \"bundle_integrity\", \"status\": \"passed\"}, {\"detail\": \"newbie week-1 decision and event matched exact fingerprints\", \"id\": \"exact_replay\", \"status\": \"passed\"}, {\"detail\": \"684 unique decision/event entries parsed from the hash-pinned fixture\", \"id\": \"full_fixture\", \"status\": \"passed\"}, {\"detail\": \"six personas, 1.0 valid rate, zero fallback, 18 target members\", \"id\": \"persona_and_determinism\", \"status\": \"passed\"}, {\"detail\": \"designed failure preserved and ineffective candidate remains rejected\", \"id\": \"designed_failure_and_rejection\", \"status\": \"passed\"}], \"duration_ms\": 254.498, \"error\": null, \"error_code\": null, \"limitations\": [\"Replay consumes committed fixtures and evidence; it does not call OpenAI.\", \"Replay does not rebuild or rerun the Godot game.\"], \"remediation\": null, \"schema_version\": \"judge-result-v1\", \"stage\": \"replay\", \"status\": \"passed\"}"
-      },
-      "id": "offline_replay",
-      "status": "passed"
-    },
-    {
-      "error": "",
-      "evidence": {
-        "command": [
-          "npm",
-          "test"
-        ],
-        "exit_code": 0,
-        "tail": "> game-analysis-agent-frontend@0.3.0 test\n> vitest run\n\n\n RUN  v3.2.6 /Users/bo/projects/game_analysis_agent/frontend\n\n \u2713 tests/api.test.ts (8 tests) 4ms\n \u2713 tests/App.test.tsx (7 tests) 163ms\n\n Test Files  2 passed (2)\n      Tests  15 passed (15)\n   Start at  21:50:22\n   Duration  778ms (transform 91ms, setup 153ms, collect 168ms, tests 167ms, environment 416ms, prepare 70ms)"
-      },
-      "id": "frontend_tests",
-      "status": "passed"
-    },
-    {
-      "error": "",
-      "evidence": {
-        "command": [
-          "npm",
-          "run",
-          "build:public"
-        ],
-        "exit_code": 0,
-        "tail": "> game-analysis-agent-frontend@0.3.0 build:public\n> npm run prepare:public && VITE_BASE_PATH=/game_analysis_agent/ npm run build\n\n\n> game-analysis-agent-frontend@0.3.0 prepare:public\n> mkdir -p public && rm -rf public/manifest.json public/browse public/judge-demo.json && cp -R public-demo/manifest.json public-demo/browse public-demo/judge-demo.json public/\n\n\n> game-analysis-agent-frontend@0.3.0 build\n> tsc --noEmit && vite build\n\nvite v8.1.5 building client environment for production...\n\u001b[2K\ntransforming...\u2713 627 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.85 kB \u2502 gzip:   0.48 kB\ndist/assets/index-wYdzRiZc.css   49.07 kB \u2502 gzip:   9.14 kB\ndist/assets/index-D3e7oWeI.js   587.43 kB \u2502 gzip: 184.14 kB \u2502 map: 2,687.89 kB\n\n\u2713 built in 97ms"
-      },
-      "id": "frontend_public_build",
-      "status": "passed"
     }
   ],
   "decision": "G4 failed closed; do not claim cross-platform Judge release readiness.",
@@ -103,8 +40,8 @@
     "published_multiarch_image"
   ],
   "gate": "G4",
-  "generated_at": "2026-07-16T19:50:24.069245+00:00",
-  "reviewed_commit": "3544f6fdb59aed12dc7e7cae4b3bee072f92efc8",
+  "generated_at": "2026-07-16T20:11:15.394750+00:00",
+  "reviewed_commit": "be56673fea66155e5eec93d2bcfa5a7a76ce10e0",
   "schema_version": "build-week-g4-review-v1",
   "status": "failed"
 }
