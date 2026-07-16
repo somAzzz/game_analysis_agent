@@ -16,36 +16,33 @@ PLATFORM_CONTRACT_FILES = (
     "frontend/package-lock.json",
     "frontend/package.json",
     "scripts/godot-docker-wrapper",
+    "scripts/run-p4-linux-amd64",
+    "scripts/run-p4-linux-arm64-image",
+    "scripts/run-p4-linux-godot",
+    "scripts/run-p4-live-openai",
     "scripts/setup-evaluator",
     "tools/build_judge_frontend_demo.py",
     "tools/build_judge_image.sh",
     "tools/judge_doctor.py",
     "tools/judge_replay.py",
+    "tools/record_platform_evidence.py",
     "tools/run_judge_api.py",
 )
 
 PLATFORM_CONTRACT_TREES = (
     "frontend/public-demo",
     "frontend/src",
+    "src/game_analysis_agent",
 )
 
-PLATFORM_CONTRACT_SOURCE_NAMES = frozenset(
+PLATFORM_CONTRACT_SOURCE_EXCLUDES = frozenset(
     {
-        "build_week_campaign.py",
-        "campaign_aggregation.py",
-        "campaign_bundle.py",
-        "campaign_contract.py",
-        "campaign_runner.py",
-        "judge_api.py",
-        "local_persona_gateway.py",
-        "openai_persona_gateway.py",
-        "persona_gateway.py",
-        "persona_gateway_factory.py",
-        "persona_runtime.py",
-        "recorded_persona_gateway.py",
-        "repair_bundle.py",
-        "repair_experiment.py",
-        "repair_verification.py",
+        "build_week_g0.py",
+        "build_week_g1.py",
+        "build_week_g2.py",
+        "build_week_g3.py",
+        "build_week_g4.py",
+        "build_week_g5.py",
     }
 )
 
@@ -59,9 +56,6 @@ def platform_contract_fingerprint(project_root: str | Path) -> str:
         base = root / directory
         if base.is_dir():
             candidates.extend(path for path in base.rglob("*") if path.is_file())
-    package = root / "src/game_analysis_agent"
-    candidates.extend(package / name for name in PLATFORM_CONTRACT_SOURCE_NAMES)
-
     digest = hashlib.sha256()
     included = 0
     for path in sorted(set(candidates)):
@@ -69,6 +63,11 @@ def platform_contract_fingerprint(project_root: str | Path) -> str:
             continue
         relative = path.relative_to(root)
         if "__pycache__" in relative.parts or path.suffix in {".pyc", ".pyo", ".orig"}:
+            continue
+        if (
+            relative.parts[:2] == ("src", "game_analysis_agent")
+            and path.name in PLATFORM_CONTRACT_SOURCE_EXCLUDES
+        ):
             continue
         digest.update(relative.as_posix().encode("utf-8"))
         digest.update(b"\0")
