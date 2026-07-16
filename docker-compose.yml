@@ -97,10 +97,10 @@ services:
     environment:
       HOME: /tmp/game-analysis-godot-home
     volumes:
-      # Mount the shared parent of both repositories at the identical path.
+      # Mount the parent of this repository at the identical host path.
       # The runner passes absolute game --path and Agent report --out paths.
       # Set GODOT_DOCKER_MOUNT_ROOT to the parent directory that contains
-      # both game_analysis_agent and study-in-germany before `compose up`.
+      # game_analysis_agent before `compose up`; the game demo is embedded.
       # The fallback below is /tmp so the service can still start on a
       # clean machine, but it is only useful for syntax / healthcheck checks
       # — real game runs need the project tree mounted here.
@@ -173,11 +173,8 @@ services:
       # overridable per-call via ``docker compose run -e``.
       - VLLM_BASE_URL=${VLLM_BASE_URL:-http://vllm:8000/v1}
       - VLLM_API_KEY=${VLLM_API_KEY:-local-dev-token}
-      - GAME_PROJECT_PATH=${GAME_PROJECT_PATH:-/data/game_project}
+      - GAME_PROJECT_PATH=${GAME_PROJECT_PATH:-/app/demo/study-in-germany}
     volumes:
-      # Read-only game data remains available to analysis commands, but this
-      # Python image intentionally contains no Docker CLI or Godot binary.
-      - ${GAME_PROJECT_PATH:-/data/game_project}:/data/game_project:ro
       # Reports are persisted back onto the host for inspection.
       - ./reports:/app/reports
     profiles:

@@ -23,6 +23,7 @@ def test_judge_dockerfile_pins_multiarch_base_and_runs_unprivileged() -> None:
     for required in (
         "judge-manifest.json",
         "COPY .agents/ ./.agents/",
+        "COPY demo/ ./demo/",
         "fixtures/",
         "examples/build_week_2026/",
     ):
@@ -44,6 +45,9 @@ def test_compose_default_is_cpu_dashboard_and_nvidia_is_opt_in() -> None:
     assert "OPENAI_API_KEY=${OPENAI_API_KEY:-}" in services["dashboard"]["environment"]
     assert services["vllm"]["profiles"] == ["local-nvidia"]
     assert services["godot"]["profiles"] == ["game-tools"]
+    assert "GAME_PROJECT_PATH=${GAME_PROJECT_PATH:-/app/demo/study-in-germany}" in services[
+        "agent"
+    ]["environment"]
     assert "depends_on" not in services["agent"]
     assert services["replay"]["network_mode"] == "none"
     assert services["replay"]["read_only"] is True

@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 ARTIFACTS = {
+    "config/build_week_2026_game_pin.json": ("embedded-demo-pin", "build-week-game-pin-v1"),
     "config/build_week_2026_replay.json": ("replay-smoke-manifest", "persona-replay-manifest-v1"),
     "fixtures/persona_replay/smoke_v1.json": ("replay-smoke-fixture", "persona-replay-fixture-v1"),
     "config/build_week_2026_full_replay.json": ("replay-campaign-manifest", "persona-replay-manifest-v1"),
@@ -51,6 +52,10 @@ ARTIFACTS = {
     ".agents/skills/playtest-forge/scripts/run-campaign": ("codex-skill-script", None),
     ".agents/skills/playtest-forge/scripts/verify-repair": ("codex-skill-script", None),
 }
+
+for demo_file in sorted((ROOT / "demo/study-in-germany").rglob("*")):
+    if demo_file.is_file():
+        ARTIFACTS[demo_file.relative_to(ROOT).as_posix()] = ("embedded-demo-source", None)
 
 CLAIMS = [
     {
@@ -207,6 +212,7 @@ def build_manifest() -> dict[str, object]:
             "The committed persona decisions are Replay fixtures, not fresh OpenAI responses.",
             "The candidate repair was rejected and is not merged into the game baseline.",
             "Live OpenAI Judge Mode requires a separately supplied server-side API key.",
+            "The embedded Study in Germany source is a competition demo, not a complete game.",
         ],
     }
 

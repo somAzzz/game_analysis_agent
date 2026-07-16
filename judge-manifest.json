@@ -1,6 +1,13 @@
 {
   "artifacts": [
     {
+      "bytes": 1828,
+      "path": "config/build_week_2026_game_pin.json",
+      "role": "embedded-demo-pin",
+      "schema_version": "build-week-game-pin-v1",
+      "sha256": "272b80cb66abf6006a0943b18a6f21a1ebb52dd0d89c80e84df87257f884a556"
+    },
+    {
       "bytes": 187,
       "path": "config/build_week_2026_replay.json",
       "role": "replay-smoke-manifest",
@@ -249,6 +256,492 @@
       "path": ".agents/skills/playtest-forge/scripts/verify-repair",
       "role": "codex-skill-script",
       "sha256": "bd7f3284ac502cfdeb44a529a713bc12a73212c2a8ad9dcf7490ebf412453f0d"
+    },
+    {
+      "bytes": 33,
+      "path": "demo/study-in-germany/.editorconfig",
+      "role": "embedded-demo-source",
+      "sha256": "3b2c749c8a940905a08f727d8be9017c9568a12421c0aee7e37e9543b3751b1b"
+    },
+    {
+      "bytes": 80,
+      "path": "demo/study-in-germany/.gitattributes",
+      "role": "embedded-demo-source",
+      "sha256": "21b01a606c9f85f18bb9230245f00ab104df7409cbb2fe9423f6751ca72ba754"
+    },
+    {
+      "bytes": 369,
+      "path": "demo/study-in-germany/.gitignore",
+      "role": "embedded-demo-source",
+      "sha256": "94c13141cd39d0ce0267559b716a6358de2fa3194e009bf9e3c4f18d520a8233"
+    },
+    {
+      "bytes": 13498,
+      "path": "demo/study-in-germany/.playtest-forge-source.json",
+      "role": "embedded-demo-source",
+      "sha256": "5aefc939243c47614e30dca0193887a9d73dba0841707dfba1294db31e53a768"
+    },
+    {
+      "bytes": 91756,
+      "path": "demo/study-in-germany/autoload/DataRegistry.gd",
+      "role": "embedded-demo-source",
+      "sha256": "90f02ffbf435a45ee1c8ce062d99cb791761149517491d7eee80304d7e65cdfd"
+    },
+    {
+      "bytes": 4931,
+      "path": "demo/study-in-germany/autoload/DifficultyConfig.gd",
+      "role": "embedded-demo-source",
+      "sha256": "a4dcc63d5bd6acaf530438b27fa78ca9a1f51aeff6277c99b58765cc26b91fff"
+    },
+    {
+      "bytes": 347,
+      "path": "demo/study-in-germany/autoload/EventBus.gd",
+      "role": "embedded-demo-source",
+      "sha256": "372cd4831f65a782bed1496d612e889ce63b3b3b54b61b106cfa701b773e9c91"
+    },
+    {
+      "bytes": 32623,
+      "path": "demo/study-in-germany/autoload/GameState.gd",
+      "role": "embedded-demo-source",
+      "sha256": "f072e47dbfcf935aeefd0dce8c22417621f4adf0c9b759b328c69f0c719d4f77"
+    },
+    {
+      "bytes": 1128,
+      "path": "demo/study-in-germany/autoload/RandomService.gd",
+      "role": "embedded-demo-source",
+      "sha256": "ea9605394c5b39c6cb25d7d7fd4031314d83b49e5d32ce1870ca7e2c2d721b4c"
+    },
+    {
+      "bytes": 28831,
+      "path": "demo/study-in-germany/data/actions/generated_actions.json",
+      "role": "embedded-demo-source",
+      "sha256": "99fdfef2f370babe69e13c22ea5cbd17299e08c62c6b0f1a84d7247653ed2f3d"
+    },
+    {
+      "bytes": 1357,
+      "path": "demo/study-in-germany/data/characters/npcs.json",
+      "role": "embedded-demo-source",
+      "sha256": "5a544832f9503392693a777f3db3cd1abf425f7d18e910c2ebd6414f554e4687"
+    },
+    {
+      "bytes": 6340,
+      "path": "demo/study-in-germany/data/endings/generated_endings.json",
+      "role": "embedded-demo-source",
+      "sha256": "b43d839db10ae368a0c0afe75e3827874b55ec0f76eef16cf0f890c4e4a463b8"
+    },
+    {
+      "bytes": 61861,
+      "path": "demo/study-in-germany/data/events/academic_events.json",
+      "role": "embedded-demo-source",
+      "sha256": "b417f523b8df0a93d8dc9d6cf078d4e7b213c9299f7ce9e170429c7078f6c1ec"
+    },
+    {
+      "bytes": 55118,
+      "path": "demo/study-in-germany/data/events/admin_events.json",
+      "role": "embedded-demo-source",
+      "sha256": "2bbdffea11004d0b38afe002e7af8d0f4cf1ef93e9e5f893bfd47d37208b2440"
+    },
+    {
+      "bytes": 25487,
+      "path": "demo/study-in-germany/data/events/application_events.json",
+      "role": "embedded-demo-source",
+      "sha256": "09417b8eebad8906660d084479170d3c13c8c27798b05c6af3553ea5bb6dd8ca"
+    },
+    {
+      "bytes": 262888,
+      "path": "demo/study-in-germany/data/events/generated_events.json",
+      "role": "embedded-demo-source",
+      "sha256": "8be881925c7fb52fea16160b6b2dbee6ecda1e31178f801cfed931ea361971b6"
+    },
+    {
+      "bytes": 40745,
+      "path": "demo/study-in-germany/data/events/life_events.json",
+      "role": "embedded-demo-source",
+      "sha256": "8a3674ad4a27399cfaeacea3090091669174050354494a8fc856e2ea2cc71a3f"
+    },
+    {
+      "bytes": 50759,
+      "path": "demo/study-in-germany/data/events/random_events.json",
+      "role": "embedded-demo-source",
+      "sha256": "9e0a6187a82b7a6fe2973b15a884cf70592da63a7b2387aadf7e5e58b4cf0d44"
+    },
+    {
+      "bytes": 19324,
+      "path": "demo/study-in-germany/data/events/relationship_events.json",
+      "role": "embedded-demo-source",
+      "sha256": "48fbbf712a002e7285f02e0f052b59f2dea302a3ee9a64b86161c13e71d514c7"
+    },
+    {
+      "bytes": 18948,
+      "path": "demo/study-in-germany/data/events/work_events.json",
+      "role": "embedded-demo-source",
+      "sha256": "be6e0e56a6c3346c575fa5452a8f00681be3f9cd84f17e4dace2a2ce19e14a42"
+    },
+    {
+      "bytes": 442,
+      "path": "demo/study-in-germany/data/scenarios/default_first_semester.json",
+      "role": "embedded-demo-source",
+      "sha256": "3a25aa07b7179130cacaa5c4e80fb3eb63dada7291976696ab07d0157a7ab635"
+    },
+    {
+      "bytes": 462,
+      "path": "demo/study-in-germany/data/scenarios/high_stress_start.json",
+      "role": "embedded-demo-source",
+      "sha256": "754f835049547a8ef4b052527785febd8a0dd7eee16f89dc23743e2a8f165648"
+    },
+    {
+      "bytes": 465,
+      "path": "demo/study-in-germany/data/scenarios/low_money_start.json",
+      "role": "embedded-demo-source",
+      "sha256": "a8b180bfe3353971aca1f5e219bbbc920343d1a61e3b3630824a1377ceb0fa78"
+    },
+    {
+      "bytes": 2421,
+      "path": "demo/study-in-germany/docs/01_project_plan.md",
+      "role": "embedded-demo-source",
+      "sha256": "046370cfe8c44a7adbff1c634f09b808951a8743e7e9be4394fa7d02afb08f53"
+    },
+    {
+      "bytes": 10481,
+      "path": "demo/study-in-germany/docs/02_game_design.md",
+      "role": "embedded-demo-source",
+      "sha256": "483076fed9c93ff7a972aefc5531a1ee892bccaacc7269e839e9cca783619e36"
+    },
+    {
+      "bytes": 5804,
+      "path": "demo/study-in-germany/docs/03_technical_architecture.md",
+      "role": "embedded-demo-source",
+      "sha256": "48ab750b169805848ceea3a1b0ebbbe83d408dd73495f218c470bdf70981395f"
+    },
+    {
+      "bytes": 8109,
+      "path": "demo/study-in-germany/docs/04_content_plan.md",
+      "role": "embedded-demo-source",
+      "sha256": "696a4fa4beb49eecb51aa4d3d063251a4250bb765bf362e58c678a4705f37a75"
+    },
+    {
+      "bytes": 117848,
+      "path": "demo/study-in-germany/docs/05_event_choice_balance.md",
+      "role": "embedded-demo-source",
+      "sha256": "db579b9dea7ebfc04e16441948abdd117e176b0076bfba84fb47b383f2da4a9a"
+    },
+    {
+      "bytes": 3690,
+      "path": "demo/study-in-germany/docs/06_agent_simulation_contract.md",
+      "role": "embedded-demo-source",
+      "sha256": "a225c0693c931f07753493b86edcaeba05e2c67a651e0af893e9fdaee35f8a58"
+    },
+    {
+      "bytes": 6552,
+      "path": "demo/study-in-germany/docs/07_agent_collaboration_roadmap.md",
+      "role": "embedded-demo-source",
+      "sha256": "840c4986bd3ca66392f3d25fe732e4521b7576a4d45e2dd1f36a83b94b03ad0d"
+    },
+    {
+      "bytes": 6565,
+      "path": "demo/study-in-germany/docs/08_chinese_student_germany_process_research.md",
+      "role": "embedded-demo-source",
+      "sha256": "c7de163def9e083c49e7ed928e2a6e8f07454ae9ae9706b944c177fd24e02b0c"
+    },
+    {
+      "bytes": 16269,
+      "path": "demo/study-in-germany/docs/09_demo_hardening_gap_plan.md",
+      "role": "embedded-demo-source",
+      "sha256": "6f39e6075fa3ba2f6ffef546f08364b91af7fe32b6bf2e40b75771d62caff34e"
+    },
+    {
+      "bytes": 4795,
+      "path": "demo/study-in-germany/docs/10_route_boundary_audit.md",
+      "role": "embedded-demo-source",
+      "sha256": "2bfbc2a153ac11e30034f2a3fe28e8fe4b5463327885cfc92110526eaab793de"
+    },
+    {
+      "bytes": 995,
+      "path": "demo/study-in-germany/icon.svg",
+      "role": "embedded-demo-source",
+      "sha256": "6c80384360a5b269d1054bfb27241258154e2cc8167c522016fdc1820e84e0f8"
+    },
+    {
+      "bytes": 1013,
+      "path": "demo/study-in-germany/icon.svg.import",
+      "role": "embedded-demo-source",
+      "sha256": "fc3b60f3400007a8546f0ab0eb462b93f7f95fe6c6f039ee8a534814bc4f88c1"
+    },
+    {
+      "bytes": 858,
+      "path": "demo/study-in-germany/project.godot",
+      "role": "embedded-demo-source",
+      "sha256": "f7f6c62f420fb49be0eb7d610609eb13304d15c1f44657c2950278551193b1c5"
+    },
+    {
+      "bytes": 1,
+      "path": "demo/study-in-germany/reports/.gitkeep",
+      "role": "embedded-demo-source",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "bytes": 27608,
+      "path": "demo/study-in-germany/scenes/main/Main.gd",
+      "role": "embedded-demo-source",
+      "sha256": "bc4e445979183735627a59379b72e8d2acf4c188e305254f37cbacbb242f09a4"
+    },
+    {
+      "bytes": 287,
+      "path": "demo/study-in-germany/scenes/main/Main.tscn",
+      "role": "embedded-demo-source",
+      "sha256": "8e9dd75330b2694a31126f892e5727f7342fb0609ea916ddf9d5d4e49e925dad"
+    },
+    {
+      "bytes": 115,
+      "path": "demo/study-in-germany/scenes/ui/ActionCard.tscn",
+      "role": "embedded-demo-source",
+      "sha256": "5a23a2a662ec452a9e96d0792cf5f68dfece71865b6960e4eb0f3061db85d91c"
+    },
+    {
+      "bytes": 173,
+      "path": "demo/study-in-germany/scenes/ui/Dashboard.tscn",
+      "role": "embedded-demo-source",
+      "sha256": "07ebcce06270cdacf5445f62086f1ff7a55466ac233a4407d645854bd8546043"
+    },
+    {
+      "bytes": 176,
+      "path": "demo/study-in-germany/scenes/ui/EndingScreen.tscn",
+      "role": "embedded-demo-source",
+      "sha256": "11410be799de87050cbaa041caf7c23f3cc0fb3157f9c23947b5771bcc1b293a"
+    },
+    {
+      "bytes": 108,
+      "path": "demo/study-in-germany/scenes/ui/EventPopup.tscn",
+      "role": "embedded-demo-source",
+      "sha256": "46b59bc5bb46cedf75feba28f4adcb7e7377ec78ba1498c3313b1e7dc1718699"
+    },
+    {
+      "bytes": 184,
+      "path": "demo/study-in-germany/scenes/ui/SemesterResultScreen.tscn",
+      "role": "embedded-demo-source",
+      "sha256": "ecd63231cb737f8cf9eed00867322c941c373e0da64e7ac0da54e6a9b8b561cd"
+    },
+    {
+      "bytes": 4796,
+      "path": "demo/study-in-germany/scripts/data/ActionDef.gd",
+      "role": "embedded-demo-source",
+      "sha256": "bc582a3e0724d6555e5966d9ca4f777c1bc567743d7e3cbcf4e7e719a0683dc8"
+    },
+    {
+      "bytes": 292,
+      "path": "demo/study-in-germany/scripts/data/CharacterDef.gd",
+      "role": "embedded-demo-source",
+      "sha256": "086106679c1646b8a7bbe98507d8b7989c469f5a9a4a7261510a156f52ba28a5"
+    },
+    {
+      "bytes": 6854,
+      "path": "demo/study-in-germany/scripts/data/DataLoader.gd",
+      "role": "embedded-demo-source",
+      "sha256": "381625a29bfe907d9b2bdfabba4fd6c1449cef6b2625592f56c55c359de8074b"
+    },
+    {
+      "bytes": 3345,
+      "path": "demo/study-in-germany/scripts/data/EndingDef.gd",
+      "role": "embedded-demo-source",
+      "sha256": "44e63f5511f18daa171cb043bab0c08e29f33c5e26daaadef78c54485c963911"
+    },
+    {
+      "bytes": 773,
+      "path": "demo/study-in-germany/scripts/data/EventChoiceDef.gd",
+      "role": "embedded-demo-source",
+      "sha256": "e50d2344f824b470204ac7bd4973c73a16df58fc47660331bae344766d6d68b9"
+    },
+    {
+      "bytes": 3445,
+      "path": "demo/study-in-germany/scripts/data/EventDef.gd",
+      "role": "embedded-demo-source",
+      "sha256": "558a0e14bb626dd799eaa3984c5245bca5a72c2b7be9ee681cfc19f1ba90ff80"
+    },
+    {
+      "bytes": 2388,
+      "path": "demo/study-in-germany/scripts/policies/AdminPolicy.gd",
+      "role": "embedded-demo-source",
+      "sha256": "9cf1c2a9b27bd636924e26630eb1e2ab42be98adc17b46a940758ad266fac268"
+    },
+    {
+      "bytes": 7612,
+      "path": "demo/study-in-germany/scripts/policies/BalancedPolicy.gd",
+      "role": "embedded-demo-source",
+      "sha256": "786aba335853e58f5b4f5c8d124a3abc586b800295b769c95c3176ac50dda51b"
+    },
+    {
+      "bytes": 2411,
+      "path": "demo/study-in-germany/scripts/policies/PlayerPolicy.gd",
+      "role": "embedded-demo-source",
+      "sha256": "410de20ce35c76bb189273cdfa62490f35303361062d66a2fe0a551220f696be"
+    },
+    {
+      "bytes": 1030,
+      "path": "demo/study-in-germany/scripts/policies/RandomPolicy.gd",
+      "role": "embedded-demo-source",
+      "sha256": "27fbcd9b40e72213557a9c8d36e2de83f20836b4987d3562380666663216913d"
+    },
+    {
+      "bytes": 1345,
+      "path": "demo/study-in-germany/scripts/policies/SlackerPolicy.gd",
+      "role": "embedded-demo-source",
+      "sha256": "f1d9380079b03e412d209b98e4129648ff1b8a6585d199b5bd33c2d56c50b523"
+    },
+    {
+      "bytes": 1864,
+      "path": "demo/study-in-germany/scripts/policies/SocialPolicy.gd",
+      "role": "embedded-demo-source",
+      "sha256": "ac13b83035004f6b5ded21687a2b0cccc1cf721e9d9bce7cf6c93eec61eefa05"
+    },
+    {
+      "bytes": 1558,
+      "path": "demo/study-in-germany/scripts/policies/StudyPolicy.gd",
+      "role": "embedded-demo-source",
+      "sha256": "69b1892e1b66a937a281ff5ece3d4422b3ba40dcb70db21ae111f4f57efe530d"
+    },
+    {
+      "bytes": 3660,
+      "path": "demo/study-in-germany/scripts/policies/WorkPolicy.gd",
+      "role": "embedded-demo-source",
+      "sha256": "9aec37c76da6d7dd9ca9f04fce8014351544a62246f72da9e39c14d6229c5cbe"
+    },
+    {
+      "bytes": 3486,
+      "path": "demo/study-in-germany/scripts/simulation/ActionResolver.gd",
+      "role": "embedded-demo-source",
+      "sha256": "8dd4e19a5da7717d7a37dd7a7925691f46e3b0b6d03c0f99eb590b059fa3d993"
+    },
+    {
+      "bytes": 611,
+      "path": "demo/study-in-germany/scripts/simulation/EconomyRules.gd",
+      "role": "embedded-demo-source",
+      "sha256": "8df8c735a53863fd372416760ac4b5fc4f3862fd79ba2978ac12590ce21685d0"
+    },
+    {
+      "bytes": 384,
+      "path": "demo/study-in-germany/scripts/simulation/EndingResolver.gd",
+      "role": "embedded-demo-source",
+      "sha256": "aab38084166a5fbe2e93bb9df37cfe5ba9e817d9e0f9ace3fac240ffefba8b72"
+    },
+    {
+      "bytes": 8311,
+      "path": "demo/study-in-germany/scripts/simulation/EventResolver.gd",
+      "role": "embedded-demo-source",
+      "sha256": "ef209cbc80c568410bdf5e22f070a80c479230cb7bfb61ef2e2e250170b83535"
+    },
+    {
+      "bytes": 2390,
+      "path": "demo/study-in-germany/scripts/simulation/ExamResolver.gd",
+      "role": "embedded-demo-source",
+      "sha256": "ef0593359ebe52165b2cf75689aa56ea8090346e87e7502a10a01853a98a2d0c"
+    },
+    {
+      "bytes": 6494,
+      "path": "demo/study-in-germany/scripts/simulation/RiskEvaluator.gd",
+      "role": "embedded-demo-source",
+      "sha256": "a5ed178251fafb408357b1e58f2312f696bf33d2aa686fc2e3a1e79cf883d4f1"
+    },
+    {
+      "bytes": 714,
+      "path": "demo/study-in-germany/scripts/simulation/SaveManager.gd",
+      "role": "embedded-demo-source",
+      "sha256": "cfecbba8031952c1f468f81ce29e7a4acc612442c85c4032160f690ef8614e3c"
+    },
+    {
+      "bytes": 7200,
+      "path": "demo/study-in-germany/scripts/simulation/SemesterReportBuilder.gd",
+      "role": "embedded-demo-source",
+      "sha256": "482d1dc0fa5dbd1cd57d088607bc62afdaf385778fea0dabc708cd00a4637c4f"
+    },
+    {
+      "bytes": 3067,
+      "path": "demo/study-in-germany/scripts/simulation/SimulationEngine.gd",
+      "role": "embedded-demo-source",
+      "sha256": "8d51b5260746e2f428698731f3de9987f53d6e57c633df08bc048e98b216f1b9"
+    },
+    {
+      "bytes": 1983,
+      "path": "demo/study-in-germany/scripts/tools/ExportContentJson.gd",
+      "role": "embedded-demo-source",
+      "sha256": "421c8c7d4f178f5f263e6d5a53323157918835407c068c786637d5bd96dd2bd9"
+    },
+    {
+      "bytes": 3708,
+      "path": "demo/study-in-germany/scripts/tools/ExportEventChoiceBalance.gd",
+      "role": "embedded-demo-source",
+      "sha256": "46d97d1dce73b6a10e816ccebd305935d5f2167254c7da3bdceb4c5a80230856"
+    },
+    {
+      "bytes": 2452,
+      "path": "demo/study-in-germany/scripts/tools/ExportEventGraph.gd",
+      "role": "embedded-demo-source",
+      "sha256": "f460c2c84796818735ba93c203665fc0810d9f91eed9af0435166d6c7d197f9d"
+    },
+    {
+      "bytes": 1023,
+      "path": "demo/study-in-germany/scripts/tools/PrintDataSources.gd",
+      "role": "embedded-demo-source",
+      "sha256": "f5ecaaea52fda8eb399f633d115938c109afc53f72223e5d13687f128672df4e"
+    },
+    {
+      "bytes": 9582,
+      "path": "demo/study-in-germany/scripts/tools/RunBoundaryProbe.gd",
+      "role": "embedded-demo-source",
+      "sha256": "4260628433d6d4a80861e7faae3d15e8382852bf5ea607330558b53a4718e3d3"
+    },
+    {
+      "bytes": 11575,
+      "path": "demo/study-in-germany/scripts/tools/RunInteractiveProbe.gd",
+      "role": "embedded-demo-source",
+      "sha256": "923e92414a87d639983b78c643d514d39d817083134343e6fb28c4318bc5947e"
+    },
+    {
+      "bytes": 16033,
+      "path": "demo/study-in-germany/scripts/tools/RunSimulation.gd",
+      "role": "embedded-demo-source",
+      "sha256": "e7b35873bb0ec2f33eb38c7457512d3aef42d505c47fa48ffbb26649895768ae"
+    },
+    {
+      "bytes": 3947,
+      "path": "demo/study-in-germany/scripts/tools/SplitEventsJsonByGroup.gd",
+      "role": "embedded-demo-source",
+      "sha256": "d1374a793cdd5fef2957800ecc04b23299eca65f4eebc7d9b023ce5ceda6e55f"
+    },
+    {
+      "bytes": 9146,
+      "path": "demo/study-in-germany/scripts/tools/ValidateContent.gd",
+      "role": "embedded-demo-source",
+      "sha256": "0983b237eeacc1e2ef0da8c0d78c4375151c144c739f76be809deac798cf4ab7"
+    },
+    {
+      "bytes": 12368,
+      "path": "demo/study-in-germany/scripts/tools/ValidateDemoGates.gd",
+      "role": "embedded-demo-source",
+      "sha256": "24751f432d23be0f16e0c976673e7c658f66b5292144c07bb43a13d0bdb18538"
+    },
+    {
+      "bytes": 9008,
+      "path": "demo/study-in-germany/scripts/tools/ValidateEconomyRules.gd",
+      "role": "embedded-demo-source",
+      "sha256": "ea9b90892bcb206ee601008548c69a6b1f11bec45b4c447fbe1f6438bbcad545"
+    },
+    {
+      "bytes": 3448,
+      "path": "demo/study-in-germany/scripts/tools/ValidateJsonContent.gd",
+      "role": "embedded-demo-source",
+      "sha256": "a410301fa4ceec98415bf7300fa970a4dbd4eda5cafe5421e0439eb137f8f77e"
+    },
+    {
+      "bytes": 7242,
+      "path": "demo/study-in-germany/scripts/tools/ValidateRiskGuidance.gd",
+      "role": "embedded-demo-source",
+      "sha256": "d2bf020dfb50081e9ed766604b21a03b079b6a3a8120f276958484b321021cdc"
+    },
+    {
+      "bytes": 7976,
+      "path": "demo/study-in-germany/scripts/tools/ValidateRouteBoundaries.gd",
+      "role": "embedded-demo-source",
+      "sha256": "dc8a8f5e8a8654a0f0408f421dae5d6702d5c99c26b04427900120501440bd5a"
     }
   ],
   "claims": [
@@ -377,7 +870,8 @@
     "Inspect validates committed evidence; it does not perform a fresh model or Godot run.",
     "The committed persona decisions are Replay fixtures, not fresh OpenAI responses.",
     "The candidate repair was rejected and is not merged into the game baseline.",
-    "Live OpenAI Judge Mode requires a separately supplied server-side API key."
+    "Live OpenAI Judge Mode requires a separately supplied server-side API key.",
+    "The embedded Study in Germany source is a competition demo, not a complete game."
   ],
   "primary_commands": {
     "inspect": "./judge --mode inspect --offline --json --output-dir -",

@@ -26,6 +26,7 @@ COPY .agents/ ./.agents/
 COPY src/ ./src/
 COPY tools/ ./tools/
 COPY config/ ./config/
+COPY demo/ ./demo/
 COPY fixtures/ ./fixtures/
 COPY examples/build_week_2026/ ./examples/build_week_2026/
 COPY docs/reviews/openai_build_week_2026/ ./docs/reviews/openai_build_week_2026/

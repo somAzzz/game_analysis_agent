@@ -15,7 +15,7 @@ ENV PYTHONUNBUFFERED=1 \
     VLLM_BASE_URL=http://vllm:8000/v1 \
     VLLM_API_KEY=local-dev-token \
     LLM_SERVED_MODEL_NAME=qwen3.6-27b-nvfp4 \
-    GAME_PROJECT_PATH=/data/game_project
+    GAME_PROJECT_PATH=/app/demo/study-in-germany
 
 WORKDIR /app
 
@@ -41,6 +41,7 @@ COPY tools/ ./tools/
 COPY prompts/ ./prompts/
 COPY scripts/tools ./scripts/tools/
 COPY config/ ./config/
+COPY demo/ ./demo/
 COPY docs/ ./docs/
 
 # Ensure the package is importable when invoked with `python -m`.
