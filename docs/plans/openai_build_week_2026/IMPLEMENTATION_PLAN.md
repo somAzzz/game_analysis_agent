@@ -1,12 +1,17 @@
 ---
 status: active
 date: 2026-07-16
+last_updated: 2026-07-16
 requirements_verified: 2026-07-16
 audience: maintainers, judges, contributors
 scope: OpenAI Build Week 2026 competition implementation and submission plan
 ---
 
 # Playtest Forge: OpenAI Build Week 2026 Implementation Plan
+
+Execution companion:
+[EXECUTION_PLAN.md](EXECUTION_PLAN.md) translates this strategy into ordered
+steps, review packets, gate criteria, failure handling, and release decisions.
 
 ## 1. Executive decision
 
@@ -26,8 +31,9 @@ The competition claim is intentionally narrow:
 > player behavior to a verified patch—without confusing designed failure with
 > a software or balance defect.
 
-The Build Week version will use a repository-scoped Codex Skill and Dockerized
-execution environment. It will not add an MCP adapter before the existing
+The Build Week version will use a repository-scoped Codex Skill, an offline
+machine-readable evaluator, a portable Replay bundle, and an optional
+Dockerized human interface. It will not add an MCP adapter before the existing
 service-layer acceptance gates are complete.
 
 ## 2. Competition requirements and design response
@@ -56,7 +62,7 @@ Playtest Forge responds as follows:
 | Requirement or criterion | Project response | Evidence for judges |
 | --- | --- | --- |
 | Codex + GPT-5.6 | Codex is the Repair Director; GPT-5.6 API workers generate persona decisions | Codex session, decision log, model audit |
-| Working project | Dockerized Godot, Python analysis, Judge API, React evidence UI | One-command Judge Mode |
+| Working project | Godot, Python analysis, Judge API, React evidence UI | Offline evaluator plus optional one-command Judge UI |
 | Non-trivial implementation | Real game execution, typed decisions, deterministic gates, counterfactual replay | Source, tests, manifests, before/after artifacts |
 | Complete design | One golden path: Campaign -> Diagnose -> Repair -> Prove | Three-stage UI and demo |
 | Real impact | Reduces repetitive playtesting and regression analysis for small game teams | Measured case study |
@@ -71,6 +77,40 @@ Official sources:
 - <https://developers.openai.com/api/docs/models>
 - <https://developers.openai.com/api/docs/guides/structured-outputs>
 - <https://learn.chatgpt.com/docs/build-skills>
+- <https://learn.chatgpt.com/docs/environments/cloud-environment>
+- <https://learn.chatgpt.com/docs/cloud/internet-access>
+- <https://github.com/openai/codex-universal>
+
+### 2.1 Evaluation-environment evidence boundary
+
+The Build Week brief does **not** publish an automated-preselection runtime,
+state that an AI performs the initial review, or guarantee Docker, network,
+GPU, browser, writable ports, secrets, or an OpenAI API key. The submission
+must not present any such assumption as an official fact.
+
+The deployment design will nevertheless defend against the strictest
+reasonable automated-review environment. The closest documented OpenAI
+execution reference is Codex cloud: it checks out the repository into an
+isolated managed container, runs setup with network access, then runs the agent
+phase offline by default; setup secrets are removed before the agent phase.
+The public `openai/codex-universal` image approximates this environment but is
+explicitly not identical to it.
+
+Therefore automated evaluation is treated as an additional compatibility
+target with these conservative assumptions:
+
+- Linux `amd64`, non-interactive, and no TTY;
+- repository checkout only, with no sibling game repository;
+- no Docker daemon or nested-container privilege;
+- no GPU, API key, or secret during the test phase;
+- network unavailable after setup and possibly unavailable throughout;
+- only repository-local writes, blocked port binding, and a short timeout;
+- scoring may use README, source, machine-readable output, committed evidence,
+  and the public video without completing the full live campaign.
+
+The design rule is: every deeper runtime layer may add evidence, but failure of
+Docker, network, credentials, Godot, or OpenAI must never prevent the evaluator
+from validating the committed reference experiment.
 
 ## 3. Current project baseline
 
@@ -114,6 +154,16 @@ The current state is not yet judge-ready:
 - No repository Skill currently exposes the competition workflow.
 - No single command currently performs campaign, diagnosis, isolated repair,
   fixed replay, holdout replay, and final acceptance.
+- The inspected development host is Apple Silicon macOS (`arm64`), but Docker
+  is not installed or not on `PATH`; the system Python is 3.9 while the project
+  requires Python 3.10 or newer, and the installed native Godot is 4.7 rather
+  than the competition target 4.4.
+- The current Compose default starts an NVIDIA Blackwell/NVFP4 vLLM service,
+  and the `agent` service waits for vLLM health. That path cannot be the macOS,
+  Judge, or automated-evaluator default.
+- The current `barichello/godot-ci:4.4` image is `linux/amd64` only. It may run
+  through Apple Silicon emulation, but that is a best-effort developer fallback
+  rather than a supported macOS delivery path.
 
 These gaps are release blockers, not details to hide in the submission.
 
@@ -243,15 +293,20 @@ React evidence console
 
 ## 6. Runtime modes
 
-| Mode | Persona source | GPU | API key | Purpose |
-| --- | --- | ---: | ---: | --- |
-| Judge/OpenAI | `gpt-5.6-luna` through backend | No | Yes, server-side | Short live campaign and official-model demonstration |
-| Judge/Replay | Sanitized, real recorded traces | No | No | Guaranteed evaluator experience and full evidence replay |
-| Self-hosted | Qwen through vLLM/SGLang | Yes | No cloud key | Privacy and scale story after the demo |
+| Mode | Persona source | Docker | GPU | API key | Purpose |
+| --- | --- | ---: | ---: | ---: | --- |
+| Automated/Inspect | Committed manifests and repair evidence | No | No | No | Sub-minute schema, hash, provenance, and claim validation |
+| Automated/Replay | Small committed real-trace fixture | No | No | No | Non-interactive replay smoke test and machine-readable result |
+| Judge/Replay | Sanitized full recorded traces | Optional | No | No | Guaranteed human evaluator experience and full evidence replay |
+| Judge/OpenAI | `gpt-5.6-luna` through backend | Optional | No | Yes, server-side | Short live campaign and official-model demonstration |
+| Self-hosted/NVIDIA | Qwen through vLLM/SGLang | Yes | Yes | No cloud key | Optional Linux privacy and scale path |
+| Self-hosted/Mac | MLX-optimized model through native vLLM-Metal | No | Apple Metal | No cloud key | Experimental developer option, never a judge dependency |
 
-The application must start in Replay mode when no OpenAI key is configured.
-Missing credentials may disable live persona generation but must not prevent a
-judge from inspecting and replaying the complete case study.
+The repository-level `judge` entrypoint must select Automated/Inspect when no
+mode is given. The interactive application must select Replay when no OpenAI
+key is configured. Missing credentials may disable live persona generation but
+must not prevent any evaluator from inspecting and replaying the case study.
+No local-model service may be started implicitly.
 
 ## 7. OpenAI model and API strategy
 
@@ -314,7 +369,7 @@ keeps the JSON fallback required by OpenAI-compatible local models.
 - Persist provider, actual model, response ID, token usage, latency, refusal,
   retry count, and error category.
 
-## 8. Docker packaging
+## 8. Portable deployment and Docker packaging
 
 ### 8.1 Repository layout
 
@@ -323,6 +378,10 @@ The submission should present one cloneable top-level repository experience:
 ```text
 game_analysis_agent/
   .agents/skills/playtest-forge/SKILL.md
+  AGENTS.md
+  JUDGE.md
+  judge                       # non-interactive offline entrypoint
+  judge-manifest.json
   app/
   config/
   docs/
@@ -331,6 +390,8 @@ game_analysis_agent/
   study-in-germany/        # pinned subtree or initialized submodule
   docker-compose.yml
   Dockerfile.judge
+  scripts/setup-evaluator
+  scripts/judge-smoke-test
 ```
 
 Preferred game packaging order:
@@ -350,10 +411,14 @@ Core/Judge profile:
 
 Optional local-model profile:
 
-- `vllm`: GPU-backed local persona provider.
+- `vllm`: GPU-backed local persona provider under an explicit
+  `local-nvidia` profile.
 
 The API service must not depend on a healthy vLLM service in Judge/OpenAI or
-Replay mode.
+Replay mode. A bare `docker compose up` must not start vLLM. Native
+vLLM-Metal on macOS, if configured, connects through the same
+`OpenAICompatiblePersonaGateway` URL and remains outside the Judge Compose
+dependency graph.
 
 ### 8.3 Source and artifact mounts
 
@@ -361,10 +426,15 @@ Replay mode.
   task so edits persist and remain visible in Git.
 - Reports are mounted to a host directory and owned by the current UID/GID.
 - The judge image pins dependencies but does not conceal source code.
-- Publish a prebuilt image by digest and retain the Dockerfile for inspection.
-- Judge/Replay should support `linux/amd64`; Apple Silicon compatibility is a
-  target for Judge/Replay even if the optional vLLM profile remains NVIDIA
-  Linux only.
+- Publish prebuilt API/dashboard/replay Judge images by digest for
+  `linux/amd64` and `linux/arm64` and retain the Dockerfile for inspection.
+- The API/dashboard/replay image must be natively multi-architecture. It may
+  not rely on Apple Silicon emulation of an `amd64` image.
+- Linux `amd64` may continue using the pinned Godot container after clean-room
+  verification. macOS Apple Silicon uses an official pinned native Godot 4.4
+  executable for real game runs until a verified ARM64 Godot image exists.
+- Every runtime path must compare Godot version, project version, and report
+  contract before accepting evidence.
 
 ### 8.4 Doctor check
 
@@ -378,6 +448,135 @@ A preflight command must report, without leaking secrets:
 - optional GPU availability;
 - selected runtime mode;
 - expected live campaign cost class and enforced limits.
+
+The doctor command must have both human text and JSON output. An unsupported
+optional capability is a warning; a missing requirement for the selected mode
+is a typed failure with a remediation command.
+
+### 8.5 macOS Apple Silicon implementation contract
+
+All competition-critical development and demonstration work can run on macOS,
+provided the NVIDIA path is treated as optional:
+
+- pin Python 3.12 in a project environment rather than using system Python;
+- pin Node.js 20 for frontend build and tests;
+- install and verify native Godot 4.4 for real gameplay execution;
+- run the real-game Python worker and Godot natively together on macOS; the
+  ARM64 Docker path guarantees Replay/UI portability and does not pretend to
+  contain a verified ARM64 Godot runtime;
+- use Docker Desktop only for the containerized Judge/Replay compatibility
+  path, not as a requirement for offline evidence inspection;
+- run OpenAI persona workers from the backend with a server-side key;
+- default to Replay when the key is absent;
+- use native vLLM-Metal with an MLX-optimized model only as an experimental
+  self-hosted provider, never as parity with the NVIDIA NVFP4 configuration;
+- prohibit hard-coded `/home/...` paths and normalize paths, UID ownership,
+  executable bits, and line endings across macOS and Linux.
+
+The required macOS acceptance run is:
+
+1. fresh Apple Silicon user account;
+2. pinned Python/Node/Godot versions installed by documented commands;
+3. Automated/Inspect and Automated/Replay without Docker;
+4. Judge/Replay through Docker Desktop using native ARM64 images;
+5. one native-Godot deterministic playthrough;
+6. one Judge/OpenAI short campaign;
+7. fixed/holdout repair verification and artifact-hash comparison against the
+   Linux reference run.
+
+### 8.6 Unknown automated-evaluator deployment ladder
+
+An AI evaluator should discover one obvious command in `AGENTS.md`, the README,
+`JUDGE.md`, and the root directory. The entrypoint must be deterministic,
+non-interactive, offline-first, and layered:
+
+| Tier | Command contract | Dependencies | Maximum expected time | Result |
+| --- | --- | --- | --- | --- |
+| 0: Inspect | `./judge --mode inspect --offline --json` | Python standard library only | 30 seconds | Validate manifest, schemas, hashes, provenance, claim references |
+| 1: Replay smoke | `./judge --mode replay-smoke --offline --json` | Locked Python environment | 120 seconds | Replay a small real fixture and evaluate representative gates |
+| 2: Full replay | `./judge --mode replay --offline --json` | Locked Python environment; Docker optional | 5 minutes | Validate the complete committed reference experiment |
+| 3: Interactive | Docker dashboard or native local services | Browser and optional Docker | 5 minutes to first result | Human Campaign/Repair/Proof experience |
+| 4: Live OpenAI | `OPENAI_API_KEY` available to backend | Network and secret | Optional | Short fresh persona campaign |
+
+Tier 0 must not import project packages that trigger unavailable optional
+dependencies. Tier 1 must use only committed fixtures and lockfiles. Tiers 0-2
+must not bind a port, launch a browser, call GitHub, pull an image, download a
+model, use a sibling checkout, or require approval. Tier 4 is never used to
+decide whether the submission is basically runnable.
+
+`scripts/setup-evaluator` is an idempotent, non-root setup-phase helper. It
+installs only locked Python and frontend dependencies, verifies hashes, and
+does not start services or require secrets. A corresponding maintenance check
+updates the environment only when lockfiles change. This matches the documented
+Codex cloud split between networked setup and an offline agent phase without
+claiming that Build Week uses Codex cloud for judging.
+
+### 8.7 AI-readable repository interface
+
+`AGENTS.md` must place the evaluator quickstart before developer-only Godot and
+vLLM instructions. `JUDGE.md` must contain:
+
+- the one-sentence product claim and Developer Tools category;
+- the exact Tier 0 and Tier 1 commands;
+- expected exit code, duration, and output path;
+- links from every claim to a committed artifact and field;
+- the Docker and macOS paths as optional deeper validation;
+- explicit limitations and which evidence is prerecorded;
+- instructions for interpreting accepted, rejected, partial, and unavailable
+  states.
+
+`judge-manifest.json` must be the machine-readable table of contents. It records
+schema version, source/game/image revisions, platform matrix, commands,
+timeouts, fixture hashes, experiment IDs, expected gate outcomes, public demo
+URL, and documentation paths. A model should not have to infer the canonical
+command from prose or search across historical reports.
+
+### 8.8 Automated-deployment failure protocol
+
+The root entrypoint writes `artifacts/judge-result.json` atomically when the
+selected output directory is writable and always emits the same compact JSON
+object on stdout. `--output-dir -` is explicit stdout-only mode. Required
+fields are `status`, `stage`, `mode`, `platform`, `duration_ms`, `checks`,
+`artifacts`, `limitations`, `error_code`, and `remediation`. Logs go to stderr.
+No ANSI control sequences, progress spinners, prompts, or background processes
+are allowed in JSON mode.
+
+Stable exit-code families:
+
+- `0`: selected mode completed and all required checks passed;
+- `2`: invalid invocation;
+- `10`: unsupported platform or runtime;
+- `11`: missing or incompatible dependency;
+- `12`: missing, stale, or hash-invalid evidence;
+- `13`: deterministic test or gate failure;
+- `14`: timeout, cancellation, or external provider failure;
+- `15`: internal harness error.
+
+Fallback changes capability, never truth. For example, a missing API key may
+select Replay before a live run begins, but an OpenAI call that fails mid-run
+must produce `status: failed`, not silently reuse recorded output.
+
+| Likely automated-test failure | Required behavior |
+| --- | --- |
+| Docker daemon/socket unavailable | Continue with Tiers 0-2; mark Docker unavailable, not project failure |
+| `amd64`/`arm64` image mismatch | Use native offline path; never start emulation implicitly |
+| Network disabled or DNS blocked | Use committed fixtures and locks; print no retry storm |
+| API key/secret absent | Select Replay before execution and state that live mode was not tested |
+| Sibling game repo or submodule unavailable | Use the pinned competition bundle; fail artifact hash validation if absent |
+| Godot unavailable | Complete evidence inspection/replay; identify real-game execution as unverified |
+| Port binding/browser unavailable | Produce JSON and static HTML artifacts without starting the dashboard |
+| Workspace read-only | Support `--output-dir` and stdout-only mode; never write outside the workspace |
+| CPU/RAM/time limit | Use bounded fixture sizes and hard child-process timeouts; preserve partial diagnostics |
+| Interrupted or orphaned process | Trap signals, terminate process groups, and write an incomplete result atomically |
+| Dependency install failure | Report package, lock hash, command, and setup-stage failure without ad hoc upgrades |
+| OpenAI quota, rate limit, or schema error | Fail live mode visibly; keep the separately labeled Replay path available |
+
+The evaluator compatibility test must run with network disabled, no secrets,
+no Docker socket, no GPU device, no TTY, and a temporary repository-local output
+directory. It must also be exercised in the public `openai/codex-universal`
+image for `linux/amd64`. Because that image is only an approximation, passing
+it is evidence of portability rather than proof of the undisclosed judging
+environment.
 
 ## 9. Codex Skill and repair protocol
 
@@ -398,6 +597,11 @@ A preflight command must report, without leaking secrets:
 
 `AGENTS.md` retains durable repository architecture and verification rules.
 The Skill contains the focused, repeatable competition workflow.
+
+Automated inspection must not require an evaluator to know or explicitly
+invoke the Skill. `AGENTS.md` routes any “test”, “evaluate”, or “judge” task to
+the root offline entrypoint first; the Skill is then the deeper Codex repair
+workflow after evidence validity is established.
 
 ### 9.2 Skill workflow
 
@@ -584,7 +788,7 @@ Provisional video allocation:
 | Time | Content |
 | --- | --- |
 | 0:00-0:20 | Problem: small game teams cannot cheaply replay diverse human behavior |
-| 0:20-0:45 | One command starts Dockerized Judge Mode and a short live OpenAI campaign |
+| 0:20-0:45 | One offline command validates the evidence bundle, then the dashboard starts a short live OpenAI campaign |
 | 0:45-1:10 | Persona differences and the shared failure attractor appear |
 | 1:10-1:40 | Codex reads evidence, cites source, and states one falsifiable hypothesis |
 | 1:40-2:10 | Codex applies one constrained patch in an isolated worktree |
@@ -644,14 +848,23 @@ Exit gate: Codex can accept or reject one real patch with field-level evidence.
 
 ### P4: Package Judge Mode
 
-- Build CPU-only Judge image and Compose profile.
+- Add root `judge`, `JUDGE.md`, `judge-manifest.json`, offline fixtures, stable
+  JSON output, and documented exit codes.
+- Add idempotent evaluator setup and maintenance checks with locked
+  dependencies.
+- Build native `linux/amd64` and `linux/arm64` CPU-only
+  API/dashboard/replay Judge images and a Compose profile.
 - Remove forced dependency on vLLM.
 - Add provider status, campaign, progress, cancellation, and experiment APIs.
 - Add Campaign/Repair/Proof UI states.
-- Publish a pinned prebuilt image and test a clean clone.
+- Add the native pinned-Godot macOS path and test it against Linux evidence.
+- Publish pinned prebuilt images and test clean clones on Linux and macOS.
+- Run the offline evaluator with network, secrets, Docker, GPU, TTY, and port
+  binding unavailable; repeat in `openai/codex-universal` `linux/amd64`.
 
-Exit gate: a judge without GPU can inspect the full case and see a first result
-within five minutes.
+Exit gate: an unknown restricted evaluator gets a machine-readable result in
+under two minutes, and a human judge without GPU gets the full case in under
+five minutes.
 
 ### P5: Submission assets
 
@@ -693,7 +906,13 @@ If schedule slips, cut in this order:
 - campaign isolation, resume, cancellation, partial failure, and aggregation;
 - repair schema, allowlist, change budget, and accept/reject logic;
 - key redaction from logs, APIs, artifacts, and frontend bundles;
-- frontend API decoding and Campaign/Repair/Proof states.
+- frontend API decoding and Campaign/Repair/Proof states;
+- judge-manifest schema, artifact traversal protection, and hash validation;
+- JSON stdout purity, atomic result writes, stable exit codes, and remediation
+  fields;
+- preselected Replay behavior when credentials are absent and visible live-run
+  failure after a provider call begins;
+- hard timeouts, signal cleanup, and stdout-only/read-only operation.
 
 ### 15.2 Integration tests
 
@@ -703,7 +922,13 @@ If schedule slips, cut in this order:
 - one replay full campaign;
 - fixed and holdout comparison;
 - critical validators and quality gates;
-- clean-clone Judge Mode on a supported CPU platform.
+- clean-clone Judge Mode on a supported CPU platform;
+- native macOS Godot 4.4 result compared with the Linux reference;
+- native ARM64 Judge/Replay through Docker Desktop;
+- offline Inspect/Replay with Docker socket, network, secrets, GPU, TTY, and
+  port binding removed;
+- `openai/codex-universal` `linux/amd64` compatibility run with pinned Python
+  3.12 and Node 20.
 
 ### 15.3 Release gates
 
@@ -716,6 +941,13 @@ If schedule slips, cut in this order:
 - Under-five-minute first judge result.
 - Under-three-minute narrated public video.
 - Repository and prebuilt test path available through the judging period.
+- Tier 0 succeeds from a repository-only checkout without setup, Docker,
+  network, secrets, sibling repositories, or imported optional packages.
+- Tier 1 completes under its documented timeout in an offline locked
+  environment.
+- Machine-readable mode contains no prompts, spinners, ANSI output, or mixed
+  stdout logs.
+- Every unsupported capability is distinguished from a failed required check.
 
 ## 16. Impact measurement
 
@@ -781,6 +1013,8 @@ The Devpost text and video may use only the highest level actually completed.
 | Too much refactoring | High | No MCP; narrow persona gateway and campaign boundary |
 | Overclaiming impact | Medium | One measured case study with explicit limits |
 | Judge cannot rebuild | High | Prebuilt pinned image and replay bundle |
+| Automated evaluator cannot use Docker/network/secrets | Critical | Standard-library Inspect plus offline Replay and typed JSON result |
+| Apple Silicon uses slow/unstable emulation | High | Native ARM64 replay image and native pinned Godot for real runs |
 | Public bundle leaks game content | High | Sanitization review and public manifest |
 
 ## 18. Explicit non-goals for Build Week
@@ -820,21 +1054,31 @@ commands are a target contract and do not yet constitute a verified quickstart:
 ```bash
 git clone <submission-repository-url>
 cd game_analysis_agent
+./judge --mode inspect --offline --json
+./judge --mode replay-smoke --offline --json
+```
+
+Those two commands are the primary automated-evaluator path. The optional
+human interface continues with:
+
+```bash
 docker compose --profile judge pull
 PLAYTEST_FORGE_MODE=replay docker compose --profile judge up -d
 ./scripts/judge-smoke-test
 ```
 
-The startup output must print the dashboard URL, expected image digest, source
-revision, demo-bundle revision, and the command that stops the stack. The
-judge should then be able to:
+The offline output must report the product claim, evidence status, artifact
+paths, limitations, and next optional command. Docker startup must print the
+dashboard URL, expected image digest, source revision, demo-bundle revision,
+and the command that stops the stack. The evaluator should then be able to:
 
-1. see doctor results and a complete replay case within two minutes;
-2. inspect Campaign, Repair, and Proof without an API key or GPU;
-3. run a deterministic smoke test without rebuilding images;
-4. optionally add `OPENAI_API_KEY` to an ignored server-side `.env.local` and
+1. validate hashes, provenance, and the central claim in under 30 seconds;
+2. replay a representative real fixture in under two minutes;
+3. inspect Campaign, Repair, and Proof without an API key, GPU, or rebuild;
+4. optionally use the digest-pinned dashboard when Docker is available;
+5. optionally add `OPENAI_API_KEY` to an ignored server-side `.env.local` and
    start the bounded live campaign;
-5. open the repository in Codex and invoke `$playtest-forge` against the
+6. open the repository in Codex and invoke `$playtest-forge` against the
    included evidence bundle to reproduce the repair judgment.
 
 The README must also include a source-build path for maintainers. That path is
@@ -844,11 +1088,13 @@ secondary to the prebuilt, digest-pinned judge path required by the challenge.
 
 Only tested combinations may be listed as supported:
 
-| Platform | Judge/Replay target | Judge/OpenAI target | Self-hosted vLLM target |
-| --- | --- | --- | --- |
-| Linux `amd64` + Docker | Required | Required | Optional, NVIDIA only |
-| macOS Apple Silicon + Docker Desktop | Required | Required | Not supported |
-| Other platforms | Best effort, not advertised until tested | Best effort | Not supported |
+| Platform | Offline Inspect/Replay | Dashboard Replay | Judge/OpenAI | Self-hosted local model |
+| --- | --- | --- | --- | --- |
+| Restricted Linux `amd64` container | Required | Not assumed | Not assumed | Not supported |
+| Linux `amd64` + Docker | Required | Required | Required | Optional, NVIDIA only |
+| Linux `arm64` + Docker | Required | Required | Required | Not supported |
+| macOS Apple Silicon | Required | Required through Docker Desktop | Required | Experimental vLLM-Metal |
+| Other platforms | Best effort, not advertised until tested | Best effort | Best effort | Not supported |
 
 The final compatibility table must replace `target` with a tested image
 digest, test date, and result. Browser support should name the exact versions
@@ -870,6 +1116,7 @@ used for Chrome, Firefox, and Safari smoke tests.
 | Installation instructions | Planned | Prebuilt and source-build paths | P4/P5 |
 | Supported platforms | Unverified | Dated compatibility matrix | P4 |
 | Test without rebuilding | Planned | Pinned image plus replay bundle and smoke test | P4 |
+| AI-readable offline evaluator path | Planned | Tier 0/1 JSON results under restricted-environment test | P4 |
 | Secret, privacy, and license review | Missing | Signed release checklist and scan results | P5 |
 | Submission before deadline | Scheduled | Devpost confirmation before July 21, 5:00 PM PT | Maintainer |
 
@@ -882,13 +1129,14 @@ official rules; this engineering plan is not a legal eligibility review.
 
 | Elapsed time | Expected proof |
 | --- | --- |
-| 0-2 minutes | Pull/start completes; doctor and provenance are visible |
-| 2-5 minutes | Replay case loads; campaign problem and repair decision are understandable |
+| 0-30 seconds | Offline Inspect validates manifest, hashes, provenance, and claim references |
+| 30 seconds-2 minutes | Replay smoke validates a real fixture and representative gates |
+| 2-5 minutes | Optional full replay/dashboard makes the problem and repair decision understandable |
 | 5-8 minutes, optional | Small OpenAI persona campaign completes under hard limits |
 | 8-12 minutes, optional | Smoke test and artifact references verify the displayed claim |
 
-Failure at any mandatory five-minute step is a release blocker. Live provider
-latency or quota must not make the replay path unavailable.
+Failure of either mandatory offline step is a release blocker. Docker, browser,
+live-provider latency, or quota must not make the offline path unavailable.
 
 ### 20.5 Final stop-ship checklist
 
@@ -896,6 +1144,10 @@ Do not submit until all of the following are true:
 
 - the canonical game commit contains every required runner and passes its real
   contract tests;
+- the root offline entrypoint succeeds without network, secrets, Docker, GPU,
+  TTY, port binding, or a sibling checkout;
+- an AI can discover the canonical command from `AGENTS.md`, README,
+  `JUDGE.md`, and `judge-manifest.json` without guessing;
 - a clean machine can use the pinned image and replay bundle without a GPU,
   OpenAI key, or local build;
 - the demo bundle hashes match the source, game, configuration, and image
@@ -1059,3 +1311,62 @@ credible shortlist shape if P0-P5 produce one real repair experiment and the
 five-minute clean-room path. It should not be submitted as a finished product
 if either proof is missing; those two artifacts are the difference between a
 strong architecture proposal and a competition-ready developer tool.
+
+### Review Pass 4: macOS delivery and unknown automated evaluation
+
+**Review question**
+
+Can the project be built completely on Apple Silicon macOS and still produce
+useful, trustworthy results when an unknown AI evaluator receives only a
+restricted repository checkout?
+
+**Evidence boundary**
+
+The published Build Week materials do not confirm an AI preselection stage or
+specify its virtual environment. The deployment cannot depend on that theory.
+The documented Codex cloud environment is used only as a conservative
+compatibility reference: isolated checkout, networked setup, offline agent by
+default, and no setup secrets during the agent phase.
+
+**Findings before revision**
+
+1. The plan correctly removed local vLLM from the judge-critical path, but the
+   repository's current Compose file still defaults to an NVIDIA-only NVFP4
+   service and makes the agent wait for it.
+2. The selected Godot 4.4 container is `linux/amd64` only, so its use through
+   Apple Silicon emulation would not justify a macOS support claim.
+3. The current Mac has native Godot 4.7 and system Python 3.9, not the pinned
+   Godot 4.4 and Python 3.10+ environment required by the plan.
+4. The prior quickstart started with Docker, which may be unavailable inside a
+   sandboxed or nested virtual environment.
+5. A live OpenAI path may be impossible when network is disabled or secrets
+   disappear before the test phase.
+6. Human-oriented logs and fallback behavior were not precise enough for an
+   automated grader to distinguish unsupported, failed, partial, and passed.
+
+**Changes applied in this revision**
+
+- Added a complete macOS contract using pinned Python 3.12, Node 20, native
+  Godot 4.4, backend OpenAI calls, Replay default, and optional native
+  vLLM-Metal.
+- Required native multi-architecture API/dashboard/replay images and prohibited
+  implicit `amd64` emulation as the Apple Silicon delivery strategy.
+- Added Tier 0 Inspect and Tier 1 Replay commands that need no Docker, GPU,
+  API key, port, browser, sibling checkout, or interactive approval.
+- Added `AGENTS.md`, `JUDGE.md`, `judge-manifest.json`, setup, and root-command
+  contracts so an AI can discover and interpret the test deterministically.
+- Added JSON result fields, stable exit-code families, atomic output, strict
+  timeout/signal cleanup, and a failure-response matrix.
+- Added restricted-environment, macOS, ARM64 Docker, cross-platform artifact,
+  and `openai/codex-universal` compatibility tests.
+- Separated official competition facts from the unverified automated-review
+  hypothesis throughout the plan.
+
+**Pass 4 verdict**
+
+Plan-level pass. The competition-critical system is fully implementable on
+Apple Silicon macOS without making NVIDIA inference part of the promise. The
+new deployment ladder is robust to a plausible AI preselection environment,
+but the repository is not yet compliant: the root evaluator, portable bundle,
+multi-architecture image, native Godot pin, and restricted-environment tests
+still have to be implemented and evidenced before submission.
