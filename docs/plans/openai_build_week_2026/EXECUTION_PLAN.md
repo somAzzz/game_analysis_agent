@@ -797,6 +797,14 @@ evidence replaces the pending rows.
 - macOS and Linux supported paths are evidenced.
 - Human UI makes the central claim and limitations clear.
 
+**Gate execution (2026-07-16): failed closed.** Six of eight checks passed:
+the restricted evaluator, human Judge UI contract, both offline modes,
+frontend tests, and public build. `platform_delivery` and
+`published_multiarch_image` failed because dated container/Linux evidence and
+a registry image-index digest do not exist yet. The generated G4 JSON is the
+authoritative blocker list; P5 release claims must not advance as though G4
+passed.
+
 ## 12. P5 — Produce submission evidence and release
 
 ### P5.1 Freeze the measured case study
