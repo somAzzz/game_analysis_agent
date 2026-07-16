@@ -83,11 +83,18 @@ def build_public_repair_bundle(
     public_patch = record.patch.model_copy(
         update={"patch_path": "patch.diff", "patch_sha256": _sha(patch_output)}
     )
+    public_tests = [
+        item.model_copy(
+            update={"command": tuple(_redact_host_path(arg) for arg in item.command)}
+        )
+        for item in record.focused_tests
+    ]
     public_record = RepairExperimentRecord.model_validate(
         record.model_dump(mode="json")
         | {
             "patch": public_patch.model_dump(mode="json"),
             "snapshots": [item.model_dump(mode="json") for item in snapshots],
+            "focused_tests": [item.model_dump(mode="json") for item in public_tests],
         }
     )
     _write_json(target / "repair_experiment.json", public_record.model_dump(mode="json"))
@@ -181,6 +188,12 @@ def _scan_public_safety(root: Path, names: list[str]) -> None:
             findings.append(name)
     if findings:
         raise RepairBundleError(f"repair public-safety scan failed: {findings}")
+
+
+def _redact_host_path(value: str) -> str:
+    if re.fullmatch(r"/(?:Users|home)/[^\s\"']+", value):
+        return "<repair-worktree>"
+    return value
 
 
 def _require_hash(path: Path, expected: str) -> None:

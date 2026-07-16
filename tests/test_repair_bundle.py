@@ -10,6 +10,7 @@ import pytest
 
 from game_analysis_agent.repair_bundle import (
     RepairBundleError,
+    _redact_host_path,
     verify_public_repair_bundle,
 )
 
@@ -17,8 +18,16 @@ ROOT = Path(__file__).resolve().parents[1]
 BUNDLE = ROOT / "examples/build_week_2026/experiment-v1"
 
 
+def test_public_bundle_redacts_host_paths_without_changing_other_arguments() -> None:
+    assert _redact_host_path("/Users/reviewer/worktree") == "<repair-worktree>"
+    assert _redact_host_path("/home/judge/worktree") == "<repair-worktree>"
+    assert _redact_host_path("res://scripts/tools/ValidateEconomyRules.gd") == (
+        "res://scripts/tools/ValidateEconomyRules.gd"
+    )
+
+
 def test_committed_rejected_experiment_is_complete_and_hash_verified() -> None:
-    if not BUNDLE.is_dir():
+    if not (BUNDLE / "gate_report.json").is_file():
         pytest.skip("public experiment bundle is generated after this capability commit")
     gate = verify_public_repair_bundle(BUNDLE)
 
@@ -28,7 +37,7 @@ def test_committed_rejected_experiment_is_complete_and_hash_verified() -> None:
 
 
 def test_repair_bundle_detects_tampered_artifact(tmp_path: Path) -> None:
-    if not BUNDLE.is_dir():
+    if not (BUNDLE / "gate_report.json").is_file():
         pytest.skip("public experiment bundle is generated after this capability commit")
     target = tmp_path / "bundle"
     shutil.copytree(BUNDLE, target)
