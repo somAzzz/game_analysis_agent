@@ -111,11 +111,49 @@ def _platform(project: Path) -> dict[str, Any]:
     expected_contract = platform_contract_fingerprint(project)
     if review.get("contract_sha256") != expected_contract:
         raise G4ReviewError("platform evidence is stale for the current delivery contract")
-    by_id = {item["id"]: item["status"] for item in review.get("checks", [])}
+    rows = {item["id"]: item for item in review.get("checks", [])}
+    by_id = {identifier: item.get("status") for identifier, item in rows.items()}
     absent = sorted(REQUIRED_PLATFORM_CHECKS - set(by_id))
-    incomplete = sorted(item for item in REQUIRED_PLATFORM_CHECKS if by_id.get(item) != "passed")
+    incomplete = {
+        item for item in REQUIRED_PLATFORM_CHECKS if by_id.get(item) != "passed"
+    }
+    stale = {
+        item
+        for item in REQUIRED_PLATFORM_CHECKS
+        if by_id.get(item) == "passed"
+        and rows[item].get("source_contract_sha256") != expected_contract
+    }
+    incomplete.update(stale)
     if absent or incomplete or review.get("status") != "passed":
-        raise G4ReviewError(f"platform evidence incomplete: {incomplete or absent}")
+        raise G4ReviewError(
+            f"platform evidence incomplete or stale: {sorted(incomplete) or absent}"
+        )
+    review_dir = project / "docs/reviews/openai_build_week_2026"
+    for identifier in sorted(REQUIRED_PLATFORM_CHECKS):
+        row = rows[identifier]
+        evidence_name = row.get("evidence")
+        if not isinstance(evidence_name, str) or not evidence_name:
+            raise G4ReviewError(f"platform row lacks evidence path: {identifier}")
+        evidence_path = (review_dir / evidence_name).resolve()
+        try:
+            evidence_path.relative_to(review_dir.resolve())
+        except ValueError as exc:
+            raise G4ReviewError(f"platform evidence escapes review directory: {identifier}") from exc
+        evidence = _read(evidence_path)
+        evidence_checks = {
+            item.get("id"): item.get("status")
+            for item in evidence.get("checks", [])
+            if isinstance(item, dict)
+        }
+        if (
+            evidence.get("schema_version") != "build-week-platform-evidence-v1"
+            or evidence.get("status") != "passed"
+            or evidence.get("source_contract_sha256") != expected_contract
+            or evidence.get("source_contract_sha256") != row.get("source_contract_sha256")
+            or evidence.get("source_revision") != row.get("source_revision")
+            or evidence_checks.get(identifier) != "passed"
+        ):
+            raise G4ReviewError(f"platform evidence payload is invalid or stale: {identifier}")
     return {
         "platform_checks_passed": len(REQUIRED_PLATFORM_CHECKS),
         "contract_sha256": expected_contract,

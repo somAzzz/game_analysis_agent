@@ -244,6 +244,18 @@ VALIDATORS = {
     "live-openai": _live_openai,
 }
 
+STALE_REMEDIATION = {
+    "macos_system_python_inspect": "Run scripts/run-p4-macos and import current macOS evidence.",
+    "macos_locked_replay": "Run scripts/run-p4-macos and import current macOS evidence.",
+    "macos_idempotent_setup": "Run scripts/run-p4-macos and import current macOS evidence.",
+    "macos_native_ui_api": "Run scripts/run-p4-macos and import current macOS evidence.",
+    "macos_pinned_real_godot": "Run scripts/run-p4-macos and import current macOS evidence.",
+    "linux_amd64_native_and_container": "Run scripts/run-p4-linux-amd64 or the Linux amd64 CI job at the current revision.",
+    "linux_pinned_real_godot": "Manually dispatch the Test workflow with godot_version=4.4-stable; the embedded demo requires no repository token.",
+    "linux_arm64_container": "Publish the current multi-architecture image and run scripts/run-p4-linux-arm64-image on native arm64.",
+    "live_openai_campaign": "Set a restricted server-side OPENAI_API_KEY and run scripts/run-p4-live-openai.",
+}
+
 
 def build_evidence(mode: str, directory: Path) -> dict[str, Any]:
     revision = _git_revision()
@@ -266,7 +278,27 @@ def update_review(evidence_path: Path, evidence: dict[str, Any]) -> None:
     review_path = ROOT / "docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json"
     review = _read(review_path)
     check_ids = MODE_CHECKS[str(evidence["mode"])]
+    current_contract = platform_contract_fingerprint(ROOT)
     checks = {item["id"]: item for item in review.get("checks", [])}
+    for check_id, item in list(checks.items()):
+        if (
+            item.get("status") == "passed"
+            and item.get("source_contract_sha256") != current_contract
+        ):
+            checks[check_id] = {
+                **item,
+                "status": "stale",
+                "reason": "Evidence was produced for a different delivery contract.",
+                "remediation": STALE_REMEDIATION.get(
+                    check_id, "Rerun this platform check at the current revision."
+                ),
+            }
+    if "linux_pinned_real_godot" in checks and checks["linux_pinned_real_godot"].get(
+        "status"
+    ) != "passed":
+        checks["linux_pinned_real_godot"]["remediation"] = STALE_REMEDIATION[
+            "linux_pinned_real_godot"
+        ]
     for check_id in check_ids:
         _require(check_id in checks, f"platform review lacks check row: {check_id}")
     try:
@@ -284,7 +316,7 @@ def update_review(evidence_path: Path, evidence: dict[str, Any]) -> None:
     review["checks"] = list(checks.values())
     review["reviewed_at"] = datetime.now(tz=UTC).isoformat()
     review["source_revision"] = _git_revision()
-    review["contract_sha256"] = platform_contract_fingerprint(ROOT)
+    review["contract_sha256"] = current_contract
     by_id = {item["id"]: item["status"] for item in review["checks"]}
     incomplete = sorted(item for item in REQUIRED_PLATFORM_CHECKS if by_id.get(item) != "passed")
     review["status"] = "passed" if not incomplete else "partial"

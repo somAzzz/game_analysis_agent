@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+import tools.record_platform_evidence as platform_evidence
 from tools.record_platform_evidence import PlatformEvidenceError, build_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -140,3 +141,45 @@ def test_live_openai_requires_completed_calls_and_rejects_secret(tmp_path: Path)
     _write(tmp_path / "live-openai-campaign.json", result)
     with pytest.raises(PlatformEvidenceError, match="secret"):
         build_evidence("live-openai", tmp_path)
+
+
+def test_review_update_marks_old_platform_rows_stale(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = tmp_path / "project"
+    review_dir = project / "docs/reviews/openai_build_week_2026"
+    evidence_dir = review_dir / "platform-evidence"
+    evidence_dir.mkdir(parents=True)
+    source_review = json.loads(
+        (ROOT / "docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    (review_dir / "P4-platform-delivery.review.json").write_text(
+        json.dumps(source_review), encoding="utf-8"
+    )
+    probe = project / "scripts/tools/RunInteractiveProbe.gd"
+    probe.parent.mkdir(parents=True)
+    probe.write_text("extends SceneTree\n", encoding="utf-8")
+    evidence_path = evidence_dir / "macos-native.json"
+    evidence_path.write_text("{}\n", encoding="utf-8")
+    contract = platform_evidence.platform_contract_fingerprint(project)
+    evidence = {
+        "mode": "macos",
+        "source_revision": "a" * 40,
+        "source_contract_sha256": contract,
+    }
+    monkeypatch.setattr(platform_evidence, "ROOT", project)
+    monkeypatch.setattr(platform_evidence, "_git_revision", lambda: "a" * 40)
+
+    platform_evidence.update_review(evidence_path, evidence)
+
+    updated = json.loads(
+        (review_dir / "P4-platform-delivery.review.json").read_text(encoding="utf-8")
+    )
+    rows = {item["id"]: item for item in updated["checks"]}
+    assert rows["macos_system_python_inspect"]["status"] == "passed"
+    assert rows["linux_amd64_native_and_container"]["status"] == "stale"
+    assert rows["linux_arm64_container"]["status"] == "stale"
+    assert "STUDY_IN_GERMANY_TOKEN" not in rows["linux_pinned_real_godot"]["remediation"]
+    assert updated["status"] == "partial"
