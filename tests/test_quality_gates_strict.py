@@ -513,6 +513,7 @@ design:
 
 def test_route_gate_reads_fresh_validation_prerequisite_traces(
     tmp_path: Path,
+    monkeypatch,
 ) -> None:
     gates = _write_gates(
         tmp_path,
@@ -552,15 +553,18 @@ design: {}
         json.dumps(balanced) + "\n",
         encoding="utf-8",
     )
-    route_trace = tmp_path / "route_audit_study.jsonl"
+    game = tmp_path / "game"
+    route_trace = game / "reports" / "route_audit_study.jsonl"
+    route_trace.parent.mkdir(parents=True)
     route_trace.write_text(json.dumps(study) + "\n", encoding="utf-8")
+    monkeypatch.setenv("GAME_PROJECT_PATH", str(game))
     (tmp_path / "validation_summary.json").write_text(
         json.dumps(
             {
                 "prerequisites": [
                     {
                         "logical_path": "reports/route_audit_study.jsonl",
-                        "path": str(route_trace),
+                        "path": "<game>/reports/route_audit_study.jsonl",
                     }
                 ]
             }

@@ -586,9 +586,9 @@ def cmd_validate(args: argparse.Namespace) -> int:
                 "check": check,
                 "script": script,
                 "returncode": proc.returncode,
-                "stdout": proc.stdout[-4000:],
-                "stderr": proc.stderr[-4000:],
-                "output_file": str(copied) if copied else "",
+                "stdout": _sanitize_runtime_text(proc.stdout[-4000:], settings),
+                "stderr": _sanitize_runtime_text(proc.stderr[-4000:], settings),
+                "output_file": copied.name if copied else "",
                 "output_error": output_error,
             }
         except RuntimeError as exc:
@@ -800,7 +800,7 @@ def _ensure_validator_input(
         proc,
         previous_signature=previous_signature,
     )
-    output = Path(str(record["path"]))
+    output = _find_godot_output(settings.game_project_path, out_path)
     output_error = _validator_output_error(output)
     if output_error:
         raise RuntimeError(f"{script} produced invalid output: {output_error}")
@@ -846,7 +846,7 @@ def _prerequisite_record(
 ) -> dict[str, object]:
     return {
         "logical_path": logical_path,
-        "path": str(path),
+        "path": f"<game>/{logical_path}",
         "reused": reused,
         "bytes": path.stat().st_size,
         "modified_at": datetime.fromtimestamp(
@@ -854,6 +854,11 @@ def _prerequisite_record(
             tz=UTC,
         ).isoformat(),
     }
+
+
+def _sanitize_runtime_text(value: str, settings) -> str:
+    sanitized = value.replace(str(ROOT), "<project>")
+    return sanitized.replace(str(settings.game_project_path), "<game>")
 
 
 def _validator_output_error(path: Path | None) -> str:

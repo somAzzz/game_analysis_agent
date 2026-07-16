@@ -465,6 +465,7 @@ def test_validate_defaults_to_all_checks(run_gameplay_agent, tmp_path) -> None:
     summary = json.loads((tmp_path / "validation" / "validation_summary.json").read_text())
     assert summary["schema_version"] == "validation-summary-v2"
     assert len(summary["checks"]) == 6
+    assert str(tmp_path) not in json.dumps(summary)
 
 
 def test_validate_fails_when_successful_process_has_no_output(

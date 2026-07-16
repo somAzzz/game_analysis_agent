@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import math
+import os
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from pathlib import Path
@@ -1110,7 +1111,11 @@ def _validation_prerequisite_paths(
         raw_path = item.get("path")
         if not logical.endswith(".jsonl") or not isinstance(raw_path, str):
             continue
-        candidate = Path(raw_path)
+        if raw_path.startswith("<game>/"):
+            game_root = Path(os.environ.get("GAME_PROJECT_PATH", ""))
+            candidate = game_root / raw_path.removeprefix("<game>/")
+        else:
+            candidate = Path(raw_path)
         if candidate.is_file():
             paths.append(candidate)
     return paths
