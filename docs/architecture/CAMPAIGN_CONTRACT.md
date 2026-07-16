@@ -76,3 +76,20 @@ grace period, and then kill if needed. Cells cancelled before evidence remain
 `cancelled`; cells with flushed weeks retain contiguous citations without being
 mislabeled as completed. Executor exceptions before any row are `failed`, while
 exceptions after valid rows are `partial`.
+
+## Deterministic aggregation and clusters
+
+P2.3 aggregation rereads every cell's `playthrough.jsonl` and verifies each row
+against its stored citation hash before calculating anything. It reports cell
+and campaign outcome, minimum/final money, maximum stress, cashflow/burnout
+weeks, decision validity, fallback, provider error, and persona-alignment
+rates. Re-running aggregation over identical rows produces byte-identical JSON.
+
+Cluster membership is controlled only by the tracked
+`config/build_week_2026_failure_rules.json`. The initial rules detect sustained
+cashflow-plus-stress pressure, sustained burnout risk, and provider fallback.
+Consecutive-week thresholds identify the first week of the qualifying streak.
+Each member is that exact cell/week citation; representatives are the first
+three members in stable persona/seed/week order. Codex may explain or prioritize
+these clusters later, but cannot add members, move first-entry weeks, or replace
+the rules fingerprint.
