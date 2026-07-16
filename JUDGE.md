@@ -161,6 +161,22 @@ cd frontend && npm run build:public && cd ..
 uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080
 ```
 
+To enable the bounded live OpenAI persona campaign, keep the key in the server
+environment and opt in explicitly:
+
+```bash
+. .tools/build-week/env.sh
+export GAME_PROJECT_PATH="$PWD/reports/build-week-2026/game-source"
+export OPENAI_API_KEY=... # server process only; never enter this in the browser
+uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080 --enable-live-openai
+```
+
+The API limits a request to three personas, three seeds, and five weeks. It
+uses the preselected OpenAI gateway with bounded calls/retries and real Godot;
+provider failure produces a failed/partial campaign and never switches to
+Replay. The public result retains response IDs, model and aggregate usage, but
+not prompts, model output, or the key.
+
 When the API is absent, the public build loads the sanitized
 `judge-demo.json` fixture and labels itself `Static evaluator copy`. It does
 not enable buttons or claim a live run. Docker, live OpenAI, and fresh

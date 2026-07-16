@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import mimetypes
+import os
 import re
 import sys
 from http import HTTPStatus
@@ -24,6 +25,10 @@ from game_analysis_agent.judge_api import (  # noqa: E402
     JudgeService,
     ProviderTestRequest,
     parse_json_body,
+)
+from game_analysis_agent.judge_live_campaign import (  # noqa: E402
+    JudgeLiveCampaignError,
+    run_judge_live_campaign,
 )
 
 CAMPAIGN_ROUTE = re.compile(r"^/api/campaigns/([a-z0-9-]{1,64})$")
@@ -150,8 +155,28 @@ def main() -> int:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8080)
     parser.add_argument("--frontend", type=Path, default=ROOT / "frontend/dist")
+    parser.add_argument(
+        "--enable-live-openai",
+        action="store_true",
+        help="Enable the bounded native Godot/OpenAI campaign runner; key remains server-side.",
+    )
     args = parser.parse_args()
-    service = JudgeService(project_root=ROOT)
+
+    def live_runner(job):  # noqa: ANN001, ANN202
+        try:
+            return run_judge_live_campaign(job, project_root=ROOT, environment=os.environ)
+        except JudgeLiveCampaignError as exc:
+            raise JudgeAPIError(
+                "live_campaign_failed",
+                str(exc),
+                "Inspect the retained campaign evidence; do not relabel it as Replay success.",
+                status_code=502,
+            ) from exc
+
+    service = JudgeService(
+        project_root=ROOT,
+        live_runner=live_runner if args.enable_live_openai else None,
+    )
     server = ThreadingHTTPServer((args.host, args.port), handler_factory(service, args.frontend.resolve()))
     print(f"Judge API listening on http://{args.host}:{server.server_port}", file=sys.stderr)
     try:

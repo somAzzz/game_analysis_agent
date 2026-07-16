@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+from collections.abc import Callable
 from pathlib import Path, PurePosixPath
 from typing import Literal
 
@@ -26,6 +27,7 @@ from .campaign_runner import (
 )
 from .game_tools import build_probe
 from .persona_gateway import PersonaProvider, PersonaProviderMode
+from .persona_runtime import GovernedPersonaGateway
 from .recorded_persona_gateway import RecordedPersonaGateway
 from .settings import Settings
 
@@ -142,6 +144,76 @@ class ReplayCampaignExecutor:
         )
 
 
+class LiveCampaignExecutor:
+    """Run a real-Godot cell through one preselected governed live gateway."""
+
+    def __init__(
+        self,
+        *,
+        gateway: GovernedPersonaGateway,
+        settings: Settings,
+        external_cancelled: Callable[[], bool] | None = None,
+    ) -> None:
+        if gateway.provider != PersonaProvider.OPENAI or gateway.mode != PersonaProviderMode.LIVE:
+            raise ValueError("live campaign executor requires a live OpenAI gateway")
+        self.gateway = gateway
+        self.settings = settings
+        self.external_cancelled = external_cancelled or (lambda: False)
+
+    def __call__(
+        self,
+        request: CampaignCellRequest,
+        output_dir: Path,
+        context: CampaignExecutionContext,
+    ) -> CellExecutionOutcome:
+        def cancelled() -> bool:
+            if self.external_cancelled():
+                self.gateway.cancellation.cancel()
+            return context.cancelled or self.gateway.cancellation.cancelled
+
+        agent = InteractivePlayerAgent(
+            llm=None,
+            persona_gateway=self.gateway,
+            prompts_root=Path(__file__).resolve().parents[2] / "prompts",
+            settings=self.settings,
+            max_weeks=request.max_weeks,
+            persona=request.persona.value,
+            difficulty=request.difficulty,
+            scenario=request.scenario,
+            seed=request.seed,
+            cancellation_check=cancelled,
+        )
+        result, _paths = agent.play_through(
+            output_dir,
+            probe=build_probe(self.settings),
+            context={"run_id": request.cell_id},
+        )
+        completed = len(result.steps)
+        if completed < 1:
+            raise RuntimeError("live campaign cell produced no weekly evidence")
+        fallback_weeks = [
+            step.week
+            for step in result.steps
+            if not step.validation.valid or step.validation.fallback_used
+        ]
+        if fallback_weeks:
+            return CellExecutionOutcome(
+                state=CampaignCellState.PARTIAL,
+                stop_reason=CampaignStopReason.PROVIDER_FAILED,
+                completed_weeks=completed,
+                error=f"live provider produced invalid/fallback decisions at weeks {fallback_weeks}",
+            )
+        return CellExecutionOutcome(
+            state=CampaignCellState.COMPLETED,
+            stop_reason=(
+                CampaignStopReason.WEEK_LIMIT
+                if completed == request.max_weeks
+                else CampaignStopReason.GAME_FINISHED
+            ),
+            completed_weeks=completed,
+        )
+
+
 def build_source_identity(
     *,
     project_root: str | Path,
@@ -178,6 +250,33 @@ def build_source_identity(
         provider=PersonaProvider.REPLAY,
         provider_mode=PersonaProviderMode.REPLAY,
         provider_revision=f"fixture:{fixture_digest}",
+    )
+
+
+def build_live_source_identity(
+    *,
+    project_root: str | Path,
+    game_root: str | Path,
+    request: CampaignRequest,
+    model: str,
+) -> CampaignSourceIdentity:
+    """Bind a dynamic live request to clean agent/game/model identities."""
+
+    project = Path(project_root).resolve()
+    game = Path(game_root).resolve()
+    if _git(project, "status", "--porcelain", "--untracked-files=all"):
+        raise TargetSelectionError("live campaign requires a clean agent worktree")
+    marker = json.loads((game / ".playtest-forge-source.json").read_text(encoding="utf-8"))
+    return CampaignSourceIdentity(
+        agent_commit=_git(project, "rev-parse", "HEAD"),
+        agent_tree=_git(project, "rev-parse", "HEAD^{tree}"),
+        game_commit=str(marker["commit"]),
+        game_tree=str(marker["tree"]),
+        game_archive_sha256=str(marker["archive_sha256"]),
+        campaign_config_sha256=request.fingerprint(),
+        provider=PersonaProvider.OPENAI,
+        provider_mode=PersonaProviderMode.LIVE,
+        provider_revision=f"model:{model}",
     )
 
 
@@ -288,11 +387,13 @@ def _git(project: Path, *args: str) -> str:
 __all__ = [
     "DEFAULT_HOLDOUT_SEEDS",
     "FrozenRepairTarget",
+    "LiveCampaignExecutor",
     "ReplayCampaignExecutor",
     "TARGET_SCHEMA",
     "TargetRubric",
     "TargetSelectionError",
     "build_source_identity",
+    "build_live_source_identity",
     "select_repair_target",
     "write_target",
 ]

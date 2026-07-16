@@ -133,6 +133,27 @@ def test_live_campaign_fails_without_key_instead_of_falling_back() -> None:
     assert failed["error"]["code"] == "openai_key_missing"
 
 
+def test_provider_status_requires_explicit_live_runner_opt_in(tmp_path: Path) -> None:
+    game = tmp_path / "game"
+    game.mkdir()
+    (game / "project.godot").write_text("[application]\n", encoding="utf-8")
+    environment = {"OPENAI_API_KEY": "server-only", "GAME_PROJECT_PATH": str(game)}
+
+    disabled = JudgeService(project_root=ROOT, environment=environment)
+    enabled = JudgeService(
+        project_root=ROOT,
+        environment=environment,
+        live_runner=lambda _job: {"source": "test"},
+    )
+
+    disabled_status = disabled.providers.status()["providers"]["openai"]
+    enabled_status = enabled.providers.status()["providers"]["openai"]
+    assert disabled_status["live_runner_enabled"] is False
+    assert disabled_status["live_campaign_ready"] is False
+    assert enabled_status["live_runner_enabled"] is True
+    assert enabled_status["live_campaign_ready"] is True
+
+
 def test_campaign_capacity_and_cancellation_are_enforced(tmp_path: Path) -> None:
     game = tmp_path / "game"
     game.mkdir()

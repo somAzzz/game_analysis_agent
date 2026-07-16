@@ -109,10 +109,12 @@ class ProviderService:
         project_root: Path,
         environment: Mapping[str, str] | None = None,
         openai_client_factory: Callable[..., Any] = OpenAI,
+        live_runner_enabled: bool = False,
     ) -> None:
         self.project = project_root.resolve()
         self.environment = dict(environment if environment is not None else os.environ)
         self._openai_client_factory = openai_client_factory
+        self.live_runner_enabled = live_runner_enabled
         self.model = self.environment.get("OPENAI_PERSONA_MODEL", DEFAULT_OPENAI_PERSONA_MODEL)
 
     def status(self) -> dict[str, object]:
@@ -134,7 +136,8 @@ class ProviderService:
                     "requires_api_key": True,
                     "api_key_configured": configured,
                     "game_runtime_configured": game_available,
-                    "live_campaign_ready": configured and game_available,
+                    "live_runner_enabled": self.live_runner_enabled,
+                    "live_campaign_ready": configured and game_available and self.live_runner_enabled,
                 },
             },
         }
@@ -358,6 +361,7 @@ class JudgeService:
             project_root=self.project,
             environment=environment,
             openai_client_factory=openai_client_factory,
+            live_runner_enabled=live_runner is not None,
         )
         self.campaigns = CampaignService(
             project_root=self.project,
