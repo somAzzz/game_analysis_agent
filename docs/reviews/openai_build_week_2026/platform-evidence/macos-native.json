@@ -2,10 +2,10 @@
   "schema_version": "build-week-platform-evidence-v1",
   "mode": "macos-native",
   "status": "passed",
-  "executed_at": "2026-07-16T17:49:15Z",
-  "source_revision": "f4b554eed7e7bf29058f94c16c29e9abd3ca0ff4",
+  "executed_at": "2026-07-16T18:02:00Z",
+  "source_revision": "2b6cf16978065759c81b8f6937eaa71ce685bc48",
   "source_dirty": false,
-  "source_contract_sha256": "7eb34461cab63ad48e246551ff8471c36cb839aee03bffb58a797f363f7c91f9",
+  "source_contract_sha256": "3a0bd376acc18fe614778c63b3c285c963ae69163c7481ae32b98c8d0d9400e4",
   "platform": {
     "system": "macOS",
     "version": "26.5.2",
@@ -51,23 +51,23 @@
   "artifact_digests": [
     {
       "name": "doctor-dashboard-native.json",
-      "sha256": "52eb774a92fe3b42bf7dd6d345cbcc306523d29ae43a2ee82d8a8d18275e062f"
+      "sha256": "4a513f981da4620f76ab8ab3b3a4d19b954633c20471b32fbd3a5664c7ec62cf"
     },
     {
       "name": "doctor-inspect.json",
-      "sha256": "9ac0addcdc30fe76fff926dcc7894ca54260799afadb1f61a24470eb5edd8313"
+      "sha256": "6b1b5f7d7c4cde83f755b6d338c5340fdd163bce4424b6d6afb02a5fd61cf6f4"
     },
     {
       "name": "doctor-real-game.json",
-      "sha256": "cb07b3ac40b925439fc70f0cbba5f8bf03ade2ccf4694e7c5c800b3c83de1bfe"
+      "sha256": "c437a8c038962d6ed8894f19a76ea04798d6ecd35a36263a199852e067e73149"
     },
     {
       "name": "judge-inspect.json",
-      "sha256": "51a6ffff9ff4ebdb4185245403a4b0a7e2b293966f78edd83940b6d47e29dfe6"
+      "sha256": "fc324e42b3b2b0cdfbd12a8fb7dbd2f200803c9472756a5aea511a9970a9be3b"
     },
     {
       "name": "judge-replay.json",
-      "sha256": "90c110b41fbb34a372e2a18061d6b40a8ae9e3da947638735588b09f11098c22"
+      "sha256": "7725e97f43569938cb1175d858f4d79de6ff4277ab128b827d12cdb284e2828d"
     },
     {
       "name": "fresh-godot/raw_runs.jsonl",
@@ -75,11 +75,11 @@
     },
     {
       "name": "fresh-godot/report_manifest.json",
-      "sha256": "f4a353f81c0cee8e61e587bdac5271f15dc942208f2ff8c51667ca18548fef5a"
+      "sha256": "7875244f926b173e733a54aec38d352ddd6d0e2232489016a12a43cb046034d4"
     },
     {
       "name": "provider-status.json",
-      "sha256": "2b99202a690480de9bf52d83381ba827ba00811cd45134f08a56fc243626c31d"
+      "sha256": "bbbc03a35a2ffc826768119b47c58c77d5c2942e825512b6f0080a6c75250ac4"
     },
     {
       "name": "experiment.json",

@@ -1,8 +1,8 @@
 {
   "schema_version": "build-week-platform-review-v1",
-  "reviewed_at": "2026-07-16T17:49:15Z",
-  "source_revision": "f4b554eed7e7bf29058f94c16c29e9abd3ca0ff4",
-  "contract_sha256": "7eb34461cab63ad48e246551ff8471c36cb839aee03bffb58a797f363f7c91f9",
+  "reviewed_at": "2026-07-16T18:02:00Z",
+  "source_revision": "2b6cf16978065759c81b8f6937eaa71ce685bc48",
+  "contract_sha256": "3a0bd376acc18fe614778c63b3c285c963ae69163c7481ae32b98c8d0d9400e4",
   "status": "partial",
   "platform": {
     "system": "macOS",

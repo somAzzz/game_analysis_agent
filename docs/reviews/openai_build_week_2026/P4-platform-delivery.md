@@ -6,7 +6,7 @@ Date: 2026-07-16
 
 Machine: macOS 26.5.2, Apple Silicon arm64
 
-Reviewed source: `f4b554eed7e7bf29058f94c16c29e9abd3ca0ff4`
+Reviewed source: `2b6cf16978065759c81b8f6937eaa71ce685bc48`
 
 The macOS-native evaluator path is now real: standard-library Inspect, locked
 Replay, twice-repeated offline setup, production frontend build, and the
