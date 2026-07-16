@@ -231,6 +231,7 @@ def materialize_game_tree(
             "archive_sha256": verification["archive_sha256"],
             "content_tree_sha256": content_tree_sha256,
             "file_count": verification["file_count"],
+            "files": content_inventory,
             "public_distribution": verification["packaging"].get(
                 "public_distribution", False
             ),
@@ -261,6 +262,70 @@ def materialize_game_tree(
     finally:
         if temporary.exists():
             shutil.rmtree(temporary)
+
+
+def verify_materialized_game_tree(
+    game_root: str | Path, manifest: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Verify an embedded game snapshot without its upstream Git repository."""
+
+    root = Path(game_root).expanduser().resolve()
+    if not (root / "project.godot").is_file():
+        raise GamePinError("materialized game is not a Godot project")
+    marker_path = root / MATERIALIZED_PROVENANCE_FILE
+    try:
+        marker = json.loads(marker_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError, OSError) as exc:
+        raise GamePinError("materialized game provenance is missing or invalid") from exc
+    if marker.get("schema_version") != MATERIALIZED_SCHEMA_VERSION:
+        raise GamePinError("materialized game provenance schema is unsupported")
+
+    pin = _mapping(manifest, "pin")
+    packaging = _mapping(manifest, "packaging")
+    expected = {
+        "repository": _mapping(manifest, "repository")["name"],
+        "commit": pin["commit"],
+        "tree": pin["tree"],
+        "archive_sha256": pin["archive_sha256"],
+        "file_count": pin["file_count"],
+        "public_distribution": packaging.get("public_distribution", False),
+    }
+    for field, value in expected.items():
+        if marker.get(field) != value:
+            raise GamePinError(f"materialized game provenance mismatch: {field}")
+
+    files = marker.get("files")
+    if not isinstance(files, list) or len(files) != pin["file_count"]:
+        raise GamePinError("materialized game inventory is missing or incomplete")
+    normalized: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for index, item in enumerate(files):
+        if not isinstance(item, dict):
+            raise GamePinError(f"materialized game inventory item {index} is invalid")
+        relative = _safe_git_path(item.get("path"), index=index)
+        if relative in seen:
+            raise GamePinError(f"duplicate materialized game path: {relative}")
+        seen.add(relative)
+        digest = str(item.get("sha256", ""))
+        mode = item.get("mode")
+        if not _SHA256.fullmatch(digest) or not isinstance(mode, int):
+            raise GamePinError(f"invalid materialized game inventory: {relative}")
+        path = root / relative
+        if not path.is_file():
+            raise GamePinError(f"materialized game file missing: {relative}")
+        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            raise GamePinError(f"materialized game file mismatch: {relative}")
+        normalized.append({"path": relative, "mode": mode, "sha256": digest})
+    if _content_tree_sha256(normalized) != marker.get("content_tree_sha256"):
+        raise GamePinError("materialized game content-tree hash mismatch")
+    _verify_materialized_required_files(root, list(manifest["required_files"]))
+    return {
+        "schema_version": MATERIALIZED_SCHEMA_VERSION,
+        "status": "verified",
+        "path": f"<embedded>/{root.name}",
+        **expected,
+        "content_tree_sha256": marker["content_tree_sha256"],
+    }
 
 
 def _mapping(payload: Mapping[str, Any], key: str) -> Mapping[str, Any]:

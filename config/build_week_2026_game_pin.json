@@ -13,12 +13,13 @@
     "file_count": 80
   },
   "packaging": {
-    "mode": "private_competition_bundle",
+    "mode": "public_bundle",
     "mount_name": "study-in-germany",
     "distribution_status": "approved_by_owner",
     "approval_basis": "maintainer_ownership_attestation",
     "approval_date": "2026-07-16",
-    "public_distribution": false
+    "public_distribution": true,
+    "embedded_path": "demo/study-in-germany"
   },
   "required_files": [
     {

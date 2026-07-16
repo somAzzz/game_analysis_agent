@@ -1,0 +1,64 @@
+{
+	"items": [
+		{
+			"description": "消息灵通，也会把群里的焦虑一并转发给你。",
+			"id": "li",
+			"name": "李同学",
+			"role": "中国同学",
+			"starting_relationship": {
+				"conflict": 0,
+				"favorability": 25,
+				"story_stage": 0,
+				"trust": 20
+			}
+		},
+		{
+			"description": "小组课上认识的德国同学，直接但靠谱。",
+			"id": "anna",
+			"name": "Anna",
+			"role": "德国同学",
+			"starting_relationship": {
+				"conflict": 0,
+				"favorability": 15,
+				"story_stage": 0,
+				"trust": 10
+			}
+		},
+		{
+			"description": "会提醒你垃圾分类，也会邀请你周末做饭。",
+			"id": "cem",
+			"name": "Cem",
+			"role": "WG 室友",
+			"starting_relationship": {
+				"conflict": 0,
+				"favorability": 20,
+				"story_stage": 0,
+				"trust": 15
+			}
+		},
+		{
+			"description": "回邮件不快，但很看重准备充分的学生。",
+			"id": "mueller",
+			"name": "Müller 教授",
+			"role": "教授",
+			"starting_relationship": {
+				"conflict": 0,
+				"favorability": 10,
+				"story_stage": 0,
+				"trust": 5
+			}
+		},
+		{
+			"description": "跨国视频电话里永远绕不开钱、成绩和未来。",
+			"id": "parents",
+			"name": "父母",
+			"role": "家庭",
+			"starting_relationship": {
+				"conflict": 10,
+				"favorability": 40,
+				"story_stage": 0,
+				"trust": 35
+			}
+		}
+	]
+}

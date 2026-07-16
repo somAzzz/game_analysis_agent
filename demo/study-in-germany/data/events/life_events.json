@@ -1,0 +1,2006 @@
+{
+	"items": [
+		{
+			"body": "室友问你平时会不会很吵，以及是不是愿意一起打扫厨房。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "housing_stable",
+					"success_effects": {
+						"social": 3.0,
+						"visa_progress": 6.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "表现得非常德式"
+				},
+				{
+					"failure_effects": {
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "wg_cooking",
+					"success_effects": {
+						"hunger": -6.0,
+						"loneliness": -4.0,
+						"social": 7.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.8,
+					"text": "说自己会做中餐"
+				},
+				{
+					"failure_effects": {
+						"social": -3.0,
+						"stress": 8.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"social": 0.003
+					},
+					"set_flag": "cheap_room_hint",
+					"success_effects": {
+						"money": 120.0,
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.55,
+					"text": "坦白预算很紧"
+				},
+				{
+					"failure_effects": {
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.002
+					},
+					"set_flag": "housing_stable",
+					"success_effects": {
+						"energy": -6.0,
+						"social": 2.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.62,
+					"text": "过度迎合每条规则"
+				}
+			],
+			"event_type": "fixed",
+			"id": "wg_interview",
+			"repeatable": false,
+			"source_order": 12,
+			"title": "WG 面试",
+			"trigger": {
+				"week": 4.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "房租和押金让账户余额看起来很不友好。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -18.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -4.0,
+						"energy": -18.0,
+						"exam_readiness": -3.0,
+						"stress": 6.0,
+						"work_hours": 8.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "接更多班"
+				},
+				{
+					"failure_effects": {
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -2.0,
+						"money": 300.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.8,
+					"text": "和父母解释"
+				},
+				{
+					"failure_effects": {
+						"money": 40.0,
+						"stress": 9.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.002,
+						"social": 0.002
+					},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 3.0,
+						"energy": -10.0,
+						"money": 180.0,
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.62,
+					"text": "找短期 Nachhilfe/家教"
+				},
+				{
+					"failure_effects": {
+						"stress": 20.0,
+						"visa_progress": -8.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "rent_arrears",
+					"success_effects": {
+						"money": 220.0,
+						"stress": 14.0,
+						"visa_progress": -4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.42,
+					"text": "先欠着房租赌下月释放"
+				}
+			],
+			"event_type": "conditional",
+			"id": "rent_pressure",
+			"repeatable": false,
+			"source_order": 22,
+			"title": "房租压力",
+			"trigger": {
+				"max_money": 700.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "街上很安静，宿舍厨房也很安静。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"loneliness": 2.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 3.0,
+						"loneliness": -10.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "给家里打视频"
+				},
+				{
+					"failure_effects": {
+						"money": -15.0,
+						"stress": 6.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"social": 0.003
+					},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -18.0,
+						"loneliness": -14.0,
+						"money": -25.0,
+						"social": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.75,
+					"text": "约同学吃饭"
+				},
+				{
+					"failure_effects": {
+						"stress": 8.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.002,
+						"social": 0.002
+					},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"loneliness": -12.0,
+						"social": 3.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.66,
+					"text": "去教堂/学生会活动"
+				},
+				{
+					"failure_effects": {
+						"energy": -6.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -2.0,
+						"energy": -6.0,
+						"loneliness": 6.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "自己扛过去"
+				}
+			],
+			"event_type": "conditional",
+			"id": "lonely_christmas",
+			"repeatable": false,
+			"source_order": 24,
+			"title": "一个人的节日",
+			"trigger": {
+				"min_loneliness": 65.0,
+				"min_week": 14.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "厨房台面上出现了没人承认的锅。",
+			"choices": [
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 4.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "主动打扫"
+				},
+				{
+					"failure_effects": {
+						"social": -2.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "在群里礼貌提醒"
+				},
+				{
+					"failure_effects": {
+						"social": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"social": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.0025
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "flat_kitchen",
+			"repeatable": false,
+			"source_order": 38,
+			"title": "WG 厨房会议",
+			"trigger": {
+				"min_week": 5.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "李同学说今晚多做了菜，问你要不要过去。你很饿，也有点不好意思。",
+			"choices": [
+				{
+					"failure_effects": {
+						"hunger": -18.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -38.0,
+						"loneliness": -6.0,
+						"money": -12.0,
+						"social": 7.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.85,
+					"text": "带点水果过去"
+				},
+				{
+					"failure_effects": {
+						"hunger": -15.0,
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -32.0,
+						"social": 5.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.78,
+					"text": "空手去但主动洗碗"
+				},
+				{
+					"failure_effects": {
+						"hunger": 6.0,
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -16.0,
+						"loneliness": 3.0,
+						"money": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "拒绝，回宿舍泡面"
+				},
+				{
+					"failure_effects": {
+						"hunger": -20.0,
+						"social": -4.0,
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -42.0,
+						"money": 20.0,
+						"social": -1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.52,
+					"text": "顺便打包明天午饭"
+				}
+			],
+			"event_type": "conditional",
+			"id": "classmate_home_dinner",
+			"repeatable": false,
+			"source_order": 40,
+			"title": "去同学家吃饭",
+			"trigger": {
+				"min_hunger": 45.0,
+				"min_week": 6.0
+			},
+			"weight": 1.3
+		},
+		{
+			"body": "店员问你从哪里来，你突然多说了几句。",
+			"choices": [
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"loneliness": 2.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"loneliness": -3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "继续聊"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "买完就走"
+				},
+				{
+					"failure_effects": {
+						"language": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.0025,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "spati_talk",
+			"repeatable": false,
+			"source_order": 50,
+			"title": "深夜便利店闲聊",
+			"trigger": {
+				"min_week": 8.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "你发现奶酪、鸡蛋和水果一起涨价了。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": 4.0,
+						"money": 75.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "改做预算"
+				},
+				{
+					"failure_effects": {
+						"hunger": 6.0,
+						"money": -60.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -10.0,
+						"money": -60.0,
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "假装没看见"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "grocery_inflation",
+			"repeatable": false,
+			"source_order": 53,
+			"title": "超市价格刺眼",
+			"trigger": {
+				"min_week": 3.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "有人低价出一辆自行车，刹车声很有存在感。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"money": -120.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 8.0,
+						"money": -120.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "买下"
+				},
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 20.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "算了"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "bike_offer",
+			"repeatable": false,
+			"source_order": 54,
+			"title": "二手自行车",
+			"trigger": {
+				"min_money": 500.0,
+				"min_week": 5.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "你发现烘干机和你的衣服并没有达成共识。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -20.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": -20.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "冷静处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "发给朋友吐槽"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "laundry_fail",
+			"repeatable": false,
+			"source_order": 62,
+			"title": "洗衣事故",
+			"trigger": {
+				"min_week": 3.0
+			},
+			"weight": 0.7
+		},
+		{
+			"body": "今天 Mensa 居然挺好吃。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"hunger": 6.0,
+						"money": -6.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 7.0,
+						"hunger": -18.0,
+						"money": -6.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "认真享受"
+				},
+				{
+					"failure_effects": {
+						"hunger": 6.0,
+						"social": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -10.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "拍照发群"
+				},
+				{
+					"failure_effects": {
+						"energy": 1.0,
+						"hunger": -4.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 3.0,
+						"hunger": -12.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 2.0,
+						"hunger": -8.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "mensa_surprise",
+			"repeatable": false,
+			"source_order": 63,
+			"title": "食堂惊喜",
+			"trigger": {
+				"min_week": 2.0
+			},
+			"weight": 1.2
+		},
+		{
+			"body": "楼上低音持续到凌晨。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "上楼沟通"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -4.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "戴耳塞"
+				},
+				{
+					"failure_effects": {
+						"social": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"social": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.0025
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "neighbor_noise",
+			"repeatable": false,
+			"source_order": 65,
+			"title": "邻居派对",
+			"trigger": {
+				"min_week": 6.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "身体提醒你德国冬天不是背景贴图。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -3.0,
+						"energy": 10.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "休息"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"energy": -12.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"energy": -12.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "硬去上课"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "sick_day",
+			"repeatable": false,
+			"source_order": 69,
+			"title": "感冒",
+			"trigger": {
+				"min_week": 8.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "下午四点像晚上八点。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"money": -25.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 4.0,
+						"money": -25.0,
+						"stress": -5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "买盏台灯"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "适应一下"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "winter_dark",
+			"repeatable": false,
+			"source_order": 73,
+			"title": "天黑太早",
+			"trigger": {
+				"min_week": 11.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "你站在超市门口，和玻璃里的自己对视。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -2.0,
+						"hunger": 6.0,
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -2.0,
+						"hunger": -12.0,
+						"money": 25.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "翻冰箱做饭"
+				},
+				{
+					"failure_effects": {
+						"hunger": 6.0,
+						"money": -28.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -24.0,
+						"money": -28.0,
+						"stress": -3.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "点外卖"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "sunday_closed",
+			"repeatable": false,
+			"source_order": 80,
+			"title": "周日超市关门",
+			"trigger": {
+				"min_week": 2.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "室友觉得 19 度很合理，你觉得南方人需要尊严。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.75,
+					"text": "开会协商"
+				},
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 10.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "多穿一件"
+				},
+				{
+					"failure_effects": {
+						"social": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"social": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.0025
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "heating_argument",
+			"repeatable": false,
+			"source_order": 95,
+			"title": "暖气温度争论",
+			"trigger": {
+				"min_week": 10.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "你突然很想吃家里的味道。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"hunger": 6.0,
+						"loneliness": 2.0,
+						"money": -18.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 5.0,
+						"hunger": -26.0,
+						"loneliness": -7.0,
+						"money": -18.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "自己复刻"
+				},
+				{
+					"failure_effects": {
+						"hunger": 6.0,
+						"loneliness": 2.0,
+						"money": -38.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -32.0,
+						"loneliness": -10.0,
+						"money": -38.0,
+						"stress": -3.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "去中餐馆"
+				},
+				{
+					"failure_effects": {
+						"energy": 1.0,
+						"hunger": -4.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 3.0,
+						"hunger": -12.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 2.0,
+						"hunger": -8.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "homesick_food",
+			"repeatable": false,
+			"source_order": 100,
+			"title": "想家的一顿饭",
+			"trigger": {
+				"min_loneliness": 40.0,
+				"min_week": 6.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你计划好的路线突然变成谜题。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -5.0,
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -5.0,
+						"language": 1.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "提前改路线"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "改线上学习"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "train_strike",
+			"repeatable": false,
+			"source_order": 119,
+			"title": "火车罢工",
+			"trigger": {
+				"min_week": 8.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "你终于拥有了德国生活的一项经典支线。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"language": -1.0,
+						"money": -15.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -4.0,
+						"language": 2.0,
+						"money": -15.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "自己修"
+				},
+				{
+					"failure_effects": {
+						"money": -45.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": -45.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "去车店"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "bike_flat_tire",
+			"repeatable": false,
+			"source_order": 120,
+			"title": "自行车爆胎",
+			"trigger": {
+				"min_week": 7.0
+			},
+			"weight": 0.7
+		},
+		{
+			"body": "学校发来讲座链接，主题像是专门写给你的。",
+			"choices": [
+				{
+					"failure_effects": {
+						"loneliness": 2.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -4.0,
+						"stress": -10.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "参加"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "收藏不看"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "mental_health_webinar",
+			"repeatable": false,
+			"source_order": 123,
+			"title": "心理健康讲座",
+			"trigger": {
+				"min_stress": 60.0,
+				"min_week": 10.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你在楼梯间和邻居进行了一场 12 秒的德语对话。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.8,
+					"text": "多聊一句"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "礼貌结束"
+				},
+				{
+					"failure_effects": {
+						"social": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"social": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.0025
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "neighbor_greeting",
+			"repeatable": false,
+			"source_order": 125,
+			"title": "邻居打招呼",
+			"trigger": {
+				"min_week": 5.0
+			},
+			"weight": 0.9
+		}
+	]
+}

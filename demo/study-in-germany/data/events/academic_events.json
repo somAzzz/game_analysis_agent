@@ -1,0 +1,2906 @@
+{
+	"items": [
+		{
+			"body": "教授讲得很快，PPT 看起来很熟悉但又陌生。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"exam_readiness": 2.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "硬着头皮记笔记"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.002,
+						"social": 0.003
+					},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"loneliness": -2.0,
+						"social": 4.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.75,
+					"text": "课后问同学资料"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"energy": -8.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"energy": -8.0,
+						"exam_readiness": 5.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "当晚重看 Moodle 资料"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -4.0,
+						"exam_readiness": -4.0,
+						"stress": -3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "假装都听懂了"
+				}
+			],
+			"event_type": "fixed",
+			"id": "first_lecture",
+			"repeatable": false,
+			"source_order": 9,
+			"title": "第一次上课",
+			"trigger": {
+				"flag": "school_registered",
+				"week": 3.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "Anna 问你要不要一起做 presentation。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.002,
+						"social": 0.003
+					},
+					"set_flag": "anna_group",
+					"success_effects": {
+						"academic_progress": 6.0,
+						"exam_readiness": 4.0,
+						"language": 3.0,
+						"social": 8.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.85,
+					"text": "答应并主动分工"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"social": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "anna_group",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"exam_readiness": 2.0,
+						"social": 3.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "只接资料整理的部分"
+				},
+				{
+					"failure_effects": {
+						"stress": 6.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.003,
+						"social": 0.002
+					},
+					"set_flag": "anna_group",
+					"success_effects": {
+						"exam_readiness": 6.0,
+						"language": 3.0,
+						"social": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.72,
+					"text": "请她先解释评分标准"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -3.0,
+						"social": -4.0,
+						"stress": -3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "委婉拒绝"
+				}
+			],
+			"event_type": "fixed",
+			"id": "group_invite",
+			"repeatable": false,
+			"source_order": 16,
+			"title": "德国同学邀你组队",
+			"trigger": {
+				"week": 12.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "题目每个词都认识，连起来突然不认识。",
+			"choices": [
+				{
+					"failure_effects": {
+						"exam_readiness": -3.0,
+						"stress": 8.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"exam_readiness": 0.004,
+						"stress": -0.002
+					},
+					"set_flag": "",
+					"success_effects": {
+						"exam_readiness": 5.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.72,
+					"text": "先做会的题"
+				},
+				{
+					"failure_effects": {
+						"exam_readiness": -4.0,
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.004,
+						"stress": -0.002
+					},
+					"set_flag": "",
+					"success_effects": {
+						"exam_readiness": 2.0,
+						"language": 3.0,
+						"stress": 7.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.58,
+					"text": "硬翻译题目"
+				},
+				{
+					"failure_effects": {
+						"stress": 7.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"exam_readiness": 0.005
+					},
+					"set_flag": "",
+					"success_effects": {
+						"exam_readiness": 7.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.68,
+					"text": "先扫整张卷子分配时间"
+				},
+				{
+					"failure_effects": {
+						"exam_readiness": -8.0,
+						"stress": 14.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"stress": -0.002
+					},
+					"set_flag": "",
+					"success_effects": {
+						"exam_readiness": -5.0,
+						"stress": 10.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.38,
+					"text": "盯着第一题死磕"
+				}
+			],
+			"event_type": "fixed",
+			"id": "exam_week",
+			"repeatable": false,
+			"source_order": 17,
+			"title": "第一次 Klausur",
+			"trigger": {
+				"week": 18.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你发现真正的难点不是知识点，而是老师默认你早就知道。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 8.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "补基础"
+				},
+				{
+					"failure_effects": {
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"social": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.8,
+					"text": "问李同学资料"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "academic_gap",
+			"repeatable": false,
+			"source_order": 25,
+			"title": "课程听不懂",
+			"trigger": {
+				"max_academic": 35.0,
+				"min_week": 5.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "老板问你周末能不能多来一班，作业也在问同一个问题。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -6.0,
+						"exam_readiness": -5.0,
+						"stress": 6.0,
+						"work_hours": 10.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "选择上班"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"money": -80.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 8.0,
+						"exam_readiness": 6.0,
+						"money": -80.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "选择写作业"
+				},
+				{
+					"failure_effects": {
+						"money": -60.0,
+						"stress": 10.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.002,
+						"social": 0.002
+					},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"exam_readiness": 3.0,
+						"stress": 5.0,
+						"work_hours": 5.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.64,
+					"text": "和老板换短班"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -6.0,
+						"exam_readiness": -6.0,
+						"stress": 20.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "overcommitted",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"energy": -18.0,
+						"exam_readiness": 1.0,
+						"stress": 14.0,
+						"work_hours": 8.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.42,
+					"text": "两边都答应"
+				}
+			],
+			"event_type": "conditional",
+			"id": "job_study_conflict",
+			"repeatable": false,
+			"source_order": 27,
+			"title": "打工和学习撞车",
+			"trigger": {
+				"max_academic": 55.0,
+				"max_money": 1200.0,
+				"min_week": 10.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你花了 40 分钟纠结称呼和语气。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "prof_email_ok",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"language": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.9,
+					"text": "用 DeepL 润色"
+				},
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.65,
+					"text": "直接发"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "问中国同学"
+				},
+				{
+					"failure_effects": {
+						"language": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				}
+			],
+			"event_type": "conditional",
+			"id": "prof_email",
+			"repeatable": false,
+			"source_order": 34,
+			"title": "第一次给教授写邮件",
+			"trigger": {
+				"min_language": 24.0,
+				"min_week": 6.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "小组文档终于打开了，但大家的理解不完全一样。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"social": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 8.0,
+						"social": 3.0,
+						"stress": 6.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "主动整合 slides"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "只负责自己的部分"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "project_presentation",
+			"repeatable": false,
+			"source_order": 36,
+			"title": "Presentation 临近",
+			"trigger": {
+				"max_academic": 70.0,
+				"min_week": 13.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "小组同学说今晚去酒吧。去不去都不是纯社交选择：钱、第二天精力和关系都会变。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -12.0,
+						"money": -30.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -8.0,
+						"hunger": 4.0,
+						"loneliness": -6.0,
+						"money": -25.0,
+						"social": 8.0,
+						"stress": -5.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.78,
+					"text": "去小酌一杯"
+				},
+				{
+					"failure_effects": {
+						"money": -10.0,
+						"social": 1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -3.0,
+						"money": -12.0,
+						"social": 5.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.002
+					},
+					"success_rate": 0.86,
+					"text": "喝无酒精饮料"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"social": -2.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "拒绝去学习"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -6.0,
+						"energy": -25.0,
+						"money": -55.0,
+						"stress": 10.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -3.0,
+						"energy": -18.0,
+						"hunger": 8.0,
+						"money": -45.0,
+						"social": 10.0,
+						"stress": -6.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.43,
+					"text": "喝过头"
+				}
+			],
+			"event_type": "random",
+			"id": "drinks_with_classmates",
+			"repeatable": false,
+			"source_order": 41,
+			"title": "同学约你喝酒",
+			"trigger": {
+				"min_week": 8.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "对方带了食材来宿舍一起做饭。你们聊课程、房租和未来，晚饭没有很贵，但很踏实。",
+			"choices": [
+				{
+					"failure_effects": {
+						"hunger": 6.0,
+						"loneliness": 2.0,
+						"money": -35.0,
+						"social": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -34.0,
+						"loneliness": -14.0,
+						"money": 12.0,
+						"social": 4.0,
+						"stress": -6.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "一起备菜聊天"
+				},
+				{
+					"failure_effects": {
+						"hunger": -18.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -4.0,
+						"hunger": -42.0,
+						"loneliness": -10.0,
+						"money": 28.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.76,
+					"text": "顺便做明天便当"
+				},
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "relationship_stable",
+					"success_effects": {
+						"loneliness": -6.0,
+						"social": 3.0,
+						"stress": -8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.72,
+					"text": "聊清楚彼此边界"
+				},
+				{
+					"failure_effects": {
+						"hunger": 6.0,
+						"loneliness": 2.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -24.0,
+						"loneliness": -8.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "只享受今晚，不谈以后"
+				}
+			],
+			"event_type": "conditional",
+			"id": "stable_partner_cooking",
+			"repeatable": false,
+			"source_order": 43,
+			"title": "稳定关系的一顿饭",
+			"trigger": {
+				"flag": "partner_cook",
+				"min_week": 11.0
+			},
+			"weight": 1.1
+		},
+		{
+			"body": "考试前一晚，对方没有拉你出去玩，而是给你留了安静时间和一盒饭。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"hunger": 6.0,
+						"loneliness": 2.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 6.0,
+						"hunger": -24.0,
+						"loneliness": -10.0,
+						"stress": -8.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "接受支持后继续复习"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"loneliness": 2.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 6.0,
+						"loneliness": -8.0,
+						"stress": -10.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "一起散步十分钟"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 2.0,
+						"social": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -12.0,
+						"social": 4.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "认真表达感谢"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"social": -2.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "焦虑中有点冷淡"
+				}
+			],
+			"event_type": "conditional",
+			"id": "relationship_support_exam",
+			"repeatable": false,
+			"source_order": 47,
+			"title": "稳定关系的考前支持",
+			"trigger": {
+				"flag": "relationship_stable",
+				"min_week": 16.0
+			},
+			"weight": 1.1
+		},
+		{
+			"body": "你又在图书馆看到同一个同学，互相点了点头。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"loneliness": -4.0,
+						"social": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.75,
+					"text": "主动聊天"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "继续学习"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "library_friend",
+			"repeatable": false,
+			"source_order": 48,
+			"title": "图书馆熟脸",
+			"trigger": {
+				"min_week": 7.0
+			},
+			"weight": 1.1
+		},
+		{
+			"body": "有人在 Moodle 里问了你也想问的问题。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "认真看讨论"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"social": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.8,
+					"text": "顺手回复"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "course_forum",
+			"repeatable": false,
+			"source_order": 52,
+			"title": "课程论坛救命帖",
+			"trigger": {
+				"min_week": 5.0
+			},
+			"weight": 1.2
+		},
+		{
+			"body": "教授竟然回复了，而且不是自动回复。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"career_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"career_progress": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "认真跟进"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先收藏"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "prof_reply",
+			"repeatable": false,
+			"source_order": 57,
+			"title": "教授回信",
+			"trigger": {
+				"flag": "prof_email_ok",
+				"min_week": 8.0
+			},
+			"weight": 1.3
+		},
+		{
+			"body": "Anna 说 presentation 可以顺便聊一下。",
+			"choices": [
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"loneliness": 2.0,
+						"money": -12.0,
+						"social": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 4.0,
+						"loneliness": -5.0,
+						"money": -12.0,
+						"social": 7.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "去"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "说太忙了"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "anna_coffee",
+			"repeatable": false,
+			"source_order": 58,
+			"title": "Anna 约咖啡",
+			"trigger": {
+				"flag": "anna_group",
+				"min_week": 13.0
+			},
+			"weight": 1.2
+		},
+		{
+			"body": "网盘里出现了传说中的 Altklausur。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 8.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "立刻刷"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"social": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"social": 4.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "分享给小组"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "exam_old_paper",
+			"repeatable": false,
+			"source_order": 68,
+			"title": "找到往年题",
+			"trigger": {
+				"min_week": 14.0
+			},
+			"weight": 1.3
+		},
+		{
+			"body": "截止前一天，系统开始装死。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"language": 2.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "截图发邮件"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 6.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "等它恢复"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "moodle_down",
+			"repeatable": false,
+			"source_order": 71,
+			"title": "Moodle 崩了",
+			"trigger": {
+				"min_week": 9.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "一个不起眼的小测突然算进平时分。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "立刻补做"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -3.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "接受损失"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "moodle_quiz",
+			"repeatable": false,
+			"source_order": 83,
+			"title": "Moodle 小测",
+			"trigger": {
+				"max_academic": 60.0,
+				"min_week": 5.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "小组实验快开始了，搭档头像安静得像默认设置。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "自己先推进"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"language": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.75,
+					"text": "联系助教"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "lab_partner_absent",
+			"repeatable": false,
+			"source_order": 84,
+			"title": "实验搭档失联",
+			"trigger": {
+				"min_week": 7.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "教授的 office hour 比热门餐厅还难约。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"language": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.75,
+					"text": "写清楚问题发邮件"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"social": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"social": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "找同学讨论"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "office_hour_full",
+			"repeatable": false,
+			"source_order": 85,
+			"title": "答疑预约满了",
+			"trigger": {
+				"max_academic": 65.0,
+				"min_week": 8.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "助教把一个你卡了三天的问题讲成了三分钟。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 6.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "认真整理笔记"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"social": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.8,
+					"text": "课后提问"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "tutorium_help",
+			"repeatable": false,
+			"source_order": 86,
+			"title": "Tutorium 救场",
+			"trigger": {
+				"min_week": 5.0
+			},
+			"weight": 1.1
+		},
+		{
+			"body": "Moodle 上的练习分数提醒你：听懂课不等于会做题。",
+			"choices": [
+				{
+					"failure_effects": {
+						"exam_readiness": 2.0,
+						"stress": 10.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"academic_progress": 0.003
+					},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"exam_readiness": 10.0,
+						"stress": 6.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.78,
+					"text": "补三套练习题"
+				},
+				{
+					"failure_effects": {
+						"stress": 7.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.003
+					},
+					"set_flag": "",
+					"success_effects": {
+						"exam_readiness": 7.0,
+						"language": 2.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.74,
+					"text": "去 Tutorium 问清楚"
+				},
+				{
+					"failure_effects": {
+						"exam_readiness": -2.0,
+						"stress": 6.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"social": 0.003
+					},
+					"set_flag": "",
+					"success_effects": {
+						"exam_readiness": 6.0,
+						"social": 4.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.68,
+					"text": "和同学对答案"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -3.0,
+						"exam_readiness": -8.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先忙别的"
+				}
+			],
+			"event_type": "fixed",
+			"id": "exercise_sheet_warning",
+			"repeatable": false,
+			"source_order": 89,
+			"title": "Übung 分数预警",
+			"trigger": {
+				"week": 13.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "日历上的考试日期突然变得很近，所有未完成的题都开始发光。",
+			"choices": [
+				{
+					"failure_effects": {
+						"exam_readiness": 2.0,
+						"stress": 9.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"exam_readiness": 0.004
+					},
+					"set_flag": "",
+					"success_effects": {
+						"exam_readiness": 12.0,
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.75,
+					"text": "整理错题清单"
+				},
+				{
+					"failure_effects": {
+						"stress": 9.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"academic_progress": 0.003,
+						"language": 0.003
+					},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"exam_readiness": 8.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.66,
+					"text": "约教授/助教答疑"
+				},
+				{
+					"failure_effects": {
+						"exam_readiness": 1.0,
+						"stress": 8.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"social": 0.003
+					},
+					"set_flag": "",
+					"success_effects": {
+						"exam_readiness": 9.0,
+						"social": 4.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "和小组模拟考试"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 5.0,
+						"exam_readiness": -12.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "继续拖延"
+				}
+			],
+			"event_type": "fixed",
+			"id": "klausur_countdown",
+			"repeatable": false,
+			"source_order": 90,
+			"title": "Klausur 倒计时两周",
+			"trigger": {
+				"week": 16.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你拿着包装盒，面对四个垃圾桶。",
+			"choices": [
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"social": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 1.0,
+						"social": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "查清楚再扔"
+				},
+				{
+					"failure_effects": {
+						"social": -2.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.6,
+					"text": "凭直觉"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "trash_sorting_test",
+			"repeatable": false,
+			"source_order": 96,
+			"title": "垃圾分类考试",
+			"trigger": {
+				"min_week": 3.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "助教说下学期研究所有学生助理位置。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"career_progress": 8.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.75,
+					"text": "主动询问"
+				},
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 5.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先准备简历"
+				},
+				{
+					"failure_effects": {
+						"career_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"energy": 0.001,
+						"language": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "hiwi_hint",
+			"repeatable": false,
+			"source_order": 106,
+			"title": "HiWi 暗示",
+			"trigger": {
+				"min_academic": 55.0,
+				"min_week": 13.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "讲完后有人点头，还有人真的鼓掌了两下。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"social": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"social": 4.0,
+						"stress": -5.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "接受这个小胜利"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "复盘不足"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "presentation_applause",
+			"repeatable": false,
+			"source_order": 110,
+			"title": "Presentation 掌声",
+			"trigger": {
+				"min_academic": 55.0,
+				"min_week": 14.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "你讲到一半忘了下一个词。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 8.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.75,
+					"text": "看提示继续"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "让队友接一下"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "presentation_freeze",
+			"repeatable": false,
+			"source_order": 111,
+			"title": "Presentation 卡壳",
+			"trigger": {
+				"max_stress": 85.0,
+				"min_week": 14.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "老师提醒引用格式不规范也可能出大问题。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "重整参考文献"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"language": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "问图书馆课程"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "plagiarism_warning",
+			"repeatable": false,
+			"source_order": 112,
+			"title": "引用格式警告",
+			"trigger": {
+				"max_academic": 65.0,
+				"min_week": 11.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "你学会了几个数据库，也学会了什么叫检索焦虑。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"career_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"career_progress": 2.0,
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "参加"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "跳过"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "library_workshop",
+			"repeatable": false,
+			"source_order": 113,
+			"title": "图书馆文献课",
+			"trigger": {
+				"min_week": 9.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "考试结束了，但你没有想象中那么轻松。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 12.0,
+						"stress": -10.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "休息半天"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "立刻复盘"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "fixed",
+			"id": "after_exam_void",
+			"repeatable": false,
+			"source_order": 127,
+			"title": "考后空虚",
+			"trigger": {
+				"week": 19.0
+			},
+			"weight": 1.0
+		}
+	]
+}

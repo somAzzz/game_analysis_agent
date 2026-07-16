@@ -1,0 +1,893 @@
+{
+	"items": [
+		{
+			"body": "你已经接近或超过全年半天额度。短期现金流很好看，但长期合规性和续签解释都会变得沉重。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -340.0,
+						"stress": 16.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "work_hours_corrected",
+					"success_effects": {
+						"money": -260.0,
+						"stress": 10.0,
+						"visa_progress": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "停止接班并整理记录"
+				},
+				{
+					"failure_effects": {
+						"money": -420.0,
+						"stress": 14.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "work_hours_corrected",
+					"success_effects": {
+						"money": -320.0,
+						"stress": 8.0,
+						"visa_progress": 7.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.72,
+					"text": "咨询专业法律帮助"
+				},
+				{
+					"failure_effects": {
+						"stress": 26.0,
+						"visa_progress": -18.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "work_law_violation",
+					"success_effects": {
+						"stress": 18.0,
+						"visa_progress": -10.0,
+						"work_hours": 17.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.42,
+					"text": "赌不会被发现"
+				},
+				{
+					"failure_effects": {
+						"stress": 10.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 8.0,
+						"money": -90.0,
+						"stress": 6.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.6,
+					"text": "转向奖学金和校内岗位"
+				}
+			],
+			"event_type": "conditional",
+			"id": "annual_work_limit_warning",
+			"repeatable": false,
+			"source_order": 30,
+			"title": "年度打工额度用尽",
+			"trigger": {
+				"flag": "annual_work_limit_exceeded",
+				"min_week": 12.0
+			},
+			"weight": 1.6
+		},
+		{
+			"body": "周末有场 Hackathon，披萨免费，睡眠自费。",
+			"choices": [
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"energy": -15.0,
+						"social": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 8.0,
+						"energy": -15.0,
+						"social": 4.0,
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "参加"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "备考优先"
+				},
+				{
+					"failure_effects": {
+						"career_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"energy": 0.001,
+						"language": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "coding_hackathon",
+			"repeatable": false,
+			"source_order": 56,
+			"title": "Hackathon 邀请",
+			"trigger": {
+				"min_week": 11.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "你拿到一堆传单，也拿到一点现实感。",
+			"choices": [
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 9.0,
+						"language": 2.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "认真投递"
+				},
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 3.0,
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "只逛一圈"
+				},
+				{
+					"failure_effects": {
+						"career_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"energy": 0.001,
+						"language": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "career_fair",
+			"repeatable": false,
+			"source_order": 67,
+			"title": "校园招聘会",
+			"trigger": {
+				"min_week": 12.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "一个同学说店里缺人，今晚就能试工。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -20.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -20.0,
+						"stress": 4.0,
+						"work_hours": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "去试工"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "婉拒"
+				},
+				{
+					"failure_effects": {
+						"career_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"energy": 0.001,
+						"language": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "student_job_offer",
+			"repeatable": false,
+			"source_order": 103,
+			"title": "临时工机会",
+			"trigger": {
+				"max_money": 1500.0,
+				"min_week": 8.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "老板说这周人手不够，希望你多来一次。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -18.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -4.0,
+						"energy": -18.0,
+						"work_hours": 8.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "答应"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "拒绝"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "boss_extra_shift",
+			"repeatable": false,
+			"source_order": 104,
+			"title": "老板加班请求",
+			"trigger": {
+				"min_week": 12.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "工资单上每个扣款项目都像陌生词汇测试。",
+			"choices": [
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 3.0,
+						"language": 2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "研究税和保险"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "问同事"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "payslip_question",
+			"repeatable": false,
+			"source_order": 105,
+			"title": "工资单疑惑",
+			"trigger": {
+				"min_week": 10.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "有人看了你的主页，但你还没写完项目经历。",
+			"choices": [
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 6.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "完善主页"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "暂时忽略"
+				},
+				{
+					"failure_effects": {
+						"career_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"energy": 0.001,
+						"language": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "linkedin_message",
+			"repeatable": false,
+			"source_order": 107,
+			"title": "LinkedIn 私信",
+			"trigger": {
+				"min_week": 12.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "你不知道该投英文简历还是德文简历。",
+			"choices": [
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 7.0,
+						"language": 2.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "做双语版本"
+				},
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 4.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先用英文"
+				},
+				{
+					"failure_effects": {
+						"career_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"energy": 0.001,
+						"language": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "cv_language_choice",
+			"repeatable": false,
+			"source_order": 108,
+			"title": "简历语言选择",
+			"trigger": {
+				"min_language": 35.0,
+				"min_week": 14.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "你突然不确定自己到底想留德、回国、读博还是转行。",
+			"choices": [
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 5.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "列路线利弊"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": -2.0,
+						"stress": -5.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先不想未来"
+				},
+				{
+					"failure_effects": {
+						"career_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"energy": 0.001,
+						"language": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "career_doubt",
+			"repeatable": false,
+			"source_order": 109,
+			"title": "职业方向怀疑",
+			"trigger": {
+				"min_stress": 50.0,
+				"min_week": 15.0
+			},
+			"weight": 1.0
+		}
+	]
+}

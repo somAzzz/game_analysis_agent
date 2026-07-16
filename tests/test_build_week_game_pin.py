@@ -14,6 +14,7 @@ from game_analysis_agent.build_week_game_pin import (
     load_game_pin,
     materialize_game_tree,
     verify_game_pin,
+    verify_materialized_game_tree,
     write_pinned_archive,
 )
 
@@ -199,3 +200,21 @@ def test_materialize_replaces_only_matching_managed_directory(tmp_path: Path) ->
     assert first["content_tree_sha256"] == second["content_tree_sha256"]
     assert not (output / "extra.txt").exists()
     assert not output.with_name(".materialized.previous").exists()
+
+
+def test_verify_materialized_tree_detects_source_mutation_without_upstream_git(
+    tmp_path: Path,
+) -> None:
+    repo, commit = _repository(tmp_path)
+    pin_path = tmp_path / "pin.json"
+    manifest = _manifest(repo, commit, pin_path)
+    output = tmp_path / "embedded"
+    materialize_game_tree(repo, manifest, output)
+
+    result = verify_materialized_game_tree(output, manifest)
+
+    assert result["status"] == "verified"
+    assert result["commit"] == commit
+    (output / "project.godot").write_text("mutated\n", encoding="utf-8")
+    with pytest.raises(GamePinError, match="file mismatch: project.godot"):
+        verify_materialized_game_tree(output, manifest)

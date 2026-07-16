@@ -1,0 +1,24 @@
+{
+  "id": "low_money_start",
+  "name": "低资金开局",
+  "initial_state": {
+    "week": 1,
+    "semester": 1,
+    "money": 120,
+    "blocked_account_balance": 11904,
+    "energy": 100,
+    "stress": 30,
+    "loneliness": 35,
+    "hunger": 55,
+    "academic_progress": 10,
+    "language": 25,
+    "social": 10,
+    "visa_progress": 5,
+    "career_progress": 0
+  },
+  "city": "Berlin",
+  "background": "ordinary",
+  "flags": {
+    "family_support_low": true
+  }
+}

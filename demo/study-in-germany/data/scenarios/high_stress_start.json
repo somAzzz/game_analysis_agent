@@ -1,0 +1,24 @@
+{
+  "id": "high_stress_start",
+  "name": "高压力开局",
+  "initial_state": {
+    "week": 1,
+    "semester": 1,
+    "money": 450,
+    "blocked_account_balance": 11904,
+    "energy": 72,
+    "stress": 68,
+    "loneliness": 48,
+    "hunger": 35,
+    "academic_progress": 12,
+    "language": 20,
+    "social": 12,
+    "visa_progress": 15,
+    "career_progress": 0
+  },
+  "city": "Berlin",
+  "background": "ordinary",
+  "flags": {
+    "anxious_start": true
+  }
+}
