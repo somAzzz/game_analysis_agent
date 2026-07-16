@@ -237,3 +237,27 @@ def test_review_update_marks_old_platform_rows_stale(
     assert rows["linux_arm64_container"]["status"] == "stale"
     assert "STUDY_IN_GERMANY_TOKEN" not in rows["linux_pinned_real_godot"]["remediation"]
     assert updated["status"] == "partial"
+
+
+def test_review_update_refuses_stale_import(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = tmp_path / "project"
+    review_dir = project / "docs/reviews/openai_build_week_2026"
+    review_dir.mkdir(parents=True)
+    source = ROOT / "docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json"
+    (review_dir / source.name).write_bytes(source.read_bytes())
+    evidence_path = review_dir / "platform-evidence/stale.json"
+    evidence_path.parent.mkdir()
+    evidence_path.write_text("{}\n", encoding="utf-8")
+    monkeypatch.setattr(platform_evidence, "ROOT", project)
+
+    with pytest.raises(PlatformEvidenceError, match="stale delivery contract"):
+        platform_evidence.update_review(
+            evidence_path,
+            {
+                "mode": "macos",
+                "source_revision": "a" * 40,
+                "source_contract_sha256": "0" * 64,
+            },
+        )

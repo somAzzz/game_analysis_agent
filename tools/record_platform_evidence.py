@@ -323,6 +323,10 @@ def update_review(evidence_path: Path, evidence: dict[str, Any]) -> None:
     review = _read(review_path)
     check_ids = MODE_CHECKS[str(evidence["mode"])]
     current_contract = platform_contract_fingerprint(ROOT)
+    _require(
+        evidence.get("source_contract_sha256") == current_contract,
+        "refusing to import platform evidence from a stale delivery contract",
+    )
     checks = {item["id"]: item for item in review.get("checks", [])}
     for check_id, item in list(checks.items()):
         if (
