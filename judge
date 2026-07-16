@@ -1,0 +1,323 @@
+#!/usr/bin/env python3
+"""Dependency-free Build Week evidence inspector."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import sys
+import tempfile
+import time
+from pathlib import Path, PurePosixPath
+from typing import Any
+
+MANIFEST_SCHEMA = "judge-manifest-v1"
+RESULT_SCHEMA = "judge-result-v1"
+EXIT_FAILED = 1
+EXIT_USAGE = 2
+EXIT_UNSUPPORTED = 3
+
+
+class InspectError(RuntimeError):
+    """A stable, evaluator-facing inspection failure."""
+
+    def __init__(self, code: str, message: str, remediation: str) -> None:
+        super().__init__(message)
+        self.code = code
+        self.remediation = remediation
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--mode", choices=("inspect", "replay"), default="inspect")
+    parser.add_argument("--manifest", type=Path, default=Path("judge-manifest.json"))
+    parser.add_argument(
+        "--output-dir",
+        default="-",
+        help="directory for judge-result.json, or '-' for stdout-only/no writes",
+    )
+    parser.add_argument("--offline", action="store_true")
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--stdout-only", action="store_true")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    started = time.monotonic()
+    args = build_parser().parse_args(argv)
+    if args.mode != "inspect":
+        result = _result(
+            status="unsupported",
+            started=started,
+            checks=[],
+            artifacts=[],
+            limitations=["Tier 1 Replay is not installed in this revision."],
+            error_code="replay_not_implemented",
+            error="Use Inspect to validate committed evidence.",
+            remediation="Run ./judge --mode inspect --offline --json --output-dir -",
+        )
+        _emit(result, args)
+        return EXIT_UNSUPPORTED
+    try:
+        result = inspect_manifest(args.manifest, started=started)
+    except InspectError as exc:
+        result = _result(
+            status="failed",
+            started=started,
+            checks=[],
+            artifacts=[],
+            limitations=["No live model or game execution is performed by Inspect."],
+            error_code=exc.code,
+            error=str(exc),
+            remediation=exc.remediation,
+        )
+        _emit(result, args)
+        return EXIT_FAILED
+    _emit(result, args)
+    return 0
+
+
+def inspect_manifest(manifest_path: Path, *, started: float) -> dict[str, Any]:
+    manifest_file = manifest_path.resolve()
+    root = manifest_file.parent
+    manifest = _read_json(manifest_file, "manifest_missing", "Restore judge-manifest.json.")
+    if manifest.get("schema_version") != MANIFEST_SCHEMA:
+        raise InspectError(
+            "manifest_schema_invalid",
+            f"expected {MANIFEST_SCHEMA}",
+            "Use the judge-manifest.json committed with this evaluator.",
+        )
+    artifacts = manifest.get("artifacts")
+    claims = manifest.get("claims")
+    if not isinstance(artifacts, list) or not artifacts:
+        raise InspectError(
+            "manifest_artifacts_invalid",
+            "manifest must list at least one artifact",
+            "Regenerate the manifest with tools/build_judge_manifest.py.",
+        )
+    if not isinstance(claims, list) or not claims:
+        raise InspectError(
+            "manifest_claims_invalid",
+            "manifest must list at least one evidence-backed claim",
+            "Regenerate the manifest with claim references.",
+        )
+    checks: list[dict[str, Any]] = [
+        {"id": "manifest_schema", "status": "passed", "detail": MANIFEST_SCHEMA}
+    ]
+    parsed: dict[str, Any] = {}
+    observed = []
+    known_paths: set[str] = set()
+    for item in artifacts:
+        if not isinstance(item, dict):
+            raise InspectError(
+                "artifact_entry_invalid",
+                "artifact entry must be an object",
+                "Regenerate the manifest.",
+            )
+        relative = _safe_relative(item.get("path"))
+        if relative in known_paths:
+            raise InspectError(
+                "artifact_duplicate",
+                f"duplicate artifact: {relative}",
+                "Remove the duplicate manifest entry.",
+            )
+        known_paths.add(relative)
+        path = root / relative
+        if path.is_symlink() or not path.is_file():
+            raise InspectError(
+                "artifact_missing",
+                f"missing regular artifact: {relative}",
+                "Restore the committed artifact and rerun Inspect.",
+            )
+        digest = _sha256(path)
+        size = path.stat().st_size
+        if digest != item.get("sha256") or size != item.get("bytes"):
+            raise InspectError(
+                "artifact_integrity_failed",
+                f"hash or size mismatch: {relative}",
+                "Restore the artifact from the reviewed commit; do not trust this bundle.",
+            )
+        declared_schema = item.get("schema_version")
+        if declared_schema is not None:
+            payload = _read_json(
+                path,
+                "artifact_json_invalid",
+                f"Restore valid JSON for {relative}.",
+            )
+            if payload.get("schema_version") != declared_schema:
+                raise InspectError(
+                    "artifact_schema_invalid",
+                    f"schema mismatch: {relative}",
+                    "Restore the schema-compatible artifact.",
+                )
+            parsed[relative] = payload
+        observed.append(
+            {"path": relative, "sha256": digest, "bytes": size, "role": item.get("role", "evidence")}
+        )
+    checks.append(
+        {
+            "id": "artifact_integrity",
+            "status": "passed",
+            "detail": f"{len(observed)} files hash and schema verified",
+        }
+    )
+    claim_ids = set()
+    for claim in claims:
+        if not isinstance(claim, dict) or not isinstance(claim.get("id"), str):
+            raise InspectError(
+                "claim_entry_invalid",
+                "claim entry lacks a stable id",
+                "Regenerate the manifest with valid claims.",
+            )
+        if claim["id"] in claim_ids:
+            raise InspectError(
+                "claim_duplicate", f"duplicate claim: {claim['id']}", "Use unique claim ids."
+            )
+        claim_ids.add(claim["id"])
+        evidence = claim.get("evidence")
+        if not isinstance(evidence, list) or not evidence:
+            raise InspectError(
+                "claim_evidence_missing",
+                f"claim has no evidence: {claim['id']}",
+                "Attach at least one artifact JSON pointer to every claim.",
+            )
+        for reference in evidence:
+            relative = _safe_relative(reference.get("path"))
+            if relative not in known_paths:
+                raise InspectError(
+                    "claim_artifact_unknown",
+                    f"claim references unlisted artifact: {relative}",
+                    "List and hash the referenced artifact.",
+                )
+            payload = parsed.get(relative)
+            if payload is None:
+                payload = _read_json(
+                    root / relative,
+                    "claim_artifact_not_json",
+                    "Point claim evidence to a JSON artifact.",
+                )
+                parsed[relative] = payload
+            pointer = reference.get("json_pointer")
+            actual = _json_pointer(payload, pointer)
+            if "equals" in reference and actual != reference["equals"]:
+                raise InspectError(
+                    "claim_value_mismatch",
+                    f"claim {claim['id']} expected {reference['equals']!r}, got {actual!r}",
+                    "Correct the public claim or regenerate evidence and manifest together.",
+                )
+    checks.append(
+        {
+            "id": "claim_references",
+            "status": "passed",
+            "detail": f"{len(claim_ids)} public claims resolved to exact JSON values",
+        }
+    )
+    return _result(
+        status="passed",
+        started=started,
+        checks=checks,
+        artifacts=observed,
+        limitations=list(manifest.get("limitations", [])),
+        error_code=None,
+        error=None,
+        remediation=None,
+    )
+
+
+def _safe_relative(value: object) -> str:
+    if not isinstance(value, str) or not value:
+        raise InspectError("path_invalid", "empty artifact path", "Regenerate the manifest.")
+    path = PurePosixPath(value.replace("\\", "/"))
+    if path.is_absolute() or ".." in path.parts or str(path) != value:
+        raise InspectError(
+            "path_unsafe", f"unsafe artifact path: {value}", "Use normalized repository-relative paths."
+        )
+    return value
+
+
+def _json_pointer(payload: Any, pointer: object) -> Any:
+    if not isinstance(pointer, str) or not pointer.startswith("/"):
+        raise InspectError(
+            "claim_pointer_invalid", f"invalid JSON pointer: {pointer!r}", "Use an RFC 6901 pointer."
+        )
+    current = payload
+    for raw in pointer.split("/")[1:]:
+        token = raw.replace("~1", "/").replace("~0", "~")
+        try:
+            current = current[int(token)] if isinstance(current, list) else current[token]
+        except (KeyError, IndexError, TypeError, ValueError) as exc:
+            raise InspectError(
+                "claim_pointer_missing",
+                f"JSON pointer does not resolve: {pointer}",
+                "Correct the claim reference or restore the evidence artifact.",
+            ) from exc
+    return current
+
+
+def _read_json(path: Path, code: str, remediation: str) -> dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise InspectError(code, f"cannot read JSON: {path.name}", remediation) from exc
+    if not isinstance(payload, dict):
+        raise InspectError(code, f"JSON root must be an object: {path.name}", remediation)
+    return payload
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _result(
+    *,
+    status: str,
+    started: float,
+    checks: list[dict[str, Any]],
+    artifacts: list[dict[str, Any]],
+    limitations: list[str],
+    error_code: str | None,
+    error: str | None,
+    remediation: str | None,
+) -> dict[str, Any]:
+    return {
+        "schema_version": RESULT_SCHEMA,
+        "status": status,
+        "stage": "inspect",
+        "duration_ms": round((time.monotonic() - started) * 1000, 3),
+        "checks": checks,
+        "artifacts": artifacts,
+        "limitations": limitations,
+        "error_code": error_code,
+        "error": error,
+        "remediation": remediation,
+    }
+
+
+def _emit(result: dict[str, Any], args: argparse.Namespace) -> None:
+    serialized = json.dumps(result, ensure_ascii=False, sort_keys=True)
+    print(serialized)
+    if args.output_dir != "-":
+        destination = Path(args.output_dir)
+        destination.mkdir(parents=True, exist_ok=True)
+        handle, temporary = tempfile.mkstemp(prefix=".judge-result.", dir=destination)
+        try:
+            with os.fdopen(handle, "w", encoding="utf-8") as stream:
+                stream.write(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+                stream.flush()
+                os.fsync(stream.fileno())
+            Path(temporary).replace(destination / "judge-result.json")
+        except Exception:
+            Path(temporary).unlink(missing_ok=True)
+            raise
+    if not args.stdout_only and result["status"] != "passed":
+        print(f"judge {result['status']}: {result['error']}", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
