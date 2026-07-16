@@ -122,8 +122,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.judge
-    entrypoint: ["python", "-m", "http.server"]
-    command: ["8080", "--bind", "0.0.0.0", "--directory", "/app/frontend/dist"]
+    entrypoint: ["/app/.venv/bin/python", "tools/run_judge_api.py"]
+    command: ["--host", "0.0.0.0", "--port", "8080", "--frontend", "/app/frontend/dist"]
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_PERSONA_MODEL=${OPENAI_PERSONA_MODEL:-gpt-5.6-luna}
     ports:
       - "${JUDGE_PORT:-8080}:8080"
     init: true
@@ -135,7 +138,7 @@ services:
     cap_drop:
       - ALL
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/', timeout=2)"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/provider-status', timeout=2)"]
       interval: 10s
       timeout: 3s
       retries: 5

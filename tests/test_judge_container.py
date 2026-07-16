@@ -31,6 +31,11 @@ def test_compose_default_is_cpu_dashboard_and_nvidia_is_opt_in() -> None:
     }
 
     assert default_services == {"dashboard"}
+    assert services["dashboard"]["entrypoint"] == [
+        "/app/.venv/bin/python",
+        "tools/run_judge_api.py",
+    ]
+    assert "OPENAI_API_KEY=${OPENAI_API_KEY:-}" in services["dashboard"]["environment"]
     assert services["vllm"]["profiles"] == ["local-nvidia"]
     assert services["godot"]["profiles"] == ["game-tools"]
     assert "depends_on" not in services["agent"]
