@@ -24,6 +24,7 @@ def test_judge_dockerfile_pins_multiarch_base_and_runs_unprivileged() -> None:
         "judge-manifest.json",
         "COPY .agents/ ./.agents/",
         "COPY demo/ ./demo/",
+        "COPY scripts/tools/ ./scripts/tools/",
         "fixtures/",
         "examples/build_week_2026/",
     ):

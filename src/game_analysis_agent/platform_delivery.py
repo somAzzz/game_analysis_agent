@@ -34,6 +34,7 @@ PLATFORM_CONTRACT_TREES = (
     "demo/study-in-germany",
     "frontend/public-demo",
     "frontend/src",
+    "scripts/tools",
     "src/game_analysis_agent",
 )
 
