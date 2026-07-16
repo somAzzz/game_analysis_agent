@@ -1,0 +1,11 @@
+{
+  "index_digest": "sha256:76cb6cf5c28e62c2fb19c60502560aa69ece1dd4a5e6b352b338e02f7681481f",
+  "platforms": [
+    "linux/amd64",
+    "linux/arm64"
+  ],
+  "reference": "ghcr.io/somazzz/playtest-forge-judge:build-week-2026-8d3b9519fe720925bb7254155e94b97423c97502",
+  "schema_version": "judge-image-metadata-v1",
+  "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
+  "status": "built_and_pushed"
+}

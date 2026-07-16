@@ -1,0 +1,57 @@
+{
+  "artifact_digests": [
+    {
+      "name": "container-inspect.json",
+      "sha256": "13cb32e9e26687f7df4f4ae568a240fdcbad1a6a2ea9a772d6e6192a1149fabe"
+    },
+    {
+      "name": "container-replay.json",
+      "sha256": "1057cb564053ee8a73d19c54c909ef04433450465f505d083a97268125fe1fce"
+    },
+    {
+      "name": "docker-image.json",
+      "sha256": "8cd15d2cc88897d7a77af1d3faeafab35be3577747022aebe1140e1fbdb0eed5"
+    },
+    {
+      "name": "doctor-dashboard-native.json",
+      "sha256": "cea604ef4929841f1a6f35097a4af61f0867bb324dd2799f910c6362f626e35c"
+    },
+    {
+      "name": "doctor-inspect.json",
+      "sha256": "29318b5f4ee88281c85c9c7073d9e8b2f2f9152d634a676dd13c11d1df7d7b61"
+    },
+    {
+      "name": "doctor-replay.json",
+      "sha256": "20379c3e87c71eabb709781ea7b45739b7d04ddbdf785c6dcf5ec726af6c1d2b"
+    },
+    {
+      "name": "judge-inspect.json",
+      "sha256": "2a63673b2d3c234903411d71a7d6fb06366e2d5f43baf739807e5a0226ff5f6f"
+    },
+    {
+      "name": "judge-replay.json",
+      "sha256": "37f2ea4b44c26d4b7f9d715922c5fc4d86dfa0b6dfb1be7044df94cc124ad195"
+    },
+    {
+      "name": "provider-status.json",
+      "sha256": "f0565c57344b448df329d6a2ecb309c801fa806434c5b69783bdbdba90cd8317"
+    }
+  ],
+  "checks": [
+    {
+      "id": "linux_amd64_native_and_container",
+      "status": "passed"
+    }
+  ],
+  "executed_at": "2026-07-16T18:27:32.995551+00:00",
+  "mode": "linux-amd64",
+  "platform": {
+    "architecture": "amd64",
+    "system": "Linux"
+  },
+  "schema_version": "build-week-platform-evidence-v1",
+  "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
+  "source_dirty": false,
+  "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+  "status": "passed"
+}

@@ -1,0 +1,41 @@
+{
+  "artifact_digests": [
+    {
+      "name": "container-inspect.json",
+      "sha256": "4852d681ddfe06a44da729dcbb2511cb916d8fb551efa0223e4359c94d694f3b"
+    },
+    {
+      "name": "container-replay.json",
+      "sha256": "71c0c8c52e00c56921d2ad6570590b7fe110de95f35dd833f8bc951171dfcd5b"
+    },
+    {
+      "name": "image-manifest.json",
+      "sha256": "124852a94d8ce6219c4f11b0264f2537516b93b54dbe78711d21e104cc38f9b2"
+    },
+    {
+      "name": "provider-status.json",
+      "sha256": "f0565c57344b448df329d6a2ecb309c801fa806434c5b69783bdbdba90cd8317"
+    },
+    {
+      "name": "runner.json",
+      "sha256": "8b871beb24740bc56ac0780f6bd843f315e781aa63a4e32cf1b231a29fbf677b"
+    }
+  ],
+  "checks": [
+    {
+      "id": "linux_arm64_container",
+      "status": "passed"
+    }
+  ],
+  "executed_at": "2026-07-16T18:29:17.997409+00:00",
+  "mode": "linux-arm64",
+  "platform": {
+    "architecture": "arm64",
+    "system": "Linux"
+  },
+  "schema_version": "build-week-platform-evidence-v1",
+  "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
+  "source_dirty": false,
+  "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+  "status": "passed"
+}

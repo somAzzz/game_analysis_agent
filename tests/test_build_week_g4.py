@@ -16,7 +16,10 @@ def test_current_g4_fails_only_unproven_release_evidence() -> None:
     review = review_g4(project_root=ROOT, execute_commands=False)
 
     assert review["status"] == "failed"
-    assert review["failures"] == ["platform_delivery", "published_multiarch_image"]
+    assert review["failures"] == ["platform_delivery"]
+    platform = next(item for item in review["checks"] if item["id"] == "platform_delivery")
+    assert "linux_pinned_real_godot" in platform["error"]
+    assert "live_openai_campaign" in platform["error"]
     assert review["checks"][0]["status"] == "passed"
     assert review["checks"][1]["status"] == "passed"
 

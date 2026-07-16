@@ -1,7 +1,7 @@
 {
   "schema_version": "build-week-platform-review-v1",
-  "reviewed_at": "2026-07-16T18:27:13.419848+00:00",
-  "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+  "reviewed_at": "2026-07-16T18:30:19.461436+00:00",
+  "source_revision": "e7ffcf4752dc0f1960ab00a474063b811018a202",
   "contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
   "status": "partial",
   "platform": {
@@ -71,10 +71,12 @@
     },
     {
       "id": "linux_amd64_native_and_container",
-      "status": "pending_ci",
-      "workflow": ".github/workflows/test.yml#judge-linux-amd64",
-      "reason": "The workflow is implemented but has not run for this unpushed commit",
-      "remediation": "Open a PR, push to main, or manually dispatch the workflow; a feature-branch push alone does not trigger it. Retain the judge-linux-amd64 artifact and update this record with run URL and image ID."
+      "status": "passed",
+      "evidence": "platform-evidence/linux-amd64.json",
+      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
+      "workflow_run_url": "https://github.com/somAzzz/game_analysis_agent/actions/runs/29523961052",
+      "workflow_job_id": 87707559079
     },
     {
       "id": "linux_pinned_real_godot",
@@ -85,10 +87,13 @@
     },
     {
       "id": "linux_arm64_container",
-      "status": "not_run",
-      "reason": "The Dockerfile and publisher target arm64, but no arm64 container was executed",
-      "remediation": "Publish the multi-architecture image and verify the arm64 manifest on a native runner."
+      "status": "passed",
+      "evidence": "platform-evidence/linux-arm64.json",
+      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
+      "workflow_run_url": "https://github.com/somAzzz/game_analysis_agent/actions/runs/29523961052",
+      "workflow_job_id": 87708003271
     }
   ],
-  "decision": "Platform delivery remains incomplete: ['linux_amd64_native_and_container', 'linux_arm64_container', 'linux_pinned_real_godot', 'live_openai_campaign']."
+  "decision": "Platform delivery remains incomplete: ['linux_pinned_real_godot', 'live_openai_campaign']."
 }

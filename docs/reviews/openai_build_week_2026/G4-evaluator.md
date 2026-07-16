@@ -1,9 +1,9 @@
 # G4 Evaluator and Judge Experience Review
 
 - Decision: **failed**
-- Reviewed commit: `aca46922320a31d2e5f918b9537fca36505e2d3a`
+- Reviewed commit: `e7ffcf4752dc0f1960ab00a474063b811018a202`
 - Checks: 8
-- Failures: 2
+- Failures: 1
 
 ## Checks
 
@@ -11,8 +11,8 @@
 | --- | --- | --- |
 | restricted_evaluator | passed |  |
 | human_judge_ui | passed |  |
-| platform_delivery | failed | platform evidence incomplete: ['linux_amd64_native_and_container', 'linux_arm64_container', 'macos_container_dashboard', 'macos_live_openai', 'macos_pinned_real_godot'] |
-| published_multiarch_image | failed | judge-image-metadata.json is missing; no image publication claim |
+| platform_delivery | failed | platform evidence incomplete: ['linux_pinned_real_godot', 'live_openai_campaign'] |
+| published_multiarch_image | passed |  |
 | offline_inspect | passed |  |
 | offline_replay | passed |  |
 | frontend_tests | passed |  |
