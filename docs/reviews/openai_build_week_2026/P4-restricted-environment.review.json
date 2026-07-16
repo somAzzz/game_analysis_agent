@@ -1,0 +1,102 @@
+{
+  "schema_version": "build-week-restricted-environment-v1",
+  "status": "passed",
+  "generated_at": "2026-07-16T16:36:03Z",
+  "reviewed_commit": "4b2badfe66d7ff91bb0fa87ebca7cd2243ded797",
+  "host": {
+    "os": "macOS Darwin 25.5.0",
+    "architecture": "arm64",
+    "system_python": "3.9.6",
+    "locked_python": "3.12",
+    "uv": "0.11.23",
+    "docker": {
+      "status": "unavailable",
+      "detail": "docker executable not found"
+    }
+  },
+  "commands": {
+    "inspect": "./judge --mode inspect --offline --json --output-dir -",
+    "replay": "./judge --mode replay --offline --json --output-dir -",
+    "focused_tests": "uv run pytest -q tests/test_judge_restricted.py tests/test_judge_inspect.py tests/test_judge_replay.py tests/test_judge_documentation.py",
+    "full_tests": "uv run pytest -q"
+  },
+  "observations": {
+    "inspect_status": "passed",
+    "inspect_duration_ms": 4.775,
+    "replay_status": "passed",
+    "replay_duration_ms": 267.661,
+    "focused_tests": "18 passed",
+    "full_tests": "404 passed",
+    "ruff": "passed"
+  },
+  "scenarios": [
+    {
+      "id": "system_python_inspect",
+      "status": "passed",
+      "evidence": "Python 3.9.6 executed dependency-free Inspect"
+    },
+    {
+      "id": "locked_offline_replay",
+      "status": "passed",
+      "evidence": "uv --offline --frozen executed the locked Replay worker"
+    },
+    {
+      "id": "no_network_docker_gpu_secret_tty_browser_port",
+      "status": "passed",
+      "evidence": "restricted environment test passed with invalid proxy/socket/game paths and no API key"
+    },
+    {
+      "id": "repository_only_no_sibling_game",
+      "status": "passed",
+      "evidence": "Replay passed with GAME_PROJECT_PATH pointing to a missing directory"
+    },
+    {
+      "id": "stdout_only_read_only_output",
+      "status": "passed",
+      "evidence": "--output-dir - created no judge-result.json"
+    },
+    {
+      "id": "missing_corrupt_wrong_hash_and_claim",
+      "status": "passed",
+      "evidence": "injected failures returned artifact_missing, artifact_integrity_failed, or claim_value_mismatch"
+    },
+    {
+      "id": "unsupported_python",
+      "status": "passed",
+      "evidence": "Python below 3.9 returned non-zero unsupported/python_unsupported JSON"
+    },
+    {
+      "id": "timeout_cleanup",
+      "status": "passed",
+      "evidence": "timeout killed the worker and its descendant process group"
+    },
+    {
+      "id": "signal_cleanup",
+      "status": "passed",
+      "evidence": "SIGTERM returned replay_interrupted and killed the worker group"
+    },
+    {
+      "id": "dependency_failure",
+      "status": "passed",
+      "evidence": "missing uv returned dependency_missing without fallback success"
+    },
+    {
+      "id": "absent_api_key",
+      "status": "passed",
+      "evidence": "Inspect and Replay passed with no OPENAI_API_KEY"
+    },
+    {
+      "id": "mid_run_provider_failure",
+      "status": "passed",
+      "evidence": "injected worker failure remained provider_failed_mid_run"
+    },
+    {
+      "id": "linux_amd64_codex_universal_approximation",
+      "status": "not_run",
+      "severity": "warning",
+      "evidence": "Docker executable unavailable on this host",
+      "remediation": "Run the same two canonical commands in the pinned Linux amd64 CI image before G4"
+    }
+  ],
+  "decision": "Repository-only Inspect/Replay and all local failure injections passed. Docker-based Linux amd64 approximation remains explicitly unverified and cannot support a platform claim yet."
+}
