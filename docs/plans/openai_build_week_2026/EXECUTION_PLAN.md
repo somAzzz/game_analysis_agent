@@ -47,7 +47,7 @@ inventory, and exact-diff UI respectively.
 Verification completed on this revision family:
 
 - embedded source verification and replacement-safety tests passed;
-- Judge Inspect passes with 121 hash-pinned artifacts;
+- Judge Inspect passes with 123 hash-pinned artifacts;
 - Python Judge/API/runtime tests and all 15 frontend tests passed;
 - the public frontend build passed and the same-origin route was visually
   checked at desktop and 390px width;

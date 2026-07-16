@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 ARTIFACTS = {
+    "config/build_week_2026_expected_demo_findings.json": ("expected-demo-findings", "build-week-expected-demo-findings-v1"),
     "config/build_week_2026_game_pin.json": ("embedded-demo-pin", "build-week-game-pin-v1"),
     "config/build_week_2026_replay.json": ("replay-smoke-manifest", "persona-replay-manifest-v1"),
     "fixtures/persona_replay/smoke_v1.json": ("replay-smoke-fixture", "persona-replay-fixture-v1"),
@@ -51,6 +52,7 @@ ARTIFACTS = {
     ".agents/skills/playtest-forge/scripts/preflight": ("codex-skill-script", None),
     ".agents/skills/playtest-forge/scripts/run-campaign": ("codex-skill-script", None),
     ".agents/skills/playtest-forge/scripts/verify-repair": ("codex-skill-script", None),
+    "tools/verify_expected_demo_findings.py": ("expected-demo-findings-gate", None),
 }
 
 for demo_file in sorted((ROOT / "demo/study-in-germany").rglob("*")):

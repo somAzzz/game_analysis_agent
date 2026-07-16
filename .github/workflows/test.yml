@@ -363,8 +363,15 @@ jobs:
         run: |
           uv run python tools/run_gameplay_agent.py export \
             --report-dir reports/balance/ci-smoke
+          set +e
           uv run python tools/run_gameplay_agent.py validate \
             --report-dir reports/balance/ci-smoke
+          validate_exit_code=$?
+          set -e
+          uv run python tools/verify_expected_demo_findings.py \
+            --report-dir reports/balance/ci-smoke \
+            --validate-exit-code "$validate_exit_code" \
+            --output reports/expected-demo-findings.json
 
       - name: Enforce deterministic smoke gates
         if: always()
@@ -413,5 +420,6 @@ jobs:
             game-analysis-agent/reports/balance/ci-smoke
             game-analysis-agent/reports/interactive/ci-smoke
             game-analysis-agent/reports/platform-ci
+            game-analysis-agent/reports/expected-demo-findings.json
           if-no-files-found: warn
           retention-days: 14

@@ -104,12 +104,22 @@ def test_linux_godot_selects_simulation_manifest_when_interactive_report_is_pres
     _write(simulation / "report_manifest.json", manifest)
     (simulation / "raw_runs.jsonl").write_text('{"week": 1}\n', encoding="utf-8")
     _write(interactive / "report_manifest.json", {"kind": "interactive"})
+    _write(
+        tmp_path / "expected-demo-findings.json",
+        {
+            "schema_version": "build-week-expected-demo-findings-result-v1",
+            "status": "passed",
+            "game_commit": _embedded_provenance(runtime, system="Linux")[
+                "game_repository"
+            ]["commit"],
+        },
+    )
 
     evidence = build_evidence("linux-godot", tmp_path)
 
     assert evidence["status"] == "passed"
     assert evidence["toolchain"]["godot"] == "4.4.stable.official"
-    assert len(evidence["artifact_digests"]) == 2
+    assert len(evidence["artifact_digests"]) == 3
 
 
 def test_linux_godot_rejects_forged_game_pin(tmp_path: Path) -> None:
@@ -121,6 +131,14 @@ def test_linux_godot_rejects_forged_game_pin(tmp_path: Path) -> None:
     provenance["game_repository"]["commit"] = "a" * 40
     _write(simulation / "report_manifest.json", {"provenance": provenance})
     (simulation / "raw_runs.jsonl").write_text('{}\n', encoding="utf-8")
+    _write(
+        tmp_path / "expected-demo-findings.json",
+        {
+            "schema_version": "build-week-expected-demo-findings-result-v1",
+            "status": "passed",
+            "game_commit": "a" * 40,
+        },
+    )
 
     with pytest.raises(PlatformEvidenceError, match="commit differs from pin"):
         build_evidence("linux-godot", tmp_path)

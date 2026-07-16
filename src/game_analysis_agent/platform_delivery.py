@@ -9,6 +9,7 @@ PLATFORM_CONTRACT_FILES = (
     ".github/workflows/test.yml",
     "Dockerfile.judge",
     "config/build_week_2026_game_pin.json",
+    "config/build_week_2026_expected_demo_findings.json",
     "config/build_week_2026_toolchain.json",
     "docker-compose.yml",
     "judge",
@@ -37,6 +38,7 @@ PLATFORM_CONTRACT_FILES = (
     "tools/prepare_build_week_game.py",
     "tools/prepare_embedded_demo.py",
     "tools/record_platform_evidence.py",
+    "tools/verify_expected_demo_findings.py",
     "tools/run_judge_api.py",
 )
 

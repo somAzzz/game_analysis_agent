@@ -220,12 +220,20 @@ def _linux_godot(directory: Path, revision: str) -> tuple[dict[str, Any], list[P
     _require(str(godot.get("version", "")).startswith("4.4.stable"), "Godot report did not use pinned 4.4")
     raw = manifest_path.parent / "raw_runs.jsonl"
     _require(raw.is_file() and raw.stat().st_size > 0, "Godot raw trace is missing")
+    expected_findings = directory / "expected-demo-findings.json"
+    findings = _read(expected_findings)
+    _require(
+        findings.get("schema_version") == "build-week-expected-demo-findings-result-v1"
+        and findings.get("status") == "passed"
+        and findings.get("game_commit") == game.get("commit"),
+        "declared demo findings were not verified",
+    )
     return {
         "platform": {"system": "Linux", "architecture": "amd64"},
         "toolchain": {"godot": godot.get("version")},
         "game_revision": game.get("commit"),
         "checks": [{"id": MODE_CHECKS["linux-godot"][0], "status": "passed"}],
-    }, [manifest_path, raw]
+    }, [manifest_path, raw, expected_findings]
 
 
 def _linux_arm64(directory: Path, _revision: str) -> tuple[dict[str, Any], list[Path]]:

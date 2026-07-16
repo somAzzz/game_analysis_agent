@@ -1,6 +1,13 @@
 {
   "artifacts": [
     {
+      "bytes": 558,
+      "path": "config/build_week_2026_expected_demo_findings.json",
+      "role": "expected-demo-findings",
+      "schema_version": "build-week-expected-demo-findings-v1",
+      "sha256": "fef7933f9fc22d865c949b0478addaae6857114158b9007afea6555beef777cb"
+    },
+    {
       "bytes": 1923,
       "path": "config/build_week_2026_game_pin.json",
       "role": "embedded-demo-pin",
@@ -256,6 +263,12 @@
       "path": ".agents/skills/playtest-forge/scripts/verify-repair",
       "role": "codex-skill-script",
       "sha256": "bd7f3284ac502cfdeb44a529a713bc12a73212c2a8ad9dcf7490ebf412453f0d"
+    },
+    {
+      "bytes": 4004,
+      "path": "tools/verify_expected_demo_findings.py",
+      "role": "expected-demo-findings-gate",
+      "sha256": "7eb5c64139c682ddf18eae828a8cd55444a3864f0588fcdb16b0ece8c3e0faf6"
     },
     {
       "bytes": 33,

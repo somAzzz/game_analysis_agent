@@ -36,6 +36,7 @@ product into a game submission.
 | P1 | UI wording could imply Replay was a live LLM playthrough | Fixed in `733e4e1`; it is labeled a deterministic persona-policy fixture |
 | P1 | G5 could pass without model evidence | Fixed in `88537b6`; live OpenAI and Codex release metadata require GPT-5.6-family proof |
 | P1 | Judge image omitted the runtime probe required by API auto-preparation | Fixed in `02b09e1`; Docker/static coverage updated |
+| P1 | Linux real-Godot CI treated the declared three-finding demo balance defect as infrastructure failure | Replaced by an exact pin-bound expected-failure gate; all five contract validators must still pass and any finding drift fails closed |
 | P1/P2 | Docs mixed the new embedded bundle with old private-token/sibling-checkout steps | Remediated in the reviewer hub and current runbooks; historical audits are labeled snapshots |
 
 ## Deliberately unresolved or external
@@ -61,4 +62,3 @@ After documentation is finalized, macOS P4 is rerun from a clean worktree and
 imported. The branch is then pushed to PR #5; Linux results are accepted only
 from completed jobs and downloaded artifacts at the same contract fingerprint.
 Skipped optional jobs are recorded as skipped, not passed.
-

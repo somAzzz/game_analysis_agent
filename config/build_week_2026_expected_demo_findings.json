@@ -1,0 +1,18 @@
+{
+  "schema_version": "build-week-expected-demo-findings-v1",
+  "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+  "validator": "scripts/tools/ValidateDemoGates.gd",
+  "expected_validate_exit_code": 1,
+  "expected_errors": [
+    "normal top action take_a_real_break share 0.199 exceeds 0.150",
+    "realistic top action take_a_real_break share 0.217 exceeds 0.150",
+    "normal scenario has 2 ending types, expected at least 4"
+  ],
+  "required_passing_validators": [
+    "content",
+    "json-content",
+    "economy",
+    "risk",
+    "route"
+  ]
+}

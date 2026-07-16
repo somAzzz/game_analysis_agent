@@ -59,6 +59,9 @@ needs network, Docker, Godot, a model key, or a sibling game checkout.
   job TTL, or billing governance. Do not expose it directly to the public web.
 - The canonical embedded demo is read-only by policy. All Godot runs use a
   verified writable runtime copy with one audited interactive-probe overlay.
+- The demo intentionally retains three declared balance findings. Linux CI
+  accepts only that exact pin-bound finding set while requiring the other five
+  Godot validators to pass; changed findings fail closed.
 - Linux/Docker/multi-architecture claims must be regenerated whenever the
   delivery fingerprint changes; old passing rows are marked stale.
 - Live OpenAI evidence must prove the GPT-5.6 model family. DeepSeek can test
@@ -75,4 +78,3 @@ Linux amd64, Docker clean-room, official Linux Godot, native arm64, and registry
 manifest proof are completed by GitHub Actions/Linux using the closeout runbook.
 Missing external evidence remains a failed or stale gate; it is never promoted
 from source inspection.
-

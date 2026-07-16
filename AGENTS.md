@@ -37,7 +37,7 @@ Godot, a browser, or any model provider:
 ```
 
 `inspect` uses only the Python standard library and verifies the committed
-`judge-manifest.json`, 121 artifact hashes/schemas (including the embedded
+`judge-manifest.json`, 123 artifact hashes/schemas (including the embedded
 demo), and six claim-to-evidence
 references. `replay` additionally requires `uv` and the locked environment; it
 consumes exact hash-pinned persona fixtures and rechecks representative persona,
