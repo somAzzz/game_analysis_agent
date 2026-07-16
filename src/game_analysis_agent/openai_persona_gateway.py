@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 import time
 from dataclasses import dataclass
 from typing import Any
@@ -33,6 +32,7 @@ from .persona_gateway import (
     validate_event_choice,
     validate_player_decision,
 )
+from .persona_runtime import redact_sensitive_text
 from .schemas import PlayerDecision
 
 DEFAULT_OPENAI_PERSONA_MODEL = "gpt-5.6-luna"
@@ -336,8 +336,7 @@ def _compact_json(payload: object) -> str:
 
 
 def _sanitize_message(value: str) -> str:
-    sanitized = re.sub(r"sk-[A-Za-z0-9_-]+", "<redacted>", str(value))
-    return sanitized[:500] or "provider error"
+    return redact_sensitive_text(value) or "provider error"
 
 
 def _nonnegative(value: Any) -> int | None:

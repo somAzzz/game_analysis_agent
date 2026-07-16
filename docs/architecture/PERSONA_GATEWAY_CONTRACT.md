@@ -56,3 +56,19 @@ debugging, but reports receive only the sanitized common error.
    a failed live result, not an implicit Replay decision.
 5. Local providers are `mode=local` and must use the same `PlayerDecision` and
    event-choice validation semantics.
+
+## Runtime selection and limits
+
+`PERSONA_PROVIDER=auto` is resolved once before campaign execution: a usable
+server-side `OPENAI_API_KEY` selects OpenAI, otherwise hash-pinned Replay is
+selected. Explicit `openai` or `deepseek` selection without its required key
+fails preflight. A live timeout, rate limit, refusal, or malformed result never
+causes an in-progress campaign to change providers.
+
+`GovernedPersonaGateway` applies validated caps for runs, weeks, concurrency,
+provider calls, retries, and exponential backoff. Its cancellation token is
+cooperative, and call budget/concurrency counters are thread-safe. Retryable
+calls retain their original provider/mode metadata; exhausted budgets and
+cancellation produce typed failures without invoking the provider. API keys
+are excluded from serialized settings and common key/header forms are redacted
+before provider failures reach reports.
