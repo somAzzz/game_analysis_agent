@@ -221,9 +221,11 @@ jobs:
 
       - name: Build and push both image manifests
         env:
-          JUDGE_IMAGE_REF: ghcr.io/${{ github.repository_owner }}/playtest-forge-judge
           JUDGE_IMAGE_TAG: build-week-2026-${{ github.sha }}
-        run: tools/build_judge_image.sh
+        run: |
+          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          export JUDGE_IMAGE_REF="ghcr.io/$owner/playtest-forge-judge"
+          tools/build_judge_image.sh
 
       - name: Export digest reference
         id: metadata

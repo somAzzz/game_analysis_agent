@@ -95,6 +95,8 @@ def test_workflow_publishes_then_executes_image_on_native_arm64() -> None:
 
     assert publish["permissions"]["packages"] == "write"
     assert "tools/build_judge_image.sh" in rendered_publish
+    assert "GITHUB_REPOSITORY_OWNER" in rendered_publish
+    assert "tr '[:upper:]' '[:lower:]'" in rendered_publish
     assert "judge-image-metadata.json" in rendered_publish
     assert arm["runs-on"] == "ubuntu-24.04-arm"
     assert arm["needs"] == "publish-judge-image"
