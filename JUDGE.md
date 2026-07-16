@@ -26,6 +26,21 @@ uv run python tools/judge_doctor.py --mode dashboard-container --json
 The doctor distinguishes native and container dashboards and returns exit 10
 for a missing required capability. Optional missing tools are warnings.
 
+## Tested-platform ledger
+
+| Delivery path | Dated result | Claim level |
+| --- | --- | --- |
+| macOS 26.5.2 arm64, native Inspect/Replay/UI | Passed 2026-07-16 | Verified locally |
+| macOS arm64, Docker dashboard/Replay | Not run; Docker absent | No support claim yet |
+| macOS arm64, fresh pinned Godot 4.4 | Not run; discovered native Godot is 4.7 | No support claim yet |
+| Linux amd64 native/container | Workflow implemented, execution pending | Target only until CI artifact exists |
+| Linux arm64 container | Multi-arch source target, not executed | Target only |
+| Live OpenAI campaign | Not run; no server key | Optional capability only |
+
+See `docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json` for
+the machine-readable checks. “Target” and “workflow implemented” do not mean
+tested or supported.
+
 Expected result for both commands is a single JSON object with
 `"schema_version":"judge-result-v1"` and `"status":"passed"` on stdout.
 Logs and failures use stderr unless `--stdout-only` is supplied. Passing

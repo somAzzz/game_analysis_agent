@@ -62,3 +62,18 @@ def test_multiarch_builder_requires_explicit_registry_and_both_native_platforms(
     assert "--push" in script
     assert "imagetools inspect" in script
     assert "built_and_pushed" in script
+
+
+def test_linux_delivery_ci_runs_native_container_and_dashboard_smokes() -> None:
+    workflow = yaml.safe_load((ROOT / ".github/workflows/test.yml").read_text(encoding="utf-8"))
+    job = workflow["jobs"]["judge-linux-amd64"]
+    rendered = json.dumps(job)
+
+    assert job["runs-on"] == "ubuntu-24.04"
+    assert "scripts/setup-evaluator" in rendered
+    assert "EVALUATOR_OFFLINE=1" in rendered
+    assert "docker build" in rendered
+    assert "--network none" in rendered
+    assert "--read-only" in rendered
+    assert "tools/run_judge_api.py" in rendered
+    assert "/api/provider-status" in rendered

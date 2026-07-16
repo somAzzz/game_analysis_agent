@@ -762,6 +762,15 @@ skip, and both offline Judge modes passed. P4.8 remains the next step.
 Compare artifact contracts and fixed-seed results across platforms; document
 legitimate platform metadata differences.
 
+**Implementation checkpoint (2026-07-16): partial.** macOS arm64 native
+Inspect, Replay, idempotent offline setup, static build, and Judge UI/API are
+verified. A Linux amd64 job now exercises native and hardened container paths
+and uploads evidence, but it has not run for the local unpushed commit. Docker,
+pinned Godot 4.4, and a server OpenAI key are absent on the current host, so
+those rows remain explicitly `not_run`; Linux arm64 is also untested. See the
+P4 platform delivery review. P4.8 and G4 remain open until dated external run
+evidence replaces the pending rows.
+
 ### P4.9 Gate G4 — Automated evaluator and judge-experience review
 
 **Automated review**

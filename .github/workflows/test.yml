@@ -96,6 +96,91 @@ jobs:
         run: npm run build:public
         working-directory: frontend
 
+  judge-linux-amd64:
+    name: Linux amd64 Judge delivery
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Require native Linux amd64 runner
+        run: test "$(uname -s)-$(uname -m)" = "Linux-x86_64"
+
+      - name: Idempotent locked evaluator setup
+        run: |
+          scripts/setup-evaluator
+          EVALUATOR_OFFLINE=1 scripts/setup-evaluator
+
+      - name: Record native offline delivery
+        run: |
+          mkdir -p reports/platform-ci
+          python3 tools/judge_doctor.py --mode inspect --json > reports/platform-ci/doctor-inspect.json
+          uv run python tools/judge_doctor.py --mode replay --json > reports/platform-ci/doctor-replay.json
+          uv run python tools/judge_doctor.py --mode dashboard-native --json > reports/platform-ci/doctor-dashboard-native.json
+          ./judge --mode inspect --offline --json --output-dir - > reports/platform-ci/judge-inspect.json
+          ./judge --mode replay --offline --json --output-dir - > reports/platform-ci/judge-replay.json
+
+      - name: Build and run the CPU Judge container
+        run: |
+          docker build --tag playtest-forge-judge:ci --file Dockerfile.judge .
+          docker image inspect playtest-forge-judge:ci --format '{{json .}}' > reports/platform-ci/docker-image.json
+          docker run --rm --network none --read-only --tmpfs /tmp:size=32m \
+            --cap-drop ALL --security-opt no-new-privileges \
+            playtest-forge-judge:ci \
+            --mode inspect --offline --json --output-dir - > reports/platform-ci/container-inspect.json
+          docker run --rm --network none --read-only --tmpfs /tmp:size=32m \
+            --cap-drop ALL --security-opt no-new-privileges \
+            playtest-forge-judge:ci \
+            --mode replay --offline --json --output-dir - > reports/platform-ci/container-replay.json
+
+      - name: Smoke the containerized Judge UI and API
+        run: |
+          docker run --detach --name playtest-forge-dashboard \
+            --publish 127.0.0.1:18080:8080 --read-only --tmpfs /tmp:size=16m \
+            --cap-drop ALL --security-opt no-new-privileges \
+            --entrypoint /app/.venv/bin/python playtest-forge-judge:ci \
+            tools/run_judge_api.py --host 0.0.0.0 --port 8080 --frontend /app/frontend/dist
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:18080/api/provider-status \
+              > reports/platform-ci/provider-status.json; then
+              break
+            fi
+            sleep 1
+          done
+          jq -e '.providers.replay.status == "available"' reports/platform-ci/provider-status.json
+          curl --fail --silent http://127.0.0.1:18080/ | grep -q '<div id="root"></div>'
+
+      - name: Stop Judge UI
+        if: always()
+        run: docker rm --force playtest-forge-dashboard 2>/dev/null || true
+
+      - name: Upload Linux Judge evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: judge-linux-amd64-${{ github.run_id }}
+          path: reports/platform-ci
+          if-no-files-found: error
+          retention-days: 14
+
   godot-contract:
     name: Real Godot validation and contract smoke
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
