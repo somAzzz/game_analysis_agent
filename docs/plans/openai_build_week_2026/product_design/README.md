@@ -1,5 +1,8 @@
 # Product-design evidence
 
+The full product, frontend, UI/UX, and competition-judge review is in
+[`COMPETITION_PRODUCT_DESIGN_REVIEW.md`](COMPETITION_PRODUCT_DESIGN_REVIEW.md).
+
 These screenshots record the evaluator-facing Build Week presentation at
 1280×720. They are visual review evidence, not execution proof: the authoritative
 claims, hashes, and platform results remain in `judge-manifest.json` and

@@ -45,13 +45,14 @@ needs network, Docker, Godot, a model key, or a sibling game checkout.
 
 1. [Implementation plan](IMPLEMENTATION_PLAN.md) — product thesis, scope, architecture, and competition mapping.
 2. [Stepwise execution plan](EXECUTION_PLAN.md) — P0–P5 tasks and gate order. Older status tables are plan-time snapshots unless explicitly dated current.
-3. [Two independent branch audits](../../reviews/openai_build_week_2026/BRANCH_AUDITS.md) — findings, remediation commits, and unresolved limits.
-4. [Judge guide](../../../JUDGE.md) — exact offline commands, exit behavior, capability labels, and central result.
-5. [P4/G4 Linux closeout](../../operations/LINUX_P4_G4_CLOSEOUT.md) — Docker, pinned Linux Godot, arm64, registry, and evidence import.
-6. [Platform review JSON](../../reviews/openai_build_week_2026/P4-platform-delivery.review.json) — current fail-closed machine ledger.
-7. [G4 review](../../reviews/openai_build_week_2026/G4-evaluator.md) and [G5 review](../../reviews/openai_build_week_2026/G5-final-release.md) — release gates.
-8. [Submission directory](../../../submission/build-week-2026/) — claim ledger, Devpost draft, video script, and external closeout records.
-9. [Product-design evidence](product_design/README.md) — evaluator UI screenshots for visual review and demo/video planning.
+3. [Competition product-design review](product_design/COMPETITION_PRODUCT_DESIGN_REVIEW.md) — frontend audit, four-role critique, game-native interaction direction, and prioritized acceptance criteria.
+4. [Product-design evidence](product_design/README.md) — evaluator UI screenshots for visual review and demo/video planning.
+5. [Two independent branch audits](../../reviews/openai_build_week_2026/BRANCH_AUDITS.md) — findings, remediation commits, and unresolved limits.
+6. [Judge guide](../../../JUDGE.md) — exact offline commands, exit behavior, capability labels, and central result.
+7. [P4/G4 Linux closeout](../../operations/LINUX_P4_G4_CLOSEOUT.md) — Docker, pinned Linux Godot, arm64, registry, and evidence import.
+8. [Platform review JSON](../../reviews/openai_build_week_2026/P4-platform-delivery.review.json) — current fail-closed machine ledger.
+9. [G4 review](../../reviews/openai_build_week_2026/G4-evaluator.md) and [G5 review](../../reviews/openai_build_week_2026/G5-final-release.md) — release gates.
+10. [Submission directory](../../../submission/build-week-2026/) — claim ledger, Devpost draft, video script, and external closeout records.
 
 ## Current implementation limits
 
