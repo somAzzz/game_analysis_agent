@@ -126,6 +126,7 @@ class OpenAIResponsesPersonaGateway:
         validate,
     ) -> _Outcome:
         total_usage = PersonaUsage(input_tokens=0, output_tokens=0, total_tokens=0)
+        total_latency_ms = 0
         last_metadata = self._metadata(attempt=1, usage=total_usage)
         last_errors = ["structured output missing"]
         saw_parsed = False
@@ -144,20 +145,22 @@ class OpenAIResponsesPersonaGateway:
                     store=False,
                 )
             except Exception as exc:
+                total_latency_ms += int((time.perf_counter() - started) * 1000)
                 metadata = self._metadata(
                     attempt=attempt,
-                    latency_ms=int((time.perf_counter() - started) * 1000),
+                    latency_ms=total_latency_ms,
                     usage=total_usage,
                     parse_status=PersonaParseStatus.FAILED,
                 )
                 return _Outcome(None, metadata, _provider_error(exc))
             parsed, refusal = _response_content(response)
+            total_latency_ms += int((time.perf_counter() - started) * 1000)
             usage = _response_usage(response)
             total_usage = _sum_usage(total_usage, usage)
             last_metadata = self._metadata(
                 attempt=attempt,
                 response=response,
-                latency_ms=int((time.perf_counter() - started) * 1000),
+                latency_ms=total_latency_ms,
                 usage=total_usage,
                 parse_status=PersonaParseStatus.FAILED,
                 refusal=refusal,

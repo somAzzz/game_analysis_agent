@@ -40,7 +40,14 @@ from pydantic import ValidationError
 from game_analysis_agent.agents.base import Agent, AgentOutput, AgentRunResult
 from game_analysis_agent.contracts import ProbeRiskGuidance
 from game_analysis_agent.game_tools import InteractiveProbe
-from game_analysis_agent.llm_client import LLMRequestError, LocalLLMClient
+from game_analysis_agent.llm_client import LocalLLMClient
+from game_analysis_agent.local_persona_gateway import LocalChatPersonaGateway
+from game_analysis_agent.persona_gateway import (
+    PersonaDecisionGateway,
+    PersonaDecisionRequest,
+    PersonaEventChoiceRequest,
+    PersonaResultStatus,
+)
 from game_analysis_agent.schemas import (
     ActionBrief,
     AgentRunReport,
@@ -103,6 +110,7 @@ class PlaythroughStep:
     validation: dict[str, Any] = field(default_factory=dict)
     delta: dict[str, int] = field(default_factory=dict)
     llm_summary: str = ""
+    persona_calls: list[dict[str, Any]] = field(default_factory=list)
     anomalies: list[dict[str, Any]] = field(default_factory=list)
 
 
@@ -123,7 +131,7 @@ class InteractivePlayerAgent(Agent):
     def __init__(
         self,
         *,
-        llm: LocalLLMClient,
+        llm: LocalLLMClient | None,
         prompts_root: Path,
         settings: Settings | None = None,
         tool_definitions: list[dict[str, Any]] | None = None,
@@ -140,9 +148,12 @@ class InteractivePlayerAgent(Agent):
         temperature: float | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
         cancellation_check: Callable[[], bool] | None = None,
+        persona_gateway: PersonaDecisionGateway | None = None,
     ) -> None:
+        if llm is None and persona_gateway is None:
+            raise ValueError("interactive player requires llm or persona_gateway")
         super().__init__(
-            llm=llm,
+            llm=llm,  # type: ignore[arg-type]
             prompts_root=prompts_root,
             settings=settings,
             output_files=output_files,
@@ -160,6 +171,21 @@ class InteractivePlayerAgent(Agent):
         self.seed = seed
         self.progress_callback = progress_callback
         self.cancellation_check = cancellation_check
+        self._gateway_llm_calls: list[LLMCall] = []
+        self._persona_call_records: list[dict[str, Any]] = []
+        if persona_gateway is not None:
+            self.persona_gateway = persona_gateway
+        else:
+            assert llm is not None
+            self.persona_gateway = LocalChatPersonaGateway(
+                llm,
+                audit_sink=self._gateway_llm_calls.append,
+                decision_max_tokens=self.decision_max_tokens,
+                temperature=self.temperature,
+            )
+        set_audit_sink = getattr(self.persona_gateway, "set_audit_sink", None)
+        if callable(set_audit_sink):
+            set_audit_sink(self._gateway_llm_calls.append)
         self.persona_strategy = load_player_personas(prompts_root.parent).get(
             self.persona, PERSONAS[self.persona]
         )
@@ -238,6 +264,8 @@ class InteractivePlayerAgent(Agent):
         steps: list[PlaythroughStep] = []
         memory = _initial_memory(self.persona, self.persona_strategy)
         truncated = False
+        self._gateway_llm_calls.clear()
+        self._persona_call_records.clear()
 
         probe.seed = self.seed
         probe.difficulty = self.difficulty
@@ -275,6 +303,7 @@ class InteractivePlayerAgent(Agent):
                 seed=self.seed,
             )
             available_action_ids = [action.id for action in context_pack.available_actions]
+            persona_call_start = len(self._persona_call_records)
 
             decision, validation, decision_calls = self._decide_one_week(
                 week=week,
@@ -351,6 +380,7 @@ class InteractivePlayerAgent(Agent):
                 validation=validation.model_dump(mode="json"),
                 delta=delta,
                 llm_summary=decision.strategic_goal,
+                persona_calls=self._persona_call_records[persona_call_start:],
                 anomalies=anomalies,
             )
             steps.append(step)
@@ -460,82 +490,36 @@ class InteractivePlayerAgent(Agent):
         system_prompt: str,
         probe: InteractiveProbe,
     ) -> tuple[PlayerDecision, DecisionValidation, list[LLMCall]]:
-        user_prompt = self._build_user_prompt(context_pack)
-        calls: list[LLMCall] = []
-        errors: list[str] = []
-        attempt_errors: list[str] = []
-        for attempt in range(3):
-            prompt = user_prompt if attempt == 0 else _repair_prompt(context_pack, errors)
-            try:
-                messages = [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt},
-                ]
-                content, call = self._chat_decision(
-                    messages,
-                    agent=self.name,
-                    step_name=f"week-{week}" if attempt == 0 else f"week-{week}-repair-{attempt}",
-                    temperature=self.temperature,
-                )
-                calls.append(call)
-            except Exception as exc:
-                if isinstance(exc, LLMRequestError):
-                    calls.append(exc.call)
-                errors = [f"LLM error: {exc}"]
-                break
-            decision, errors = _parse_player_decision(
-                content,
-                context_pack,
+        del system_prompt, probe
+        call_start = len(self._gateway_llm_calls)
+        request = PersonaDecisionRequest.from_context(
+            context_pack,
+            request_id=f"{self.persona}-{self.seed}-w{week}-decision",
+        )
+        result = self.persona_gateway.decide(request)
+        self._record_persona_result("decision", result)
+        calls = self._gateway_llm_calls[call_start:]
+        if result.status == PersonaResultStatus.COMPLETED and result.decision is not None:
+            return (
+                result.decision,
+                DecisionValidation(
+                    valid=True,
+                    repair_count=max(0, result.metadata.attempt_count - 1),
+                ),
+                list(calls),
             )
-            if not errors:
-                return (
-                    decision,
-                    DecisionValidation(
-                        valid=True,
-                        errors=attempt_errors,
-                        repair_count=attempt,
-                    ),
-                    list(calls),
-                )
-            attempt_errors.extend(errors)
+        errors = [_persona_error_text(result.error)]
         fallback = _fallback_decision(context_pack, errors)
         return (
             fallback,
             DecisionValidation(
                 valid=False,
                 errors=errors,
-                repair_count=max(0, len(calls) - 1),
+                repair_count=max(0, result.metadata.attempt_count - 1),
                 fallback_used=True,
             ),
             list(calls),
         )
-
-    def _chat_decision(
-        self,
-        messages: list[dict[str, str]],
-        *,
-        agent: str,
-        step_name: str,
-        temperature: float | None,
-        max_tokens: int | None = None,
-    ) -> tuple[str, LLMCall]:
-        try:
-            return self.llm.chat(
-                messages,
-                agent=agent,
-                step_name=step_name,
-                max_tokens=max_tokens or self.decision_max_tokens,
-                temperature=temperature,
-            )
-        except TypeError as exc:
-            if "max_tokens" not in str(exc):
-                raise
-            return self.llm.chat(
-                messages,
-                agent=agent,
-                step_name=step_name,
-                temperature=temperature,
-            )
 
     def _decide_event_choice(
         self,
@@ -544,85 +528,49 @@ class InteractivePlayerAgent(Agent):
         context_pack: WeekContext,
         selected_actions: list[str],
     ) -> tuple[str, DecisionValidation, list[LLMCall]]:
-        valid_choices = [choice.choice_id for choice in context_pack.event_choices]
-        compact_context = {
-            "week": week,
-            "persona": self.persona,
-            "priorities": context_pack.persona_strategy.get("priorities", []),
-            "selected_actions": selected_actions,
-            "state": context_pack.state.model_dump(mode="json"),
-            "top_risk_ids": [risk.id for risk in context_pack.top_risks],
-            "event_id": context_pack.current_event_id,
-            "event_choices": [
-                choice.model_dump(mode="json") for choice in context_pack.event_choices
-            ],
-        }
-        calls: list[LLMCall] = []
-        errors: list[str] = []
-        for attempt in range(2):
-            if self.cancellation_check is not None and self.cancellation_check():
-                raise RuntimeError(f"Playthrough cancelled during week {week} event")
-            prompt = "\n".join(
-                [
-                    "/no_think",
-                    "Choose exactly one event_choice_id from the JSON context.",
-                    json.dumps(compact_context, ensure_ascii=False, separators=(",", ":")),
-                    "Valid event_choice_id values:",
-                    json.dumps(valid_choices, ensure_ascii=False),
-                    (
-                        "Return only compact JSON: {\"event_choice_id\":\"...\"}."
-                        if attempt == 0
-                        else f"Previous errors: {errors}. Return one valid id as JSON only."
-                    ),
-                ]
+        if self.cancellation_check is not None and self.cancellation_check():
+            raise RuntimeError(f"Playthrough cancelled during week {week} event")
+        call_start = len(self._gateway_llm_calls)
+        request = PersonaEventChoiceRequest.from_context(
+            context_pack,
+            request_id=f"{self.persona}-{self.seed}-w{week}-event",
+            selected_actions=selected_actions,
+        )
+        result = self.persona_gateway.choose_event(request)
+        self._record_persona_result("event_choice", result)
+        calls = self._gateway_llm_calls[call_start:]
+        if result.status == PersonaResultStatus.COMPLETED and result.choice is not None:
+            return (
+                result.choice.event_choice_id,
+                DecisionValidation(
+                    valid=True,
+                    repair_count=max(0, result.metadata.attempt_count - 1),
+                ),
+                list(calls),
             )
-            try:
-                content, call = self._chat_decision(
-                    [
-                        {
-                            "role": "system",
-                            "content": "Select one game event option. Never invent an id.",
-                        },
-                        {"role": "user", "content": prompt},
-                    ],
-                    agent=self.name,
-                    step_name=(
-                        f"week-{week}-event"
-                        if attempt == 0
-                        else f"week-{week}-event-repair-{attempt}"
-                    ),
-                    temperature=self.temperature,
-                    max_tokens=192,
-                )
-                calls.append(call)
-            except Exception as exc:
-                if isinstance(exc, LLMRequestError):
-                    calls.append(exc.call)
-                errors = [f"LLM error: {exc}"]
-                break
-            parsed = _extract_json_object(content)
-            choice_id = str(parsed.get("event_choice_id") or "") if parsed else ""
-            if choice_id in valid_choices:
-                return (
-                    choice_id,
-                    DecisionValidation(
-                        valid=True,
-                        errors=errors,
-                        repair_count=attempt,
-                    ),
-                    calls,
-                )
-            errors = [f"Invalid event_choice_id: {choice_id or '(empty)'}"]
+        errors = [_persona_error_text(result.error)]
+        valid_choices = [choice.choice_id for choice in context_pack.event_choices]
         fallback = valid_choices[0] if valid_choices else ""
         return (
             fallback,
             DecisionValidation(
                 valid=False,
                 errors=errors,
-                repair_count=max(0, len(calls) - 1),
+                repair_count=max(0, result.metadata.attempt_count - 1),
                 fallback_used=True,
             ),
-            calls,
+            list(calls),
+        )
+
+    def _record_persona_result(self, phase: str, result: Any) -> None:
+        self._persona_call_records.append(
+            {
+                "phase": phase,
+                "status": result.status.value,
+                "request_fingerprint": result.request_fingerprint,
+                "metadata": result.metadata.model_dump(mode="json"),
+                "error": result.error.model_dump(mode="json") if result.error else None,
+            }
         )
 
     def _build_user_prompt(self, context_pack: WeekContext) -> str:
@@ -1055,6 +1003,12 @@ def _fallback_decision(context_pack: WeekContext, errors: list[str]) -> PlayerDe
     )
 
 
+def _persona_error_text(error: Any) -> str:
+    if error is None:
+        return "persona provider failed without a typed error"
+    return f"{error.category.value}: {error.message}"
+
+
 def _best_fallback_action(context_pack: WeekContext) -> str:
     priorities = context_pack.persona_strategy.get("priorities", [])
     for priority in priorities:
@@ -1157,6 +1111,7 @@ def _append_step_jsonl(path: Path, step: PlaythroughStep, *, run_id: str) -> Non
                     "available_actions": step.available_actions,
                     "chosen_actions": step.chosen_actions,
                     "llm_summary": step.llm_summary,
+                    "persona_calls": step.persona_calls,
                     "anomalies": step.anomalies,
                 },
                 ensure_ascii=False,

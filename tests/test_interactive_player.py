@@ -282,6 +282,7 @@ def test_play_through_runs_explicit_weekly_loop(tmp_path) -> None:
     assert rows[0]["run_id"] == tmp_path.name
     assert rows[0]["chosen_actions"] == ["study_library"]
     assert rows[1]["chosen_actions"] == ["sleep_recover"]
+    assert rows[0]["persona_calls"][0]["metadata"]["provider"] == "vllm"
 
 
 def test_play_through_terminates_when_probe_finishes(tmp_path) -> None:
@@ -303,8 +304,8 @@ def test_play_through_falls_back_to_first_action_when_decision_invalid(tmp_path)
     result, _written = agent.play_through(tmp_path, probe=probe)  # type: ignore[arg-type]
     assert len(result.steps) == 5
     assert probe.calls[0]["actions"] == ["study_library"]
-    # Three invalid attempts per week must all remain in the audit report.
-    assert len(result.report.llm_calls) == 15
+    # The shared gateway permits one repair, and both calls remain audited.
+    assert len(result.report.llm_calls) == 10
 
 
 def test_play_through_records_failed_llm_call_before_fallback(tmp_path) -> None:

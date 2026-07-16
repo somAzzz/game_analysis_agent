@@ -72,3 +72,15 @@ calls retain their original provider/mode metadata; exhausted budgets and
 cancellation produce typed failures without invoking the provider. API keys
 are excluded from serialized settings and common key/header forms are redacted
 before provider failures reach reports.
+
+## Interactive-player integration
+
+The interactive player now depends on `PersonaDecisionGateway` only at its two
+decision points. `LocalChatPersonaGateway` adapts the existing vLLM, SGLang,
+and DeepSeek clients, while Replay and OpenAI use their native adapters. Each
+adapter gets one structured-output repair and then returns a typed failure;
+the player may keep the Godot loop moving with a deterministic action, but
+records that action as `fallback_used=true` and preserves the failed provider
+metadata in `playthrough.jsonl`. Provider construction happens once through
+`build_persona_gateway`, which wraps the selected adapter with the P1.4 runtime
+limits and never installs a secondary provider.
