@@ -1,0 +1,16 @@
+{
+  "schema_version": "build-week-clean-room-review-v1",
+  "status": "not_run",
+  "reviewer_role": "non_builder_required",
+  "elapsed_seconds": null,
+  "tasks": {
+    "product": false,
+    "roles": false,
+    "first_command": false,
+    "headline_evidence": false,
+    "repair_decision": false
+  },
+  "criterion_scores": {},
+  "stop_ship_findings": ["Independent review has not run."],
+  "notes": "Give the reviewer only the Devpost draft, video, and repository URL."
+}

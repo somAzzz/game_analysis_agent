@@ -15,6 +15,19 @@ The submission is not authorized while G4 is failed. Complete in order:
 - [ ] Confirm repository access/licensing for all judges.
 - [ ] Run final G5 secret, privacy, link, hash, test, clean-clone, image, and video review.
 
+Machine-readable records to complete without estimates:
+
+- `release-metadata.json`
+- `manual-comparison.json`
+- `clean-room-review.json`
+- `video-review.json`
+
+Final local gate:
+
+```bash
+uv run python tools/review_build_week_g5.py --json
+```
+
 Never add token/cost/time-saved, platform-support, live-provider, or repair-
 success language unless its pending claim has acquired a dated artifact and the
 claim ledger reviewer accepts it.

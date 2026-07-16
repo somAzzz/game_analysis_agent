@@ -1,0 +1,11 @@
+{
+  "schema_version": "build-week-video-review-v1",
+  "status": "not_recorded",
+  "url": "",
+  "duration_seconds": null,
+  "signed_out_access": false,
+  "audio_verified": false,
+  "captions_verified": false,
+  "no_secrets_verified": false,
+  "verified_at": null
+}

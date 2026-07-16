@@ -860,6 +860,14 @@ pending claims. The submission-asset reviewer passes the draft while returning
 `release_status: blocked`; this preparation does not satisfy the G4 dependency
 or authorize P5 release claims.
 
+**Fail-closed G5 tooling (2026-07-16): implemented.**
+`tools/review_build_week_g5.py --json` now verifies G0-G4, the claim ledger,
+release URLs, manual comparison, independent clean-room review, video checks,
+published image digest, license, privacy status, and tracked-file secret scan.
+The committed templates contain `not_run`/`blocked` states, and the reviewer
+has both a current-project failure test and a synthetic all-evidence pass test.
+It cannot pass merely by replacing placeholders or changing one status field.
+
 ### P5.1 Freeze the measured case study
 
 **Depends on:** G3, G4.
