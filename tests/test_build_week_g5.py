@@ -31,17 +31,16 @@ def test_current_submission_fails_closed_on_external_release_blockers() -> None:
     review = review_g5(project_root=ROOT)
 
     assert review["status"] == "failed"
-    assert review["failure_count"] >= 7
-    assert {
+    assert review["failure_count"] == 7
+    assert set(review["failures"]) == {
         "prior_gates",
         "claim_ledger",
         "release_metadata",
         "manual_comparison",
         "clean_room_review",
         "video_review",
-        "published_image",
         "license_privacy_secrets",
-    }.issubset(review["failures"])
+    }
 
 
 def test_complete_synthetic_submission_can_pass_all_g5_checks(tmp_path: Path) -> None:
@@ -79,6 +78,10 @@ def test_complete_synthetic_submission_can_pass_all_g5_checks(tmp_path: Path) ->
 
     image_ref = "ghcr.io/example/playtest-forge-judge"
     digest = "sha256:" + "b" * 64
+    current_image = _read(ROOT / "judge-image-metadata.json")
+    current_image_digest = (
+        f"{current_image['reference']}@{current_image['index_digest']}"
+    )
     devpost_path = tmp_path / "submission/build-week-2026/DEVPOST_DRAFT.md"
     devpost = devpost_path.read_text(encoding="utf-8")
     replacements = {
@@ -88,6 +91,7 @@ def test_complete_synthetic_submission_can_pass_all_g5_checks(tmp_path: Path) ->
         "https://somazzz.github.io/game_analysis_agent/": "https://example.com/ui",
         "{{YOUTUBE_URL}}": "https://youtube.com/watch?v=example",
         "{{IMAGE_REFERENCE_AND_DIGEST}}": f"{image_ref}@{digest}",
+        current_image_digest: f"{image_ref}@{digest}",
     }
     for before, after in replacements.items():
         devpost = devpost.replace(before, after)

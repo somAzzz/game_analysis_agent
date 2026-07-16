@@ -48,15 +48,19 @@ def review() -> dict[str, Any]:
     g4 = json.loads((ROOT / "docs/reviews/openai_build_week_2026/G4-evaluator.review.json").read_text(encoding="utf-8"))
     release_state_ok = ledger["status"] == "draft_blocked" and g4["status"] == "failed"
     checks.append({"id": "release_state", "status": "passed" if release_state_ok else "failed", "errors": [] if release_state_ok else ["draft/G4 state mismatch"]})
-    pending_placeholders = {"{{YOUTUBE_URL}}", "{{IMAGE_REFERENCE_AND_DIGEST}}"}
+    image = json.loads((ROOT / "judge-image-metadata.json").read_text(encoding="utf-8"))
+    published_image = f"{image['reference']}@{image['index_digest']}"
+    pending_placeholders = {"{{YOUTUBE_URL}}"}
     completed_links = {
         "https://github.com/somAzzz/game_analysis_agent",
         "https://somazzz.github.io/game_analysis_agent/",
+        published_image,
     }
     placeholder_state_ok = (
         all(item in drafts["devpost"] for item in pending_placeholders)
         and "{{REPOSITORY_URL}}" not in drafts["devpost"]
         and "{{PUBLIC_UI_URL}}" not in drafts["devpost"]
+        and "{{IMAGE_REFERENCE_AND_DIGEST}}" not in drafts["devpost"]
         and all(item in drafts["devpost"] for item in completed_links)
     )
     checks.append({"id": "external_placeholders", "status": "passed" if placeholder_state_ok else "failed", "errors": []})
