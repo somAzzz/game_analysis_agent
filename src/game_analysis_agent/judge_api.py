@@ -286,21 +286,50 @@ class CampaignService:
     def _run_replay(self, job: CampaignJob) -> dict[str, object]:
         bundle = self.project / "examples/build_week_2026/campaign-v1"
         gate = verify_public_campaign_bundle(bundle)
-        summary = CampaignAggregation.model_validate_json(
+        CampaignAggregation.model_validate_json(
             (bundle / "campaign_summary.json").read_text(encoding="utf-8")
         )
+        requested_cells = {
+            (persona, seed)
+            for persona in job.request.personas
+            for seed in job.request.seeds
+        }
+        records = []
+        for line in (bundle / "persona_runs.jsonl").read_text(encoding="utf-8").splitlines():
+            record = json.loads(line)
+            cell = (record.get("persona"), record.get("seed"))
+            if cell in requested_cells and int(record.get("week", 0)) <= job.request.max_weeks:
+                records.append(record)
+        observed_cells = {(record["persona"], record["seed"]) for record in records}
+        missing = sorted(requested_cells - observed_cells)
+        if missing:
+            raise JudgeAPIError(
+                "replay_cell_unavailable",
+                f"Committed Replay does not contain requested cells: {missing}",
+                "Choose retained personas and seeds 42, 43, or 44, or select OpenAI live mode.",
+                status_code=422,
+            )
+        count = len(records)
+        valid = sum(bool(record.get("valid")) for record in records)
+        fallback = sum(bool(record.get("fallback_used")) for record in records)
+        provider_errors = sum(bool(record.get("provider_error")) for record in records)
         self._event(
             job,
             "facts_loaded",
-            f"Loaded {summary.metrics.completed_cells} cells and {summary.metrics.total_weeks} weeks",
+            f"Loaded {len(observed_cells)} cells and {count} retained Godot weeks",
         )
         return {
             "source": "committed-public-bundle",
+            "authoring": "deterministic-persona-policy-fixture",
             "campaign_id": gate.campaign_id,
-            "completed_cells": summary.metrics.completed_cells,
-            "total_weeks": summary.metrics.total_weeks,
-            "valid_rate": summary.metrics.valid_rate,
-            "fallback_rate": summary.metrics.fallback_rate,
+            "personas": list(job.request.personas),
+            "seeds": list(job.request.seeds),
+            "max_weeks": job.request.max_weeks,
+            "completed_cells": len(observed_cells),
+            "total_weeks": count,
+            "valid_rate": round(valid / count, 6),
+            "fallback_rate": round(fallback / count, 6),
+            "provider_error_rate": round(provider_errors / count, 6),
         }
 
     def _run_live(self, job: CampaignJob) -> dict[str, object]:

@@ -17,7 +17,7 @@ import type {
 } from "@/types";
 
 const PROVIDER_LABEL: Record<JudgeProvider, string> = {
-  replay: "Replay evidence",
+  replay: "Deterministic policy Replay",
   openai: "OpenAI live subagent",
 };
 
@@ -181,7 +181,7 @@ export function JudgePage() {
               <Metric value="100%" label="valid actions" />
               <Metric value="18/18" label="cashflow collapse" intent="danger" />
             </div>
-            <p className="judge-copy">The game runtime is automated; the action provider is swappable. Replay makes the judge path deterministic. OpenAI runs the same bounded interface as a live persona subagent when server configuration is ready.</p>
+            <p className="judge-copy">The game runtime is automated; the action provider is swappable. Replay is a deterministically authored persona-policy fixture—not a recorded LLM run. OpenAI runs the same bounded interface as a live persona subagent when server configuration is ready.</p>
 
             <div className="judge-console">
               <fieldset>
@@ -196,7 +196,7 @@ export function JudgePage() {
                       onChange={() => setProvider(item)}
                     />
                     <span>{PROVIDER_LABEL[item]}</span>
-                    <small>{item === "replay" ? "deterministic · no key" : openAIReady ? "live · server key ready" : "live · configuration required"}</small>
+                    <small>{item === "replay" ? "fixture policy · no key" : openAIReady ? "live · server key ready" : "live · configuration required"}</small>
                   </label>
                 ))}
               </fieldset>

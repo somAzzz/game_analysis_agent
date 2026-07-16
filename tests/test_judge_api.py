@@ -109,7 +109,9 @@ def test_replay_campaign_and_public_experiment_are_bounded_and_labeled() -> None
 
     assert completed["status"] == "completed"
     assert completed["mode"] == "prerecorded"
-    assert completed["result"]["completed_cells"] == 18
+    assert completed["result"]["completed_cells"] == 1
+    assert completed["result"]["total_weeks"] == 3
+    assert completed["result"]["authoring"] == "deterministic-persona-policy-fixture"
     assert experiment["decision"] == "rejected"
     assert experiment["patch"]["canonical_source_path"] == "demo/study-in-germany"
     assert experiment["patch"]["disposition"] == "candidate_not_merged"
@@ -123,6 +125,18 @@ def test_replay_campaign_and_public_experiment_are_bounded_and_labeled() -> None
     ]
     with pytest.raises(JudgeAPIError, match="Only the committed"):
         service.experiment("../../private")
+
+
+def test_replay_campaign_fails_closed_for_unretained_seed() -> None:
+    service = JudgeService(project_root=ROOT, environment={})
+    created = service.campaigns.create(
+        CampaignCreateRequest(provider="replay", personas=("newbie",), seeds=(999,), max_weeks=3)
+    )
+
+    failed = _wait(service, str(created["campaign_id"]))
+
+    assert failed["status"] == "failed"
+    assert failed["error"]["code"] == "replay_cell_unavailable"
 
 
 def test_live_campaign_fails_without_key_instead_of_falling_back() -> None:
