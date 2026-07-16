@@ -1,6 +1,7 @@
 ---
 status: active
 date: 2026-07-16
+requirements_verified: 2026-07-16
 audience: maintainers, judges, contributors
 scope: OpenAI Build Week 2026 competition implementation and submission plan
 ---
@@ -805,7 +806,134 @@ After the Build Week submission:
 4. Add an MCP adapter only after those gates pass.
 5. Expand the repair protocol to additional games and engines.
 
-## 20. Judge review log
+## 20. Submission and judge-readiness contract
+
+This section distinguishes required final behavior from evidence that exists
+today. Nothing marked `planned`, `unverified`, or `missing` may be described as
+complete in the submission.
+
+### 20.1 Clean-room judge path
+
+The final repository README must expose the following stable interface. These
+commands are a target contract and do not yet constitute a verified quickstart:
+
+```bash
+git clone <submission-repository-url>
+cd game_analysis_agent
+docker compose --profile judge pull
+PLAYTEST_FORGE_MODE=replay docker compose --profile judge up -d
+./scripts/judge-smoke-test
+```
+
+The startup output must print the dashboard URL, expected image digest, source
+revision, demo-bundle revision, and the command that stops the stack. The
+judge should then be able to:
+
+1. see doctor results and a complete replay case within two minutes;
+2. inspect Campaign, Repair, and Proof without an API key or GPU;
+3. run a deterministic smoke test without rebuilding images;
+4. optionally add `OPENAI_API_KEY` to an ignored server-side `.env.local` and
+   start the bounded live campaign;
+5. open the repository in Codex and invoke `$playtest-forge` against the
+   included evidence bundle to reproduce the repair judgment.
+
+The README must also include a source-build path for maintainers. That path is
+secondary to the prebuilt, digest-pinned judge path required by the challenge.
+
+### 20.2 Supported-platform statement
+
+Only tested combinations may be listed as supported:
+
+| Platform | Judge/Replay target | Judge/OpenAI target | Self-hosted vLLM target |
+| --- | --- | --- | --- |
+| Linux `amd64` + Docker | Required | Required | Optional, NVIDIA only |
+| macOS Apple Silicon + Docker Desktop | Required | Required | Not supported |
+| Other platforms | Best effort, not advertised until tested | Best effort | Not supported |
+
+The final compatibility table must replace `target` with a tested image
+digest, test date, and result. Browser support should name the exact versions
+used for Chrome, Firefox, and Safari smoke tests.
+
+### 20.3 Submission compliance ledger
+
+| Deliverable | Status on July 16 | Completion evidence | Stop-ship owner |
+| --- | --- | --- | --- |
+| Developer Tools category | Decided | Devpost category selection | Maintainer |
+| Working project | Partial | Clean-clone replay plus optional live run | P0-P4 |
+| Project description | Planned | Final Devpost text with measured claims | P5 |
+| Public YouTube demo under 3 minutes | Missing | Public URL, audio, captions, duration check | P5 |
+| Video explains both Codex and GPT-5.6 | Planned | Narration transcript and final video | P5 |
+| Judge-accessible code repository | Pending packaging decision | Public licensed repo, or private access granted to required judge accounts | P0/P5 |
+| README setup, sample data, and run guide | Partial | Clean-room-tested README | P4/P5 |
+| Codex decisions and acceleration highlighted | Planned | Session references, decision log, README section | P3/P5 |
+| `/feedback` core Codex Session ID | Missing | ID captured from the core implementation task and entered in Devpost | P3/P5 |
+| Installation instructions | Planned | Prebuilt and source-build paths | P4/P5 |
+| Supported platforms | Unverified | Dated compatibility matrix | P4 |
+| Test without rebuilding | Planned | Pinned image plus replay bundle and smoke test | P4 |
+| Secret, privacy, and license review | Missing | Signed release checklist and scan results | P5 |
+| Submission before deadline | Scheduled | Devpost confirmation before July 21, 5:00 PM PT | Maintainer |
+
+If the repository remains private, it must be shared with
+`testing@devpost.com` and `build-week-event@openai.com`, as specified by the
+challenge page. The maintainer must separately confirm eligibility and the
+official rules; this engineering plan is not a legal eligibility review.
+
+### 20.4 Judge time budget
+
+| Elapsed time | Expected proof |
+| --- | --- |
+| 0-2 minutes | Pull/start completes; doctor and provenance are visible |
+| 2-5 minutes | Replay case loads; campaign problem and repair decision are understandable |
+| 5-8 minutes, optional | Small OpenAI persona campaign completes under hard limits |
+| 8-12 minutes, optional | Smoke test and artifact references verify the displayed claim |
+
+Failure at any mandatory five-minute step is a release blocker. Live provider
+latency or quota must not make the replay path unavailable.
+
+### 20.5 Final stop-ship checklist
+
+Do not submit until all of the following are true:
+
+- the canonical game commit contains every required runner and passes its real
+  contract tests;
+- a clean machine can use the pinned image and replay bundle without a GPU,
+  OpenAI key, or local build;
+- the demo bundle hashes match the source, game, configuration, and image
+  revisions displayed in the UI;
+- the repair record contains fixed and holdout evidence and an honest
+  accept/reject result;
+- no secret, private prompt, unlicensed asset, or inaccessible dependency is
+  included;
+- the public video is under three minutes, has audio, and visibly explains the
+  distinct roles of Codex and GPT-5.6;
+- the repository is accessible to judges for the full judging period;
+- the `/feedback` Session ID comes from the task where the majority of core
+  functionality was built;
+- every numerical Devpost or video claim resolves to a committed artifact;
+- the Devpost submission confirmation is recorded before the deadline.
+
+### 20.6 Internal shortlist scorecard
+
+The official criteria are not assigned weights on the public brief, so this
+is a readiness rubric rather than a prediction of judge scoring:
+
+At the July 16 verification, Devpost displayed 19,688 registered participants
+and only first- and second-place awards for Developer Tools. Registrations are
+not the same as completed submissions, but the visible competition level means
+functional completeness alone is not a shortlist strategy.
+
+| Official criterion | Shortlist-level proof | Current decisive risk |
+| --- | --- | --- |
+| Technological implementation | Real Godot run, typed OpenAI decisions, Codex patch, deterministic fixed/holdout gates | Integration remains unbuilt |
+| Design and user experience | One understandable Campaign -> Repair -> Proof journey in under five minutes | Current frontend is report-only |
+| Potential impact | Timed case study and independent clean-room use with bounded cost | No measured comparison yet |
+| Quality of idea | Intent-aware closed-loop repair, including credible rejection of overfit patches | Novelty exists only on paper until demonstrated |
+
+A polished video cannot compensate for a broken judge path, and a large code
+base cannot compensate for an unclear before/after claim. The strongest
+submission is the smallest complete version that clears all four rows.
+
+## 21. Judge review log
 
 ### Review Pass 1: Technological implementation and Codex centrality
 
@@ -887,3 +1015,47 @@ with meaningful differentiation and an honest impact-validation path. The
 remaining risk is execution: without a real experiment record and a judge
 path that works from a clean machine, the differentiation remains a design
 claim rather than demonstrated product quality.
+
+### Review Pass 3: Judge usability, compliance, and submission credibility
+
+**Review question**
+
+Can an unfamiliar judge verify the central claim quickly, without a GPU,
+local model, repository rebuild, private knowledge, or trust in an edited
+video—and does the submission satisfy every explicit developer-tool item?
+
+**Findings before revision**
+
+1. Requirements were listed near the start, but completion status and
+   stop-ship evidence were distributed across the plan.
+2. “One-command Judge Mode” was a promise without a precise clean-room command
+   surface or time budget.
+3. Supported platforms mixed targets with proven compatibility.
+4. The plan did not explicitly protect against submitting a private repository
+   without granting the two required judge accounts access.
+5. The video, `/feedback` Session ID, public licensing, secret review, and
+   no-rebuild path had no single blocking ledger.
+6. The plan described strong engineering but lacked a final rubric connecting
+   each official judging criterion to judge-visible proof.
+
+**Changes applied in this revision**
+
+- Added a target clean-room command contract with a no-key, no-GPU replay path
+  and an optional backend-only OpenAI path.
+- Added a five-minute mandatory judge journey and optional deeper checks.
+- Separated platform targets from dated, digest-specific validation.
+- Added a submission ledger with current status, evidence, and responsible
+  phase, including the required private-repository access addresses.
+- Added explicit security, licensing, artifact-traceability, video, repository,
+  deadline, and `/feedback` stop-ship gates.
+- Added a non-weighted shortlist scorecard mapping all four official criteria
+  to concrete proof and current risk.
+
+**Pass 3 verdict**
+
+Plan-level pass. The proposed submission is focused, auditable, and aligned
+with every published Build Week deliverable and judging criterion. It has a
+credible shortlist shape if P0-P5 produce one real repair experiment and the
+five-minute clean-room path. It should not be submitted as a finished product
+if either proof is missing; those two artifacts are the difference between a
+strong architecture proposal and a competition-ready developer tool.
