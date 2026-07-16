@@ -1,9 +1,9 @@
 # G5 Final Release Review
 
 - Decision: **failed**
-- Reviewed commit: `2222d1e05bb495dd2d8f63acfa5f3d3d6444ab6b`
+- Reviewed commit: `b4dfd2ed89996ac81e8ebca67cfe6e706ee4bab2`
 - Checks: 8
-- Failures: 8
+- Failures: 7
 
 ## Checks
 
@@ -15,7 +15,7 @@
 | manual_comparison | failed | manual comparison is not completed |
 | clean_room_review | failed | clean-room review is not completed |
 | video_review | failed | video review is not completed |
-| published_image | failed | image digest is absent from Devpost draft |
+| published_image | passed |  |
 | license_privacy_secrets | failed | declared repository license is missing |
 
 ## Decision

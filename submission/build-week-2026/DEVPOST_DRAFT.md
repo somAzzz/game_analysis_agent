@@ -6,8 +6,9 @@
 
 Category: Developer Tools
 
-Status: pre-release draft blocked by G4 platform evidence. Do not publish this
-text until `RELEASE_CHECKLIST.md` is complete.
+Status: pre-release draft blocked by the live OpenAI G4 row and remaining G5
+human/release evidence. Do not publish this text until `RELEASE_CHECKLIST.md`
+is complete.
 
 ## The problem
 
@@ -74,12 +75,13 @@ Core Codex task: 019f6816-fe0d-78a2-9001-1890b32ef820.
 - Repository: [github.com/somAzzz/game_analysis_agent](https://github.com/somAzzz/game_analysis_agent)
 - Public Judge UI: [somazzz.github.io/game_analysis_agent](https://somazzz.github.io/game_analysis_agent/)
 - YouTube demo under 3:00: `{{YOUTUBE_URL}}`
-- Published Judge image: `{{IMAGE_REFERENCE_AND_DIGEST}}`
+- Published Judge image: `ghcr.io/somazzz/playtest-forge-judge:build-week-2026-60abfa2a46c22bb2eb1848c16bec69dc399d89f5@sha256:59601230928f6da17f88dda1dd869cfee9a8a1b87323c442297bddad97f5a8c2`
 
 ## Current limitations
 
-The recorded candidate did not repair the target failure. A live OpenAI
-campaign, published multi-architecture image, Linux CI evidence, manual timing
-comparison, and independent clean-room review must be completed before release
-claims advance. Local-model vLLM remains optional and is not required to judge
-the project.
+The recorded candidate did not repair the target failure. The published
+multi-architecture image and Linux amd64/Godot/arm64 evidence are complete. A
+live OpenAI campaign, manual timing comparison, independent clean-room review,
+license choice, and final video must be completed before release claims
+advance. Local-model vLLM remains optional and is not required to judge the
+project.

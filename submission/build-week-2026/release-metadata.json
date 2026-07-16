@@ -22,7 +22,8 @@
   },
   "license_path": "",
   "privacy_review": {
-    "status": "pending",
+    "status": "completed",
+    "reviewed_at": "2026-07-16T20:22:56Z",
     "raw_prompts_committed": false,
     "raw_model_outputs_committed": false
   }

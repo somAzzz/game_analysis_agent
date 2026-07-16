@@ -38,10 +38,13 @@
       "status": "failed"
     },
     {
-      "error": "image digest is absent from Devpost draft",
-      "evidence": {},
+      "error": "",
+      "evidence": {
+        "index_digest": "sha256:59601230928f6da17f88dda1dd869cfee9a8a1b87323c442297bddad97f5a8c2",
+        "reference": "ghcr.io/somazzz/playtest-forge-judge:build-week-2026-60abfa2a46c22bb2eb1848c16bec69dc399d89f5"
+      },
       "id": "published_image",
-      "status": "failed"
+      "status": "passed"
     },
     {
       "error": "declared repository license is missing",
@@ -51,7 +54,7 @@
     }
   ],
   "decision": "G5 failed closed; do not submit or publish final release claims.",
-  "failure_count": 8,
+  "failure_count": 7,
   "failures": [
     "prior_gates",
     "claim_ledger",
@@ -59,12 +62,11 @@
     "manual_comparison",
     "clean_room_review",
     "video_review",
-    "published_image",
     "license_privacy_secrets"
   ],
   "gate": "G5",
-  "generated_at": "2026-07-16T18:32:54.002109+00:00",
-  "reviewed_commit": "2222d1e05bb495dd2d8f63acfa5f3d3d6444ab6b",
+  "generated_at": "2026-07-16T20:23:55.363889+00:00",
+  "reviewed_commit": "b4dfd2ed89996ac81e8ebca67cfe6e706ee4bab2",
   "schema_version": "build-week-g5-review-v1",
   "status": "failed"
 }

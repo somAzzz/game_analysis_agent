@@ -77,8 +77,8 @@
     }
   ],
   "pending_external_claims": [
-    {"id": "linux_delivery", "status": "completed", "required_artifact": "GitHub Actions run 29523961052 plus committed amd64 and native arm64 evidence"},
-    {"id": "multiarch_image", "status": "completed", "required_artifact": "judge-image-metadata.json with registry index digest sha256:76cb6cf5c28e62c2fb19c60502560aa69ece1dd4a5e6b352b338e02f7681481f"},
+    {"id": "linux_delivery", "status": "completed", "required_artifact": "GitHub Actions run 29531033847 plus committed amd64, official-Godot, and native arm64 evidence"},
+    {"id": "multiarch_image", "status": "completed", "required_artifact": "judge-image-metadata.json with registry index digest sha256:59601230928f6da17f88dda1dd869cfee9a8a1b87323c442297bddad97f5a8c2"},
     {"id": "manual_time_comparison", "status": "not_measured", "required_artifact": "timed non-builder baseline and Forge task"},
     {"id": "live_openai_campaign", "status": "not_run", "required_artifact": "redacted server-side provider/campaign record"},
     {"id": "clean_room_reviewer", "status": "not_run", "required_artifact": "dated non-builder review"},
