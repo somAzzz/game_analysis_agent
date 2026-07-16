@@ -2,15 +2,15 @@
   "artifact_digests": [
     {
       "name": "doctor-dashboard-native.json",
-      "sha256": "47251a9c6bb0873850f89a6f13a5fa14895c200c5fa10b60e99d6e8b83a070f7"
+      "sha256": "d448050fed7de255809592b5d3f9288d98ec4fccb82e966fe2acba5609304f30"
     },
     {
       "name": "doctor-inspect.json",
-      "sha256": "b267d5d2b5c699196e54dac2fa798ef94cebc7c1463be9a00d95eea0de103512"
+      "sha256": "679c1ba068ba11ec303e3030395250b7ff9f4930f039ba53a96451f1e8bcddea"
     },
     {
       "name": "doctor-real-game.json",
-      "sha256": "2b1af9543439f9b12c020669900951ded5a48a361d7b9757c46c87087b68e04f"
+      "sha256": "4fac23dbc331ae2fd29bbd78afd5d813aac1d70ec28fd6fb667b0c833307ab86"
     },
     {
       "name": "experiment.json",
@@ -22,15 +22,15 @@
     },
     {
       "name": "fresh-godot/report_manifest.json",
-      "sha256": "8549e666c3df1f1ea866bb1ee3a34a2c7ad6da75785341724a7b029102eb3389"
+      "sha256": "c06a55697cc6796483ca080ddf237e3dc1ae8040e06013edc7e0d335e58f2848"
     },
     {
       "name": "judge-inspect.json",
-      "sha256": "7ee3634417dfa2a0453e2ae18704653b199bd998ae07905208754d8ac07b3d9f"
+      "sha256": "9bf8f9260017dc49a4c7c902cfc946eada965c4ac625b5abed045e3bcbca829d"
     },
     {
       "name": "judge-replay.json",
-      "sha256": "6955290e1003ca743a0cf6e46fefd7a4d3d6ecb4b8988b15807386ceebdc09d3"
+      "sha256": "a7876365be53190fd88cf3f0849e27b7d7e0c73baa550fc77245b4c2877af778"
     },
     {
       "name": "provider-status.json",
@@ -63,7 +63,7 @@
       "status": "passed"
     }
   ],
-  "executed_at": "2026-07-16T18:11:56.002696+00:00",
+  "executed_at": "2026-07-16T18:27:13.418997+00:00",
   "game_revision": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
   "mode": "macos",
   "platform": {
@@ -71,9 +71,9 @@
     "system": "macOS"
   },
   "schema_version": "build-week-platform-evidence-v1",
-  "source_contract_sha256": "dd39532dbd0134488984d8513d5d2d6bcb67036ee652ab0c371fdd74d6187c1c",
+  "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
   "source_dirty": false,
-  "source_revision": "47ba3180ada4983d86a78940b21c7a7f9817194e",
+  "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
   "status": "passed",
   "toolchain": {
     "godot": "4.4.stable.official.4c311cbee"

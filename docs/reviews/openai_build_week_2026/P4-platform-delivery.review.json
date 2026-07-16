@@ -1,8 +1,8 @@
 {
   "schema_version": "build-week-platform-review-v1",
-  "reviewed_at": "2026-07-16T18:11:56.003551+00:00",
-  "source_revision": "47ba3180ada4983d86a78940b21c7a7f9817194e",
-  "contract_sha256": "dd39532dbd0134488984d8513d5d2d6bcb67036ee652ab0c371fdd74d6187c1c",
+  "reviewed_at": "2026-07-16T18:27:13.419848+00:00",
+  "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+  "contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
   "status": "partial",
   "platform": {
     "system": "macOS",
@@ -26,29 +26,29 @@
       "id": "macos_system_python_inspect",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "47ba3180ada4983d86a78940b21c7a7f9817194e",
-      "source_contract_sha256": "dd39532dbd0134488984d8513d5d2d6bcb67036ee652ab0c371fdd74d6187c1c"
+      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983"
     },
     {
       "id": "macos_locked_replay",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "47ba3180ada4983d86a78940b21c7a7f9817194e",
-      "source_contract_sha256": "dd39532dbd0134488984d8513d5d2d6bcb67036ee652ab0c371fdd74d6187c1c"
+      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983"
     },
     {
       "id": "macos_idempotent_setup",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "47ba3180ada4983d86a78940b21c7a7f9817194e",
-      "source_contract_sha256": "dd39532dbd0134488984d8513d5d2d6bcb67036ee652ab0c371fdd74d6187c1c"
+      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983"
     },
     {
       "id": "macos_native_ui_api",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "47ba3180ada4983d86a78940b21c7a7f9817194e",
-      "source_contract_sha256": "dd39532dbd0134488984d8513d5d2d6bcb67036ee652ab0c371fdd74d6187c1c"
+      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983"
     },
     {
       "id": "macos_container_dashboard_optional",
@@ -60,8 +60,8 @@
       "id": "macos_pinned_real_godot",
       "status": "passed",
       "evidence": "platform-evidence/macos-native.json",
-      "source_revision": "47ba3180ada4983d86a78940b21c7a7f9817194e",
-      "source_contract_sha256": "dd39532dbd0134488984d8513d5d2d6bcb67036ee652ab0c371fdd74d6187c1c"
+      "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+      "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983"
     },
     {
       "id": "live_openai_campaign",
