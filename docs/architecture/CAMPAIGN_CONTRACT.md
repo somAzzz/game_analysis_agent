@@ -93,3 +93,20 @@ Each member is that exact cell/week citation; representatives are the first
 three members in stable persona/seed/week order. Codex may explain or prioritize
 these clusters later, but cannot add members, move first-entry weeks, or replace
 the rules fingerprint.
+
+## Public-safe bundle
+
+P2.4 emits exactly the review-facing manifest, campaign summary, normalized
+weekly persona rows, per-cell evaluations, sanitized provider-call metadata,
+failure clusters, and gate report. It never copies prompts, response text,
+authorization fields, raw game state, or event/dialogue content. Provider calls
+retain provider/mode/model/usage/status and sanitized typed errors only.
+
+`persona_runs.jsonl` is the public citation source: one normalized row per
+cell/week with money, stress, validity, fallback, provider-error, ending, and
+the private source-row hash. Cluster citations are rewritten to its public line
+number and canonical row hash, so a reviewer can resolve evidence without the
+private game bundle. All six evidence files are reparsed against Pydantic
+schemas and SHA-256 hashed before `gate_report.json` may say `passed`; any
+missing cell, non-completed cell, identity mismatch, forbidden field, secret
+signature, or later file mutation fails verification.
