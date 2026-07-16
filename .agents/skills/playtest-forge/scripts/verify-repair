@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../../../.." && pwd)
+cd "$ROOT"
+if [ ! -f tools/verify_build_week_repair.py ]; then
+  echo "repair verifier is unavailable" >&2
+  exit 2
+fi
+exec uv run python tools/verify_build_week_repair.py "$@"

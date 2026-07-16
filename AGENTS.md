@@ -46,3 +46,14 @@ Do not register `tools/run_gameplay_agent.py` `cmd_*` functions as MCP
 tools, construct `argparse.Namespace` inside MCP code, or duplicate
 Godot/contract/report logic in an MCP package. CLI and MCP must share the same
 typed request/result services.
+
+## Build Week repair workflow
+
+For a request to diagnose, repair, evaluate, or judge the committed Build Week
+persona campaign, run `.agents/skills/playtest-forge/scripts/preflight` before
+inspecting candidate game changes. Then use the repository Skill at
+`.agents/skills/playtest-forge/SKILL.md`. It requires facts before inference,
+one mechanism, an isolated game worktree, budgeted allowlisted edits, fixed and
+unseen-holdout verification, and an explicit accepted/rejected record. Never
+edit the canonical baseline bundle under `reports/build-week-2026/game-source`
+in place and never merge a repair automatically.
