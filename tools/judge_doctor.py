@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+TOOLCHAIN = ROOT / "config/build_week_2026_toolchain.json"
 MODES = (
     "inspect",
     "replay",
@@ -47,7 +48,16 @@ def _probe(command: list[str], *, timeout: float = 3) -> dict[str, str]:
     }
 
 
-def _godot_probe(environment: dict[str, str]) -> dict[str, str]:
+def _expected_godot_version() -> str:
+    try:
+        value = json.loads(TOOLCHAIN.read_text(encoding="utf-8"))
+        return str(value["godot"]["version"])
+    except (KeyError, OSError, TypeError, ValueError):
+        return ""
+
+
+def _godot_probe(environment: dict[str, str]) -> dict[str, Any]:
+    expected = _expected_godot_version()
     configured = environment.get("GODOT_BIN", "").strip()
     candidates = [configured] if configured else ["godot4", "godot"]
     for candidate in candidates:
@@ -56,8 +66,16 @@ def _godot_probe(environment: dict[str, str]) -> dict[str, str]:
         result = _probe([candidate, "--version"], timeout=5)
         if result["status"] == "available":
             result["path"] = shutil.which(candidate) or candidate
+            result["expected_version"] = expected
+            result["version_matches_pin"] = bool(expected and result["version"].startswith(expected))
             return result
-    return {"status": "unavailable", "version": "", "path": configured}
+    return {
+        "status": "unavailable",
+        "version": "",
+        "path": configured,
+        "expected_version": expected,
+        "version_matches_pin": False,
+    }
 
 
 def _docker_probe() -> dict[str, str]:
@@ -149,7 +167,13 @@ def diagnose(mode: str, environment: dict[str, str] | None = None) -> dict[str, 
         checks.extend(
             [
                 _check("game_project", game_ok, True, str(game_path or "not configured"), "Set GAME_PROJECT_PATH to a Godot project."),
-                _check("godot", godot["status"] == "available", True, godot["version"] or "not found", "Set GODOT_BIN to the pinned Godot executable."),
+                _check(
+                    "godot",
+                    godot["status"] == "available" and bool(godot["version_matches_pin"]),
+                    True,
+                    godot["version"] or "not found",
+                    f"Set GODOT_BIN to the pinned Godot {godot['expected_version'] or 'version'} executable.",
+                ),
                 _check("report_directory", reports_writable, True, str(report_path), "Choose a writable JUDGE_REPORT_DIR."),
             ]
         )

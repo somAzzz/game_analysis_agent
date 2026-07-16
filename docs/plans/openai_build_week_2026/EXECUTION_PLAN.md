@@ -790,27 +790,31 @@ skip, and both offline Judge modes passed. P4.8 remains the next step.
 
 - Fresh Apple Silicon account with Python 3.12, Node 20, native Godot 4.4.
 - Offline Inspect/Replay without Docker.
-- ARM64 Replay/UI through Docker Desktop.
 - Native Python worker + native Godot for one real run and one short OpenAI
   campaign.
 
 **Linux path**
 
 - Repository-only restricted evaluator.
-- Digest-pinned amd64 Replay/UI image.
-- Pinned real-Godot path where supported.
+- Hardened digest-pinned amd64 Replay/UI image and native arm64 image execution.
+- Pinned real-Godot 4.4 path on Linux amd64.
+
+Docker evidence is deliberately owned by the Linux delivery path. Docker
+Desktop on macOS remains an optional developer convenience and is not a
+substitute for native Linux container evidence.
 
 Compare artifact contracts and fixed-seed results across platforms; document
 legitimate platform metadata differences.
 
 **Implementation checkpoint (2026-07-16): partial.** macOS arm64 native
 Inspect, Replay, idempotent offline setup, static build, and Judge UI/API are
-verified. A Linux amd64 job now exercises native and hardened container paths
-and uploads evidence, but it has not run for the local unpushed commit. Docker,
-pinned Godot 4.4, and a server OpenAI key are absent on the current host, so
-those rows remain explicitly `not_run`; Linux arm64 is also untested. See the
-P4 platform delivery review. P4.8 and G4 remain open until dated external run
-evidence replaces the pending rows.
+verified. The repository-local pinned Godot 4.4 toolchain is installed, but its
+P4 acceptance row still needs a fresh release-revision run. A Linux amd64 job
+now exercises native and hardened container paths and uploads evidence, but it
+has not run for the local unpushed commit. Linux pinned-Godot 4.4, Linux arm64,
+and a server OpenAI campaign are also untested. See the P4 platform delivery
+review. P4.8 and G4 remain open until dated run evidence replaces the pending
+rows.
 
 ### P4.9 Gate G4 — Automated evaluator and judge-experience review
 

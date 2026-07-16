@@ -15,7 +15,8 @@
     "node": "20.20.2",
     "npm": "10.8.2",
     "uv": "0.11.23",
-    "discovered_godot": "4.7.stable.official.5b4e0cb0f",
+    "system_godot": "4.7.stable.official.5b4e0cb0f",
+    "pinned_godot": "4.4.stable.official.4c311cbee",
     "required_godot": "4.4.stable",
     "docker": "unavailable"
   },
@@ -45,19 +46,19 @@
       "claim": "same-origin native Judge UI/API runs on macOS arm64"
     },
     {
-      "id": "macos_container_dashboard",
+      "id": "macos_container_dashboard_optional",
       "status": "not_run",
       "reason": "Docker executable and daemon are unavailable on this host",
       "remediation": "Run the dashboard-container doctor and Compose smoke on Docker Desktop."
     },
     {
       "id": "macos_pinned_real_godot",
-      "status": "not_run",
-      "reason": "The discovered native Godot is 4.7, not the competition pin 4.4; the 4.4 Docker wrapper is unusable without Docker",
-      "remediation": "Install the SHA-512-pinned Godot 4.4 toolchain or enable the verified Docker wrapper before rerunning a fresh game trace."
+      "status": "pending_refresh",
+      "reason": "The repository-local SHA-512-pinned Godot 4.4 toolchain is installed and G0 used it, but P4 still needs a fresh acceptance record at the release revision.",
+      "remediation": "Source .tools/build-week/env.sh, run the real-game doctor and fresh acceptance, then attach the dated artifact and revision."
     },
     {
-      "id": "macos_live_openai",
+      "id": "live_openai_campaign",
       "status": "not_run",
       "reason": "OPENAI_API_KEY is not configured",
       "remediation": "Set a restricted server-side key and run the bounded provider and campaign smokes."
@@ -67,7 +68,14 @@
       "status": "pending_ci",
       "workflow": ".github/workflows/test.yml#judge-linux-amd64",
       "reason": "The workflow is implemented but has not run for this unpushed commit",
-      "remediation": "Push the branch or open a PR; retain the uploaded judge-linux-amd64 artifact and update this record with run URL and image ID."
+      "remediation": "Open a PR, push to main, or manually dispatch the workflow; a feature-branch push alone does not trigger it. Retain the judge-linux-amd64 artifact and update this record with run URL and image ID."
+    },
+    {
+      "id": "linux_pinned_real_godot",
+      "status": "pending_ci",
+      "workflow": ".github/workflows/test.yml#godot-contract",
+      "reason": "The real-Godot job has not run at this revision with the competition-pinned 4.4-stable release.",
+      "remediation": "Configure STUDY_IN_GERMANY_TOKEN and manually dispatch the Test workflow with godot_version=4.4-stable; retain the contract artifact and run URL."
     },
     {
       "id": "linux_arm64_container",
@@ -76,5 +84,5 @@
       "remediation": "Publish the multi-architecture image and verify the arm64 manifest on a native runner."
     }
   ],
-  "decision": "Native macOS offline and UI delivery are evidenced. Container, pinned fresh-Godot, live OpenAI, and Linux execution remain unverified, so P4.8 and G4 cannot pass yet."
+  "decision": "Native macOS offline and UI delivery are evidenced. The pinned Godot toolchain is installed but needs a fresh P4 acceptance record; live OpenAI, Linux container/Godot execution, native arm64, and image publication remain unverified, so P4.8 and G4 cannot pass yet."
 }

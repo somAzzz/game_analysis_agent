@@ -21,7 +21,7 @@ on:
       godot_version:
         description: Official godot-builds release tag
         required: true
-        default: 4.7-dev5
+        default: 4.4-stable
         type: string
 
 permissions:
@@ -189,7 +189,7 @@ jobs:
     env:
       GAME_REPOSITORY: ${{ inputs.game_repository || 'somAzzz/study-in-germany' }}
       GAME_REF: ${{ inputs.game_ref || '348b9fd5501e71ebc7142e10f9068fc1490b5124' }}
-      GODOT_VERSION: ${{ inputs.godot_version || '4.7-dev5' }}
+      GODOT_VERSION: ${{ inputs.godot_version || '4.4-stable' }}
       GAME_REPO_TOKEN: ${{ secrets.STUDY_IN_GERMANY_TOKEN }}
       GAME_PROJECT_PATH: ${{ github.workspace }}/study-in-germany
       GODOT_BIN: godot4
@@ -233,13 +233,12 @@ jobs:
         run: |
           archive="Godot_v${GODOT_VERSION}_linux.x86_64.zip"
           release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}"
+          expected_sha512="$(python3 -c 'import json; print(json.load(open("game-analysis-agent/config/build_week_2026_toolchain.json"))["godot"]["assets"]["linux-amd64"]["sha512"])')"
           mkdir -p "$RUNNER_TEMP/godot"
           curl --fail --location --retry 3 "$release/$archive" \
             --output "$RUNNER_TEMP/godot/$archive"
-          curl --fail --location --retry 3 "$release/SHA512-SUMS.txt" \
-            --output "$RUNNER_TEMP/godot/SHA512-SUMS.txt"
           cd "$RUNNER_TEMP/godot"
-          grep "  $archive$" SHA512-SUMS.txt | sha512sum --check --strict
+          printf '%s  %s\n' "$expected_sha512" "$archive" | sha512sum --check --strict
           unzip -q "$archive"
           install -m 0755 "Godot_v${GODOT_VERSION}_linux.x86_64" "$RUNNER_TEMP/godot4"
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"

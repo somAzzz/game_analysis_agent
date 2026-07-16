@@ -16,10 +16,10 @@ REQUIRED_PLATFORM_CHECKS = frozenset(
         "macos_locked_replay",
         "macos_idempotent_setup",
         "macos_native_ui_api",
-        "macos_container_dashboard",
         "macos_pinned_real_godot",
-        "macos_live_openai",
+        "live_openai_campaign",
         "linux_amd64_native_and_container",
+        "linux_pinned_real_godot",
         "linux_arm64_container",
     }
 )

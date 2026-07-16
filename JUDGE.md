@@ -31,9 +31,10 @@ for a missing required capability. Optional missing tools are warnings.
 | Delivery path | Dated result | Claim level |
 | --- | --- | --- |
 | macOS 26.5.2 arm64, native Inspect/Replay/UI | Passed 2026-07-16 | Verified locally |
-| macOS arm64, Docker dashboard/Replay | Not run; Docker absent | No support claim yet |
-| macOS arm64, fresh pinned Godot 4.4 | Not run; discovered native Godot is 4.7 | No support claim yet |
+| macOS arm64, Docker dashboard/Replay | Optional; Docker absent | Not required for release |
+| macOS arm64, fresh pinned Godot 4.4 | Installed; P4 release-revision rerun pending | G0 verified, P4 pending |
 | Linux amd64 native/container | Workflow implemented, execution pending | Target only until CI artifact exists |
+| Linux amd64, fresh pinned Godot 4.4 | Manual/scheduled workflow implemented, execution pending | Target only until CI artifact exists |
 | Linux arm64 container | Multi-arch source target, not executed | Target only |
 | Live OpenAI campaign | Not run; no server key | Optional capability only |
 

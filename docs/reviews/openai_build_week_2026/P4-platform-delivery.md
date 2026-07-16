@@ -14,14 +14,15 @@ same-origin Judge UI/API all passed. The doctor correctly separates the native
 dashboard from its Docker delivery and returns an unsupported exit for the
 latter on this host.
 
-This is not yet a cross-platform pass. Docker is absent, the locally discovered
-Godot is 4.7 instead of the pinned 4.4 release, and no OpenAI key is configured.
-Those facts leave the macOS container, fresh pinned-Godot, and live campaign
-checks `not_run`. The Linux amd64 job now executes native Inspect/Replay, builds
-the CPU image, runs read-only/networkless container checks, smokes the UI/API,
-and uploads the evidence—but that workflow must run after the commit is pushed
-before it becomes Linux evidence. Linux arm64 also remains a packaging target,
-not a tested claim.
+This is not yet a cross-platform pass. Docker is absent and no OpenAI key is
+configured. The project-local SHA-512-pinned Godot 4.4 binary is installed and
+was used by G0; its P4 row remains pending until a fresh acceptance artifact is
+recorded at the release revision. Docker evidence is assigned to the Linux
+path. The Linux amd64 job now executes native Inspect/Replay, builds the CPU
+image, runs read-only/networkless container checks, smokes the UI/API, and
+uploads the evidence—but it must run from a PR, `main`, or manual dispatch
+before it becomes evidence. The separate real-Godot job must also run with
+`4.4-stable`. Linux arm64 remains a packaging target, not a tested claim.
 
 Machine-readable details and remediation are in
 `P4-platform-delivery.review.json`. G4 must remain open until the pending rows
