@@ -1,3 +1,10 @@
+---
+status: passed
+date: 2026-07-16
+audience: maintainers, OpenAI Build Week judges
+scope: canonical Build Week baseline and G0 reproducibility gate
+---
+
 # G0 review — canonical Build Week baseline
 
 **Decision:** Passed on 2026-07-16.
