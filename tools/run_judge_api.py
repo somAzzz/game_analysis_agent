@@ -130,6 +130,11 @@ def handler_factory(service: JudgeService, frontend: Path):
 
         def _static(self, request_path: str) -> None:
             relative = request_path.lstrip("/") or "index.html"
+            public_prefix = "game_analysis_agent/"
+            if relative == public_prefix.rstrip("/"):
+                relative = "index.html"
+            elif relative.startswith(public_prefix):
+                relative = relative.removeprefix(public_prefix) or "index.html"
             candidate = (frontend / relative).resolve()
             if frontend.resolve() not in candidate.parents or not candidate.is_file():
                 candidate = frontend / "index.html"

@@ -276,12 +276,18 @@ export interface JudgeExperiment {
     evidence_paths: string[];
   }[];
   patch: {
+    baseline_commit: string;
     patched_commit: string;
     mechanism_class: string;
     modified_paths: string[];
     changed_files: number;
     added_lines: number;
     deleted_lines: number;
+    patch_path: string;
+    patch_sha256: string;
+    canonical_source_path: string;
+    disposition: "candidate_not_merged";
+    diff: string;
   };
   codex: {
     task_reference: string;

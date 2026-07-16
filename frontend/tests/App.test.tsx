@@ -194,8 +194,11 @@ const experiment: JudgeExperiment = {
     { gate_id: "decision_validity", status: "passed", detail: "validity threshold met", evidence_paths: [] },
   ],
   patch: {
-    patched_commit: "b".repeat(40), mechanism_class: "recurring_living_cost_drift",
+    baseline_commit: "a".repeat(40), patched_commit: "b".repeat(40), mechanism_class: "recurring_living_cost_drift",
     modified_paths: ["scripts/simulation/SimulationEngine.gd"], changed_files: 1, added_lines: 35, deleted_lines: 5,
+    patch_path: "patch.diff", patch_sha256: "c".repeat(64),
+    canonical_source_path: "demo/study-in-germany", disposition: "candidate_not_merged",
+    diff: "--- a/scripts/simulation/SimulationEngine.gd\n+++ b/scripts/simulation/SimulationEngine.gd\n+const WEEKLY_ALLOWANCE := 248\n",
   },
   codex: {
     task_reference: "task", feedback_session_id: "session", model: "codex-runtime", skill: "playtest-forge",
@@ -237,6 +240,9 @@ describe("application routes", () => {
     expect(screen.getAllByText("REJECTED").length).toBeGreaterThan(0);
     expect(screen.getAllByText("18/18").length).toBeGreaterThanOrEqual(3);
     expect(screen.getByText(/OpenAI live subagent/i)).toBeInTheDocument();
+    expect(screen.getByText(/View exact candidate diff/i)).toBeInTheDocument();
+    expect(screen.getByText(/demo\/study-in-germany/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Exact candidate source diff/i)).toHaveTextContent("WEEKLY_ALLOWANCE");
   });
 
   it("runs the bounded Replay action from Judge Mode", async () => {

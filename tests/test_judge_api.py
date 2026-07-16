@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import threading
 import time
 import urllib.error
@@ -110,6 +111,9 @@ def test_replay_campaign_and_public_experiment_are_bounded_and_labeled() -> None
     assert completed["mode"] == "prerecorded"
     assert completed["result"]["completed_cells"] == 18
     assert experiment["decision"] == "rejected"
+    assert experiment["patch"]["canonical_source_path"] == "demo/study-in-germany"
+    assert experiment["patch"]["disposition"] == "candidate_not_merged"
+    assert "SimulationEngine.gd" in experiment["patch"]["diff"]
     assert experiment["mode"] == "prerecorded"
     assert [item["cohort"] for item in experiment["cohorts"]] == [
         "baseline_fixed",
@@ -211,6 +215,13 @@ def test_http_surface_status_replay_events_and_experiment() -> None:
             events = response.read().decode()
         with urllib.request.urlopen(f"{base}/api/experiments/cashflow-drift-repair-v1") as response:
             experiment = json.load(response)
+        with urllib.request.urlopen(f"{base}/") as response:
+            index = response.read().decode()
+        asset_path = re.search(r'src="(/game_analysis_agent/assets/[^"]+\.js)"', index)
+        assert asset_path is not None
+        with urllib.request.urlopen(f"{base}{asset_path.group(1)}") as response:
+            javascript = response.read()
+            javascript_type = response.headers.get_content_type()
     finally:
         server.shutdown()
         server.server_close()
@@ -220,6 +231,8 @@ def test_http_surface_status_replay_events_and_experiment() -> None:
     assert completed["status"] == "completed"
     assert "event: campaign_completed" in events
     assert experiment["decision"] == "rejected"
+    assert javascript_type in {"application/javascript", "text/javascript"}
+    assert len(javascript) > 1000
 
 
 def test_http_unknown_route_is_typed_404() -> None:

@@ -1423,6 +1423,20 @@ main.judge-ledger { max-width: none; margin: 0; padding: 0 clamp(24px, 7vw, 108p
 .judge-patch ul { margin: 0; padding: 0; list-style: none; color: var(--judge-muted); font-size: 11px; line-height: 2; overflow-wrap: anywhere; }
 .judge-patch li::before { content: "+ "; color: var(--judge-cyan); }
 .judge-stamp { position: absolute; right: 4%; top: 36%; padding: 8px 16px; border: 5px double var(--judge-red); color: var(--judge-red); font: 700 clamp(30px, 5vw, 62px)/1 var(--mono); letter-spacing: .08em; transform: rotate(-8deg); opacity: .92; text-shadow: 0 0 20px #071318; }
+.judge-diff { margin-top: 14px; border: 1px solid var(--judge-rule); background: #061116; }
+.judge-diff summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 18px; color: var(--judge-ink); font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+.judge-diff summary::marker { color: var(--judge-cyan); }
+.judge-diff summary code { color: var(--judge-muted); font-size: 9px; }
+.judge-diff[open] summary { border-bottom: 1px solid var(--judge-rule); }
+.judge-diff-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 15px 18px; border-bottom: 1px solid var(--judge-rule); }
+.judge-diff-meta p { margin: 0; min-width: 0; }
+.judge-diff-meta span { display: block; margin-bottom: 5px; color: var(--judge-muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+.judge-diff-meta code, .judge-diff-meta strong { color: var(--judge-cyan); font-size: 10px; overflow-wrap: anywhere; }
+.judge-diff-meta strong { color: var(--judge-red); text-transform: uppercase; }
+.judge-diff pre { max-height: 430px; margin: 0; padding: 20px 18px; overflow: auto; color: #a6b7b5; font: 10px/1.65 var(--mono); tab-size: 2; }
+.judge-diff pre span { display: block; min-width: max-content; }
+.judge-diff pre .is-addition { color: #83d6bc; background: rgba(76, 210, 170, .07); }
+.judge-diff pre .is-deletion { color: #f1998f; background: rgba(242, 103, 90, .07); }
 .judge-provenance { display: grid; grid-template-columns: repeat(3, 1fr); margin: 30px 0 0; border-top: 1px solid var(--judge-rule); }
 .judge-provenance div { padding: 18px 18px 0 0; }
 .judge-provenance dt { color: var(--judge-muted); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
@@ -1471,6 +1485,7 @@ main.judge-ledger { max-width: none; margin: 0; padding: 0 clamp(24px, 7vw, 108p
   .judge-metrics > div:nth-child(2) { border-right: 0; }
   .judge-comparison { grid-template-columns: 1fr; }
   .judge-patch { grid-template-columns: 1fr; }
+  .judge-diff-meta { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 560px) {

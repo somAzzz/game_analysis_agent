@@ -227,6 +227,23 @@ export function JudgePage() {
               </ul>
               <div className="judge-stamp" aria-label="Candidate repair rejected">REJECTED</div>
             </div>
+            <details className="judge-diff">
+              <summary>
+                <span>View exact candidate diff</span>
+                <code>sha256 {experiment.patch.patch_sha256.slice(0, 12)}</code>
+              </summary>
+              <div className="judge-diff-meta">
+                <p><span>Canonical demo</span><code>{experiment.patch.canonical_source_path} @ {experiment.patch.baseline_commit.slice(0, 12)}</code></p>
+                <p><span>Disposition</span><strong>{experiment.patch.disposition.replaceAll("_", " ")}</strong></p>
+              </div>
+              <pre aria-label="Exact candidate source diff"><code>{experiment.patch.diff.split("\n").map((line, index) => (
+                <span
+                  // A patch can contain identical text on different lines.
+                  key={`${index}-${line}`}
+                  className={line.startsWith("+") && !line.startsWith("+++") ? "is-addition" : line.startsWith("-") && !line.startsWith("---") ? "is-deletion" : undefined}
+                >{line}{"\n"}</span>
+              ))}</code></pre>
+            </details>
             <p className="judge-copy">The focused Godot validator passed. That proves the implementation is internally legal; it does not prove the player-level failure was repaired.</p>
             <dl className="judge-provenance">
               <div><dt>Planner</dt><dd>Codex main agent</dd></div>

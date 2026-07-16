@@ -382,6 +382,7 @@ class JudgeService:
         record = RepairExperimentRecord.model_validate_json(
             (bundle / "repair_experiment.json").read_text(encoding="utf-8")
         )
+        patch_diff = (bundle / record.patch.patch_path).read_text(encoding="utf-8")
         return {
             "schema_version": "judge-public-experiment-v1",
             "experiment_id": gate.experiment_id,
@@ -393,7 +394,12 @@ class JudgeService:
             "comparison": record.comparison.model_dump(mode="json"),
             "cohorts": [item.model_dump(mode="json") for item in record.snapshots],
             "gates": [item.model_dump(mode="json") for item in record.gates],
-            "patch": record.patch.model_dump(mode="json"),
+            "patch": {
+                **record.patch.model_dump(mode="json"),
+                "canonical_source_path": "demo/study-in-germany",
+                "disposition": "candidate_not_merged",
+                "diff": patch_diff,
+            },
             "codex": record.codex.model_dump(mode="json"),
             "mode": "prerecorded",
         }
