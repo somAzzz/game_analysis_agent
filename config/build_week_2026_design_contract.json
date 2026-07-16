@@ -1,0 +1,91 @@
+{
+  "schema_version": "build-week-design-intent-v1",
+  "contract_id": "build-week-2026-cashflow-stress-v1",
+  "approved_before_patch": true,
+  "approval_basis": {
+    "g2_review": "docs/reviews/openai_build_week_2026/G2-campaign.review.json",
+    "g2_review_sha256": "bdadb9fec83f94cc2ebe87a49610b4afec555cc1010dfd03e2e0df60fc0490f2",
+    "target": "config/build_week_2026_target.json",
+    "target_sha256": "3d871f195d6857f2f9839ac26b991b92dfce5a1cacf4ed304aa8b86094910e57",
+    "gates_sha256": "8f85db1daab8385d4bb6e70bdea605332c7ed67899b9ed6e89dab315468da002",
+    "personas_sha256": "b3734201edc44bbd523bfc0c60d9ed3f472f5d973100a9ca0baa76092bace692"
+  },
+  "selected_target": {
+    "cluster_id": "cashflow-stress-attractor",
+    "baseline_fixed_members": 18,
+    "baseline_fixed_personas": 6,
+    "acceptance_max_fixed_members": 12,
+    "minimum_holdout_relative_reduction": 0.25
+  },
+  "persona_intent": {
+    "newbie": "non_failure",
+    "study": "non_failure",
+    "money": "non_failure",
+    "social": "non_failure",
+    "visa": "non_failure",
+    "slacker": "failure_seeking"
+  },
+  "designed_failure_endings": [
+    "forced_departure",
+    "cashflow_collapse",
+    "living_imbalance",
+    "burnout_pause",
+    "registration_failure",
+    "academic_failure",
+    "work_law_trouble",
+    "romance_bankrupt",
+    "admin_collapse",
+    "mental_crash"
+  ],
+  "critical_invariants": {
+    "ending_id_empty": 0,
+    "pipeline_stalled": 0,
+    "stat_overflow": 0,
+    "stat_underflow": 0,
+    "crisis_success_ending": 0,
+    "social_success_under_survival_crisis": 0,
+    "academic_success_with_failed_courses": 0,
+    "visa_success_without_registration": 0,
+    "testdaf_pass_with_low_language": 0,
+    "aps_pass_with_low_aps_knowledge": 0
+  },
+  "protected_metrics": {
+    "minimum_valid_rate": 0.95,
+    "maximum_fallback_rate": 0.05,
+    "maximum_provider_error_rate": 0.05,
+    "maximum_persona_alignment_decline": 0.05,
+    "require_designed_failure_coverage": true,
+    "slacker_success_required": false
+  },
+  "allowed_mechanism_classes": [
+    "recurring_living_cost_drift",
+    "cashflow_crisis_stress_feedback",
+    "survival_recovery_action_effect"
+  ],
+  "change_budget": {
+    "maximum_changed_files": 2,
+    "maximum_changed_lines": 80,
+    "allowlist": [
+      "scripts/simulation/EconomyRules.gd",
+      "scripts/simulation/SimulationEngine.gd",
+      "scripts/tools/ValidateEconomyRules.gd",
+      "data/actions/generated_actions.json"
+    ],
+    "forbidden_paths": [
+      "config/gates.yaml",
+      "config/ci_gates.yaml",
+      "config/player_personas.yaml",
+      "config/build_week_2026_design_contract.json",
+      "tests",
+      "prompts"
+    ]
+  },
+  "non_goals": [
+    "Do not guarantee a successful ending for every persona.",
+    "Do not require the failure-seeking slacker persona to win.",
+    "Do not remove or weaken designed failure endings.",
+    "Do not change personas, prompts, tests, gates, or evidence thresholds.",
+    "Do not modify provider, campaign, Judge API, UI, or MCP behavior.",
+    "Do not optimize specifically for fixed or holdout seed values."
+  ]
+}
