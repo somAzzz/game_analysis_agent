@@ -9,6 +9,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from .platform_delivery import platform_contract_fingerprint
+
 G4_SCHEMA = "build-week-g4-review-v1"
 REQUIRED_PLATFORM_CHECKS = frozenset(
     {
@@ -106,12 +108,18 @@ def _ui(project: Path) -> dict[str, Any]:
 
 def _platform(project: Path) -> dict[str, Any]:
     review = _read(project / "docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json")
+    expected_contract = platform_contract_fingerprint(project)
+    if review.get("contract_sha256") != expected_contract:
+        raise G4ReviewError("platform evidence is stale for the current delivery contract")
     by_id = {item["id"]: item["status"] for item in review.get("checks", [])}
     absent = sorted(REQUIRED_PLATFORM_CHECKS - set(by_id))
     incomplete = sorted(item for item in REQUIRED_PLATFORM_CHECKS if by_id.get(item) != "passed")
     if absent or incomplete or review.get("status") != "passed":
         raise G4ReviewError(f"platform evidence incomplete: {incomplete or absent}")
-    return {"platform_checks_passed": len(REQUIRED_PLATFORM_CHECKS)}
+    return {
+        "platform_checks_passed": len(REQUIRED_PLATFORM_CHECKS),
+        "contract_sha256": expected_contract,
+    }
 
 
 def _image(project: Path) -> dict[str, Any]:
@@ -124,7 +132,15 @@ def _image(project: Path) -> dict[str, Any]:
     digest = str(value.get("index_digest", ""))
     if not digest.startswith("sha256:") or len(digest) != 71:
         raise G4ReviewError("published image index digest is invalid")
-    return {"reference": value.get("reference"), "index_digest": digest, "platforms": value["platforms"]}
+    contract = platform_contract_fingerprint(project)
+    if value.get("source_contract_sha256") != contract:
+        raise G4ReviewError("published image was not built from the current delivery contract")
+    return {
+        "reference": value.get("reference"),
+        "index_digest": digest,
+        "platforms": value["platforms"],
+        "source_contract_sha256": contract,
+    }
 
 
 def _command(cwd: Path, command: list[str]) -> dict[str, Any]:

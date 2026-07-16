@@ -7,6 +7,7 @@ import shutil
 from pathlib import Path
 
 from game_analysis_agent.build_week_g4 import REQUIRED_PLATFORM_CHECKS, review_g4
+from game_analysis_agent.platform_delivery import platform_contract_fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -26,6 +27,7 @@ def test_g4_passes_when_all_platform_rows_and_image_are_proven(tmp_path: Path) -
     review_path = project / "docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json"
     platform_review = json.loads(review_path.read_text(encoding="utf-8"))
     platform_review["status"] = "passed"
+    platform_review["contract_sha256"] = platform_contract_fingerprint(project)
     by_id = {item["id"]: item for item in platform_review["checks"]}
     for identifier in REQUIRED_PLATFORM_CHECKS:
         by_id[identifier]["status"] = "passed"
@@ -35,6 +37,7 @@ def test_g4_passes_when_all_platform_rows_and_image_are_proven(tmp_path: Path) -
             "status": "built_and_pushed", "reference": "registry/judge:tag",
             "index_digest": "sha256:" + "a" * 64,
             "platforms": ["linux/amd64", "linux/arm64"],
+            "source_contract_sha256": platform_contract_fingerprint(project),
         }),
         encoding="utf-8",
     )
@@ -43,3 +46,18 @@ def test_g4_passes_when_all_platform_rows_and_image_are_proven(tmp_path: Path) -
 
     assert review["status"] == "passed"
     assert review["failure_count"] == 0
+
+
+def test_g4_rejects_stale_platform_contract(tmp_path: Path) -> None:
+    project = tmp_path / "project"
+    shutil.copytree(ROOT, project, ignore=shutil.ignore_patterns(".git", ".venv", "node_modules", "dist", "reports"))
+    review_path = project / "docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json"
+    platform_review = json.loads(review_path.read_text(encoding="utf-8"))
+    platform_review["contract_sha256"] = "0" * 64
+    review_path.write_text(json.dumps(platform_review), encoding="utf-8")
+
+    review = review_g4(project_root=project, execute_commands=False)
+
+    platform = next(item for item in review["checks"] if item["id"] == "platform_delivery")
+    assert platform["status"] == "failed"
+    assert "stale" in platform["error"]

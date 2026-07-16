@@ -62,6 +62,7 @@ def test_multiarch_builder_requires_explicit_registry_and_both_native_platforms(
     assert "--push" in script
     assert "imagetools inspect" in script
     assert "built_and_pushed" in script
+    assert "source_contract_sha256" in script
 
 
 def test_linux_delivery_ci_runs_native_container_and_dashboard_smokes() -> None:

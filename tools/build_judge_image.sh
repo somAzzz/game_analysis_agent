@@ -25,7 +25,19 @@ case "$digest" in
   *) echo "registry did not return a valid image-index digest" >&2; exit 3 ;;
 esac
 
-python3 - "$OUTPUT" "$reference" "$digest" <<'PY'
+contract="$(python3 - <<'PY'
+import pathlib
+import sys
+
+root = pathlib.Path.cwd()
+sys.path.insert(0, str(root / "src"))
+from game_analysis_agent.platform_delivery import platform_contract_fingerprint
+
+print(platform_contract_fingerprint(root))
+PY
+)"
+
+python3 - "$OUTPUT" "$reference" "$digest" "$contract" <<'PY'
 import json
 import pathlib
 import sys
@@ -36,6 +48,7 @@ payload = {
     "reference": sys.argv[2],
     "index_digest": sys.argv[3],
     "platforms": ["linux/amd64", "linux/arm64"],
+    "source_contract_sha256": sys.argv[4],
     "status": "built_and_pushed",
 }
 path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
