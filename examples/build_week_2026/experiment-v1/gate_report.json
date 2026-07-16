@@ -1,0 +1,55 @@
+{
+  "artifacts": [
+    {
+      "bytes": 11176,
+      "path": "repair_experiment.json",
+      "sha256": "fc07008ef77c8fbf41593d4b17532293a5560ced1b88d3f27a62f68781e80c9a"
+    },
+    {
+      "bytes": 1136,
+      "path": "repair_summary.md",
+      "sha256": "33f8a65f3ab4d0f8db8822b537c5d374892dbd9ff21e2f95aa17eb74e1ac0764"
+    },
+    {
+      "bytes": 213,
+      "path": "comparison.json",
+      "sha256": "0766cd6bb3e1d200317b59937198d9ec7c3587fd3aa9f68091dc0639e90f867c"
+    },
+    {
+      "bytes": 4271,
+      "path": "patch.diff",
+      "sha256": "bacc310c1a2490af7f5833c526cb5e052c3436a9d60400df6588698f6f8c4d2d"
+    },
+    {
+      "bytes": 13782,
+      "path": "baseline/fixed.json",
+      "sha256": "a2cb9d3024fbf4c6795494cbdc52811845952074ff0b9dea95e637d6e9790cd2"
+    },
+    {
+      "bytes": 13814,
+      "path": "baseline/holdout.json",
+      "sha256": "0cd4ec4be3ea1f4dd35c4ca9d579ac10016250e9ad34cfae07759f7c6375a6c5"
+    },
+    {
+      "bytes": 13782,
+      "path": "patched/fixed.json",
+      "sha256": "2b6f55cda6dfa37a502c2e24d0a0ab4fca485d02e36e575579aa5a72aa54c832"
+    },
+    {
+      "bytes": 13824,
+      "path": "patched/holdout.json",
+      "sha256": "d09866309914bf9571320a6231f880d4babbea9e9756ae76eb7dc9f5573fb80c"
+    }
+  ],
+  "checks": [
+    "record_reparsed",
+    "four_cohorts_reparsed",
+    "patch_hash_verified",
+    "comparison_recomputed_by_record_schema",
+    "public_safety_scan_passed"
+  ],
+  "decision": "rejected",
+  "experiment_id": "cashflow-drift-repair-v1",
+  "schema_version": "repair-bundle-gate-v1",
+  "status": "passed"
+}
