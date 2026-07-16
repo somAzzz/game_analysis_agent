@@ -100,8 +100,8 @@ def analyze_coverage(
 
             flags = _true_flags(state.get("flags"))
             flags_seen.update(flags)
-            flag_set_transitions.update(flags - previous_flags)
-            flag_unset_transitions.update(previous_flags - flags)
+            flag_set_transitions.update(sorted(flags - previous_flags))
+            flag_unset_transitions.update(sorted(previous_flags - flags))
             previous_flags = flags
 
     regimes = []
@@ -143,12 +143,12 @@ def analyze_coverage(
             for (difficulty, policy, scenario), count in sorted(cell_counts.items())
         ],
         "state_regimes": regimes,
-        "regime_pair_coverage": dict(regime_pairs.most_common()),
+        "regime_pair_coverage": dict(_sorted_counts(regime_pairs)),
         "state_coverage": {
             "observed_keys": sorted(state_keys),
             "observed_flags": sorted(flags_seen),
-            "flag_set_transitions": dict(flag_set_transitions.most_common()),
-            "flag_unset_transitions": dict(flag_unset_transitions.most_common()),
+            "flag_set_transitions": dict(_sorted_counts(flag_set_transitions)),
+            "flag_unset_transitions": dict(_sorted_counts(flag_unset_transitions)),
         },
         "event_coverage": {
             "catalog_available": bool(catalog_event_ids),
@@ -161,7 +161,7 @@ def analyze_coverage(
             "unknown_observed_event_ids": sorted(observed_event_ids - catalog_event_ids)
             if catalog_event_ids
             else [],
-            "top_events": dict(event_counts.most_common(20)),
+            "top_events": dict(_sorted_counts(event_counts, limit=20)),
             "no_event_weeks": no_event_weeks,
         },
         "choice_coverage": {
@@ -177,7 +177,7 @@ def analyze_coverage(
             else [],
             "selected": [
                 {"event_id": event_id, "choice_id": choice_id, "count": count}
-                for (event_id, choice_id), count in choice_counts.most_common()
+                for (event_id, choice_id), count in _sorted_counts(choice_counts)
             ],
         },
         "action_coverage": {
@@ -192,7 +192,7 @@ def analyze_coverage(
             "unknown_observed_action_ids": sorted(observed_action_ids - action_denominator)
             if action_denominator
             else [],
-            "top_actions": dict(action_counts.most_common(20)),
+            "top_actions": dict(_sorted_counts(action_counts, limit=20)),
         },
         "data_quality": {
             "malformed_runs": malformed_runs,
@@ -205,6 +205,13 @@ def analyze_coverage(
 def write_coverage_report(report: dict[str, Any], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _sorted_counts(
+    counter: Counter[Any], *, limit: int | None = None
+) -> list[tuple[Any, int]]:
+    ordered = sorted(counter.items(), key=lambda item: (-item[1], item[0]))
+    return ordered if limit is None else ordered[:limit]
 
 
 def analyze_and_write_coverage(

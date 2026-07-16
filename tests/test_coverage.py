@@ -109,6 +109,10 @@ def test_analyze_coverage_reports_catalog_branch_action_and_flag_gaps() -> None:
         "arrived": 1,
         "registered": 1,
     }
+    assert list(report["state_coverage"]["flag_set_transitions"]) == [
+        "arrived",
+        "registered",
+    ]
     assert report["regime_pair_coverage"]["high_stress+low_energy"] == 1
 
 
