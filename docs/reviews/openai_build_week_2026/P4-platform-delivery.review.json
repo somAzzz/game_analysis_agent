@@ -1,7 +1,8 @@
 {
   "schema_version": "build-week-platform-review-v1",
-  "reviewed_at": "2026-07-16T19:18:00+02:00",
-  "source_revision": "73f4274dcb153570c69733a2e4deb42ea43253ec",
+  "reviewed_at": "2026-07-16T17:49:15Z",
+  "source_revision": "f4b554eed7e7bf29058f94c16c29e9abd3ca0ff4",
+  "contract_sha256": "7eb34461cab63ad48e246551ff8471c36cb839aee03bffb58a797f363f7c91f9",
   "status": "partial",
   "platform": {
     "system": "macOS",
@@ -25,25 +26,29 @@
       "id": "macos_system_python_inspect",
       "status": "passed",
       "command": "./judge --mode inspect --offline --json --output-dir -",
-      "claim": "dependency-free Inspect works on the host system Python"
+      "claim": "dependency-free Inspect works on the host system Python",
+      "evidence": "platform-evidence/macos-native.json"
     },
     {
       "id": "macos_locked_replay",
       "status": "passed",
       "command": "./judge --mode replay --offline --json --output-dir -",
-      "claim": "locked offline Replay works without Docker, network, GPU, key, or sibling game checkout"
+      "claim": "locked offline Replay works without Docker, network, GPU, key, or sibling game checkout",
+      "evidence": "platform-evidence/macos-native.json"
     },
     {
       "id": "macos_idempotent_setup",
       "status": "passed",
       "command": "EVALUATOR_OFFLINE=1 scripts/setup-evaluator (twice)",
-      "claim": "cached locked evaluator setup is idempotent and rebuilds the public UI"
+      "claim": "cached locked evaluator setup is idempotent and rebuilds the public UI",
+      "evidence": "platform-evidence/macos-native.json"
     },
     {
       "id": "macos_native_ui_api",
       "status": "passed",
       "command": "tools/run_judge_api.py plus provider, experiment, root, and report-route HTTP probes",
-      "claim": "same-origin native Judge UI/API runs on macOS arm64"
+      "claim": "same-origin native Judge UI/API runs on macOS arm64",
+      "evidence": "platform-evidence/macos-native.json"
     },
     {
       "id": "macos_container_dashboard_optional",
@@ -53,9 +58,10 @@
     },
     {
       "id": "macos_pinned_real_godot",
-      "status": "pending_refresh",
-      "reason": "The repository-local SHA-512-pinned Godot 4.4 toolchain is installed and G0 used it, but P4 still needs a fresh acceptance record at the release revision.",
-      "remediation": "Source .tools/build-week/env.sh, run the real-game doctor and fresh acceptance, then attach the dated artifact and revision."
+      "status": "passed",
+      "command": "Pinned real-game doctor plus a clean two-run/four-week seed-4242 Godot trace",
+      "claim": "native macOS execution uses the SHA-512-pinned Godot 4.4 runtime and packaged canonical game",
+      "evidence": "platform-evidence/macos-native.json"
     },
     {
       "id": "live_openai_campaign",

@@ -1,0 +1,89 @@
+{
+  "schema_version": "build-week-platform-evidence-v1",
+  "mode": "macos-native",
+  "status": "passed",
+  "executed_at": "2026-07-16T17:49:15Z",
+  "source_revision": "f4b554eed7e7bf29058f94c16c29e9abd3ca0ff4",
+  "source_dirty": false,
+  "source_contract_sha256": "7eb34461cab63ad48e246551ff8471c36cb839aee03bffb58a797f363f7c91f9",
+  "platform": {
+    "system": "macOS",
+    "version": "26.5.2",
+    "kernel": "Darwin 25.5.0",
+    "architecture": "arm64"
+  },
+  "toolchain": {
+    "system_python": "3.9.6",
+    "locked_python": "3.12.13",
+    "node": "20.20.2",
+    "npm": "10.8.2",
+    "uv": "0.11.23",
+    "godot": "4.4.stable.official.4c311cbee"
+  },
+  "checks": [
+    {
+      "id": "macos_system_python_inspect",
+      "status": "passed",
+      "command": "/usr/bin/python3 tools/judge_doctor.py --mode inspect --json; ./judge --mode inspect --offline --json --output-dir -"
+    },
+    {
+      "id": "macos_locked_replay",
+      "status": "passed",
+      "command": "./judge --mode replay --offline --json --output-dir -"
+    },
+    {
+      "id": "macos_idempotent_setup",
+      "status": "passed",
+      "command": "EVALUATOR_OFFLINE=1 scripts/setup-evaluator (twice)"
+    },
+    {
+      "id": "macos_native_ui_api",
+      "status": "passed",
+      "command": "tools/run_judge_api.py plus provider-status, experiment, root HTML HTTP probes"
+    },
+    {
+      "id": "macos_pinned_real_godot",
+      "status": "passed",
+      "command": "tools/judge_doctor.py --mode real-game; run_gameplay_agent.py sim --runs 2 --weeks 4 --seed 4242",
+      "detail": "Two clean-worktree runs used the packaged study-in-germany revision 348b9fd5501e71ebc7142e10f9068fc1490b5124 and pinned native Godot 4.4."
+    }
+  ],
+  "artifact_digests": [
+    {
+      "name": "doctor-dashboard-native.json",
+      "sha256": "52eb774a92fe3b42bf7dd6d345cbcc306523d29ae43a2ee82d8a8d18275e062f"
+    },
+    {
+      "name": "doctor-inspect.json",
+      "sha256": "9ac0addcdc30fe76fff926dcc7894ca54260799afadb1f61a24470eb5edd8313"
+    },
+    {
+      "name": "doctor-real-game.json",
+      "sha256": "cb07b3ac40b925439fc70f0cbba5f8bf03ade2ccf4694e7c5c800b3c83de1bfe"
+    },
+    {
+      "name": "judge-inspect.json",
+      "sha256": "51a6ffff9ff4ebdb4185245403a4b0a7e2b293966f78edd83940b6d47e29dfe6"
+    },
+    {
+      "name": "judge-replay.json",
+      "sha256": "90c110b41fbb34a372e2a18061d6b40a8ae9e3da947638735588b09f11098c22"
+    },
+    {
+      "name": "fresh-godot/raw_runs.jsonl",
+      "sha256": "bb26a08dbee138c5136d6505b278e3cf16479fb6bfd45dc847afc5892b13c04e"
+    },
+    {
+      "name": "fresh-godot/report_manifest.json",
+      "sha256": "f4a353f81c0cee8e61e587bdac5271f15dc942208f2ff8c51667ca18548fef5a"
+    },
+    {
+      "name": "provider-status.json",
+      "sha256": "2b99202a690480de9bf52d83381ba827ba00811cd45134f08a56fc243626c31d"
+    },
+    {
+      "name": "experiment.json",
+      "sha256": "06b4934f0702f7221070752c2b62579955a218adfac9ac09403078b174e5e419"
+    }
+  ]
+}
