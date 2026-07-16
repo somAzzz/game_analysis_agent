@@ -470,6 +470,10 @@ def _write_jsonl(path: Path, rows: list[BaseModel]) -> None:
 __all__ = [
     "CampaignBundleError",
     "CampaignBundleGate",
+    "PublicAgentEval",
+    "PublicFailureClusters",
+    "PublicPersonaCall",
+    "PublicPersonaRun",
     "build_public_campaign_bundle",
     "verify_public_campaign_bundle",
 ]
