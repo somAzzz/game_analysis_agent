@@ -16,11 +16,34 @@ def test_current_g4_fails_only_unproven_release_evidence() -> None:
     review = review_g4(project_root=ROOT, execute_commands=False)
 
     assert review["status"] == "failed"
-    assert review["failures"] == ["platform_delivery", "published_multiarch_image"]
+    assert review["failures"] == ["platform_delivery"]
     platform = next(item for item in review["checks"] if item["id"] == "platform_delivery")
     assert "platform evidence" in platform["error"]
     assert review["checks"][0]["status"] == "passed"
     assert review["checks"][1]["status"] == "passed"
+    image = next(
+        item for item in review["checks"] if item["id"] == "published_multiarch_image"
+    )
+    assert image["status"] == "passed"
+    assert image["evidence"]["source_contract_sha256"] == (
+        platform_contract_fingerprint(ROOT)
+    )
+
+
+def test_g4_rejects_stale_published_image_contract(tmp_path: Path) -> None:
+    project = tmp_path / "project"
+    shutil.copytree(
+        ROOT,
+        project,
+        ignore=shutil.ignore_patterns(".git", ".venv", "node_modules", "dist", "reports"),
+    )
+    metadata_path = project / "judge-image-metadata.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    metadata["source_contract_sha256"] = "0" * 64
+    metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+
+    review = review_g4(project_root=project, execute_commands=False)
+
     image = next(
         item for item in review["checks"] if item["id"] == "published_multiarch_image"
     )
