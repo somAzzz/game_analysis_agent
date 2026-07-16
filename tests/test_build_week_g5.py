@@ -84,6 +84,8 @@ def test_complete_synthetic_submission_can_pass_all_g5_checks(tmp_path: Path) ->
     replacements = {
         "{{REPOSITORY_URL}}": "https://example.com/repository",
         "{{PUBLIC_UI_URL}}": "https://example.com/ui",
+        "https://github.com/somAzzz/game_analysis_agent": "https://example.com/repository",
+        "https://somazzz.github.io/game_analysis_agent/": "https://example.com/ui",
         "{{YOUTUBE_URL}}": "https://youtube.com/watch?v=example",
         "{{IMAGE_REFERENCE_AND_DIGEST}}": f"{image_ref}@{digest}",
     }

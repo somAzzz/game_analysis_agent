@@ -70,8 +70,8 @@ Core Codex task: 019f6816-fe0d-78a2-9001-1890b32ef820.
 
 ## Links (release blockers)
 
-- Repository: `{{REPOSITORY_URL}}`
-- Public Judge UI: `{{PUBLIC_UI_URL}}`
+- Repository: [github.com/somAzzz/game_analysis_agent](https://github.com/somAzzz/game_analysis_agent)
+- Public Judge UI: [somazzz.github.io/game_analysis_agent](https://somazzz.github.io/game_analysis_agent/)
 - YouTube demo under 3:00: `{{YOUTUBE_URL}}`
 - Published Judge image: `{{IMAGE_REFERENCE_AND_DIGEST}}`
 

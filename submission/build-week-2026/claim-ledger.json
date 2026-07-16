@@ -83,6 +83,7 @@
     {"id": "live_openai_campaign", "status": "not_run", "required_artifact": "redacted server-side provider/campaign record"},
     {"id": "clean_room_reviewer", "status": "not_run", "required_artifact": "dated non-builder review"},
     {"id": "video_url", "status": "missing", "required_artifact": "signed-out-accessible public or unlisted YouTube URL under 3:00"},
-    {"id": "repository_url", "status": "missing", "required_artifact": "judge-accessible repository URL"}
+    {"id": "repository_url", "status": "completed", "required_artifact": "public repository verified at https://github.com/somAzzz/game_analysis_agent on 2026-07-16"},
+    {"id": "public_ui_url", "status": "completed", "required_artifact": "HTTPS GitHub Pages URL returned HTTP 200 on 2026-07-16"}
   ]
 }
