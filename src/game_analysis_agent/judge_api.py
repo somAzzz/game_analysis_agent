@@ -387,6 +387,7 @@ class JudgeService:
             "hypothesis": record.plan.hypothesis,
             "mechanism_class": record.plan.mechanism_class,
             "comparison": record.comparison.model_dump(mode="json"),
+            "cohorts": [item.model_dump(mode="json") for item in record.snapshots],
             "gates": [item.model_dump(mode="json") for item in record.gates],
             "patch": record.patch.model_dump(mode="json"),
             "codex": record.codex.model_dump(mode="json"),

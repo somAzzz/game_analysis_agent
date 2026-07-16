@@ -8,12 +8,20 @@ import type {
   DecisionGraphManifest,
   FrontManifest,
   IssueManifest,
+  JudgeExperiment,
+  JudgeProviderStatus,
 } from "@/types";
 
 const apiMocks = vi.hoisted(() => ({
   fetchFrontManifest: vi.fn(),
   fetchIssueManifest: vi.fn(),
   fetchDecisionGraphManifest: vi.fn(),
+  fetchJudgeProviderStatus: vi.fn(),
+  fetchJudgeExperiment: vi.fn(),
+  fetchStaticJudgeExperiment: vi.fn(),
+  testJudgeProvider: vi.fn(),
+  createJudgeCampaign: vi.fn(),
+  fetchJudgeCampaign: vi.fn(),
 }));
 
 vi.mock("@/lib/api", () => apiMocks);
@@ -153,6 +161,49 @@ const graphManifest: DecisionGraphManifest = {
   },
 };
 
+const providerStatus: JudgeProviderStatus = {
+  schema_version: "judge-provider-status-v1",
+  providers: {
+    replay: { status: "available", mode: "prerecorded", requires_api_key: false, requires_game_runtime: false },
+    openai: {
+      status: "unavailable", mode: "live", model: "gpt-5.6-luna", requires_api_key: true,
+      api_key_configured: false, game_runtime_configured: false, live_campaign_ready: false,
+    },
+  },
+};
+
+const experiment: JudgeExperiment = {
+  schema_version: "judge-public-experiment-v1",
+  experiment_id: "cashflow-drift-repair-v1",
+  status: "passed",
+  decision: "rejected",
+  decision_reason: "Repair rejected because required proof failed: fixed_target, holdout_target",
+  hypothesis: "Recurring survival-economy drift depletes spendable cash faster than persona strategies recover.",
+  mechanism_class: "recurring_living_cost_drift",
+  comparison: { fixed_member_delta: 0, fixed_relative_reduction: 0, holdout_member_delta: 0, holdout_relative_reduction: 0 },
+  cohorts: [
+    ["baseline_fixed", 0], ["patched_fixed", 18], ["baseline_holdout", 0], ["patched_holdout", 61],
+  ].map(([name, money]) => ({
+    cohort: name as "baseline_fixed", game_commit: "a".repeat(40), seeds: [42, 43, 44], cells: 18,
+    weeks: 342, target_members: 18, target_personas: 6, mean_final_money: money as number,
+    mean_max_stress: 100, valid_rate: 1, fallback_rate: 0, provider_error_rate: 0,
+    persona_alignment_rate: .5, ending_counts: { cashflow_collapse: 18 },
+  })),
+  gates: [
+    { gate_id: "fixed_target", status: "failed", detail: "18 <= 12", evidence_paths: [] },
+    { gate_id: "decision_validity", status: "passed", detail: "validity threshold met", evidence_paths: [] },
+  ],
+  patch: {
+    patched_commit: "b".repeat(40), mechanism_class: "recurring_living_cost_drift",
+    modified_paths: ["scripts/simulation/SimulationEngine.gd"], changed_files: 1, added_lines: 35, deleted_lines: 5,
+  },
+  codex: {
+    task_reference: "task", feedback_session_id: "session", model: "codex-runtime", skill: "playtest-forge",
+    hypothesis_owned_by_codex: true, patch_owned_by_codex: true, decision_owned_by_codex: true,
+  },
+  mode: "prerecorded",
+};
+
 function renderRoute(path: string) {
   return render(
     <MemoryRouter
@@ -170,11 +221,45 @@ describe("application routes", () => {
     apiMocks.fetchFrontManifest.mockResolvedValue(frontManifest);
     apiMocks.fetchIssueManifest.mockResolvedValue(issueManifest);
     apiMocks.fetchDecisionGraphManifest.mockResolvedValue(graphManifest);
+    apiMocks.fetchJudgeProviderStatus.mockResolvedValue(providerStatus);
+    apiMocks.fetchJudgeExperiment.mockResolvedValue(experiment);
+    apiMocks.fetchStaticJudgeExperiment.mockResolvedValue(experiment);
+  });
+
+  it("tells the complete Campaign Repair Proof story on the evaluator route", async () => {
+    renderRoute("/");
+
+    expect(await screen.findByRole("heading", { name: /A patch passed its unit test/i })).toBeInTheDocument();
+    expect(screen.getByText(/prerecorded evidence/i)).toBeInTheDocument();
+    expect(screen.getByText("CAMPAIGN")).toBeInTheDocument();
+    expect(screen.getByText("REPAIR")).toBeInTheDocument();
+    expect(screen.getByText("PROOF")).toBeInTheDocument();
+    expect(screen.getAllByText("REJECTED").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("18/18").length).toBeGreaterThanOrEqual(3);
+    expect(screen.getByText(/OpenAI live subagent/i)).toBeInTheDocument();
+  });
+
+  it("runs the bounded Replay action from Judge Mode", async () => {
+    const user = userEvent.setup();
+    const created = {
+      campaign_id: "judge-demo123", status: "completed", mode: "prerecorded",
+      request: { provider: "replay", personas: ["newbie"], seeds: [42], max_weeks: 3 },
+      created_at: "2026-07-16T10:00:00Z", updated_at: "2026-07-16T10:00:01Z",
+      result: { completed_cells: 18, total_weeks: 342, valid_rate: 1 }, error: null,
+    };
+    apiMocks.createJudgeCampaign.mockResolvedValue(created);
+    apiMocks.fetchJudgeCampaign.mockResolvedValue(created);
+    renderRoute("/");
+
+    await user.click(await screen.findByRole("button", { name: /Run bounded campaign/i }));
+    expect(apiMocks.createJudgeCampaign).toHaveBeenCalledWith("replay");
+    expect(await screen.findByText(/campaign completed with evidence attached/i)).toBeInTheDocument();
+    expect(screen.getByText(/judge-demo123/i)).toBeInTheDocument();
   });
 
   it("renders the report index and filters cards with search and severity controls", async () => {
     const user = userEvent.setup();
-    renderRoute("/");
+    renderRoute("/reports");
 
     expect(
       await screen.findByRole("heading", { name: /The Analysis Console/i }),
@@ -199,7 +284,7 @@ describe("application routes", () => {
 
   it("navigates from a report card to the issue page", async () => {
     const user = userEvent.setup();
-    renderRoute("/");
+    renderRoute("/reports");
 
     await user.click(
       await screen.findByRole("link", { name: /Calm Route/i }),
@@ -241,16 +326,14 @@ describe("application routes", () => {
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("link", { name: /Back to the front page/i }));
-    expect(
-      await screen.findByRole("heading", { name: /The Analysis Console/i }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /A patch passed its unit test/i })).toBeInTheDocument();
   });
 
   it("shows a useful front-page loading failure", async () => {
     apiMocks.fetchFrontManifest.mockRejectedValue(
       new Error("manifest service unavailable"),
     );
-    renderRoute("/");
+    renderRoute("/reports");
 
     expect(
       await screen.findByRole("heading", { name: "Failed to load manifest" }),

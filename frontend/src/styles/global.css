@@ -1295,3 +1295,196 @@ main {
     margin-top: 10px;
   }
 }
+
+/* Judge Mode — a dark evidence ledger, intentionally separate from the archive. */
+.judge-shell {
+  --judge-bg: #071318;
+  --judge-panel: #0c1d23;
+  --judge-ink: #edf7f3;
+  --judge-muted: #9bb0af;
+  --judge-rule: #294249;
+  --judge-cyan: #77ddd4;
+  --judge-amber: #f2c66d;
+  --judge-red: #ff665f;
+  min-height: 100vh;
+  color: var(--judge-ink);
+  background:
+    linear-gradient(90deg, transparent 0 47px, rgba(119, 221, 212, 0.08) 48px, transparent 49px),
+    linear-gradient(rgba(119, 221, 212, 0.035) 1px, transparent 1px),
+    var(--judge-bg);
+  background-size: 100% 100%, 100% 32px, auto;
+  font-family: var(--mono);
+  font-size: 14px;
+}
+
+.judge-shell a { border-color: var(--judge-rule); }
+.judge-shell a:hover { border-color: var(--judge-cyan); }
+
+.judge-nav {
+  min-height: 72px;
+  padding: 0 clamp(24px, 5vw, 76px);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
+  align-items: center;
+  border-bottom: 1px solid var(--judge-rule);
+  color: var(--judge-muted);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.judge-nav > :last-child { justify-self: end; }
+.judge-wordmark { color: var(--judge-cyan); font-weight: 600; letter-spacing: 0.2em; }
+
+.judge-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 38px 60px;
+  padding: clamp(64px, 9vw, 126px) clamp(24px, 7vw, 108px) 72px;
+  border-bottom: 1px solid var(--judge-rule);
+  position: relative;
+}
+
+.judge-kicker,
+.judge-eyebrow {
+  margin: 0 0 20px;
+  color: var(--judge-cyan);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.judge-hero h1 {
+  max-width: 1000px;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(47px, 7.2vw, 104px);
+  font-variation-settings: "opsz" 120, "wght" 440, "SOFT" 22;
+  letter-spacing: -0.045em;
+  line-height: 0.93;
+}
+
+.judge-hero h1 em { color: var(--judge-red); font-weight: 340; }
+
+.judge-verdict {
+  align-self: end;
+  padding: 16px 0;
+  border-top: 1px solid var(--judge-red);
+  border-bottom: 1px solid var(--judge-red);
+  text-transform: uppercase;
+}
+
+.judge-verdict span,
+.judge-verdict small { display: block; color: var(--judge-muted); font-size: 9px; letter-spacing: 0.15em; }
+.judge-verdict strong { display: block; margin: 6px 0; color: var(--judge-red); font-size: 30px; letter-spacing: 0.1em; }
+.judge-verdict small { overflow-wrap: anywhere; text-transform: none; letter-spacing: 0; }
+.judge-thesis { max-width: 760px; margin: 0; color: #c5d5d2; font-family: var(--body); font-size: 20px; line-height: 1.55; }
+.judge-mode { margin: auto 0 0; color: var(--judge-muted); font-size: 10px; line-height: 1.6; text-transform: uppercase; }
+.judge-mode span { color: var(--judge-amber); }
+
+main.judge-ledger { max-width: none; margin: 0; padding: 0 clamp(24px, 7vw, 108px) 110px; }
+.judge-stage { display: grid; grid-template-columns: 130px minmax(0, 1fr); border-bottom: 1px solid var(--judge-rule); }
+.judge-stage-marker { padding: 70px 25px 0 0; border-right: 1px solid var(--judge-rule); }
+.judge-stage-marker span { display: block; color: var(--judge-cyan); font-family: var(--serif); font-size: 52px; line-height: 1; }
+.judge-stage-marker b { display: block; margin-top: 10px; color: var(--judge-muted); font-size: 10px; letter-spacing: 0.22em; }
+.judge-stage-body { min-width: 0; padding: 72px 0 80px clamp(30px, 5vw, 78px); }
+.judge-stage-body h2 { margin: 0 0 36px; max-width: 860px; font-family: var(--serif); font-size: clamp(36px, 5vw, 67px); font-weight: 420; letter-spacing: -0.025em; line-height: 1; }
+.judge-copy { max-width: 850px; color: var(--judge-muted); font-family: var(--body); font-size: 17px; line-height: 1.55; }
+
+.judge-metrics { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--judge-rule); border-bottom: 1px solid var(--judge-rule); }
+.judge-metrics > div { padding: 26px 20px 25px 0; border-right: 1px solid var(--judge-rule); }
+.judge-metrics > div:not(:first-child) { padding-left: 20px; }
+.judge-metrics > div:last-child { border-right: 0; }
+.judge-metrics strong { display: block; font-family: var(--serif); font-size: clamp(34px, 4vw, 57px); font-weight: 460; line-height: 1; }
+.judge-metrics span { display: block; margin-top: 9px; color: var(--judge-muted); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; }
+.judge-metrics .is-danger strong { color: var(--judge-red); }
+
+.judge-console { margin-top: 34px; padding: 26px; border: 1px solid var(--judge-rule); background: rgba(12, 29, 35, 0.86); }
+.judge-console fieldset { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; border: 0; }
+.judge-console legend { margin-bottom: 14px; color: var(--judge-muted); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; }
+.judge-console label { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; padding: 15px; border: 1px solid var(--judge-rule); cursor: pointer; }
+.judge-console label.is-selected { border-color: var(--judge-cyan); background: rgba(119, 221, 212, 0.06); }
+.judge-console label input { grid-row: 1 / span 2; accent-color: var(--judge-cyan); }
+.judge-console label span { font-weight: 600; }
+.judge-console label small { color: var(--judge-muted); }
+.judge-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.judge-console button { padding: 11px 15px; border: 1px solid var(--judge-rule); font: 600 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+.judge-console button:disabled { cursor: not-allowed; opacity: 0.4; }
+.judge-button-secondary { color: var(--judge-ink); background: transparent; }
+.judge-button-primary { color: var(--judge-bg); background: var(--judge-cyan); border-color: var(--judge-cyan) !important; }
+.judge-activity { min-height: 18px; margin: 18px 0 0; color: var(--judge-amber); font-size: 11px; line-height: 1.5; }
+.judge-job { margin: 8px 0 0; color: var(--judge-muted); font-size: 10px; overflow-wrap: anywhere; }
+
+.judge-stage blockquote { max-width: 900px; margin: 0 0 34px; padding: 24px 0 24px 30px; border-left: 3px solid var(--judge-cyan); color: #c5d5d2; font-family: var(--body); font-size: 19px; line-height: 1.55; }
+.judge-patch { position: relative; display: grid; grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr); gap: 35px; min-height: 190px; padding: 30px; border: 1px solid var(--judge-rule); background: #0a191e; overflow: hidden; }
+.judge-patch span, .judge-patch code { display: block; color: var(--judge-muted); font-size: 10px; text-transform: uppercase; }
+.judge-patch strong { display: block; margin: 14px 0; color: var(--judge-amber); font-size: 19px; }
+.judge-patch ul { margin: 0; padding: 0; list-style: none; color: var(--judge-muted); font-size: 11px; line-height: 2; overflow-wrap: anywhere; }
+.judge-patch li::before { content: "+ "; color: var(--judge-cyan); }
+.judge-stamp { position: absolute; right: 4%; top: 36%; padding: 8px 16px; border: 5px double var(--judge-red); color: var(--judge-red); font: 700 clamp(30px, 5vw, 62px)/1 var(--mono); letter-spacing: .08em; transform: rotate(-8deg); opacity: .92; text-shadow: 0 0 20px #071318; }
+.judge-provenance { display: grid; grid-template-columns: repeat(3, 1fr); margin: 30px 0 0; border-top: 1px solid var(--judge-rule); }
+.judge-provenance div { padding: 18px 18px 0 0; }
+.judge-provenance dt { color: var(--judge-muted); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+.judge-provenance dd { margin: 7px 0 0; overflow-wrap: anywhere; }
+
+.judge-comparison { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.judge-comparison article { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; padding: 25px; border: 1px solid var(--judge-rule); }
+.judge-comparison h3, .judge-comparison p { grid-column: 1 / -1; margin: 0; }
+.judge-comparison h3 { color: var(--judge-muted); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+.judge-outcome span, .judge-outcome small { display: block; color: var(--judge-muted); font-size: 9px; text-transform: uppercase; }
+.judge-outcome strong { display: block; margin: 4px 0; font-family: var(--serif); font-size: 43px; }
+.judge-arrow { color: var(--judge-cyan); font-size: 24px; }
+.judge-comparison p { padding-top: 15px; border-top: 1px solid var(--judge-rule); color: var(--judge-muted); }
+.judge-comparison p b { color: var(--judge-red); }
+.judge-gates { margin-top: 28px; }
+.judge-gates h3 { color: var(--judge-muted); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; }
+.judge-gates ol { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--judge-rule); }
+.judge-gates li { display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; min-height: 58px; border-bottom: 1px solid var(--judge-rule); }
+.judge-gates li > span { font-size: 22px; }
+.judge-gates li b { display: block; font-size: 11px; text-transform: uppercase; }
+.judge-gates li small { display: block; margin-top: 4px; color: var(--judge-muted); }
+.judge-gates li em { font-size: 9px; font-style: normal; letter-spacing: .12em; text-transform: uppercase; }
+.judge-gates li.passed > span, .judge-gates li.passed em { color: var(--judge-cyan); }
+.judge-gates li.failed > span, .judge-gates li.failed em { color: var(--judge-red); }
+.judge-decision { display: grid; grid-template-columns: auto auto 1fr; gap: 15px 26px; align-items: baseline; margin: 34px 0 0; padding: 22px; border: 1px solid var(--judge-red); color: var(--judge-muted); }
+.judge-decision span { color: var(--judge-muted); font-size: 9px; text-transform: uppercase; }
+.judge-decision strong { color: var(--judge-red); font-size: 24px; letter-spacing: .1em; text-transform: uppercase; }
+.judge-loading { padding: 15vh 8vw; }
+.judge-loading h1 { font-family: var(--serif); font-size: clamp(40px, 7vw, 84px); font-weight: 420; }
+.judge-shell + .colophon { background: var(--ink); color: var(--paper); border-color: #294249; }
+
+.judge-shell button:focus-visible,
+.judge-shell a:focus-visible,
+.judge-shell input:focus-visible { outline: 3px solid var(--judge-amber); outline-offset: 3px; }
+
+@media (max-width: 860px) {
+  .judge-nav { grid-template-columns: 1fr auto; }
+  .judge-nav > span { display: none; }
+  .judge-hero { grid-template-columns: 1fr; }
+  .judge-verdict { max-width: 300px; }
+  .judge-stage { grid-template-columns: 70px minmax(0, 1fr); }
+  .judge-stage-marker { padding-right: 12px; }
+  .judge-stage-marker span { font-size: 37px; }
+  .judge-stage-marker b { writing-mode: vertical-rl; }
+  .judge-metrics { grid-template-columns: repeat(2, 1fr); }
+  .judge-metrics > div:nth-child(2) { border-right: 0; }
+  .judge-comparison { grid-template-columns: 1fr; }
+  .judge-patch { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  main.judge-ledger { padding-left: 18px; padding-right: 18px; }
+  .judge-stage { grid-template-columns: 1fr; }
+  .judge-stage-marker { padding: 45px 0 0; border-right: 0; }
+  .judge-stage-marker span, .judge-stage-marker b { display: inline-block; margin-right: 12px; writing-mode: initial; }
+  .judge-stage-body { padding: 25px 0 60px; }
+  .judge-console fieldset, .judge-provenance { grid-template-columns: 1fr; }
+  .judge-actions { flex-direction: column; }
+  .judge-actions button { width: 100%; }
+  .judge-decision { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}

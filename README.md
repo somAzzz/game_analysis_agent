@@ -32,9 +32,10 @@ bug discovery, value analysis, quality gates, and interactive LLM playtesting.
 **Open the public dashboard:**  
 **[https://somazzz.github.io/game_analysis_agent/](https://somazzz.github.io/game_analysis_agent/)**
 
-The GitHub Pages demo uses sanitized report data, so reviewers can inspect the
-dashboard and decision-graph experience without running Godot, local LLMs, or
-private game assets.
+The GitHub Pages root is the sanitized Campaign → Repair → Proof Judge story;
+the report and decision-graph archive remains under `/reports`. Static hosting
+is clearly labeled prerecorded evidence and needs no Godot, local LLM, API key,
+or private game assets.
 
 The agent is not embedded in the game runtime as an NPC. Instead, it runs beside
 the game as a QA and design-review system:

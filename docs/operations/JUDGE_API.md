@@ -4,6 +4,7 @@ The minimal Judge API serves the built frontend and a bounded `/api` surface
 from one origin:
 
 ```bash
+cd frontend && npm run build:public && cd ..
 uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080
 ```
 
@@ -70,3 +71,17 @@ All failures return:
 ```
 
 SDK exceptions and environment values are not serialized.
+
+## Frontend states
+
+The root route is the evaluator narrative: Campaign → Repair → Proof. Replay
+is the deterministic default; OpenAI is selectable only when the server says
+the restricted key and game runtime are ready. The browser has no key input.
+Campaign status and typed remediation are announced through an accessible live
+region, and pass/fail states use text and symbols in addition to color.
+
+`tools/build_judge_frontend_demo.py` regenerates the sanitized static fixture
+from the verified public repair bundle. `npm run prepare:public` copies it into
+the build beside the legacy report archive. If `/api/experiments/...` is
+unreachable, the UI loads that fixture, labels the page `Static evaluator
+copy`, and disables campaign controls rather than simulating success.

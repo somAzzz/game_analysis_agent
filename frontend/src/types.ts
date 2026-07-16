@@ -196,3 +196,101 @@ export interface GraphPayload {
     event_index: Record<string, DecisionGraphEvent>;
   };
 }
+
+export type JudgeProvider = "replay" | "openai";
+export type JudgeJobStatus = "queued" | "running" | "completed" | "failed" | "cancelled";
+
+export interface JudgeProviderStatus {
+  schema_version: string;
+  providers: {
+    replay: {
+      status: "available";
+      mode: "prerecorded";
+      requires_api_key: false;
+      requires_game_runtime: false;
+    };
+    openai: {
+      status: "available" | "unavailable";
+      mode: "live";
+      model: string;
+      requires_api_key: true;
+      api_key_configured: boolean;
+      game_runtime_configured: boolean;
+      live_campaign_ready: boolean;
+    };
+  };
+}
+
+export interface JudgeCampaignJob {
+  campaign_id: string;
+  status: JudgeJobStatus;
+  mode: "prerecorded" | "live";
+  request: {
+    provider: JudgeProvider;
+    personas: string[];
+    seeds: number[];
+    max_weeks: number;
+  };
+  created_at: string;
+  updated_at: string;
+  result: Record<string, unknown> | null;
+  error: { code: string; message: string; remediation: string } | null;
+}
+
+export interface JudgeCohort {
+  cohort: "baseline_fixed" | "patched_fixed" | "baseline_holdout" | "patched_holdout";
+  game_commit: string;
+  seeds: number[];
+  cells: number;
+  weeks: number;
+  target_members: number;
+  target_personas: number;
+  mean_final_money: number | null;
+  mean_max_stress: number | null;
+  valid_rate: number;
+  fallback_rate: number;
+  provider_error_rate: number;
+  persona_alignment_rate: number | null;
+  ending_counts: Record<string, number>;
+}
+
+export interface JudgeExperiment {
+  schema_version: string;
+  experiment_id: string;
+  status: string;
+  decision: "accepted" | "rejected";
+  decision_reason: string;
+  hypothesis: string;
+  mechanism_class: string;
+  comparison: {
+    fixed_member_delta: number;
+    fixed_relative_reduction: number;
+    holdout_member_delta: number;
+    holdout_relative_reduction: number;
+  };
+  cohorts: JudgeCohort[];
+  gates: {
+    gate_id: string;
+    status: "passed" | "failed";
+    detail: string;
+    evidence_paths: string[];
+  }[];
+  patch: {
+    patched_commit: string;
+    mechanism_class: string;
+    modified_paths: string[];
+    changed_files: number;
+    added_lines: number;
+    deleted_lines: number;
+  };
+  codex: {
+    task_reference: string;
+    feedback_session_id: string;
+    model: string;
+    skill: string;
+    hypothesis_owned_by_codex: true;
+    patch_owned_by_codex: true;
+    decision_owned_by_codex: true;
+  };
+  mode: "prerecorded";
+}

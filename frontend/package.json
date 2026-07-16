@@ -6,7 +6,7 @@
   "description": "React + React Flow dashboard for game_analysis_agent reports.",
   "scripts": {
     "dev": "vite",
-    "prepare:public": "mkdir -p public && rm -rf public/manifest.json public/browse && cp -R public-demo/manifest.json public-demo/browse public/",
+    "prepare:public": "mkdir -p public && rm -rf public/manifest.json public/browse public/judge-demo.json && cp -R public-demo/manifest.json public-demo/browse public-demo/judge-demo.json public/",
     "build:public": "npm run prepare:public && VITE_BASE_PATH=/game_analysis_agent/ npm run build",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --port 4173",

@@ -9,6 +9,10 @@ import type {
   DecisionGraphManifest,
   FrontManifest,
   IssueManifest,
+  JudgeCampaignJob,
+  JudgeExperiment,
+  JudgeProvider,
+  JudgeProviderStatus,
 } from "@/types";
 
 const BASE_URL = import.meta.env.BASE_URL || "/";
@@ -86,10 +90,76 @@ function decodeManifest<T>(
   return value as T;
 }
 
-function assetPath(path: string): string {
+export function assetPath(path: string): string {
   const cleanBase = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
   return `${cleanBase}${cleanPath}`;
+}
+
+export class JudgeAPIError extends Error {
+  status?: number;
+  code?: string;
+  remediation?: string;
+}
+
+async function judgeJSON<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`/api/${path}`, {
+    ...init,
+    headers: { Accept: "application/json", ...init?.headers },
+  });
+  let value: unknown;
+  try {
+    value = await response.json();
+  } catch {
+    throw new JudgeAPIError(`/api/${path} returned non-JSON`);
+  }
+  if (!response.ok) {
+    const detail = value as { error?: { code?: string; message?: string; remediation?: string } };
+    const error = new JudgeAPIError(detail.error?.message ?? `/api/${path} → HTTP ${response.status}`);
+    error.status = response.status;
+    error.code = detail.error?.code;
+    error.remediation = detail.error?.remediation;
+    throw error;
+  }
+  return value as T;
+}
+
+export function fetchJudgeProviderStatus(): Promise<JudgeProviderStatus> {
+  return judgeJSON<JudgeProviderStatus>("provider-status");
+}
+
+export function testJudgeProvider(provider: JudgeProvider): Promise<Record<string, unknown>> {
+  return judgeJSON<Record<string, unknown>>("provider-test", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ provider }),
+  });
+}
+
+export function createJudgeCampaign(provider: JudgeProvider): Promise<JudgeCampaignJob> {
+  return judgeJSON<JudgeCampaignJob>("campaigns", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ provider }),
+  });
+}
+
+export function fetchJudgeCampaign(campaignId: string): Promise<JudgeCampaignJob> {
+  return judgeJSON<JudgeCampaignJob>(`campaigns/${encodeURIComponent(campaignId)}`);
+}
+
+export function fetchJudgeExperiment(): Promise<JudgeExperiment> {
+  return judgeJSON<JudgeExperiment>("experiments/cashflow-drift-repair-v1");
+}
+
+export async function fetchStaticJudgeExperiment(): Promise<JudgeExperiment> {
+  const response = await fetch(assetPath("judge-demo.json"), {
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) {
+    throw new ManifestError(`${assetPath("judge-demo.json")} → HTTP ${response.status}`, response.status);
+  }
+  return response.json() as Promise<JudgeExperiment>;
 }
 
 export class ManifestError extends Error {

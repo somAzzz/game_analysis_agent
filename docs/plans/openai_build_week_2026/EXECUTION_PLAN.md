@@ -732,6 +732,15 @@ cancellation, error typing, and public-bundle-only defaults.
 - Avoid color-only status and provide text summaries.
 - Keep one primary action per stage.
 
+**Implementation checkpoint (2026-07-16): complete.** The root evaluator route
+now renders the verified public experiment as Campaign → Repair → Proof, with a
+same-origin Replay/OpenAI provider control, typed campaign status, static
+GitHub Pages fallback, explicit prerecorded/live labels, fixed/holdout
+comparisons, and non-color gate states. The legacy report archive moved to
+`/reports`. Acceptance evidence: 15 frontend tests, TypeScript lint, public
+production build, API/UI HTTP smoke, 416 Python tests passed with one optional
+skip, and both offline Judge modes passed. P4.8 remains the next step.
+
 ### P4.8 Validate macOS and Linux delivery
 
 **Depends on:** P4.5-P4.7.

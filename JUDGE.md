@@ -114,5 +114,22 @@ To retain a result atomically instead of stdout-only output:
 - `python_unsupported`: use Python 3.9+ for Inspect; Replay continues to use
   the repository's locked Python through `uv`.
 
-Docker, browser UI, live OpenAI, and fresh real-Godot runs are deeper optional
-paths. Their absence must not block these repository-only checks.
+## Human Judge UI
+
+The React root route presents the same case as a three-stage evidence ledger:
+Campaign, Repair, and Proof. It explicitly labels the Godot runtime, Replay
+action provider, optional OpenAI live subagent, fixed/holdout cohorts, and the
+rejected candidate. The former report dashboard remains at `/reports`.
+
+Build and start the same-origin UI/API locally:
+
+```bash
+cd frontend && npm run build:public && cd ..
+uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080
+```
+
+When the API is absent, the public build loads the sanitized
+`judge-demo.json` fixture and labels itself `Static evaluator copy`. It does
+not enable buttons or claim a live run. Docker, live OpenAI, and fresh
+real-Godot runs remain deeper optional paths; their absence must not block the
+repository-only checks above.

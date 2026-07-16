@@ -111,6 +111,12 @@ def test_replay_campaign_and_public_experiment_are_bounded_and_labeled() -> None
     assert completed["result"]["completed_cells"] == 18
     assert experiment["decision"] == "rejected"
     assert experiment["mode"] == "prerecorded"
+    assert [item["cohort"] for item in experiment["cohorts"]] == [
+        "baseline_fixed",
+        "patched_fixed",
+        "baseline_holdout",
+        "patched_holdout",
+    ]
     with pytest.raises(JudgeAPIError, match="Only the committed"):
         service.experiment("../../private")
 

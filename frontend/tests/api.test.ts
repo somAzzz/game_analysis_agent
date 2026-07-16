@@ -4,6 +4,12 @@ import {
   fetchDecisionGraphManifest,
   fetchFrontManifest,
   fetchIssueManifest,
+  createJudgeCampaign,
+  fetchJudgeCampaign,
+  fetchJudgeExperiment,
+  fetchJudgeProviderStatus,
+  fetchStaticJudgeExperiment,
+  testJudgeProvider,
 } from "@/lib/api";
 import type {
   DecisionGraphManifest,
@@ -175,5 +181,41 @@ describe("manifest API", () => {
     ).rejects.toThrow(
       "invalid decision graph manifest: event_graph must be object",
     );
+  });
+
+  it("uses the bounded same-origin Judge API without browser credentials", async () => {
+    const status = { schema_version: "judge-provider-status-v1", providers: {} };
+    const job = { campaign_id: "judge-abc", status: "completed" };
+    const experiment = { schema_version: "judge-public-experiment-v1", decision: "rejected" };
+    fetchMock
+      .mockResolvedValueOnce(responseWith(status))
+      .mockResolvedValueOnce(responseWith({ status: "passed" }))
+      .mockResolvedValueOnce(responseWith(job))
+      .mockResolvedValueOnce(responseWith(job))
+      .mockResolvedValueOnce(responseWith(experiment));
+
+    await fetchJudgeProviderStatus();
+    await testJudgeProvider("replay");
+    await createJudgeCampaign("openai");
+    await fetchJudgeCampaign("judge-abc");
+    await fetchJudgeExperiment();
+
+    expect(fetchMock.mock.calls.map((call) => call[0])).toEqual([
+      "/api/provider-status", "/api/provider-test", "/api/campaigns",
+      "/api/campaigns/judge-abc", "/api/experiments/cashflow-drift-repair-v1",
+    ]);
+    const createBody = String(fetchMock.mock.calls[2]?.[1]?.body);
+    expect(createBody).toBe('{"provider":"openai"}');
+    expect(createBody).not.toContain("api_key");
+  });
+
+  it("loads the frozen Judge experiment for static evaluator hosting", async () => {
+    const experiment = { schema_version: "judge-public-experiment-v1", decision: "rejected" };
+    fetchMock.mockResolvedValue(responseWith(experiment));
+
+    await expect(fetchStaticJudgeExperiment()).resolves.toEqual(experiment);
+    expect(fetchMock).toHaveBeenCalledWith("/judge-demo.json", {
+      headers: { Accept: "application/json" },
+    });
   });
 });

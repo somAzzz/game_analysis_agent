@@ -11,8 +11,8 @@ export function Masthead({ kicker, center, date }: MastheadProps) {
     <header className="masthead">
       <span className="kicker">
         {kicker ?? (
-          <Link to="/" style={{ borderBottom: 0 }}>
-            ← Front Page
+          <Link to="/reports" style={{ borderBottom: 0 }}>
+            ← Report archive
           </Link>
         )}
       </span>

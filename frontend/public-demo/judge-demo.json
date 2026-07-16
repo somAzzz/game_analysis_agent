@@ -1,0 +1,254 @@
+{
+  "codex": {
+    "decision_owned_by_codex": true,
+    "feedback_session_id": "019f6816-fe0d-78a2-9001-1890b32ef820",
+    "hypothesis_owned_by_codex": true,
+    "model": "codex-gpt-5-runtime-exact-revision-undisclosed",
+    "patch_owned_by_codex": true,
+    "skill": "playtest-forge",
+    "task_reference": "019f6816-fe0d-78a2-9001-1890b32ef820"
+  },
+  "cohorts": [
+    {
+      "artifact_path": "baseline/fixed.json",
+      "artifact_sha256": "a2cb9d3024fbf4c6795494cbdc52811845952074ff0b9dea95e637d6e9790cd2",
+      "cells": 18,
+      "cohort": "baseline_fixed",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.502924,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    },
+    {
+      "artifact_path": "patched/fixed.json",
+      "artifact_sha256": "2b6f55cda6dfa37a502c2e24d0a0ab4fca485d02e36e575579aa5a72aa54c832",
+      "cells": 18,
+      "cohort": "patched_fixed",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "c42b1c84630497427d895bf963103f8b40f5976d",
+      "mean_final_money": 17.944444,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.502924,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    },
+    {
+      "artifact_path": "baseline/holdout.json",
+      "artifact_sha256": "0cd4ec4be3ea1f4dd35c4ca9d579ac10016250e9ad34cfae07759f7c6375a6c5",
+      "cells": 18,
+      "cohort": "baseline_holdout",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.5,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        1042,
+        1043,
+        1044
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    },
+    {
+      "artifact_path": "patched/holdout.json",
+      "artifact_sha256": "d09866309914bf9571320a6231f880d4babbea9e9756ae76eb7dc9f5573fb80c",
+      "cells": 18,
+      "cohort": "patched_holdout",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "c42b1c84630497427d895bf963103f8b40f5976d",
+      "mean_final_money": 60.666667,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.5,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        1042,
+        1043,
+        1044
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    }
+  ],
+  "comparison": {
+    "fixed_member_delta": 0,
+    "fixed_persona_alignment_delta": 0.0,
+    "fixed_relative_reduction": 0.0,
+    "holdout_member_delta": 0,
+    "holdout_persona_alignment_delta": 0.0,
+    "holdout_relative_reduction": 0.0
+  },
+  "decision": "rejected",
+  "decision_reason": "Repair rejected because required proof failed: fixed_target, holdout_target",
+  "experiment_id": "cashflow-drift-repair-v1",
+  "gates": [
+    {
+      "detail": "18 <= 12",
+      "evidence_paths": [],
+      "gate_id": "fixed_target",
+      "status": "failed"
+    },
+    {
+      "detail": "0.000000 >= 0.250000",
+      "evidence_paths": [],
+      "gate_id": "holdout_target",
+      "status": "failed"
+    },
+    {
+      "detail": "patched fixed and holdout critical counters are zero",
+      "evidence_paths": [],
+      "gate_id": "critical_invariants",
+      "status": "passed"
+    },
+    {
+      "detail": "patched fixed and holdout validity meet threshold",
+      "evidence_paths": [],
+      "gate_id": "decision_validity",
+      "status": "passed"
+    },
+    {
+      "detail": "deterministic policy produced no hidden failure",
+      "evidence_paths": [],
+      "gate_id": "provider_health",
+      "status": "passed"
+    },
+    {
+      "detail": "fixed and holdout persona alignment decline is bounded",
+      "evidence_paths": [],
+      "gate_id": "persona_preservation",
+      "status": "passed"
+    },
+    {
+      "detail": "patched cohorts do not add unknown or pipeline-stalled endings",
+      "evidence_paths": [],
+      "gate_id": "no_new_invalid_endings",
+      "status": "passed"
+    },
+    {
+      "detail": "designed failure remains possible and is not reclassified",
+      "evidence_paths": [],
+      "gate_id": "designed_failure_preserved",
+      "status": "passed"
+    }
+  ],
+  "hypothesis": "Recurring survival-economy drift depletes spendable cash faster than distinct persona strategies can recover, after which the cash-shortfall stress feedback pushes every intent into the same cashflow/stress attractor.",
+  "mechanism_class": "recurring_living_cost_drift",
+  "mode": "prerecorded",
+  "patch": {
+    "added_lines": 35,
+    "baseline_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "changed_files": 2,
+    "deleted_lines": 5,
+    "mechanism_class": "recurring_living_cost_drift",
+    "modified_paths": [
+      "scripts/simulation/SimulationEngine.gd",
+      "scripts/tools/ValidateEconomyRules.gd"
+    ],
+    "patch_path": "patch.diff",
+    "patch_sha256": "bacc310c1a2490af7f5833c526cb5e052c3436a9d60400df6588698f6f8c4d2d",
+    "patched_commit": "c42b1c84630497427d895bf963103f8b40f5976d",
+    "patched_tree": "ce5264c46b900493237acd4a42a65a0f8f884f62"
+  },
+  "schema_version": "judge-public-experiment-v1",
+  "status": "passed"
+}
