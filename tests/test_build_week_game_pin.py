@@ -12,6 +12,7 @@ import pytest
 from game_analysis_agent.build_week_game_pin import (
     GamePinError,
     load_game_pin,
+    materialize_game_tree,
     verify_game_pin,
     write_pinned_archive,
 )
@@ -147,3 +148,54 @@ def test_load_pin_rejects_unsafe_required_path(tmp_path: Path) -> None:
 
     with pytest.raises(GamePinError, match="unsafe"):
         load_game_pin(pin_path)
+
+
+def test_materialize_uses_pinned_tree_and_writes_provenance(tmp_path: Path) -> None:
+    repo, commit = _repository(tmp_path)
+    pin_path = tmp_path / "pin.json"
+    _manifest(repo, commit, pin_path)
+    (repo / "scripts/tools/RunInteractiveProbe.gd").unlink()
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-qm", "later checkout without runner")
+    output = tmp_path / "materialized"
+
+    result = materialize_game_tree(repo, load_game_pin(pin_path), output)
+
+    assert result["status"] == "materialized"
+    assert result["commit"] == commit
+    assert (output / "scripts/tools/RunInteractiveProbe.gd").is_file()
+    provenance = json.loads(
+        (output / ".playtest-forge-source.json").read_text(encoding="utf-8")
+    )
+    assert provenance["commit"] == commit
+    assert provenance["file_count"] == len(REQUIRED_PATHS)
+    assert provenance["public_distribution"] is False
+
+
+def test_materialize_refuses_to_replace_unmanaged_directory(tmp_path: Path) -> None:
+    repo, commit = _repository(tmp_path)
+    pin_path = tmp_path / "pin.json"
+    manifest = _manifest(repo, commit, pin_path)
+    output = tmp_path / "materialized"
+    output.mkdir()
+    (output / "user-file.txt").write_text("preserve me", encoding="utf-8")
+
+    with pytest.raises(GamePinError, match="unmanaged"):
+        materialize_game_tree(repo, manifest, output, replace=True)
+
+    assert (output / "user-file.txt").read_text(encoding="utf-8") == "preserve me"
+
+
+def test_materialize_replaces_only_matching_managed_directory(tmp_path: Path) -> None:
+    repo, commit = _repository(tmp_path)
+    pin_path = tmp_path / "pin.json"
+    manifest = _manifest(repo, commit, pin_path)
+    output = tmp_path / "materialized"
+    first = materialize_game_tree(repo, manifest, output)
+    (output / "extra.txt").write_text("remove", encoding="utf-8")
+
+    second = materialize_game_tree(repo, manifest, output, replace=True)
+
+    assert first["content_tree_sha256"] == second["content_tree_sha256"]
+    assert not (output / "extra.txt").exists()
+    assert not output.with_name(".materialized.previous").exists()

@@ -16,6 +16,7 @@ sys.path.insert(0, str(SRC))
 from game_analysis_agent.build_week_game_pin import (  # noqa: E402
     GamePinError,
     load_game_pin,
+    materialize_game_tree,
     verify_game_pin,
     write_pinned_archive,
 )
@@ -29,7 +30,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--source", type=Path, help="game Git repository")
     parser.add_argument("--pin", type=Path, default=DEFAULT_PIN)
-    parser.add_argument("--output-archive", type=Path)
+    outputs = parser.add_mutually_exclusive_group()
+    outputs.add_argument("--output-archive", type=Path)
+    outputs.add_argument("--materialize-dir", type=Path)
+    parser.add_argument(
+        "--replace",
+        action="store_true",
+        help="replace only a previously managed materialized directory with matching provenance",
+    )
     parser.add_argument("--json", action="store_true")
     return parser
 
@@ -46,6 +54,13 @@ def main(argv: list[str] | None = None) -> int:
         if args.output_archive:
             output = write_pinned_archive(configured_source, manifest, args.output_archive)
             result["output_archive"] = _display_path(output, ROOT)
+        elif args.materialize_dir:
+            result["materialized"] = materialize_game_tree(
+                configured_source,
+                manifest,
+                args.materialize_dir,
+                replace=args.replace,
+            )
     except GamePinError as exc:
         print(f"game pin error: {exc}", file=sys.stderr)
         return 1

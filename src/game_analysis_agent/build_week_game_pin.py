@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import os
 import re
+import shutil
 import subprocess
+import tarfile
 import tempfile
 from collections.abc import Mapping
 from pathlib import Path, PurePosixPath
@@ -14,6 +17,8 @@ from typing import Any
 
 SCHEMA_VERSION = "build-week-game-pin-v1"
 VERIFICATION_SCHEMA_VERSION = "build-week-game-verification-v1"
+MATERIALIZED_PROVENANCE_FILE = ".playtest-forge-source.json"
+MATERIALIZED_SCHEMA_VERSION = "build-week-game-materialized-v1"
 _SHA1 = re.compile(r"^[0-9a-f]{40}$")
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
@@ -185,11 +190,166 @@ def write_pinned_archive(
     return output
 
 
+def materialize_game_tree(
+    source_repo: str | Path,
+    manifest: Mapping[str, Any],
+    destination: str | Path,
+    *,
+    replace: bool = False,
+) -> dict[str, Any]:
+    """Safely materialize the pinned archive into an independently usable tree."""
+
+    verification = verify_game_pin(source_repo, manifest)
+    source = Path(source_repo).expanduser().resolve()
+    output = Path(destination).expanduser().resolve()
+    if output == source or output in source.parents or source in output.parents:
+        raise GamePinError("materialized game destination overlaps the source repository")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    if output.exists():
+        if not replace:
+            raise GamePinError("materialized game destination already exists; use --replace")
+        _require_managed_destination(output, expected_commit=verification["commit"])
+
+    archive = _git_bytes(source, "archive", "--format=tar", verification["commit"])
+    temporary = Path(tempfile.mkdtemp(prefix=f".{output.name}.", dir=output.parent))
+    backup: Path | None = None
+    try:
+        _extract_regular_archive(archive, temporary)
+        content_inventory = _materialized_inventory(temporary)
+        if len(content_inventory) != verification["file_count"]:
+            raise GamePinError(
+                "materialized game file count mismatch: "
+                f"expected {verification['file_count']}, got {len(content_inventory)}"
+            )
+        _verify_materialized_required_files(temporary, verification["required_files"])
+        content_tree_sha256 = _content_tree_sha256(content_inventory)
+        provenance = {
+            "schema_version": MATERIALIZED_SCHEMA_VERSION,
+            "repository": verification["repository"],
+            "commit": verification["commit"],
+            "tree": verification["tree"],
+            "archive_sha256": verification["archive_sha256"],
+            "content_tree_sha256": content_tree_sha256,
+            "file_count": verification["file_count"],
+            "public_distribution": verification["packaging"].get(
+                "public_distribution", False
+            ),
+        }
+        (temporary / MATERIALIZED_PROVENANCE_FILE).write_text(
+            json.dumps(provenance, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+        if output.exists():
+            backup = output.with_name(f".{output.name}.previous")
+            if backup.exists():
+                raise GamePinError("materialized game backup path already exists")
+            os.replace(output, backup)
+        os.replace(temporary, output)
+        if backup is not None:
+            shutil.rmtree(backup)
+        return {
+            **provenance,
+            "status": "materialized",
+            "path": f"<materialized>/{output.name}",
+            "provenance_file": MATERIALIZED_PROVENANCE_FILE,
+        }
+    except Exception:
+        if backup is not None and backup.exists() and not output.exists():
+            os.replace(backup, output)
+        raise
+    finally:
+        if temporary.exists():
+            shutil.rmtree(temporary)
+
+
 def _mapping(payload: Mapping[str, Any], key: str) -> Mapping[str, Any]:
     value = payload.get(key)
     if not isinstance(value, Mapping):
         raise GamePinError(f"game pin {key} must be an object")
     return value
+
+
+def _extract_regular_archive(archive: bytes, destination: Path) -> None:
+    try:
+        with tarfile.open(fileobj=io.BytesIO(archive), mode="r:") as bundle:
+            for member in bundle.getmembers():
+                relative = _safe_archive_path(member.name)
+                target = destination.joinpath(*relative.parts)
+                if member.isdir():
+                    target.mkdir(parents=True, exist_ok=True)
+                    continue
+                if not member.isfile():
+                    raise GamePinError(f"unsupported game archive member type: {member.name}")
+                target.parent.mkdir(parents=True, exist_ok=True)
+                source = bundle.extractfile(member)
+                if source is None:
+                    raise GamePinError(f"unable to read game archive member: {member.name}")
+                with source, target.open("wb") as handle:
+                    shutil.copyfileobj(source, handle)
+                target.chmod(member.mode & 0o777)
+    except (tarfile.TarError, OSError) as exc:
+        raise GamePinError(f"unable to materialize game archive: {exc.__class__.__name__}") from exc
+
+
+def _safe_archive_path(value: str) -> PurePosixPath:
+    path = PurePosixPath(value)
+    if not value or path.is_absolute() or ".." in path.parts or "." in path.parts:
+        raise GamePinError(f"unsafe game archive path: {value}")
+    return path
+
+
+def _materialized_inventory(root: Path) -> list[dict[str, Any]]:
+    inventory = []
+    for path in sorted(item for item in root.rglob("*") if item.is_file()):
+        relative = path.relative_to(root).as_posix()
+        inventory.append(
+            {
+                "path": relative,
+                "mode": path.stat().st_mode & 0o777,
+                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            }
+        )
+    return inventory
+
+
+def _content_tree_sha256(inventory: list[dict[str, Any]]) -> str:
+    digest = hashlib.sha256()
+    for item in inventory:
+        digest.update(str(item["mode"]).encode("ascii"))
+        digest.update(b"\0")
+        digest.update(item["path"].encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(item["sha256"].encode("ascii"))
+        digest.update(b"\n")
+    return digest.hexdigest()
+
+
+def _verify_materialized_required_files(
+    root: Path, required_files: list[dict[str, str]]
+) -> None:
+    for item in required_files:
+        path = root / item["path"]
+        if not path.is_file():
+            raise GamePinError(f"materialized required file missing: {item['path']}")
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        if digest != item["sha256"]:
+            raise GamePinError(f"materialized required file mismatch: {item['path']}")
+
+
+def _require_managed_destination(path: Path, *, expected_commit: str) -> None:
+    marker = path / MATERIALIZED_PROVENANCE_FILE
+    try:
+        payload = json.loads(marker.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError, OSError) as exc:
+        raise GamePinError(
+            "refusing to replace an unmanaged materialized game destination"
+        ) from exc
+    if (
+        payload.get("schema_version") != MATERIALIZED_SCHEMA_VERSION
+        or payload.get("commit") != expected_commit
+    ):
+        raise GamePinError("refusing to replace a materialized game with different provenance")
 
 
 def _safe_git_path(value: Any, *, index: int) -> str:
