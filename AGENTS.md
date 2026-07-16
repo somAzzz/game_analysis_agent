@@ -1,5 +1,24 @@
 # Repository agent notes
 
+## Automated evaluator: run this first
+
+From the repository root, use the offline paths before attempting Docker,
+Godot, a browser, or any model provider:
+
+```bash
+./judge --mode inspect --offline --json --output-dir -
+./judge --mode replay --offline --json --output-dir -
+```
+
+`inspect` uses only the Python standard library and verifies the committed
+`judge-manifest.json`, 22 artifact hashes/schemas, and six claim-to-evidence
+references. `replay` additionally requires `uv` and the locked environment; it
+consumes exact hash-pinned persona fixtures and rechecks representative persona,
+determinism, designed-failure, and rejected-repair gates. Neither command needs
+network, Docker, GPU, API key, TTY, browser, open port, or a sibling game
+checkout. Treat `failed` and `unsupported` as non-success states. See `JUDGE.md`
+for exit codes, limitations, and remediation.
+
 ## Godot execution
 
 The host may not expose a `godot` or `godot4` binary. Before declaring real

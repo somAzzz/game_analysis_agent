@@ -1,5 +1,27 @@
 # game_analysis_agent
 
+## Judge / automated evaluator quickstart
+
+The primary review path is repository-only and offline:
+
+```bash
+./judge --mode inspect --offline --json --output-dir -
+./judge --mode replay --offline --json --output-dir -
+```
+
+Inspect needs only Python 3.10+ and validates 22 committed artifact hashes,
+schemas, provenance gates, and six exact public claim references. Replay adds
+the locked `uv` environment and consumes hash-pinned persona fixtures; it does
+not need Godot, Docker, a GPU, network, an API key, a browser, or the private
+game checkout. Both commands print one `judge-result-v1` JSON object. Expected
+status is `passed`; `failed` and `unsupported` are never fallback successes.
+
+The committed case is explicitly **prerecorded Replay evidence**: Codex formed
+and implemented a bounded repair hypothesis, then rejected the candidate after
+fixed and holdout cohorts both failed to improve the target cluster. It is not
+presented as a fresh OpenAI call or a successful game fix. See [JUDGE.md](JUDGE.md)
+for the evidence map, commands, exit codes, and limitations.
+
 Development-side AI agent pipeline for simulation games. The current reference
 integration is the Godot `study-in-germany` demo, but the project is structured
 as a reusable game QA agent framework for balance testing, boundary probing,

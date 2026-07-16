@@ -1,5 +1,24 @@
 # game_analysis_agent
 
+## 评审 / 自动初审入口
+
+在仓库根目录优先运行完全离线的两条命令：
+
+```bash
+./judge --mode inspect --offline --json --output-dir -
+./judge --mode replay --offline --json --output-dir -
+```
+
+Inspect 只需 Python 3.10+，会校验 22 个已提交证据文件的哈希、schema、来源门禁，
+以及 6 条公开结论对应的精确 JSON 指针。Replay 额外使用锁定的 `uv` 环境并消费
+哈希固定的 persona fixture；两者都不需要 Godot、Docker、GPU、网络、API key、
+浏览器、端口或相邻的私有游戏仓库。输出是单个 `judge-result-v1` JSON；只有
+`passed` 是成功，`failed` 和 `unsupported` 不能视为降级成功。
+
+当前案例明确标记为**预录 Replay 证据**：Codex 提出并实现受限修复假设，但 fixed
+和 holdout 都没有改善目标失败簇，因此系统拒绝候选补丁。它不是一次新的 OpenAI
+调用，也不声称游戏已经修好。完整证据地图与限制见 [JUDGE.md](JUDGE.md)。
+
 面向 Godot 数值模拟游戏的开发侧 AI Agent 流水线。本项目把"试玩 / 边界 / Bug / 数值"分析自动化：
 让 LLM 在压缩报告、异常检测和工具调用之上产生诊断，而不是把 LLM 塞进游戏运行时当 NPC。
 
