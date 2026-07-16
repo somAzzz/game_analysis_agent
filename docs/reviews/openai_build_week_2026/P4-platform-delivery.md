@@ -16,11 +16,20 @@ same-origin Judge UI/API all passed. The doctor correctly separates the native
 dashboard from its Docker delivery and returns an unsupported exit for the
 latter on this host.
 
-The post-audit macOS rerun now also proves the project-local,
+The post-audit macOS rerun proved the project-local,
 SHA-512-pinned Godot 4.4 runtime with a clean-worktree two-run/four-week fresh
 trace. It binds the exact embedded game commit/content tree, audited runtime
 overlay, and game/runtime/execution source fingerprints. The exact command set and result digests are retained in
 `platform-evidence/macos-native.json`.
+
+After the final expected-failure gate changed the delivery contract, those
+macOS rows became stale and are queued for one last native rerun. At contract
+`6fd5874d`, Linux amd64 native/container acceptance passed in workflow run
+`29530325297`. Official Linux Godot 4.4 also passed in run `29530260522`: five
+contract validators were clean, and the three declared demo balance findings
+matched the exact pin-bound expected-failure contract. The generated evidence
+is retained in `platform-evidence/linux-amd64.json` and
+`platform-evidence/linux-godot.json`.
 
 This is not yet a cross-platform pass. Docker is absent and no OpenAI key is
 configured. Docker evidence is assigned to the Linux path. The Linux amd64 job

@@ -2,39 +2,39 @@
   "artifact_digests": [
     {
       "name": "container-inspect.json",
-      "sha256": "13cb32e9e26687f7df4f4ae568a240fdcbad1a6a2ea9a772d6e6192a1149fabe"
+      "sha256": "ed7751476999e1d395eaaf89bedfe4ec94855cc5119bde5a81c74b9914bd619d"
     },
     {
       "name": "container-replay.json",
-      "sha256": "1057cb564053ee8a73d19c54c909ef04433450465f505d083a97268125fe1fce"
+      "sha256": "c5d22d2506c3f4925fee5ac5238a9ba5403b5db2a12a994a1ff9bb0cff6e4093"
     },
     {
       "name": "docker-image.json",
-      "sha256": "8cd15d2cc88897d7a77af1d3faeafab35be3577747022aebe1140e1fbdb0eed5"
+      "sha256": "d8c9f06d6624ade94cb219e77772c34673319d2c46dead266cee6fa1cfcc560e"
     },
     {
       "name": "doctor-dashboard-native.json",
-      "sha256": "cea604ef4929841f1a6f35097a4af61f0867bb324dd2799f910c6362f626e35c"
+      "sha256": "8f6b15bdd8e514c2af91cfe3d9851f3fb745e42f5fe201de426ca3b4c3a4a6c0"
     },
     {
       "name": "doctor-inspect.json",
-      "sha256": "29318b5f4ee88281c85c9c7073d9e8b2f2f9152d634a676dd13c11d1df7d7b61"
+      "sha256": "76ab47aaec2dc36fe49b9652b8964adbee60453358c795117d8730a61c170ef3"
     },
     {
       "name": "doctor-replay.json",
-      "sha256": "20379c3e87c71eabb709781ea7b45739b7d04ddbdf785c6dcf5ec726af6c1d2b"
+      "sha256": "4043773399fc8a6e553d9a019e1a21f4f6243a779bf9211d921d7f427a6f62cf"
     },
     {
       "name": "judge-inspect.json",
-      "sha256": "2a63673b2d3c234903411d71a7d6fb06366e2d5f43baf739807e5a0226ff5f6f"
+      "sha256": "7dd5386093a6bfd988c5abde710bb9870cd7f5ea6c9e51f6738d14f24daca1f8"
     },
     {
       "name": "judge-replay.json",
-      "sha256": "37f2ea4b44c26d4b7f9d715922c5fc4d86dfa0b6dfb1be7044df94cc124ad195"
+      "sha256": "56b4ae6486bb26a86f2e889592d433904419bf493f95daedc94cc65b7e9a9d0e"
     },
     {
       "name": "provider-status.json",
-      "sha256": "f0565c57344b448df329d6a2ecb309c801fa806434c5b69783bdbdba90cd8317"
+      "sha256": "bbbc03a35a2ffc826768119b47c58c77d5c2942e825512b6f0080a6c75250ac4"
     }
   ],
   "checks": [
@@ -43,15 +43,15 @@
       "status": "passed"
     }
   ],
-  "executed_at": "2026-07-16T18:27:32.995551+00:00",
+  "executed_at": "2026-07-16T20:02:12.083003+00:00",
   "mode": "linux-amd64",
   "platform": {
     "architecture": "amd64",
     "system": "Linux"
   },
   "schema_version": "build-week-platform-evidence-v1",
-  "source_contract_sha256": "c2f557af6dd0146061cfcd1bcc3c69c058a7aa46d437c23c35e30d609a1d3983",
+  "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a",
   "source_dirty": false,
-  "source_revision": "8d3b9519fe720925bb7254155e94b97423c97502",
+  "source_revision": "18bc467d0f5de821552f66a323271bc5609c592a",
   "status": "passed"
 }
