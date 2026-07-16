@@ -14,6 +14,7 @@ test -z "$(git -C "$ROOT" status --porcelain --untracked-files=all)" || {
   exit 2
 }
 
+mkdir -p "$OUTPUT"
 cd "$ROOT"
 scripts/setup-build-week-toolchain --json
 . .tools/build-week/env.sh

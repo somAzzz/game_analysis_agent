@@ -17,7 +17,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from game_analysis_agent.build_week_g4 import REQUIRED_PLATFORM_CHECKS  # noqa: E402
+from game_analysis_agent.build_week_game_pin import load_game_pin  # noqa: E402
 from game_analysis_agent.platform_delivery import platform_contract_fingerprint  # noqa: E402
+from game_analysis_agent.report_manifest import (  # noqa: E402
+    execution_source_fingerprint,
+    game_source_fingerprint,
+    runtime_source_fingerprint,
+)
 
 MODE_CHECKS = {
     "macos": (
@@ -71,6 +77,47 @@ def _artifact_digests(paths: list[Path], base: Path) -> list[dict[str, str]]:
     ]
 
 
+def _validate_game_provenance(
+    manifest: dict[str, Any], directory: Path, revision: str
+) -> dict[str, Any]:
+    provenance = manifest.get("provenance") or {}
+    game = provenance.get("game_repository") or {}
+    fingerprints = provenance.get("fingerprints") or {}
+    pin = load_game_pin(ROOT / "config/build_week_2026_game_pin.json")["pin"]
+    runtime = directory / "game-runtime"
+    expected_overlay_path = "scripts/tools/RunInteractiveProbe.gd"
+    overlays = game.get("runtime_overlays") or []
+    _require(game.get("source_type") == "embedded_runtime_overlay", "Godot report did not use the embedded runtime overlay")
+    for field in ("commit", "tree", "archive_sha256", "content_tree_sha256", "file_count"):
+        _require(game.get(field) == pin.get(field), f"Godot report game {field} differs from pin")
+    _require(len(overlays) == 1, "Godot report must contain exactly one runtime overlay")
+    overlay = overlays[0]
+    canonical = ROOT / "demo/study-in-germany" / expected_overlay_path
+    runtime_probe = ROOT / expected_overlay_path
+    _require(
+        overlay == {
+            "path": expected_overlay_path,
+            "source": expected_overlay_path,
+            "canonical_sha256": _digest(canonical),
+            "runtime_sha256": _digest(runtime_probe),
+        },
+        "Godot report runtime overlay differs from the audited adapter",
+    )
+    _require(runtime.is_dir(), "prepared game runtime is missing from platform artifacts")
+    expected_game = game_source_fingerprint(runtime)
+    expected_runtime = runtime_source_fingerprint(ROOT)
+    _require(fingerprints.get("game_source_sha256") == expected_game, "Godot report game fingerprint differs from runtime")
+    _require(fingerprints.get("runtime_source_sha256") == expected_runtime, "Godot report agent fingerprint differs from checkout")
+    _require(
+        fingerprints.get("execution_source_sha256")
+        == execution_source_fingerprint(ROOT, runtime),
+        "Godot report execution fingerprint differs from checkout and runtime",
+    )
+    agent = provenance.get("agent_repository") or {}
+    _require(agent.get("commit") == revision and agent.get("dirty") is False, "Godot report agent provenance differs from clean checkout")
+    return game
+
+
 def _macos(directory: Path, revision: str) -> tuple[dict[str, Any], list[Path]]:
     names = (
         "doctor-inspect.json",
@@ -108,15 +155,11 @@ def _macos(directory: Path, revision: str) -> tuple[dict[str, Any], list[Path]]:
     _require('<div id="root"></div>' in root_html, "native Judge frontend did not load")
     manifest = values["report_manifest.json"]
     provenance = manifest.get("provenance") or {}
-    agent = provenance.get("agent_repository") or {}
     runtime = provenance.get("runtime") or {}
     godot = runtime.get("godot") or {}
-    game = provenance.get("game_repository") or {}
-    _require(agent.get("commit") == revision, "macOS Godot report agent revision differs from checkout")
-    _require(agent.get("dirty") is False, "macOS Godot report came from a dirty worktree")
+    game = _validate_game_provenance(manifest, directory, revision)
     _require(str(runtime.get("platform", "")).lower().startswith("macos"), "Godot report is not from macOS")
     _require(str(godot.get("version", "")).startswith("4.4.stable"), "Godot report did not use pinned 4.4")
-    _require(len(str(game.get("commit", ""))) == 40, "Godot report lacks pinned game commit")
     raw = directory / "fresh-godot/raw_runs.jsonl"
     _require(raw.is_file() and raw.stat().st_size > 0, "Godot raw trace is missing")
     return {
@@ -170,15 +213,11 @@ def _linux_godot(directory: Path, revision: str) -> tuple[dict[str, Any], list[P
     manifest_path = manifests[0]
     manifest = _read(manifest_path)
     provenance = manifest.get("provenance") or {}
-    agent = provenance.get("agent_repository") or {}
     runtime = provenance.get("runtime") or {}
     godot = runtime.get("godot") or {}
-    game = provenance.get("game_repository") or {}
-    _require(agent.get("commit") == revision, "Godot report agent revision differs from checkout")
-    _require(agent.get("dirty") is False, "Godot report came from a dirty worktree")
+    game = _validate_game_provenance(manifest, directory, revision)
     _require(str(runtime.get("platform", "")).lower().startswith("linux"), "Godot report is not from Linux")
     _require(str(godot.get("version", "")).startswith("4.4.stable"), "Godot report did not use pinned 4.4")
-    _require(len(str(game.get("commit", ""))) == 40, "Godot report lacks pinned game commit")
     raw = manifest_path.parent / "raw_runs.jsonl"
     _require(raw.is_file() and raw.stat().st_size > 0, "Godot raw trace is missing")
     return {

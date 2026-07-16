@@ -92,6 +92,12 @@ def test_linux_delivery_ci_runs_native_container_and_dashboard_smokes() -> None:
     assert "record_platform_evidence.py" in rendered
 
 
+def test_linux_godot_runner_creates_output_before_first_redirect() -> None:
+    script = (ROOT / "scripts/run-p4-linux-godot").read_text(encoding="utf-8")
+
+    assert script.index('mkdir -p "$OUTPUT"') < script.index('> "$OUTPUT/embedded-demo.json"')
+
+
 def test_workflow_publishes_then_executes_image_on_native_arm64() -> None:
     workflow = yaml.safe_load((ROOT / ".github/workflows/test.yml").read_text(encoding="utf-8"))
     publish = workflow["jobs"]["publish-judge-image"]

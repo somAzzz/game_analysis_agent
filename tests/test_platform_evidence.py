@@ -9,6 +9,12 @@ from pathlib import Path
 import pytest
 
 import tools.record_platform_evidence as platform_evidence
+from game_analysis_agent.build_week_game_pin import prepare_embedded_game_runtime
+from game_analysis_agent.report_manifest import (
+    _game_provenance,
+    execution_source_fingerprint,
+    runtime_source_fingerprint,
+)
 from tools.record_platform_evidence import PlatformEvidenceError, build_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +28,22 @@ def _revision() -> str:
     return subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, check=True, text=True
     ).stdout.strip()
+
+
+def _embedded_provenance(runtime: Path, *, system: str) -> dict:
+    return {
+        "agent_repository": {"commit": _revision(), "dirty": False},
+        "runtime": {
+            "platform": system,
+            "godot": {"version": "4.4.stable.official"},
+        },
+        "game_repository": _game_provenance(runtime),
+        "fingerprints": {
+            "runtime_source_sha256": runtime_source_fingerprint(ROOT),
+            "game_source_sha256": platform_evidence.game_source_fingerprint(runtime),
+            "execution_source_sha256": execution_source_fingerprint(ROOT, runtime),
+        },
+    }
 
 
 def test_linux_amd64_evidence_requires_native_clean_and_container_results(tmp_path: Path) -> None:
@@ -74,15 +96,10 @@ def test_linux_godot_selects_simulation_manifest_when_interactive_report_is_pres
     interactive = tmp_path / "interactive" / "ci-smoke"
     simulation.mkdir(parents=True)
     interactive.mkdir(parents=True)
+    runtime = tmp_path / "game-runtime"
+    prepare_embedded_game_runtime(ROOT, runtime)
     manifest = {
-        "provenance": {
-            "agent_repository": {"commit": _revision(), "dirty": False},
-            "runtime": {
-                "platform": "Linux-6.8-x86_64",
-                "godot": {"version": "4.4.stable.official"},
-            },
-            "game_repository": {"commit": "a" * 40},
-        }
+        "provenance": _embedded_provenance(runtime, system="Linux-6.8-x86_64")
     }
     _write(simulation / "report_manifest.json", manifest)
     (simulation / "raw_runs.jsonl").write_text('{"week": 1}\n', encoding="utf-8")
@@ -93,6 +110,20 @@ def test_linux_godot_selects_simulation_manifest_when_interactive_report_is_pres
     assert evidence["status"] == "passed"
     assert evidence["toolchain"]["godot"] == "4.4.stable.official"
     assert len(evidence["artifact_digests"]) == 2
+
+
+def test_linux_godot_rejects_forged_game_pin(tmp_path: Path) -> None:
+    simulation = tmp_path / "ci-smoke"
+    simulation.mkdir()
+    runtime = tmp_path / "game-runtime"
+    prepare_embedded_game_runtime(ROOT, runtime)
+    provenance = _embedded_provenance(runtime, system="Linux-6.8-x86_64")
+    provenance["game_repository"]["commit"] = "a" * 40
+    _write(simulation / "report_manifest.json", {"provenance": provenance})
+    (simulation / "raw_runs.jsonl").write_text('{}\n', encoding="utf-8")
+
+    with pytest.raises(PlatformEvidenceError, match="commit differs from pin"):
+        build_evidence("linux-godot", tmp_path)
 
 
 def test_macos_evidence_rejects_stale_doctor_outputs(tmp_path: Path) -> None:
