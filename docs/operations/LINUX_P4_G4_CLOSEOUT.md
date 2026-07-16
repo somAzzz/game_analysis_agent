@@ -18,6 +18,20 @@ git rev-parse HEAD
 The `Test` workflow runs for pull requests, pushes to `main`, scheduled runs,
 or manual dispatch. A feature-branch push by itself does not trigger it.
 
+On Apple Silicon, refresh all native macOS rows with one clean-worktree run:
+
+```bash
+scripts/run-p4-macos
+uv run python tools/record_platform_evidence.py \
+  --mode macos \
+  --artifact-dir reports/platform-acceptance/macos-native \
+  --output docs/reviews/openai_build_week_2026/platform-evidence/macos-native.json \
+  --update-review
+```
+
+The recorder rejects stale doctor/Godot outputs, a dirty source revision,
+non-arm64 macOS, the wrong Godot version, or a missing native UI/API response.
+
 ## 2. Native Linux amd64 and hardened Docker
 
 On a native Linux x86_64 host with Docker Engine:

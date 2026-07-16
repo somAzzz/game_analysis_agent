@@ -19,11 +19,18 @@ sys.path.insert(0, str(ROOT / "src"))
 from game_analysis_agent.build_week_g4 import REQUIRED_PLATFORM_CHECKS  # noqa: E402
 from game_analysis_agent.platform_delivery import platform_contract_fingerprint  # noqa: E402
 
-MODE_CHECK = {
-    "linux-amd64": "linux_amd64_native_and_container",
-    "linux-godot": "linux_pinned_real_godot",
-    "linux-arm64": "linux_arm64_container",
-    "live-openai": "live_openai_campaign",
+MODE_CHECKS = {
+    "macos": (
+        "macos_system_python_inspect",
+        "macos_locked_replay",
+        "macos_idempotent_setup",
+        "macos_native_ui_api",
+        "macos_pinned_real_godot",
+    ),
+    "linux-amd64": ("linux_amd64_native_and_container",),
+    "linux-godot": ("linux_pinned_real_godot",),
+    "linux-arm64": ("linux_arm64_container",),
+    "live-openai": ("live_openai_campaign",),
 }
 
 
@@ -64,6 +71,62 @@ def _artifact_digests(paths: list[Path], base: Path) -> list[dict[str, str]]:
     ]
 
 
+def _macos(directory: Path, revision: str) -> tuple[dict[str, Any], list[Path]]:
+    names = (
+        "doctor-inspect.json",
+        "doctor-dashboard-native.json",
+        "doctor-real-game.json",
+        "judge-inspect.json",
+        "judge-replay.json",
+        "provider-status.json",
+        "experiment.json",
+        "root.html",
+        "fresh-godot/report_manifest.json",
+        "fresh-godot/raw_runs.jsonl",
+    )
+    paths = [directory / name for name in names]
+    values = {path.name: _read(path) for path in paths if path.suffix == ".json"}
+    for name in ("doctor-inspect.json", "doctor-dashboard-native.json", "doctor-real-game.json"):
+        item = values[name]
+        _require(item.get("status") == "ready", f"{name} is not ready")
+        host = item.get("platform") or {}
+        _require(host.get("system") == "Darwin", f"{name} was not produced on macOS")
+        _require(str(host.get("machine", "")).lower() == "arm64", f"{name} is not arm64")
+        source = item.get("source") or {}
+        _require(source.get("revision") == revision, f"{name} revision differs from checkout")
+        _require(source.get("dirty") is False, f"{name} came from a dirty worktree")
+    for name in ("judge-inspect.json", "judge-replay.json"):
+        _require(values[name].get("status") == "passed", f"{name} did not pass")
+    providers = values["provider-status.json"].get("providers") or {}
+    _require((providers.get("replay") or {}).get("status") == "available", "native Replay provider unavailable")
+    experiment = values["experiment.json"]
+    _require(
+        experiment.get("status") == "passed" and experiment.get("decision") in {"accepted", "rejected"},
+        "native experiment API did not return a governed decision",
+    )
+    root_html = (directory / "root.html").read_text(encoding="utf-8")
+    _require('<div id="root"></div>' in root_html, "native Judge frontend did not load")
+    manifest = values["report_manifest.json"]
+    provenance = manifest.get("provenance") or {}
+    agent = provenance.get("agent_repository") or {}
+    runtime = provenance.get("runtime") or {}
+    godot = runtime.get("godot") or {}
+    game = provenance.get("game_repository") or {}
+    _require(agent.get("commit") == revision, "macOS Godot report agent revision differs from checkout")
+    _require(agent.get("dirty") is False, "macOS Godot report came from a dirty worktree")
+    _require(str(runtime.get("platform", "")).lower().startswith("macos"), "Godot report is not from macOS")
+    _require(str(godot.get("version", "")).startswith("4.4.stable"), "Godot report did not use pinned 4.4")
+    _require(len(str(game.get("commit", ""))) == 40, "Godot report lacks pinned game commit")
+    raw = directory / "fresh-godot/raw_runs.jsonl"
+    _require(raw.is_file() and raw.stat().st_size > 0, "Godot raw trace is missing")
+    return {
+        "platform": {"system": "macOS", "architecture": "arm64"},
+        "toolchain": {"godot": godot.get("version")},
+        "game_revision": game.get("commit"),
+        "checks": [{"id": identifier, "status": "passed"} for identifier in MODE_CHECKS["macos"]],
+    }, paths
+
+
 def _linux_amd64(directory: Path, revision: str) -> tuple[dict[str, Any], list[Path]]:
     names = (
         "doctor-inspect.json",
@@ -93,7 +156,7 @@ def _linux_amd64(directory: Path, revision: str) -> tuple[dict[str, Any], list[P
     _require((providers.get("replay") or {}).get("status") == "available", "container Replay provider unavailable")
     return {
         "platform": {"system": "Linux", "architecture": "amd64"},
-        "checks": [{"id": MODE_CHECK["linux-amd64"], "status": "passed"}],
+        "checks": [{"id": MODE_CHECKS["linux-amd64"][0], "status": "passed"}],
     }, paths
 
 
@@ -122,7 +185,7 @@ def _linux_godot(directory: Path, revision: str) -> tuple[dict[str, Any], list[P
         "platform": {"system": "Linux", "architecture": "amd64"},
         "toolchain": {"godot": godot.get("version")},
         "game_revision": game.get("commit"),
-        "checks": [{"id": MODE_CHECK["linux-godot"], "status": "passed"}],
+        "checks": [{"id": MODE_CHECKS["linux-godot"][0], "status": "passed"}],
     }, [manifest_path, raw]
 
 
@@ -147,7 +210,7 @@ def _linux_arm64(directory: Path, _revision: str) -> tuple[dict[str, Any], list[
     _require("linux/arm64" in manifest_text, "image manifest does not declare linux/arm64")
     return {
         "platform": {"system": "Linux", "architecture": "arm64"},
-        "checks": [{"id": MODE_CHECK["linux-arm64"], "status": "passed"}],
+        "checks": [{"id": MODE_CHECKS["linux-arm64"][0], "status": "passed"}],
     }, paths
 
 
@@ -169,11 +232,12 @@ def _live_openai(directory: Path, _revision: str) -> tuple[dict[str, Any], list[
         "platform": {"system": platform.system(), "architecture": platform.machine()},
         "provider": "openai",
         "model": result.get("model"),
-        "checks": [{"id": MODE_CHECK["live-openai"], "status": "passed"}],
+        "checks": [{"id": MODE_CHECKS["live-openai"][0], "status": "passed"}],
     }, [path]
 
 
 VALIDATORS = {
+    "macos": _macos,
     "linux-amd64": _linux_amd64,
     "linux-godot": _linux_godot,
     "linux-arm64": _linux_arm64,
@@ -201,20 +265,22 @@ def build_evidence(mode: str, directory: Path) -> dict[str, Any]:
 def update_review(evidence_path: Path, evidence: dict[str, Any]) -> None:
     review_path = ROOT / "docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json"
     review = _read(review_path)
-    check_id = MODE_CHECK[str(evidence["mode"])]
+    check_ids = MODE_CHECKS[str(evidence["mode"])]
     checks = {item["id"]: item for item in review.get("checks", [])}
-    _require(check_id in checks, f"platform review lacks check row: {check_id}")
+    for check_id in check_ids:
+        _require(check_id in checks, f"platform review lacks check row: {check_id}")
     try:
         display = evidence_path.resolve().relative_to(review_path.parent.resolve()).as_posix()
     except ValueError as exc:
         raise PlatformEvidenceError("--update-review requires evidence inside the platform review directory") from exc
-    checks[check_id] = {
-        "id": check_id,
-        "status": "passed",
-        "evidence": display,
-        "source_revision": evidence["source_revision"],
-        "source_contract_sha256": evidence["source_contract_sha256"],
-    }
+    for check_id in check_ids:
+        checks[check_id] = {
+            "id": check_id,
+            "status": "passed",
+            "evidence": display,
+            "source_revision": evidence["source_revision"],
+            "source_contract_sha256": evidence["source_contract_sha256"],
+        }
     review["checks"] = list(checks.values())
     review["reviewed_at"] = datetime.now(tz=UTC).isoformat()
     review["source_revision"] = _git_revision()

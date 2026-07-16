@@ -1,0 +1,58 @@
+#!/bin/sh
+set -eu
+
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+OUTPUT=${P4_MACOS_OUTPUT:-$ROOT/reports/platform-acceptance/macos-native}
+EVIDENCE=${P4_MACOS_EVIDENCE:-$OUTPUT/evidence.json}
+PORT=${P4_MACOS_PORT:-18081}
+
+test "$(uname -s)-$(uname -m)" = "Darwin-arm64" || {
+  echo "run-p4-macos requires a native Apple Silicon macOS host" >&2
+  exit 2
+}
+test -z "$(git -C "$ROOT" status --porcelain --untracked-files=all)" || {
+  echo "platform acceptance requires a clean worktree" >&2
+  exit 2
+}
+
+mkdir -p "$OUTPUT"
+cd "$ROOT"
+scripts/setup-build-week-toolchain --json >/dev/null
+. .tools/build-week/env.sh
+: "${GAME_PROJECT_PATH:=$ROOT/reports/build-week-2026/game-source}"
+export GAME_PROJECT_PATH
+test -f "$GAME_PROJECT_PATH/project.godot" || {
+  echo "materialized study-in-germany project is missing: $GAME_PROJECT_PATH" >&2
+  exit 2
+}
+
+EVALUATOR_OFFLINE=1 scripts/setup-evaluator >/dev/null
+EVALUATOR_OFFLINE=1 scripts/setup-evaluator >/dev/null
+/usr/bin/python3 tools/judge_doctor.py --mode inspect --json > "$OUTPUT/doctor-inspect.json"
+uv run python tools/judge_doctor.py --mode dashboard-native --json > "$OUTPUT/doctor-dashboard-native.json"
+uv run python tools/judge_doctor.py --mode real-game --json > "$OUTPUT/doctor-real-game.json"
+./judge --mode inspect --offline --json --output-dir - > "$OUTPUT/judge-inspect.json"
+./judge --mode replay --offline --json --output-dir - > "$OUTPUT/judge-replay.json"
+
+uv run python tools/run_judge_api.py --port "$PORT" --frontend frontend/dist \
+  > "$OUTPUT/api.stdout" 2> "$OUTPUT/api.stderr" &
+server_pid=$!
+cleanup() { kill "$server_pid" >/dev/null 2>&1 || true; wait "$server_pid" >/dev/null 2>&1 || true; }
+trap cleanup EXIT INT TERM
+for attempt in $(seq 1 20); do
+  if curl --fail --silent "http://127.0.0.1:$PORT/api/provider-status" > "$OUTPUT/provider-status.json"; then
+    break
+  fi
+  sleep 1
+done
+curl --fail --silent "http://127.0.0.1:$PORT/api/experiments/cashflow-drift-repair-v1" > "$OUTPUT/experiment.json"
+curl --fail --silent "http://127.0.0.1:$PORT/" > "$OUTPUT/root.html"
+cleanup
+trap - EXIT INT TERM
+
+uv run python tools/run_gameplay_agent.py sim \
+  --run-id macos-p4 --runs 2 --policy balanced --difficulty normal --seed 4242 \
+  --scenario default_first_semester --weeks 4 --report-dir "$OUTPUT/fresh-godot"
+uv run python tools/record_platform_evidence.py \
+  --mode macos --artifact-dir "$OUTPUT" --output "$EVIDENCE"
+echo "macOS P4 evidence: $EVIDENCE"

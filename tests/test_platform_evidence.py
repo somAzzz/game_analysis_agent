@@ -94,6 +94,28 @@ def test_linux_godot_selects_simulation_manifest_when_interactive_report_is_pres
     assert len(evidence["artifact_digests"]) == 2
 
 
+def test_macos_evidence_rejects_stale_doctor_outputs(tmp_path: Path) -> None:
+    doctor = {
+        "status": "ready",
+        "platform": {"system": "Darwin", "machine": "arm64"},
+        "source": {"revision": "0" * 40, "dirty": False},
+    }
+    for name in ("doctor-inspect.json", "doctor-dashboard-native.json", "doctor-real-game.json"):
+        _write(tmp_path / name, doctor)
+    for name in ("judge-inspect.json", "judge-replay.json"):
+        _write(tmp_path / name, {"status": "passed"})
+    _write(tmp_path / "provider-status.json", {"providers": {"replay": {"status": "available"}}})
+    _write(tmp_path / "experiment.json", {"status": "passed", "decision": "rejected"})
+    (tmp_path / "root.html").write_text('<div id="root"></div>', encoding="utf-8")
+    godot = tmp_path / "fresh-godot"
+    godot.mkdir()
+    _write(godot / "report_manifest.json", {"provenance": {}})
+    (godot / "raw_runs.jsonl").write_text("{}\n", encoding="utf-8")
+
+    with pytest.raises(PlatformEvidenceError, match="revision differs"):
+        build_evidence("macos", tmp_path)
+
+
 def test_live_openai_requires_completed_calls_and_rejects_secret(tmp_path: Path) -> None:
     result = {
         "status": "completed",

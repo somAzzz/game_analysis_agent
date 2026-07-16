@@ -16,6 +16,7 @@ PLATFORM_CONTRACT_FILES = (
     "frontend/package-lock.json",
     "frontend/package.json",
     "scripts/godot-docker-wrapper",
+    "scripts/run-p4-macos",
     "scripts/run-p4-linux-amd64",
     "scripts/run-p4-linux-arm64-image",
     "scripts/run-p4-linux-godot",
