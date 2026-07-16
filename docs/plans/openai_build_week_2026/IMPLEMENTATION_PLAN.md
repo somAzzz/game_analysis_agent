@@ -165,6 +165,42 @@ the demo will use one previously observed and reproducible invariant defect.
 The fallback must still run through the same repair protocol and may not be an
 artificially injected bug.
 
+### 4.5 Idea quality and differentiation
+
+The novelty claim is not that language models can play games or that coding
+agents can edit game code. The differentiated product is the closed,
+auditable experiment that connects those capabilities while preserving game
+design intent.
+
+| Approach | Diverse player intent | Reproducible execution | Changes source | Tests causal claim on holdouts | Can reject its own patch |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Scripted game bot | Limited | Yes | No | No | No |
+| LLM playtest report | Yes | Sometimes | No | No | No |
+| General coding agent from a bug report | No | Depends on prompt | Yes | Usually no | Sometimes |
+| Playtest Forge | Yes | Yes | Yes, constrained | Yes | Yes, by explicit gates |
+
+This is a conceptual comparison, not a claim that no adjacent product exists.
+The competition-worthy idea is the combination of:
+
+- behavioral diversity before diagnosis;
+- deterministic evidence instead of model-generated conclusions;
+- a design-intent contract that distinguishes desired difficulty from defects;
+- one falsifiable repair experiment rather than open-ended auto-balancing;
+- acceptance or rejection under both fixed and unseen seeds.
+
+Rejection is a successful product outcome. Preventing an attractive but
+overfit patch from reaching a human review is as valuable as generating a
+valid patch, and makes the tool credible for real repositories.
+
+### 4.6 Why Codex is indispensable
+
+Persona workers know only the public decision schema and current game state.
+They cannot inspect the repository, select an implementation mechanism, edit
+source, run repository-specific validation, or judge a Git diff. Codex can
+connect all of those contexts through the repository Skill. Removing Codex
+would leave a useful playtest report but eliminate the core product promise:
+turning evidence into a bounded, reviewable, and proven repair experiment.
+
 ## 5. System architecture
 
 ```text
@@ -495,6 +531,21 @@ startup through an ignored environment file or Docker secret.
 The existing editorial visual identity should be preserved. New UI work is
 limited to these three states; a general dashboard redesign is out of scope.
 
+### 11.3 Judge-visible design principles
+
+- **Progressive disclosure**: the first screen answers what failed, what
+  changed, and whether the proof passed; raw traces remain one level deeper.
+- **Evidence before explanation**: measured facts and trace references appear
+  before the Codex hypothesis.
+- **Uncertainty is visible**: partial campaigns, API errors, missing evidence,
+  and rejected patches cannot render as success.
+- **Before/after symmetry**: baseline and patched views use the same metrics,
+  seed groups, and visual scales.
+- **One focal action**: each stage has one primary next step—run, inspect, or
+  verify—so a judge can follow the golden path without learning the framework.
+- **Accessible proof**: status is never encoded by color alone; tables and
+  charts include text labels and keyboard-readable summaries.
+
 ## 12. Golden demo execution
 
 ### 12.1 Live versus recorded work
@@ -682,6 +733,38 @@ The final submission will report measured, not estimated, values for:
 The case study must state its limits: one reference game and one validated
 repair do not prove universal game compatibility.
 
+### 16.1 Minimum impact experiment
+
+The submission should include one small but honest workflow comparison using
+the same failure target:
+
+1. Record the time and manual steps required to locate the failure cluster
+   from raw playthrough output and prepare a reproducible developer report.
+2. Run Playtest Forge from the committed campaign bundle and record time to
+   cited hypothesis, time to candidate patch, and time to accept/reject proof.
+3. Report compute/API cost, failures, and human interventions for both the
+   live and replay paths.
+4. Ask at least one developer who did not build the workflow to complete the
+   clean-clone judge path and record setup time, points of confusion, and
+   whether the final decision was independently understandable.
+
+This is not a statistically significant user study. It is a concrete case
+study that tests the claimed value and exposes setup or comprehension costs.
+
+### 16.2 Impact claim ladder
+
+Claims must advance only as evidence becomes available:
+
+| Level | Permitted claim | Required evidence |
+| --- | --- | --- |
+| 0 | The architecture is designed to reduce repetitive QA work | Plan and contracts |
+| 1 | The reference case is reproducible | Clean clone, replay bundle, artifact hashes |
+| 2 | One real repair was accepted or rejected correctly | Full fixed/holdout experiment record |
+| 3 | The workflow reduced time or effort in this case | Timed comparison and intervention log |
+| 4 | Another developer could use and understand it | Independent clean-room test |
+
+The Devpost text and video may use only the highest level actually completed.
+
 ## 17. Risks and mitigations
 
 | Risk | Severity | Mitigation |
@@ -763,3 +846,44 @@ Conditional pass. The plan now demonstrates deep Codex/GPT-5.6 integration
 and non-trivial engineering. It is not competition-ready until the canonical
 game baseline, one real repair experiment, and clean Judge Mode are proven.
 
+### Review Pass 2: Quality of idea, product design, and potential impact
+
+**Review question**
+
+Would a judge remember this as a focused product with a defensible idea and
+measurable value, rather than as a collection of technically impressive game
+analysis scripts?
+
+**Findings before revision**
+
+1. The golden path was focused, but the novelty claim still sounded like a
+   loose combination of LLM playtesting and an autonomous coding agent.
+2. The plan did not explain what remains impossible if Codex is removed.
+3. A successful accepted patch was treated as the main payoff; the safety and
+   product value of rejecting an overfit patch were underdeveloped.
+4. The UI named three screens but did not state design rules that help a judge
+   understand evidence quickly or distinguish failure from success.
+5. The impact section listed telemetry but did not define an experiment that
+   could substantiate a time/effort claim.
+6. The plan risked turning targets into marketing claims before the final
+   campaign existed.
+
+**Changes applied in this revision**
+
+- Added a careful conceptual comparison across scripted bots, LLM playtest
+  reports, general coding agents, and Playtest Forge.
+- Defined the core invention as an intent-aware, evidence-gated repair
+  experiment with holdout proof and first-class rejection.
+- Added a “Why Codex is indispensable” boundary test.
+- Added judge-visible interaction, uncertainty, accessibility, and evidence
+  presentation principles.
+- Added a minimum impact experiment, an independent clean-room task, and a
+  claim ladder that prevents unsupported submission language.
+
+**Pass 2 verdict**
+
+Conditional pass. The idea is now focused and explainable in one sentence,
+with meaningful differentiation and an honest impact-validation path. The
+remaining risk is execution: without a real experiment record and a judge
+path that works from a clean machine, the differentiation remains a design
+claim rather than demonstrated product quality.
