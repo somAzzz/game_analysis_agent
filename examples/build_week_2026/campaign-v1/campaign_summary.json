@@ -1,0 +1,1216 @@
+{
+  "campaign_id": "build-week-2026-evidence-v1",
+  "cells": [
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 17,
+      "cell_id": "newbie-seed-42-5f892f958f7a",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-42-5f892f958f7a/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-42-5f892f958f7a",
+          "line_number": 4,
+          "persona": "newbie",
+          "record_sha256": "5eb07dc7581ca90e98f91d2a031275aa79de5c5ef855b74ad42ab0810499b0ef",
+          "seed": 42,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-42-5f892f958f7a/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-42-5f892f958f7a",
+          "line_number": 6,
+          "persona": "newbie",
+          "record_sha256": "2380302c276d17f5ef4f503385bfc0e66962eaed95aa335cd483f711f009a6ec",
+          "seed": 42,
+          "week": 6
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "newbie",
+      "persona_alignment_rate": 0.0,
+      "provider_error_rate": 0.0,
+      "seed": 42,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 17,
+      "cell_id": "newbie-seed-43-7df1f58c34e4",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-43-7df1f58c34e4/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-43-7df1f58c34e4",
+          "line_number": 4,
+          "persona": "newbie",
+          "record_sha256": "007075e493f72599357222bd2e5c4bc34d6c725ad8223766f64e606d8fa8703b",
+          "seed": 43,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-43-7df1f58c34e4/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-43-7df1f58c34e4",
+          "line_number": 6,
+          "persona": "newbie",
+          "record_sha256": "6106046863305319f3087ade0a720bb85fb7613e67be5e9cd1ba4404d795b285",
+          "seed": 43,
+          "week": 6
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "newbie",
+      "persona_alignment_rate": 0.0,
+      "provider_error_rate": 0.0,
+      "seed": 43,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 18,
+      "cell_id": "newbie-seed-44-0a3527c3786c",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-44-0a3527c3786c/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-44-0a3527c3786c",
+          "line_number": 4,
+          "persona": "newbie",
+          "record_sha256": "7a8369c7164a1a797b21d98166838e052488b036871d7f599e8bd405dc839c95",
+          "seed": 44,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-44-0a3527c3786c/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-44-0a3527c3786c",
+          "line_number": 14,
+          "persona": "newbie",
+          "record_sha256": "d81bc6b437fa35a64b17a586f8dd5f8e5ab97ed6a1fce72628de4c7b6def8d34",
+          "seed": 44,
+          "week": 14
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "newbie",
+      "persona_alignment_rate": 0.0,
+      "provider_error_rate": 0.0,
+      "seed": 44,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 17,
+      "cell_id": "study-seed-42-7d2e825b38e4",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-42-7d2e825b38e4/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-42-7d2e825b38e4",
+          "line_number": 4,
+          "persona": "study",
+          "record_sha256": "146ed29894e5eae7bfaddaf76b4e98963441af39cc4f4608407114d7ff654516",
+          "seed": 42,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-42-7d2e825b38e4/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-42-7d2e825b38e4",
+          "line_number": 6,
+          "persona": "study",
+          "record_sha256": "88aa5360db2f55a9c1da3e7932782bef1e7b8dab0ba2da159245f9d5620b2ba6",
+          "seed": 42,
+          "week": 6
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "study",
+      "persona_alignment_rate": 1.0,
+      "provider_error_rate": 0.0,
+      "seed": 42,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 17,
+      "cell_id": "study-seed-43-dbc157b6184d",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-43-dbc157b6184d/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-43-dbc157b6184d",
+          "line_number": 4,
+          "persona": "study",
+          "record_sha256": "33e12d863f03aceca2b76ec347456eec615b1beeb838c8ccc7350ea4a3ef2943",
+          "seed": 43,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-43-dbc157b6184d/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-43-dbc157b6184d",
+          "line_number": 3,
+          "persona": "study",
+          "record_sha256": "776fa30810435fde623176280da5b522f84f8bde0c0e63ea106f180b83548df4",
+          "seed": 43,
+          "week": 3
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "study",
+      "persona_alignment_rate": 1.0,
+      "provider_error_rate": 0.0,
+      "seed": 43,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 18,
+      "cell_id": "study-seed-44-e686b9b7053c",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-44-e686b9b7053c/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-44-e686b9b7053c",
+          "line_number": 4,
+          "persona": "study",
+          "record_sha256": "870e914bec9b684b4a9f8a95994f9815f1379d99f755fc93d9e0de0f9a0d984c",
+          "seed": 44,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-44-e686b9b7053c/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-44-e686b9b7053c",
+          "line_number": 6,
+          "persona": "study",
+          "record_sha256": "04f312ca506ef465e63d6d0f131fa28daf1f4bc83d8b73e188a5e078da1c8517",
+          "seed": 44,
+          "week": 6
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "study",
+      "persona_alignment_rate": 1.0,
+      "provider_error_rate": 0.0,
+      "seed": 44,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 18,
+      "cell_id": "money-seed-42-788c411014b0",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-42-788c411014b0/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-42-788c411014b0",
+          "line_number": 4,
+          "persona": "money",
+          "record_sha256": "c05481a0d03207da520e8c3df65d3ba2e7e1a5674442f0911625a0bf5d9f94a5",
+          "seed": 42,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-42-788c411014b0/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-42-788c411014b0",
+          "line_number": 3,
+          "persona": "money",
+          "record_sha256": "c9570ea6b2fe09cb438a15769d060e07d68395a60b842493af84d3e46d8d5884",
+          "seed": 42,
+          "week": 3
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "money",
+      "persona_alignment_rate": 0.0,
+      "provider_error_rate": 0.0,
+      "seed": 42,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 17,
+      "cell_id": "money-seed-43-08b22124c938",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-43-08b22124c938/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-43-08b22124c938",
+          "line_number": 4,
+          "persona": "money",
+          "record_sha256": "b8509bf2789c7a3c0f42dc039978e54999c3786fd988ab550543647800ef4dfe",
+          "seed": 43,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-43-08b22124c938/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-43-08b22124c938",
+          "line_number": 3,
+          "persona": "money",
+          "record_sha256": "e752b2d5743f5f0e19f78f15205f3a1c95a7c74b258f60a8950a6bb65e47d2f5",
+          "seed": 43,
+          "week": 3
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "money",
+      "persona_alignment_rate": 0.052632,
+      "provider_error_rate": 0.0,
+      "seed": 43,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 15,
+      "cashflow_crisis_weeks": 18,
+      "cell_id": "money-seed-44-761a50b43e8f",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-44-761a50b43e8f/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-44-761a50b43e8f",
+          "line_number": 4,
+          "persona": "money",
+          "record_sha256": "2c4da2bd2272e267b9aeb2bf2d0ae2bc9d5049a380a16a74fb74bc6ba348d5f4",
+          "seed": 44,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-44-761a50b43e8f/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-44-761a50b43e8f",
+          "line_number": 6,
+          "persona": "money",
+          "record_sha256": "2753d20ec0e8f44ec2352db63563bd07408de16f13e31208c441063fdec4d8a1",
+          "seed": 44,
+          "week": 6
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "money",
+      "persona_alignment_rate": 0.0,
+      "provider_error_rate": 0.0,
+      "seed": 44,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 17,
+      "cell_id": "social-seed-42-35718501a460",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-42-35718501a460/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-42-35718501a460",
+          "line_number": 4,
+          "persona": "social",
+          "record_sha256": "72658a657fe4e20d49296bd75e5cab5a795ec887bb9669ca9a357bcde095bcb0",
+          "seed": 42,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-42-35718501a460/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-42-35718501a460",
+          "line_number": 3,
+          "persona": "social",
+          "record_sha256": "ae4d43b2ebd56f7b5afddebb8f956f125a8135c84a7067789a168082201ca0ae",
+          "seed": 42,
+          "week": 3
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "social",
+      "persona_alignment_rate": 1.0,
+      "provider_error_rate": 0.0,
+      "seed": 42,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 17,
+      "cell_id": "social-seed-43-6812cbe89130",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-43-6812cbe89130/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-43-6812cbe89130",
+          "line_number": 4,
+          "persona": "social",
+          "record_sha256": "cd0e86d2c842a9e8702201ac8bc5df1a62e443c578269fd69815a0070aa4f086",
+          "seed": 43,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-43-6812cbe89130/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-43-6812cbe89130",
+          "line_number": 6,
+          "persona": "social",
+          "record_sha256": "7861968f1d0e1c8148296f4361a6836d73dcc7131ed3a91db13fe9de5b50add4",
+          "seed": 43,
+          "week": 6
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "social",
+      "persona_alignment_rate": 1.0,
+      "provider_error_rate": 0.0,
+      "seed": 43,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 17,
+      "cell_id": "social-seed-44-76d07fd8006d",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-44-76d07fd8006d/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-44-76d07fd8006d",
+          "line_number": 4,
+          "persona": "social",
+          "record_sha256": "23b6c06d22acde84dad82b44bb9f2ae850e836b6d76541dee563797af93e550e",
+          "seed": 44,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-44-76d07fd8006d/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-44-76d07fd8006d",
+          "line_number": 6,
+          "persona": "social",
+          "record_sha256": "37bc2c02a8d8f7ea15e137b2e7562b8359f56aad8c3bedc51c99d6229c95a47c",
+          "seed": 44,
+          "week": 6
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "social",
+      "persona_alignment_rate": 1.0,
+      "provider_error_rate": 0.0,
+      "seed": 44,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 18,
+      "cell_id": "visa-seed-42-7e9f114d5833",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-42-7e9f114d5833/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-42-7e9f114d5833",
+          "line_number": 4,
+          "persona": "visa",
+          "record_sha256": "aeacf7c5b33ae8e5d81bc1c693cd1857539bd3ac1a682c571ae3fac2ce50feb7",
+          "seed": 42,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-42-7e9f114d5833/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-42-7e9f114d5833",
+          "line_number": 6,
+          "persona": "visa",
+          "record_sha256": "99d8e9207f17c74b4cdd34e790490d99c73bd5688dabacfc7002169d1db9b30a",
+          "seed": 42,
+          "week": 6
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "visa",
+      "persona_alignment_rate": 1.0,
+      "provider_error_rate": 0.0,
+      "seed": 42,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 17,
+      "cell_id": "visa-seed-43-d2aa716c8593",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-43-d2aa716c8593/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-43-d2aa716c8593",
+          "line_number": 4,
+          "persona": "visa",
+          "record_sha256": "c4b7fc38ebe2164c1dceba089a5a013b51622570c21402d339b77b023e246849",
+          "seed": 43,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-43-d2aa716c8593/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-43-d2aa716c8593",
+          "line_number": 6,
+          "persona": "visa",
+          "record_sha256": "9b01d93493489ec8841a9ec85a9a05e70128ae3e3f1d31f9b0497f8e84bc23d7",
+          "seed": 43,
+          "week": 6
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "visa",
+      "persona_alignment_rate": 1.0,
+      "provider_error_rate": 0.0,
+      "seed": 43,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 18,
+      "cell_id": "visa-seed-44-6cd0817a131f",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-44-6cd0817a131f/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-44-6cd0817a131f",
+          "line_number": 4,
+          "persona": "visa",
+          "record_sha256": "4b3d2b80f23878b41050323fdf747449c1c8d7279b152b54543573e2461e1f8c",
+          "seed": 44,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-44-6cd0817a131f/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-44-6cd0817a131f",
+          "line_number": 10,
+          "persona": "visa",
+          "record_sha256": "df08293a5afb18c2c168b5805ed87f2c3c062caabeab31eb2effcfc482af50c4",
+          "seed": 44,
+          "week": 10
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "visa",
+      "persona_alignment_rate": 1.0,
+      "provider_error_rate": 0.0,
+      "seed": 44,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 18,
+      "cell_id": "slacker-seed-42-abc632354e36",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-42-abc632354e36/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-42-abc632354e36",
+          "line_number": 4,
+          "persona": "slacker",
+          "record_sha256": "d170744a3b4c53063cb72e47a049794f5ea7cbe468b5ccf3f0965f00152928c0",
+          "seed": 42,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-42-abc632354e36/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-42-abc632354e36",
+          "line_number": 6,
+          "persona": "slacker",
+          "record_sha256": "393006c6ae4aff4a86180726f8364979cf82b1ec47b6e95918c9d771101d17cd",
+          "seed": 42,
+          "week": 6
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "slacker",
+      "persona_alignment_rate": 0.0,
+      "provider_error_rate": 0.0,
+      "seed": 42,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 16,
+      "cashflow_crisis_weeks": 17,
+      "cell_id": "slacker-seed-43-3022539ba907",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-43-3022539ba907/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-43-3022539ba907",
+          "line_number": 4,
+          "persona": "slacker",
+          "record_sha256": "f9d4a13dda14733127cbb25ff656aa21eb42c7472bfc6a688e2b54e3ef58e98b",
+          "seed": 43,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-43-3022539ba907/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-43-3022539ba907",
+          "line_number": 3,
+          "persona": "slacker",
+          "record_sha256": "e9cede07e9dbae7b66aea2ffd2ba77ea9222148ebccc2249eeb97582d1787d4e",
+          "seed": 43,
+          "week": 3
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "slacker",
+      "persona_alignment_rate": 0.0,
+      "provider_error_rate": 0.0,
+      "seed": 43,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    },
+    {
+      "burnout_risk_weeks": 15,
+      "cashflow_crisis_weeks": 18,
+      "cell_id": "slacker-seed-44-811bc5bebba1",
+      "ending": "unknown",
+      "fallback_rate": 0.0,
+      "final_money": 0.0,
+      "first_failure_entries": {
+        "burnout-risk": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-44-811bc5bebba1/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-44-811bc5bebba1",
+          "line_number": 4,
+          "persona": "slacker",
+          "record_sha256": "273aea7b41934785532589842e8ff144d13b45dfd1aa38ce03e19de59379bfd1",
+          "seed": 44,
+          "week": 4
+        },
+        "cashflow-stress-attractor": {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-44-811bc5bebba1/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-44-811bc5bebba1",
+          "line_number": 6,
+          "persona": "slacker",
+          "record_sha256": "40386c3eef0018e471ebcf671a2117085b4a72fcf42115de9ed80a345cdaa86d",
+          "seed": 44,
+          "week": 6
+        }
+      },
+      "max_stress": 100.0,
+      "min_money": 0.0,
+      "persona": "slacker",
+      "persona_alignment_rate": 0.0,
+      "provider_error_rate": 0.0,
+      "seed": 44,
+      "state": "completed",
+      "valid_rate": 1.0,
+      "weeks": 19
+    }
+  ],
+  "clusters": [
+    {
+      "cell_rate": 1.0,
+      "cluster_id": "cashflow-stress-attractor",
+      "label": "Cashflow and stress attractor",
+      "member_count": 18,
+      "members": [
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-42-788c411014b0/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-42-788c411014b0",
+          "line_number": 3,
+          "persona": "money",
+          "record_sha256": "c9570ea6b2fe09cb438a15769d060e07d68395a60b842493af84d3e46d8d5884",
+          "seed": 42,
+          "week": 3
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-43-08b22124c938/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-43-08b22124c938",
+          "line_number": 3,
+          "persona": "money",
+          "record_sha256": "e752b2d5743f5f0e19f78f15205f3a1c95a7c74b258f60a8950a6bb65e47d2f5",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-44-761a50b43e8f/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-44-761a50b43e8f",
+          "line_number": 6,
+          "persona": "money",
+          "record_sha256": "2753d20ec0e8f44ec2352db63563bd07408de16f13e31208c441063fdec4d8a1",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-42-5f892f958f7a/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-42-5f892f958f7a",
+          "line_number": 6,
+          "persona": "newbie",
+          "record_sha256": "2380302c276d17f5ef4f503385bfc0e66962eaed95aa335cd483f711f009a6ec",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-43-7df1f58c34e4/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-43-7df1f58c34e4",
+          "line_number": 6,
+          "persona": "newbie",
+          "record_sha256": "6106046863305319f3087ade0a720bb85fb7613e67be5e9cd1ba4404d795b285",
+          "seed": 43,
+          "week": 6
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-44-0a3527c3786c/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-44-0a3527c3786c",
+          "line_number": 14,
+          "persona": "newbie",
+          "record_sha256": "d81bc6b437fa35a64b17a586f8dd5f8e5ab97ed6a1fce72628de4c7b6def8d34",
+          "seed": 44,
+          "week": 14
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-42-abc632354e36/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-42-abc632354e36",
+          "line_number": 6,
+          "persona": "slacker",
+          "record_sha256": "393006c6ae4aff4a86180726f8364979cf82b1ec47b6e95918c9d771101d17cd",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-43-3022539ba907/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-43-3022539ba907",
+          "line_number": 3,
+          "persona": "slacker",
+          "record_sha256": "e9cede07e9dbae7b66aea2ffd2ba77ea9222148ebccc2249eeb97582d1787d4e",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-44-811bc5bebba1/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-44-811bc5bebba1",
+          "line_number": 6,
+          "persona": "slacker",
+          "record_sha256": "40386c3eef0018e471ebcf671a2117085b4a72fcf42115de9ed80a345cdaa86d",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-42-35718501a460/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-42-35718501a460",
+          "line_number": 3,
+          "persona": "social",
+          "record_sha256": "ae4d43b2ebd56f7b5afddebb8f956f125a8135c84a7067789a168082201ca0ae",
+          "seed": 42,
+          "week": 3
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-43-6812cbe89130/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-43-6812cbe89130",
+          "line_number": 6,
+          "persona": "social",
+          "record_sha256": "7861968f1d0e1c8148296f4361a6836d73dcc7131ed3a91db13fe9de5b50add4",
+          "seed": 43,
+          "week": 6
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-44-76d07fd8006d/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-44-76d07fd8006d",
+          "line_number": 6,
+          "persona": "social",
+          "record_sha256": "37bc2c02a8d8f7ea15e137b2e7562b8359f56aad8c3bedc51c99d6229c95a47c",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-42-7d2e825b38e4/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-42-7d2e825b38e4",
+          "line_number": 6,
+          "persona": "study",
+          "record_sha256": "88aa5360db2f55a9c1da3e7932782bef1e7b8dab0ba2da159245f9d5620b2ba6",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-43-dbc157b6184d/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-43-dbc157b6184d",
+          "line_number": 3,
+          "persona": "study",
+          "record_sha256": "776fa30810435fde623176280da5b522f84f8bde0c0e63ea106f180b83548df4",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-44-e686b9b7053c/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-44-e686b9b7053c",
+          "line_number": 6,
+          "persona": "study",
+          "record_sha256": "04f312ca506ef465e63d6d0f131fa28daf1f4bc83d8b73e188a5e078da1c8517",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-42-7e9f114d5833/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-42-7e9f114d5833",
+          "line_number": 6,
+          "persona": "visa",
+          "record_sha256": "99d8e9207f17c74b4cdd34e790490d99c73bd5688dabacfc7002169d1db9b30a",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-43-d2aa716c8593/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-43-d2aa716c8593",
+          "line_number": 6,
+          "persona": "visa",
+          "record_sha256": "9b01d93493489ec8841a9ec85a9a05e70128ae3e3f1d31f9b0497f8e84bc23d7",
+          "seed": 43,
+          "week": 6
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-44-6cd0817a131f/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-44-6cd0817a131f",
+          "line_number": 10,
+          "persona": "visa",
+          "record_sha256": "df08293a5afb18c2c168b5805ed87f2c3c062caabeab31eb2effcfc482af50c4",
+          "seed": 44,
+          "week": 10
+        }
+      ],
+      "persona_counts": {
+        "money": 3,
+        "newbie": 3,
+        "slacker": 3,
+        "social": 3,
+        "study": 3,
+        "visa": 3
+      },
+      "representatives": [
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-42-788c411014b0/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-42-788c411014b0",
+          "line_number": 3,
+          "persona": "money",
+          "record_sha256": "c9570ea6b2fe09cb438a15769d060e07d68395a60b842493af84d3e46d8d5884",
+          "seed": 42,
+          "week": 3
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-43-08b22124c938/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-43-08b22124c938",
+          "line_number": 3,
+          "persona": "money",
+          "record_sha256": "e752b2d5743f5f0e19f78f15205f3a1c95a7c74b258f60a8950a6bb65e47d2f5",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-44-761a50b43e8f/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-44-761a50b43e8f",
+          "line_number": 6,
+          "persona": "money",
+          "record_sha256": "2753d20ec0e8f44ec2352db63563bd07408de16f13e31208c441063fdec4d8a1",
+          "seed": 44,
+          "week": 6
+        }
+      ],
+      "rule": {
+        "cluster_id": "cashflow-stress-attractor",
+        "consecutive_weeks": 2,
+        "fallback_used": null,
+        "label": "Cashflow and stress attractor",
+        "money_lte": 0.0,
+        "stress_gte": 80.0
+      }
+    },
+    {
+      "cell_rate": 1.0,
+      "cluster_id": "burnout-risk",
+      "label": "Sustained burnout risk",
+      "member_count": 18,
+      "members": [
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-42-788c411014b0/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-42-788c411014b0",
+          "line_number": 4,
+          "persona": "money",
+          "record_sha256": "c05481a0d03207da520e8c3df65d3ba2e7e1a5674442f0911625a0bf5d9f94a5",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-43-08b22124c938/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-43-08b22124c938",
+          "line_number": 4,
+          "persona": "money",
+          "record_sha256": "b8509bf2789c7a3c0f42dc039978e54999c3786fd988ab550543647800ef4dfe",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-44-761a50b43e8f/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-44-761a50b43e8f",
+          "line_number": 4,
+          "persona": "money",
+          "record_sha256": "2c4da2bd2272e267b9aeb2bf2d0ae2bc9d5049a380a16a74fb74bc6ba348d5f4",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-42-5f892f958f7a/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-42-5f892f958f7a",
+          "line_number": 4,
+          "persona": "newbie",
+          "record_sha256": "5eb07dc7581ca90e98f91d2a031275aa79de5c5ef855b74ad42ab0810499b0ef",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-43-7df1f58c34e4/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-43-7df1f58c34e4",
+          "line_number": 4,
+          "persona": "newbie",
+          "record_sha256": "007075e493f72599357222bd2e5c4bc34d6c725ad8223766f64e606d8fa8703b",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/newbie-seed-44-0a3527c3786c/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-44-0a3527c3786c",
+          "line_number": 4,
+          "persona": "newbie",
+          "record_sha256": "7a8369c7164a1a797b21d98166838e052488b036871d7f599e8bd405dc839c95",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-42-abc632354e36/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-42-abc632354e36",
+          "line_number": 4,
+          "persona": "slacker",
+          "record_sha256": "d170744a3b4c53063cb72e47a049794f5ea7cbe468b5ccf3f0965f00152928c0",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-43-3022539ba907/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-43-3022539ba907",
+          "line_number": 4,
+          "persona": "slacker",
+          "record_sha256": "f9d4a13dda14733127cbb25ff656aa21eb42c7472bfc6a688e2b54e3ef58e98b",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/slacker-seed-44-811bc5bebba1/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-44-811bc5bebba1",
+          "line_number": 4,
+          "persona": "slacker",
+          "record_sha256": "273aea7b41934785532589842e8ff144d13b45dfd1aa38ce03e19de59379bfd1",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-42-35718501a460/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-42-35718501a460",
+          "line_number": 4,
+          "persona": "social",
+          "record_sha256": "72658a657fe4e20d49296bd75e5cab5a795ec887bb9669ca9a357bcde095bcb0",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-43-6812cbe89130/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-43-6812cbe89130",
+          "line_number": 4,
+          "persona": "social",
+          "record_sha256": "cd0e86d2c842a9e8702201ac8bc5df1a62e443c578269fd69815a0070aa4f086",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/social-seed-44-76d07fd8006d/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-44-76d07fd8006d",
+          "line_number": 4,
+          "persona": "social",
+          "record_sha256": "23b6c06d22acde84dad82b44bb9f2ae850e836b6d76541dee563797af93e550e",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-42-7d2e825b38e4/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-42-7d2e825b38e4",
+          "line_number": 4,
+          "persona": "study",
+          "record_sha256": "146ed29894e5eae7bfaddaf76b4e98963441af39cc4f4608407114d7ff654516",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-43-dbc157b6184d/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-43-dbc157b6184d",
+          "line_number": 4,
+          "persona": "study",
+          "record_sha256": "33e12d863f03aceca2b76ec347456eec615b1beeb838c8ccc7350ea4a3ef2943",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/study-seed-44-e686b9b7053c/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-44-e686b9b7053c",
+          "line_number": 4,
+          "persona": "study",
+          "record_sha256": "870e914bec9b684b4a9f8a95994f9815f1379d99f755fc93d9e0de0f9a0d984c",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-42-7e9f114d5833/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-42-7e9f114d5833",
+          "line_number": 4,
+          "persona": "visa",
+          "record_sha256": "aeacf7c5b33ae8e5d81bc1c693cd1857539bd3ac1a682c571ae3fac2ce50feb7",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-43-d2aa716c8593/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-43-d2aa716c8593",
+          "line_number": 4,
+          "persona": "visa",
+          "record_sha256": "c4b7fc38ebe2164c1dceba089a5a013b51622570c21402d339b77b023e246849",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/visa-seed-44-6cd0817a131f/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-44-6cd0817a131f",
+          "line_number": 4,
+          "persona": "visa",
+          "record_sha256": "4b3d2b80f23878b41050323fdf747449c1c8d7279b152b54543573e2461e1f8c",
+          "seed": 44,
+          "week": 4
+        }
+      ],
+      "persona_counts": {
+        "money": 3,
+        "newbie": 3,
+        "slacker": 3,
+        "social": 3,
+        "study": 3,
+        "visa": 3
+      },
+      "representatives": [
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-42-788c411014b0/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-42-788c411014b0",
+          "line_number": 4,
+          "persona": "money",
+          "record_sha256": "c05481a0d03207da520e8c3df65d3ba2e7e1a5674442f0911625a0bf5d9f94a5",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-43-08b22124c938/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-43-08b22124c938",
+          "line_number": 4,
+          "persona": "money",
+          "record_sha256": "b8509bf2789c7a3c0f42dc039978e54999c3786fd988ab550543647800ef4dfe",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "reports/build-week-2026/campaigns/build-week-2026-evidence-v1/cells/money-seed-44-761a50b43e8f/playthrough.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-44-761a50b43e8f",
+          "line_number": 4,
+          "persona": "money",
+          "record_sha256": "2c4da2bd2272e267b9aeb2bf2d0ae2bc9d5049a380a16a74fb74bc6ba348d5f4",
+          "seed": 44,
+          "week": 4
+        }
+      ],
+      "rule": {
+        "cluster_id": "burnout-risk",
+        "consecutive_weeks": 2,
+        "fallback_used": null,
+        "label": "Sustained burnout risk",
+        "money_lte": null,
+        "stress_gte": 90.0
+      }
+    },
+    {
+      "cell_rate": 0.0,
+      "cluster_id": "provider-fallback",
+      "label": "Persona provider fallback",
+      "member_count": 0,
+      "members": [],
+      "persona_counts": {},
+      "representatives": [],
+      "rule": {
+        "cluster_id": "provider-fallback",
+        "consecutive_weeks": 1,
+        "fallback_used": true,
+        "label": "Persona provider fallback",
+        "money_lte": null,
+        "stress_gte": null
+      }
+    }
+  ],
+  "metrics": {
+    "cancelled_cells": 0,
+    "completed_cells": 18,
+    "expected_cells": 18,
+    "failed_cells": 0,
+    "fallback_rate": 0.0,
+    "mean_final_money": 0.0,
+    "mean_max_stress": 100.0,
+    "partial_cells": 0,
+    "persona_alignment_rate": 0.502924,
+    "provider_error_rate": 0.0,
+    "total_weeks": 342,
+    "valid_rate": 1.0
+  },
+  "request_fingerprint": "8fa65234cb151a16534cfdbad7a2a26b330a9efc0610c701f7e20e87a41b7538",
+  "rules_fingerprint": "7de01b76e52d72c9472f9e8fe66fd78ef00b6299f29b8ee013bd6736586ac61b",
+  "schema_version": "campaign-aggregation-v1",
+  "source_fingerprint": "01dbba63744eec8f0c055fe6cc75bc0dd9ddf02a9ea6192238193dd009eee49b"
+}

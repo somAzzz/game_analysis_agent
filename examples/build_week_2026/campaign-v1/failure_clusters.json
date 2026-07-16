@@ -1,0 +1,496 @@
+{
+  "campaign_id": "build-week-2026-evidence-v1",
+  "clusters": [
+    {
+      "cell_rate": 1.0,
+      "cluster_id": "cashflow-stress-attractor",
+      "label": "Cashflow and stress attractor",
+      "member_count": 18,
+      "members": [
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-42-788c411014b0",
+          "line_number": 117,
+          "persona": "money",
+          "record_sha256": "4234e244da648e83213ecfbbd99e2eeb71e75940e61f11af34a5dd333f76cbcd",
+          "seed": 42,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-43-08b22124c938",
+          "line_number": 136,
+          "persona": "money",
+          "record_sha256": "e1bb4d1cbbe2ac93c4c531b8b8bd8b979730eb072e30bdf788d3412f68e41b66",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-44-761a50b43e8f",
+          "line_number": 158,
+          "persona": "money",
+          "record_sha256": "39ff7b11266f67102042a96c060a43cbc8dfa7a428dc51250f1b3eb666388b92",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-42-5f892f958f7a",
+          "line_number": 6,
+          "persona": "newbie",
+          "record_sha256": "fcfb9d2b2b02eb1c6e29b1de95f6d9b32341afa0266aa650cd4a3c293981ab2e",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-43-7df1f58c34e4",
+          "line_number": 25,
+          "persona": "newbie",
+          "record_sha256": "75a08c79def168682414ed6c427a78b88faa3da2ba01d62eedc0a05609627884",
+          "seed": 43,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-44-0a3527c3786c",
+          "line_number": 52,
+          "persona": "newbie",
+          "record_sha256": "1b996a69a5970a148b1373f17b35caa53a322c8a701311e366e3c1794f10ee52",
+          "seed": 44,
+          "week": 14
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-42-abc632354e36",
+          "line_number": 291,
+          "persona": "slacker",
+          "record_sha256": "a50a1fedceca90f5e33742a81a0dd2879f1e28989bdee40ec05ed4a7ce3795f6",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-43-3022539ba907",
+          "line_number": 307,
+          "persona": "slacker",
+          "record_sha256": "3b8cb42c1c664f3aaf4b65c1a29a692fc754d37b3112ac7328b480b1d1196076",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-44-811bc5bebba1",
+          "line_number": 329,
+          "persona": "slacker",
+          "record_sha256": "6c0a9c13bf0c8ab21ac9fdcd4b92cb3b7a87527d3d3515b87082b40f146c51ac",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-42-35718501a460",
+          "line_number": 174,
+          "persona": "social",
+          "record_sha256": "822a1d13e802e75f0dec1efc91c3a5d787e18e7c92319ccbce962ebc40d8863f",
+          "seed": 42,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-43-6812cbe89130",
+          "line_number": 196,
+          "persona": "social",
+          "record_sha256": "42767cd83176be66f8fb2ad3f9b00269ee367d2b99534c5dbcf60412b231d57b",
+          "seed": 43,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-44-76d07fd8006d",
+          "line_number": 215,
+          "persona": "social",
+          "record_sha256": "0c71775a66f1086d82fdb2b08d877c50400fc9e2bf0dfc7613328c607209ec21",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-42-7d2e825b38e4",
+          "line_number": 63,
+          "persona": "study",
+          "record_sha256": "9db358c6fe7ea378ea02115ebb8c6446a53dd0a84153d53566f6fc48c30e6048",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-43-dbc157b6184d",
+          "line_number": 79,
+          "persona": "study",
+          "record_sha256": "59516d62cbf0d3d253a5188b2a6f9ac2449a3cac5a5dcc17453b883e1d6a630c",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-44-e686b9b7053c",
+          "line_number": 101,
+          "persona": "study",
+          "record_sha256": "063dd3aa815bd1245548c142ee7d3da3a6b6adc5471ff1f4ee29e556272c39e1",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-42-7e9f114d5833",
+          "line_number": 234,
+          "persona": "visa",
+          "record_sha256": "106ea2ca22734545d3d1543071e5d32f05dc71414afd488806d510b7dc15fe40",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-43-d2aa716c8593",
+          "line_number": 253,
+          "persona": "visa",
+          "record_sha256": "a8b6a7bf3ccbc513e5cf4ff83e2fad501035b4054a546434d6132cfd03093d73",
+          "seed": 43,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-44-6cd0817a131f",
+          "line_number": 276,
+          "persona": "visa",
+          "record_sha256": "6d4fa4936408534a220f9e0e96d4ca1847251ade5aac1e7f52c51e9048793b65",
+          "seed": 44,
+          "week": 10
+        }
+      ],
+      "persona_counts": {
+        "money": 3,
+        "newbie": 3,
+        "slacker": 3,
+        "social": 3,
+        "study": 3,
+        "visa": 3
+      },
+      "representatives": [
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-42-788c411014b0",
+          "line_number": 117,
+          "persona": "money",
+          "record_sha256": "4234e244da648e83213ecfbbd99e2eeb71e75940e61f11af34a5dd333f76cbcd",
+          "seed": 42,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-43-08b22124c938",
+          "line_number": 136,
+          "persona": "money",
+          "record_sha256": "e1bb4d1cbbe2ac93c4c531b8b8bd8b979730eb072e30bdf788d3412f68e41b66",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-44-761a50b43e8f",
+          "line_number": 158,
+          "persona": "money",
+          "record_sha256": "39ff7b11266f67102042a96c060a43cbc8dfa7a428dc51250f1b3eb666388b92",
+          "seed": 44,
+          "week": 6
+        }
+      ],
+      "rule": {
+        "cluster_id": "cashflow-stress-attractor",
+        "consecutive_weeks": 2,
+        "fallback_used": null,
+        "label": "Cashflow and stress attractor",
+        "money_lte": 0.0,
+        "stress_gte": 80.0
+      }
+    },
+    {
+      "cell_rate": 1.0,
+      "cluster_id": "burnout-risk",
+      "label": "Sustained burnout risk",
+      "member_count": 18,
+      "members": [
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-42-788c411014b0",
+          "line_number": 118,
+          "persona": "money",
+          "record_sha256": "343b83a9cfa7f19f5c2e386b3b49ab70bcc998e54af4c081d4f28e12a7a9951a",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-43-08b22124c938",
+          "line_number": 137,
+          "persona": "money",
+          "record_sha256": "5f5d57089baf6ba3ae3970dec99adbe66df0dc143dbb18facfb5e4433e43fc49",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-44-761a50b43e8f",
+          "line_number": 156,
+          "persona": "money",
+          "record_sha256": "e4f3ba1a87312fbcdd4e8a2b96e6b67eb5f0bd81f667dc9a4e110983299139ae",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-42-5f892f958f7a",
+          "line_number": 4,
+          "persona": "newbie",
+          "record_sha256": "209325d947f6a500c525a9cbe11f808a01f0b498cace8cfdf88e456a91419d1c",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-43-7df1f58c34e4",
+          "line_number": 23,
+          "persona": "newbie",
+          "record_sha256": "d46c6d91875489fa22a77906d560649015c9e373ddfa69068e68f40a0cde8291",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "newbie-seed-44-0a3527c3786c",
+          "line_number": 42,
+          "persona": "newbie",
+          "record_sha256": "8681ca0ce1c721c7b2feeaf6ac6c03425ad2909f075a7198e1f558a2f7d1392c",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-42-abc632354e36",
+          "line_number": 289,
+          "persona": "slacker",
+          "record_sha256": "27c2e3d986da0d89bd6f718566d17dde653f23f85bc4f6f40672fdbe72d74b13",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-43-3022539ba907",
+          "line_number": 308,
+          "persona": "slacker",
+          "record_sha256": "36fc3d0e88e3a8e018b3603ba0c2609b1f0b9dd7df0e722e4d561f3021029366",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "slacker-seed-44-811bc5bebba1",
+          "line_number": 327,
+          "persona": "slacker",
+          "record_sha256": "efb855baf8c06e65807262b411a5b75e8824365c04ecb78cad2a5d320da7aa2d",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-42-35718501a460",
+          "line_number": 175,
+          "persona": "social",
+          "record_sha256": "336727b4aa9e46bf74ca99cc019919c80ab2f0512f1cd9e5c87cd50845db3bc1",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-43-6812cbe89130",
+          "line_number": 194,
+          "persona": "social",
+          "record_sha256": "7f7f8c0eaf140285ddd1b20c77d32044e80a07453a28e17897c5d3fb5763fbd7",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "social-seed-44-76d07fd8006d",
+          "line_number": 213,
+          "persona": "social",
+          "record_sha256": "b1fda94c983110a8d5a310e9c517d13882fdd78bf061f918a754be2fbf6858a4",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-42-7d2e825b38e4",
+          "line_number": 61,
+          "persona": "study",
+          "record_sha256": "8a037645d0674cb6afb20a9b1a6d5ee39c047feb1e53a7b0ae8b9e1c27f6da0f",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-43-dbc157b6184d",
+          "line_number": 80,
+          "persona": "study",
+          "record_sha256": "dc9b3f35033e1fb2318725bfcfc3f72bfa8187be45c4aecb370b3f5bce5c0177",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "study-seed-44-e686b9b7053c",
+          "line_number": 99,
+          "persona": "study",
+          "record_sha256": "e4ea0810cd5bf20b1fa3bfd90e2cdc7d16367d1f3cd1189915e41e25634c4963",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-42-7e9f114d5833",
+          "line_number": 232,
+          "persona": "visa",
+          "record_sha256": "c0b20acd1a792acef63ed0b2012e1f7c2bee0b68861032ac27bbfb879a8ea23d",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-43-d2aa716c8593",
+          "line_number": 251,
+          "persona": "visa",
+          "record_sha256": "13fb30f2918ab9ab8b2dffd4b6788ba12a8f62d844b2d6b0a9375554b35c0b85",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "visa-seed-44-6cd0817a131f",
+          "line_number": 270,
+          "persona": "visa",
+          "record_sha256": "f685ccd52662c3d9fb3d585ce636711ff11efbeaff1afb9df75caa5f5faa33bf",
+          "seed": 44,
+          "week": 4
+        }
+      ],
+      "persona_counts": {
+        "money": 3,
+        "newbie": 3,
+        "slacker": 3,
+        "social": 3,
+        "study": 3,
+        "visa": 3
+      },
+      "representatives": [
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-42-788c411014b0",
+          "line_number": 118,
+          "persona": "money",
+          "record_sha256": "343b83a9cfa7f19f5c2e386b3b49ab70bcc998e54af4c081d4f28e12a7a9951a",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-43-08b22124c938",
+          "line_number": 137,
+          "persona": "money",
+          "record_sha256": "5f5d57089baf6ba3ae3970dec99adbe66df0dc143dbb18facfb5e4433e43fc49",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "build-week-2026-evidence-v1",
+          "cell_id": "money-seed-44-761a50b43e8f",
+          "line_number": 156,
+          "persona": "money",
+          "record_sha256": "e4f3ba1a87312fbcdd4e8a2b96e6b67eb5f0bd81f667dc9a4e110983299139ae",
+          "seed": 44,
+          "week": 4
+        }
+      ],
+      "rule": {
+        "cluster_id": "burnout-risk",
+        "consecutive_weeks": 2,
+        "fallback_used": null,
+        "label": "Sustained burnout risk",
+        "money_lte": null,
+        "stress_gte": 90.0
+      }
+    },
+    {
+      "cell_rate": 0.0,
+      "cluster_id": "provider-fallback",
+      "label": "Persona provider fallback",
+      "member_count": 0,
+      "members": [],
+      "persona_counts": {},
+      "representatives": [],
+      "rule": {
+        "cluster_id": "provider-fallback",
+        "consecutive_weeks": 1,
+        "fallback_used": true,
+        "label": "Persona provider fallback",
+        "money_lte": null,
+        "stress_gte": null
+      }
+    }
+  ],
+  "rules_fingerprint": "7de01b76e52d72c9472f9e8fe66fd78ef00b6299f29b8ee013bd6736586ac61b",
+  "schema_version": "public-failure-clusters-v1"
+}
