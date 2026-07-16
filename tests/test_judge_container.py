@@ -78,3 +78,22 @@ def test_linux_delivery_ci_runs_native_container_and_dashboard_smokes() -> None:
     assert "--read-only" in rendered
     assert "tools/run_judge_api.py" in rendered
     assert "/api/provider-status" in rendered
+    assert "record_platform_evidence.py" in rendered
+
+
+def test_workflow_publishes_then_executes_image_on_native_arm64() -> None:
+    workflow = yaml.safe_load((ROOT / ".github/workflows/test.yml").read_text(encoding="utf-8"))
+    publish = workflow["jobs"]["publish-judge-image"]
+    arm = workflow["jobs"]["judge-linux-arm64"]
+    rendered_publish = json.dumps(publish)
+    rendered_arm = json.dumps(arm)
+
+    assert publish["permissions"]["packages"] == "write"
+    assert "tools/build_judge_image.sh" in rendered_publish
+    assert "judge-image-metadata.json" in rendered_publish
+    assert arm["runs-on"] == "ubuntu-24.04-arm"
+    assert arm["needs"] == "publish-judge-image"
+    assert arm["permissions"]["packages"] == "read"
+    assert "docker/login-action" in rendered_arm
+    assert "run-p4-linux-arm64-image" in rendered_arm
+    assert "JUDGE_IMAGE_DIGEST_REF" in rendered_arm

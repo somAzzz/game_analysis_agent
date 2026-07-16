@@ -48,6 +48,6 @@ done
 cleanup
 trap - EXIT INT TERM
 
-uv run python tools/record_platform_evidence.py \
+python3 tools/record_platform_evidence.py \
   --mode linux-arm64 --artifact-dir "$OUTPUT" --output "$EVIDENCE"
 echo "Linux arm64 P4 evidence: $EVIDENCE"

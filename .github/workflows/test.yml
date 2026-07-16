@@ -23,6 +23,11 @@ on:
         required: true
         default: 4.4-stable
         type: string
+      publish_judge_image:
+        description: Publish the GHCR multi-architecture Judge image and run native arm64 acceptance
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -168,6 +173,13 @@ jobs:
           jq -e '.providers.replay.status == "available"' reports/platform-ci/provider-status.json
           curl --fail --silent http://127.0.0.1:18080/ | grep -q '<div id="root"></div>'
 
+      - name: Validate Linux amd64 evidence packet
+        run: >-
+          uv run python tools/record_platform_evidence.py
+          --mode linux-amd64
+          --artifact-dir reports/platform-ci
+          --output reports/platform-ci/evidence.json
+
       - name: Stop Judge UI
         if: always()
         run: docker rm --force playtest-forge-dashboard 2>/dev/null || true
@@ -178,6 +190,104 @@ jobs:
         with:
           name: judge-linux-amd64-${{ github.run_id }}
           path: reports/platform-ci
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-judge-image:
+    name: Publish multi-architecture Judge image
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_judge_image
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      digest_ref: ${{ steps.metadata.outputs.digest_ref }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU for image publication only
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Authenticate to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push both image manifests
+        env:
+          JUDGE_IMAGE_REF: ghcr.io/${{ github.repository_owner }}/playtest-forge-judge
+          JUDGE_IMAGE_TAG: build-week-2026-${{ github.sha }}
+        run: tools/build_judge_image.sh
+
+      - name: Export digest reference
+        id: metadata
+        run: |
+          reference="$(jq -r .reference judge-image-metadata.json)"
+          digest="$(jq -r .index_digest judge-image-metadata.json)"
+          echo "digest_ref=${reference}@${digest}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload published image metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: judge-image-metadata-${{ github.run_id }}
+          path: judge-image-metadata.json
+          if-no-files-found: error
+          retention-days: 14
+
+  judge-linux-arm64:
+    name: Native Linux arm64 Judge delivery
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_judge_image
+    needs: publish-judge-image
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Authenticate to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Require native Linux arm64 runner
+        run: |
+          test "$(uname -s)" = Linux
+          case "$(uname -m)" in aarch64|arm64) ;; *) exit 1 ;; esac
+
+      - name: Execute published image by index digest
+        env:
+          JUDGE_IMAGE_DIGEST_REF: ${{ needs.publish-judge-image.outputs.digest_ref }}
+          P4_LINUX_ARM64_OUTPUT: ${{ github.workspace }}/reports/platform-ci-arm64
+        run: scripts/run-p4-linux-arm64-image
+
+      - name: Upload native arm64 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: judge-linux-arm64-${{ github.run_id }}
+          path: reports/platform-ci-arm64
           if-no-files-found: error
           retention-days: 14
 
@@ -301,6 +411,15 @@ jobs:
         run: uv run pytest tests/test_game_contract.py -m game_contract -q -ra
         working-directory: game-analysis-agent
 
+      - name: Validate pinned Linux Godot evidence packet
+        if: always()
+        run: |
+          mkdir -p reports/platform-ci
+          uv run python tools/record_platform_evidence.py \
+            --mode linux-godot --artifact-dir reports \
+            --output reports/platform-ci/linux-godot-evidence.json
+        working-directory: game-analysis-agent
+
       - name: Upload generated contract evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -309,6 +428,7 @@ jobs:
           path: |
             game-analysis-agent/reports/balance/ci-smoke
             game-analysis-agent/reports/interactive/ci-smoke
+            game-analysis-agent/reports/platform-ci
             study-in-germany/reports
           if-no-files-found: warn
           retention-days: 14

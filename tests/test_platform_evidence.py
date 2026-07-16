@@ -66,6 +66,34 @@ def test_linux_amd64_rejects_emulated_or_dirty_runner(tmp_path: Path) -> None:
         build_evidence("linux-amd64", tmp_path)
 
 
+def test_linux_godot_selects_simulation_manifest_when_interactive_report_is_present(
+    tmp_path: Path,
+) -> None:
+    simulation = tmp_path / "balance" / "ci-smoke"
+    interactive = tmp_path / "interactive" / "ci-smoke"
+    simulation.mkdir(parents=True)
+    interactive.mkdir(parents=True)
+    manifest = {
+        "provenance": {
+            "agent_repository": {"commit": _revision(), "dirty": False},
+            "runtime": {
+                "platform": "Linux-6.8-x86_64",
+                "godot": {"version": "4.4.stable.official"},
+            },
+            "game_repository": {"commit": "a" * 40},
+        }
+    }
+    _write(simulation / "report_manifest.json", manifest)
+    (simulation / "raw_runs.jsonl").write_text('{"week": 1}\n', encoding="utf-8")
+    _write(interactive / "report_manifest.json", {"kind": "interactive"})
+
+    evidence = build_evidence("linux-godot", tmp_path)
+
+    assert evidence["status"] == "passed"
+    assert evidence["toolchain"]["godot"] == "4.4.stable.official"
+    assert len(evidence["artifact_digests"]) == 2
+
+
 def test_live_openai_requires_completed_calls_and_rejects_secret(tmp_path: Path) -> None:
     result = {
         "status": "completed",

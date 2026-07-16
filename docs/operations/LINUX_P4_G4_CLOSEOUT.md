@@ -69,6 +69,14 @@ revision, missing raw trace, an unpinned game, or Godot other than 4.4.
 
 ## 4. Publish and execute the arm64 image
 
+The preferred evidence path is a manual `Test` workflow dispatch with
+`publish_judge_image=true`. It publishes the multi-architecture image to GHCR,
+then executes the digest-pinned arm64 image on GitHub's native
+`ubuntu-24.04-arm` runner. Download both the image-metadata and
+`judge-linux-arm64-<run-id>` artifacts before importing them into the review.
+
+The equivalent local/registry procedure is below.
+
 Authenticate to the registry and publish both native manifests:
 
 ```bash

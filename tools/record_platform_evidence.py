@@ -98,8 +98,12 @@ def _linux_amd64(directory: Path, revision: str) -> tuple[dict[str, Any], list[P
 
 
 def _linux_godot(directory: Path, revision: str) -> tuple[dict[str, Any], list[Path]]:
-    manifests = [path for path in directory.rglob("report_manifest.json") if "ci-smoke" in path.as_posix()]
-    _require(len(manifests) == 1, "expected exactly one ci-smoke report_manifest.json")
+    manifests = [
+        path
+        for path in directory.rglob("report_manifest.json")
+        if "ci-smoke" in path.as_posix() and (path.parent / "raw_runs.jsonl").is_file()
+    ]
+    _require(len(manifests) == 1, "expected exactly one ci-smoke simulation manifest with raw trace")
     manifest_path = manifests[0]
     manifest = _read(manifest_path)
     provenance = manifest.get("provenance") or {}
