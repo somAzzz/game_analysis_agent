@@ -33,6 +33,8 @@ restricted server-side environment variable before process startup:
 ```bash
 export OPENAI_API_KEY=...
 export OPENAI_PERSONA_MODEL=gpt-5.6-luna
+export GAME_PROJECT_PATH=/path/to/pinned/study-in-germany
+uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080 --enable-live-openai
 ```
 
 The browser never sends, reads, stores, or receives the key. Requests containing
@@ -68,6 +70,11 @@ Campaign requests accept only `provider`, up to three known `personas`, up to
 three unique `seeds`, and `max_weeks` from 1 to 5. Bodies are limited to 32 KiB,
 at most two jobs may be active, IDs are server generated, and experiment access
 is allowlisted to the public bundle.
+
+DeepSeek and local OpenAI-compatible endpoints remain useful development
+compatibility tests, but they do not close the release row named
+`live_openai_campaign`. That row requires a completed OpenAI Responses API
+campaign and redacted response-ID/model/usage evidence.
 
 All failures return:
 

@@ -42,6 +42,10 @@ See `docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json` for
 the machine-readable checks. “Target” and “workflow implemented” do not mean
 tested or supported.
 
+For exact native Linux amd64, pinned-Godot, native arm64 image, registry,
+evidence-import, and G4 closeout commands, follow
+`docs/operations/LINUX_P4_G4_CLOSEOUT.md`.
+
 Expected result for both commands is a single JSON object with
 `"schema_version":"judge-result-v1"` and `"status":"passed"` on stdout.
 Logs and failures use stderr unless `--stdout-only` is supplied. Passing

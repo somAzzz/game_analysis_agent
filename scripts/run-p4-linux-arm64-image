@@ -1,0 +1,53 @@
+#!/bin/sh
+set -eu
+
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+: "${JUDGE_IMAGE_DIGEST_REF:?set a published ref such as ghcr.io/owner/image@sha256:...}"
+OUTPUT=${P4_LINUX_ARM64_OUTPUT:-$ROOT/reports/platform-ci-local/linux-arm64}
+EVIDENCE=${P4_LINUX_ARM64_EVIDENCE:-$OUTPUT/evidence.json}
+
+case "$(uname -s)-$(uname -m)" in
+  Linux-aarch64|Linux-arm64) ;;
+  *) echo "run-p4-linux-arm64-image requires a native Linux arm64 host" >&2; exit 2 ;;
+esac
+command -v docker >/dev/null 2>&1 || { echo "Docker Engine is required" >&2; exit 2; }
+docker info >/dev/null
+test -z "$(git -C "$ROOT" status --porcelain --untracked-files=all)" || {
+  echo "platform acceptance requires a clean worktree" >&2
+  exit 2
+}
+
+mkdir -p "$OUTPUT"
+cd "$ROOT"
+python3 - "$OUTPUT/runner.json" <<'PY'
+import json, pathlib, platform, sys
+pathlib.Path(sys.argv[1]).write_text(json.dumps({"system": platform.system(), "machine": platform.machine()}))
+PY
+docker pull "$JUDGE_IMAGE_DIGEST_REF"
+docker buildx imagetools inspect "$JUDGE_IMAGE_DIGEST_REF" --format '{{json .}}' > "$OUTPUT/image-manifest.json"
+docker run --rm --network none --read-only --tmpfs /tmp:size=32m \
+  --cap-drop ALL --security-opt no-new-privileges "$JUDGE_IMAGE_DIGEST_REF" \
+  --mode inspect --offline --json --output-dir - > "$OUTPUT/container-inspect.json"
+docker run --rm --network none --read-only --tmpfs /tmp:size=32m \
+  --cap-drop ALL --security-opt no-new-privileges "$JUDGE_IMAGE_DIGEST_REF" \
+  --mode replay --offline --json --output-dir - > "$OUTPUT/container-replay.json"
+
+name=playtest-forge-p4-arm64
+cleanup() { docker rm --force "$name" >/dev/null 2>&1 || true; }
+trap cleanup EXIT INT TERM
+docker run --detach --name "$name" --publish 127.0.0.1:18080:8080 \
+  --read-only --tmpfs /tmp:size=16m --cap-drop ALL --security-opt no-new-privileges \
+  --entrypoint /app/.venv/bin/python "$JUDGE_IMAGE_DIGEST_REF" \
+  tools/run_judge_api.py --host 0.0.0.0 --port 8080 --frontend /app/frontend/dist >/dev/null
+for attempt in $(seq 1 20); do
+  if curl --fail --silent http://127.0.0.1:18080/api/provider-status > "$OUTPUT/provider-status.json"; then
+    break
+  fi
+  sleep 1
+done
+cleanup
+trap - EXIT INT TERM
+
+uv run python tools/record_platform_evidence.py \
+  --mode linux-arm64 --artifact-dir "$OUTPUT" --output "$EVIDENCE"
+echo "Linux arm64 P4 evidence: $EVIDENCE"
