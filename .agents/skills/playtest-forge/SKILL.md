@@ -49,8 +49,11 @@ repository's interactive path:
 3. Do not make a provider call until those choices are confirmed. Recommend a
    one-strategy local vLLM run first, then six-strategy local divergence, then
    repair evidence; use OpenAI only when the user selects it.
-4. Start the frontend in a persistent terminal before the campaign and provide
-   `http://127.0.0.1:5173/#/playthrough-inspector`.
+4. Start the governed Judge API and the Vite frontend in separate persistent
+   terminals before the campaign, then provide
+   `http://127.0.0.1:5173/#/playthrough-inspector`. The Vite `/api` proxy makes
+   Replay, local vLLM, and live OpenAI selectable in Judge Mode; full 20-week
+   profiles still execute through the frozen session command.
 5. Execute the exact command emitted by `scripts/session-options`. Local and
    API providers must use the same typed campaign service, real-Godot probe,
    limits, progress publisher, UI view, and evidence gates. Never create a

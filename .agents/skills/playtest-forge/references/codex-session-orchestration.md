@@ -70,13 +70,22 @@ Use the planner again with the confirmed values, for example:
 Run the emitted environment and command exactly. Do not hand-maintain a second
 OpenAI command or change the matrix between local and API comparisons.
 
-### 3. Start the viewer first
+### 3. Start the Judge API and viewer first
 
-Start the frontend in a persistent terminal:
+Start both processes in separate persistent terminals:
 
 ```bash
+scripts/run-judge-dev --host 127.0.0.1 --port 8080
 npm --prefix frontend run dev -- --host 127.0.0.1
 ```
+
+`scripts/run-judge-dev` loads `.env` server-side and enables the governed Judge
+adapter. Vite proxies only `/api` to port 8080; no credential is exposed to the
+browser. Judge Mode can therefore select Replay, run a real local vLLM
+generation-health test, or select live OpenAI when its server-side key and game
+runtime are ready. Its bounded action is a readiness/demo campaign, not a
+replacement for the frozen 20-week profiles chosen in the Codex conversation.
+Never run a Judge action campaign concurrently with the full campaign command.
 
 Give the user this URL before the campaign begins:
 
@@ -85,9 +94,10 @@ http://127.0.0.1:5173/#/playthrough-inspector
 ```
 
 The browser polls `frontend/public/live-playthrough/session.json` every 1.5
-seconds. Each completed weekly decision updates the session card. The previous
-verified campaign remains selectable until the new campaign completes all
-gates; then the complete sanitized paths replace it atomically.
+seconds. Both local and API campaigns publish through the same campaign service
+to this location. Each completed weekly decision updates the session card. The
+previous verified campaign remains selectable until the new campaign completes
+all gates; then the complete sanitized paths replace it atomically.
 
 ### 4. Execute and monitor
 

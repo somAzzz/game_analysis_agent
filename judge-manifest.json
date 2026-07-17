@@ -163,10 +163,10 @@
       "sha256": "0e0f57f8bf7b0b9188f7eac32f4cfaf5b4dc8aefe5ab8dfd1d368cd1816164cf"
     },
     {
-      "bytes": 7819,
+      "bytes": 8032,
       "path": ".agents/skills/playtest-forge/SKILL.md",
       "role": "codex-skill",
-      "sha256": "1e490e909eea96ee3d94f03022906df4c9fec6afc467fd7d0622689c8090cba8"
+      "sha256": "7c3f76ff5b42aeaf9b29517d33dba2477271f41508ca673f1700e50c8b42de5a"
     },
     {
       "bytes": 344,
@@ -247,10 +247,10 @@
       "sha256": "c8cb5309d0658beefdbd3864b0931329420259f223aae6395a758f25c1c9c847"
     },
     {
-      "bytes": 5241,
+      "bytes": 5948,
       "path": ".agents/skills/playtest-forge/references/codex-session-orchestration.md",
       "role": "codex-skill-reference",
-      "sha256": "3d24712ee27901d390df6440042a24d48bd89daf95ad2a36fe3f81099c30c72e"
+      "sha256": "9533d528aad911ef34b06deb1f39fdf3519e2c8ce4e3c2c04e8de66bf1a7ad3b"
     },
     {
       "bytes": 150,
