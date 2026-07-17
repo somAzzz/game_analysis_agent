@@ -51,6 +51,9 @@ def handler_factory(service: JudgeService, frontend: Path):
                 if path == "/api/provider-status":
                     self._json(HTTPStatus.OK, service.providers.status())
                     return
+                if path == "/api/experiments":
+                    self._json(HTTPStatus.OK, service.list_experiments())
+                    return
                 if match := CAMPAIGN_ROUTE.fullmatch(path):
                     self._json(HTTPStatus.OK, service.campaigns.get(match.group(1)))
                     return

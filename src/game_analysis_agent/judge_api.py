@@ -19,16 +19,15 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .campaign_aggregation import CampaignAggregation
 from .campaign_bundle import verify_public_campaign_bundle
+from .experiment_registry import SIGNED_EXPERIMENT_ID, ExperimentRegistry, ExperimentRegistryError
 from .llm_client import LocalLLMClient
 from .openai_persona_gateway import DEFAULT_OPENAI_PERSONA_MODEL
-from .repair_bundle import verify_public_repair_bundle
-from .repair_experiment import RepairExperimentRecord, file_sha256
 from .settings import Settings
 
 MAX_REQUEST_BYTES = 32 * 1024
 MAX_CAMPAIGNS = 2
 PUBLIC_CAMPAIGN_ID = "build-week-2026-evidence-v1"
-PUBLIC_EXPERIMENT_ID = "cashflow-drift-repair-v1"
+PUBLIC_EXPERIMENT_ID = SIGNED_EXPERIMENT_ID
 PERSONAS = frozenset({"newbie", "study", "money", "social", "visa", "slacker"})
 
 
@@ -483,46 +482,36 @@ class JudgeService:
             provider_service=self.providers,
             live_runner=live_runner,
         )
+        self.experiments = ExperimentRegistry(self.project)
+
+    def list_experiments(self) -> dict[str, object]:
+        return self.experiments.list()
 
     def experiment(self, experiment_id: str) -> dict[str, object]:
-        if experiment_id != PUBLIC_EXPERIMENT_ID or not _safe_id(experiment_id):
+        if not _safe_id(experiment_id):
             raise JudgeAPIError(
                 "experiment_not_found",
-                "Only the committed public experiment is available",
-                f"Use {PUBLIC_EXPERIMENT_ID}.",
+                "Experiment is not available",
+                "Choose an experiment returned by GET /api/experiments.",
                 status_code=404,
             )
-        bundle = self.project / "examples/build_week_2026/experiment-v1"
-        record_path = bundle / "repair_experiment.json"
-        gate = verify_public_repair_bundle(bundle)
-        record = RepairExperimentRecord.model_validate_json(record_path.read_text(encoding="utf-8"))
-        patch_diff = (bundle / record.patch.patch_path).read_text(encoding="utf-8")
-        return {
-            "schema_version": "judge-public-experiment-v1",
-            "experiment_id": gate.experiment_id,
-            "evidence_fingerprint": file_sha256(record_path),
-            "human_review": _read_human_review(
+        try:
+            experiment = self.experiments.get(experiment_id)
+        except ExperimentRegistryError as exc:
+            raise JudgeAPIError(
+                "experiment_not_found",
+                "Experiment is not available",
+                "Choose an experiment returned by GET /api/experiments.",
+                status_code=404,
+            ) from exc
+        if experiment["lifecycle_status"] == "proof_complete":
+            fingerprint = str(experiment["evidence_fingerprint"])
+            experiment["human_review"] = _read_human_review(
                 self.project,
                 experiment_id,
-                evidence_fingerprint=file_sha256(record_path),
-            ),
-            "status": gate.status,
-            "decision": record.decision.value,
-            "decision_reason": record.decision_reason,
-            "hypothesis": record.plan.hypothesis,
-            "mechanism_class": record.plan.mechanism_class,
-            "comparison": record.comparison.model_dump(mode="json"),
-            "cohorts": [item.model_dump(mode="json") for item in record.snapshots],
-            "gates": [item.model_dump(mode="json") for item in record.gates],
-            "patch": {
-                **record.patch.model_dump(mode="json"),
-                "canonical_source_path": "demo/study-in-germany",
-                "disposition": "candidate_not_merged",
-                "diff": patch_diff,
-            },
-            "codex": record.codex.model_dump(mode="json"),
-            "mode": "prerecorded",
-        }
+                evidence_fingerprint=fingerprint,
+            )
+        return experiment
 
     def review_experiment(
         self,
@@ -530,6 +519,13 @@ class JudgeService:
         request: HumanReviewRequest,
     ) -> dict[str, object]:
         experiment = self.experiment(experiment_id)
+        if experiment["lifecycle_status"] != "proof_complete":
+            raise JudgeAPIError(
+                "human_review_unavailable",
+                "Human review requires completed repair proof",
+                "Complete bounded repair and fixed plus holdout proof before reviewing.",
+                status_code=409,
+            )
         current_fingerprint = str(experiment["evidence_fingerprint"])
         if request.evidence_fingerprint != current_fingerprint:
             raise JudgeAPIError(

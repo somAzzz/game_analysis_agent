@@ -130,6 +130,7 @@ def test_replay_campaign_and_public_experiment_are_bounded_and_labeled() -> None
     )
     completed = _wait(service, str(created["campaign_id"]))
     experiment = service.experiment("cashflow-drift-repair-v1")
+    experiment_index = service.list_experiments()
 
     assert completed["status"] == "completed"
     assert completed["mode"] == "prerecorded"
@@ -137,6 +138,8 @@ def test_replay_campaign_and_public_experiment_are_bounded_and_labeled() -> None
     assert completed["result"]["total_weeks"] == 3
     assert completed["result"]["authoring"] == "deterministic-persona-policy-fixture"
     assert experiment["decision"] == "rejected"
+    assert experiment_index["experiments"][0]["source_label"] == "SIGNED REPLAY"
+    assert experiment_index["experiments"][0]["lifecycle_status"] == "proof_complete"
     assert experiment["patch"]["canonical_source_path"] == "demo/study-in-germany"
     assert experiment["patch"]["disposition"] == "candidate_not_merged"
     assert "SimulationEngine.gd" in experiment["patch"]["diff"]
@@ -147,8 +150,34 @@ def test_replay_campaign_and_public_experiment_are_bounded_and_labeled() -> None
         "baseline_holdout",
         "patched_holdout",
     ]
-    with pytest.raises(JudgeAPIError, match="Only the committed"):
+    with pytest.raises(JudgeAPIError, match="Experiment is not available"):
         service.experiment("../../private")
+
+
+def test_campaign_only_experiment_cannot_receive_human_review(monkeypatch: pytest.MonkeyPatch) -> None:
+    service = JudgeService(project_root=ROOT, environment={})
+    monkeypatch.setattr(
+        service.experiments,
+        "get",
+        lambda _experiment_id: {
+            "lifecycle_status": "campaign_complete",
+            "evidence_fingerprint": "a" * 64,
+            "decision": None,
+        },
+    )
+
+    with pytest.raises(JudgeAPIError) as error:
+        service.review_experiment(
+            "campaign-only",
+            HumanReviewRequest(
+                evidence_fingerprint="a" * 64,
+                decision="needs_more_evidence",
+                reviewer_note="Repair proof is not available yet.",
+            ),
+        )
+
+    assert error.value.code == "human_review_unavailable"
+    assert error.value.status_code == 409
 
 
 def test_replay_campaign_fails_closed_for_unretained_seed() -> None:
@@ -363,6 +392,7 @@ def test_human_review_is_bound_to_evidence_and_never_merges(
         "experiment",
         lambda _experiment_id: {
             "experiment_id": "cashflow-drift-repair-v1",
+            "lifecycle_status": "proof_complete",
             "evidence_fingerprint": fingerprint,
             "decision": "rejected",
         },
@@ -413,6 +443,7 @@ def test_http_human_review_route_exports_same_durable_record(
         service,
         "experiment",
         lambda _experiment_id: {
+            "lifecycle_status": "proof_complete",
             "evidence_fingerprint": fingerprint,
             "decision": "rejected",
         },
