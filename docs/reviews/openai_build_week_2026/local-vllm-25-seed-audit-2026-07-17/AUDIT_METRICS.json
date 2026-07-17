@@ -1,0 +1,102 @@
+{
+  "schema_version": "local-vllm-25-seed-audit-summary-v1",
+  "date": "2026-07-17",
+  "contract": {
+    "provider": "vllm",
+    "model": "qwen3.6-27b-nvfp4",
+    "truth_label": "local-vllm-real-godot",
+    "personas": ["newbie", "study", "money", "social", "visa", "slacker"],
+    "seeds": {"first": 42, "last": 66, "count": 25},
+    "requested_weeks_per_cell": 20,
+    "recorded_decision_weeks_per_cell": 19,
+    "cells": 150
+  },
+  "source": {
+    "agent_commit": "cb142f99b4e24470fe2aa028233aa78212393429",
+    "agent_tree": "6f86561b59348a60ddf6ce92d79cae91de1e9d87",
+    "agent_dirty": false,
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d"
+  },
+  "cohorts": [
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cells": 48,
+      "weeks": 912,
+      "successful_calls": 1824,
+      "gate": "passed",
+      "request_fingerprint": "9cf036933710be7b0cddc0d3c11b4b3d598c38621ee519a1f04bcc92f08babbb",
+      "source_fingerprint": "9406c37845e5dbbd61bc620519710dcb0e8aa25f7bb6ec8c80ca9530e663991b"
+    },
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cells": 48,
+      "weeks": 912,
+      "successful_calls": 1824,
+      "gate": "passed",
+      "request_fingerprint": "d999b53c9d6ab15b43eeea7acfe58d3e1150a98327e831b8773cee9a9c3a28fc",
+      "source_fingerprint": "c4fc40a6582a6bc3dac4771c512b4a80c4371324ef3a019306e5d7e999c9aa06"
+    },
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-c",
+      "cells": 54,
+      "weeks": 1026,
+      "successful_calls": 2052,
+      "gate": "passed",
+      "request_fingerprint": "af0002b82ece06abf034d107dcef4312ca7d429ee86d07e17750aea62961ba1b",
+      "source_fingerprint": "d363637304f40c58838edab12f63ed0ec9ca6969e6e3ce21387746ebfe9c3824"
+    }
+  ],
+  "agent": {
+    "completed_cells": 150,
+    "recorded_weeks": 2850,
+    "successful_provider_calls": 5700,
+    "valid_rate": 1.0,
+    "fallback_weeks": 0,
+    "invalid_weeks": 0,
+    "schema_repaired_calls": 1,
+    "input_tokens": 11109541,
+    "output_tokens": 335195,
+    "total_tokens": 11444736,
+    "latency_ms": {"mean": 2774.26, "p50": 2732.0, "p95": 5603.55, "p99": 8618.18, "max": 18222.0},
+    "transient_partial_cells_across_first_attempts": 17,
+    "structured_unknown_endings": 150,
+    "actual_endings_in_cell_summaries": 150,
+    "anomaly_occurrences": 4429,
+    "duplicate_anomaly_occurrences_by_cell_kind_message": 3525,
+    "duplicate_anomaly_rate": 0.7959
+  },
+  "game": {
+    "burnout_cells": 144,
+    "burnout_rate": 0.96,
+    "cashflow_attractor_cells": 131,
+    "cashflow_attractor_rate": 0.8733,
+    "stress_100_cells": 145,
+    "stress_100_rate": 0.9667,
+    "mean_max_stress": 99.78,
+    "median_first_burnout_week": 9.0,
+    "recovered_below_80_after_90_cells": 9,
+    "recovery_rate": 0.0625,
+    "mean_final_money": 21.79,
+    "mean_final_arrears": 1466.97,
+    "mean_final_hunger": 95.08,
+    "endings": {
+      "cashflow_collapse": 90,
+      "burnout_pause": 29,
+      "living_imbalance": 21,
+      "survival_struggle": 4,
+      "academic_failure": 3,
+      "mental_crash": 2,
+      "high_pressure_top_student": 1
+    },
+    "by_persona": {
+      "newbie": {"burnout": 25, "cashflow_attractor": 23, "stress_100": 25},
+      "study": {"burnout": 25, "cashflow_attractor": 25, "stress_100": 25},
+      "money": {"burnout": 20, "cashflow_attractor": 9, "stress_100": 21},
+      "social": {"burnout": 24, "cashflow_attractor": 24, "stress_100": 24},
+      "visa": {"burnout": 25, "cashflow_attractor": 25, "stress_100": 25},
+      "slacker": {"burnout": 25, "cashflow_attractor": 25, "stress_100": 25}
+    }
+  }
+}

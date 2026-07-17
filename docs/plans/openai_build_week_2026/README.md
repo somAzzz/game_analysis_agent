@@ -47,6 +47,8 @@ Start with [Codex-first playtest session](CODEX_PLAYTEST_SESSION.md) for the
 implemented Skill conversation, frozen profiles, local/API parity, live weekly
 UI updates, and repair boundary.
 
+Latest evidence: [25-seed local-vLLM full-flow audit](../../reviews/openai_build_week_2026/local-vllm-25-seed-audit-2026-07-17/README.md) records 150 real-Godot cells, agent reliability findings, game findings, and the pressure/burnout cross-check.
+
 1. [Implementation plan](IMPLEMENTATION_PLAN.md) — product thesis, scope, architecture, and competition mapping.
 2. [Stepwise execution plan](EXECUTION_PLAN.md) — P0–P5 tasks and gate order. Older status tables are plan-time snapshots unless explicitly dated current.
 3. [Competition product-design review](product_design/COMPETITION_PRODUCT_DESIGN_REVIEW.md) — frontend audit, four-role critique, game-native interaction direction, and prioritized acceptance criteria.
