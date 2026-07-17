@@ -53,9 +53,32 @@ def test_get_state_returns_initial_shape(tmp_path: Path) -> None:
     assert payload["state"] == {}
 
 
-def test_probe_propagates_risk_guidance_from_snapshot(
-    tmp_path: Path, monkeypatch
+def test_finished_step_exposes_structured_final_ending(
+    tmp_path: Path,
+    monkeypatch,
 ) -> None:
+    monkeypatch.setattr(
+        game_tools,
+        "_run_one_step",
+        lambda *_args, **_kwargs: {
+            "current_state": {"week": 20, "money": 50},
+            "next_available_actions": [],
+            "triggered_event_id": "semester_end",
+            "event_choices": [],
+            "finished": True,
+            "final_ending_id": "semester_complete",
+        },
+    )
+    probe = build_probe(_settings(tmp_path))
+
+    result = probe.step(["study_library"])
+
+    assert result["finished"] is True
+    assert result["final_ending"] == "semester_complete"
+    assert probe.get_state()["final_ending"] == "semester_complete"
+
+
+def test_probe_propagates_risk_guidance_from_snapshot(tmp_path: Path, monkeypatch) -> None:
     guidance = {
         "contract_version": "1.0",
         "source": "game_risk_evaluator",
@@ -125,22 +148,13 @@ def test_incomplete_probe_does_not_report_empty_ending(tmp_path: Path) -> None:
     assert "ending_id_empty" not in {item.kind for item in anomalies}
 
 
-def test_run_one_step_validates_contract_and_cleans_temp_files(
-    tmp_path, monkeypatch
-) -> None:
-    fixture = (
-        Path(__file__).parent
-        / "fixtures"
-        / "contracts"
-        / "interactive_probe_v1.json"
-    )
+def test_run_one_step_validates_contract_and_cleans_temp_files(tmp_path, monkeypatch) -> None:
+    fixture = Path(__file__).parent / "fixtures" / "contracts" / "interactive_probe_v1.json"
 
     def invoke(_settings, *, script, extra_args):  # noqa: ANN001
         assert script == "res://scripts/tools/RunInteractiveProbe.gd"
         output = Path(
-            next(arg for arg in extra_args if arg.startswith("--out=")).removeprefix(
-                "--out="
-            )
+            next(arg for arg in extra_args if arg.startswith("--out=")).removeprefix("--out=")
         )
         output.write_text(fixture.read_text(encoding="utf-8"), encoding="utf-8")
         return subprocess.CompletedProcess([], 0, "", "")

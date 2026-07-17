@@ -9,16 +9,14 @@ from game_analysis_agent.playthrough_view import (
     TRUTH_LABEL,
     PlaythroughViewError,
     build_cell_view,
+    build_playthrough_views,
     verify_playthrough_evidence,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
 EVIDENCE = ROOT / "examples/build_week_2026/playthrough-v1"
 SOURCE = EVIDENCE / "source"
-CAMPAIGN = (
-    SOURCE
-    / "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1"
-)
+CAMPAIGN = SOURCE / "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1"
 
 
 def test_committed_playthrough_evidence_is_complete_and_hash_verified() -> None:
@@ -88,3 +86,31 @@ def test_cell_view_rejects_tampered_raw_trace(tmp_path: Path) -> None:
             trace_path=tampered,
             summary_path=cell_dir / "playthrough_summary.md",
         )
+
+
+def test_builder_emits_hash_bound_cell_index_for_lazy_review(tmp_path: Path) -> None:
+    output = tmp_path / "playthrough"
+
+    manifest = build_playthrough_views(
+        source_root=SOURCE,
+        campaign_manifest_path=CAMPAIGN / "campaign_manifest.json",
+        failure_clusters_path=SOURCE / "public/failure_clusters.json",
+        public_gate_path=SOURCE / "public/gate_report.json",
+        personas_path=SOURCE / "config/player_personas.yaml",
+        action_catalog_path=SOURCE / "demo/study-in-germany/data/actions/generated_actions.json",
+        output_dir=output,
+    )
+    index = __import__("json").loads((output / "index.json").read_text(encoding="utf-8"))
+
+    assert manifest["cell_index"]["path"] == "index.json"
+    assert index["cell_count"] == 18
+    assert len(index["cells"]) == 18
+    assert {
+        "persona": "money",
+        "seed": 42,
+        "path": "cells/money-seed-42.json",
+        "final_ending": "cashflow_collapse",
+    }.items() <= next(
+        cell.items() for cell in index["cells"] if cell["persona"] == "money" and cell["seed"] == 42
+    )
+    assert verify_playthrough_evidence(output, source_root=SOURCE)["cells"] == 18

@@ -6,7 +6,7 @@ import json
 import os
 import shutil
 import threading
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
@@ -26,9 +26,12 @@ from .campaign_bundle import (
 )
 from .campaign_contract import (
     CampaignCellRequest,
+    CampaignCellResult,
     CampaignManifest,
     CampaignRequest,
+    CampaignSourceIdentity,
     build_campaign_cells,
+    resume_compatible,
 )
 from .campaign_runner import CampaignRunner, CampaignRunSummary
 from .llm_client import LocalLLMClient
@@ -122,8 +125,12 @@ class _CampaignSessionPublisher:
             record = self._cell(cell.cell_id)
             record.update(
                 {
-                    "status": "completed" if bool(event.get("finished")) else "running",
-                    "phase": str(event.get("phase") or "running"),
+                    "status": "running",
+                    "phase": (
+                        "game_finished_pending_validation"
+                        if bool(event.get("finished"))
+                        else str(event.get("phase") or "running")
+                    ),
                     "current_week": int(event.get("week") or 0),
                     "completed_weeks": int(event.get("completed_weeks") or 0),
                 }
@@ -133,6 +140,29 @@ class _CampaignSessionPublisher:
             self._payload["message"] = (
                 f"{cell.persona.value} seed {cell.seed}: "
                 f"week {record['current_week']}/{cell.max_weeks} {record['phase']}"
+            )
+            self._refresh_counts()
+            self._write_locked()
+
+    def hydrate(self, retained: tuple[CampaignCellResult, ...]) -> None:
+        """Expose resume candidates without claiming final validation."""
+
+        if not retained:
+            return
+        with self._lock:
+            for result in retained:
+                record = self._cell(result.request.cell_id)
+                record.update(
+                    {
+                        "status": "retained",
+                        "phase": "resume_candidate_pending_validation",
+                        "current_week": result.completed_weeks,
+                        "completed_weeks": result.completed_weeks,
+                    }
+                )
+            self._payload["message"] = (
+                f"{len(retained)} compatible completed cells retained; "
+                "they will be revalidated before publication."
             )
             self._refresh_counts()
             self._write_locked()
@@ -181,6 +211,7 @@ class _CampaignSessionPublisher:
             "running_cells": sum(cell["status"] == "running" for cell in cells),
             "failed_cells": sum(cell["status"] in {"failed", "partial"} for cell in cells),
             "completed_weeks": sum(int(cell["completed_weeks"]) for cell in cells),
+            "retained_cells": sum(cell["status"] == "retained" for cell in cells),
         }
 
     def _write_locked(self) -> None:
@@ -199,7 +230,11 @@ def _session_latest(
         "cell_id": cell.cell_id,
         "persona": cell.persona.value,
         "seed": cell.seed,
-        "phase": str(event.get("phase") or "running"),
+        "phase": (
+            "game_finished_pending_validation"
+            if bool(event.get("finished"))
+            else str(event.get("phase") or "running")
+        ),
         "week": int(event.get("week") or 0),
         "completed_weeks": int(event.get("completed_weeks") or 0),
         "max_weeks": cell.max_weeks,
@@ -229,6 +264,7 @@ def run_persona_campaign(
     environment: Mapping[str, str] | None = None,
     failure_rules_path: str | Path | None = None,
     resume: bool = True,
+    external_cancelled: Callable[[], bool] | None = None,
 ) -> dict[str, Any]:
     """Run one bounded campaign and publish sanitized, frontend-ready evidence."""
 
@@ -307,6 +343,9 @@ def run_persona_campaign(
         truth_label=truth_label_for(request.provider.value, selection.mode.value),
         model=model,
     )
+    retained = _resumable_results(project, request, source) if resume else ()
+    publisher.hydrate(retained)
+    retained_calls = _provider_call_count(project, retained)
     runner = CampaignRunner(
         project_root=project,
         request=request,
@@ -315,6 +354,7 @@ def run_persona_campaign(
             gateway=built.gateway,
             settings=settings,
             progress_callback=publisher.progress,
+            external_cancelled=external_cancelled,
         ),
         cancellation=cancellation,
     )
@@ -391,9 +431,10 @@ def run_persona_campaign(
             output_dir=view,
         )
         _write_json(view / "repair_eligibility.json", eligibility)
+        cumulative_calls = retained_calls + built.gateway.calls_used
         verify_playthrough_evidence(view, source_root=project)
         publisher.completed(
-            calls_used=built.gateway.calls_used,
+            calls_used=cumulative_calls,
             repair_target_eligible=bool(eligibility["eligible"]),
         )
         return {
@@ -405,7 +446,8 @@ def run_persona_campaign(
             "model": model,
             "cells": summary.status_counts,
             "weeks": aggregation.metrics.total_weeks,
-            "calls_used": built.gateway.calls_used,
+            "calls_used": cumulative_calls,
+            "resumed_cells": len(summary.resumed_cell_ids),
             "bundle": bundle.relative_to(project).as_posix(),
             "view": view.relative_to(project).as_posix(),
             "truth_label": view_manifest["truth_label"],
@@ -414,6 +456,43 @@ def run_persona_campaign(
     except Exception as exc:
         publisher.failed(f"Campaign finalization failed: {exc}")
         raise
+
+
+def _resumable_results(
+    project: Path,
+    request: CampaignRequest,
+    source: CampaignSourceIdentity,
+) -> tuple[CampaignCellResult, ...]:
+    retained = []
+    for cell in build_campaign_cells(request):
+        path = project / cell.output_dir / "cell_result.json"
+        try:
+            result = CampaignCellResult.model_validate_json(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if resume_compatible(result, cell, source):
+            retained.append(result)
+    return tuple(retained)
+
+
+def _provider_call_count(
+    project: Path,
+    results: tuple[CampaignCellResult, ...],
+) -> int:
+    count = 0
+    for result in results:
+        path = project / result.request.output_dir / "playthrough.jsonl"
+        try:
+            rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+        except (OSError, json.JSONDecodeError):
+            continue
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            calls = row.get("persona_calls")
+            if isinstance(calls, list):
+                count += sum(isinstance(call, dict) for call in calls)
+    return count
 
 
 def _clear_view_evidence(view: Path) -> None:

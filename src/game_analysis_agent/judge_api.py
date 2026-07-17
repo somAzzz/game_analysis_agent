@@ -9,7 +9,7 @@ import time
 import uuid
 from collections.abc import Callable, Mapping
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
@@ -19,9 +19,11 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .campaign_aggregation import CampaignAggregation
 from .campaign_bundle import verify_public_campaign_bundle
+from .llm_client import LocalLLMClient
 from .openai_persona_gateway import DEFAULT_OPENAI_PERSONA_MODEL
 from .repair_bundle import verify_public_repair_bundle
-from .repair_experiment import RepairExperimentRecord
+from .repair_experiment import RepairExperimentRecord, file_sha256
+from .settings import Settings
 
 MAX_REQUEST_BYTES = 32 * 1024
 MAX_CAMPAIGNS = 2
@@ -54,13 +56,13 @@ class JudgeAPIError(RuntimeError):
 class ProviderTestRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    provider: Literal["replay", "openai"]
+    provider: Literal["replay", "vllm", "openai"]
 
 
 class CampaignCreateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    provider: Literal["replay", "openai"] = "replay"
+    provider: Literal["replay", "vllm", "openai"] = "replay"
     personas: tuple[str, ...] = Field(default=("newbie",), min_length=1, max_length=3)
     seeds: tuple[int, ...] = Field(default=(42,), min_length=1, max_length=3)
     max_weeks: int = Field(default=3, ge=1, le=5)
@@ -73,6 +75,20 @@ class CampaignCreateRequest(BaseModel):
             raise ValueError("personas must be unique known ids")
         if len(set(self.seeds)) != len(self.seeds):
             raise ValueError("seeds must be unique")
+        return self
+
+
+class HumanReviewRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    evidence_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    decision: Literal["approve", "reject", "needs_more_evidence"]
+    reviewer_note: str = Field(min_length=1, max_length=2000)
+
+    @model_validator(mode="after")
+    def _note_must_contain_text(self) -> HumanReviewRequest:
+        if not self.reviewer_note.strip():
+            raise ValueError("reviewer_note must contain non-whitespace text")
         return self
 
 
@@ -109,17 +125,23 @@ class ProviderService:
         project_root: Path,
         environment: Mapping[str, str] | None = None,
         openai_client_factory: Callable[..., Any] = OpenAI,
+        local_client_factory: Callable[[Settings], Any] = LocalLLMClient.from_settings,
         live_runner_enabled: bool = False,
     ) -> None:
         self.project = project_root.resolve()
         self.environment = dict(environment if environment is not None else os.environ)
         self._openai_client_factory = openai_client_factory
+        self._local_client_factory = local_client_factory
         self.live_runner_enabled = live_runner_enabled
         self.model = self.environment.get("OPENAI_PERSONA_MODEL", DEFAULT_OPENAI_PERSONA_MODEL)
 
     def status(self) -> dict[str, object]:
         configured = bool(self.environment.get("OPENAI_API_KEY", "").strip())
         game_available = _game_available(self.environment.get("GAME_PROJECT_PATH"))
+        defaults = Settings()
+        local_model = self.environment.get("LLM_SERVED_MODEL_NAME", defaults.vllm_model)
+        local_endpoint = self.environment.get("VLLM_BASE_URL", defaults.vllm_base_url)
+        runner_ready = game_available and self.live_runner_enabled
         return {
             "schema_version": "judge-provider-status-v1",
             "providers": {
@@ -129,6 +151,16 @@ class ProviderService:
                     "requires_api_key": False,
                     "requires_game_runtime": False,
                 },
+                "vllm": {
+                    "status": "available" if local_endpoint and local_model else "unavailable",
+                    "mode": "local",
+                    "model": local_model,
+                    "requires_api_key": False,
+                    "endpoint_configured": bool(local_endpoint),
+                    "game_runtime_configured": game_available,
+                    "live_runner_enabled": self.live_runner_enabled,
+                    "live_campaign_ready": bool(local_endpoint and local_model) and runner_ready,
+                },
                 "openai": {
                     "status": "available" if configured else "unavailable",
                     "mode": "live",
@@ -137,7 +169,7 @@ class ProviderService:
                     "api_key_configured": configured,
                     "game_runtime_configured": game_available,
                     "live_runner_enabled": self.live_runner_enabled,
-                    "live_campaign_ready": configured and game_available and self.live_runner_enabled,
+                    "live_campaign_ready": configured and runner_ready,
                 },
             },
         }
@@ -153,6 +185,44 @@ class ProviderService:
                 "mode": "prerecorded",
                 "campaign_id": gate.campaign_id,
             }
+        if request.provider == "vllm":
+            defaults = Settings()
+            settings = replace(
+                defaults,
+                llm_provider="vllm",
+                vllm_base_url=self.environment.get("VLLM_BASE_URL", defaults.vllm_base_url),
+                vllm_api_key=self.environment.get("VLLM_API_KEY", defaults.vllm_api_key),
+                vllm_model=self.environment.get("LLM_SERVED_MODEL_NAME", defaults.vllm_model),
+            )
+            started = time.monotonic()
+            try:
+                client = self._local_client_factory(settings)
+                client.validate_model_available()
+                output = client.complete(
+                    "Return exactly READY.",
+                    agent="judge_provider_probe",
+                    step_name="generation_health",
+                    max_tokens=16,
+                    temperature=0,
+                )
+                if not str(output).strip():
+                    raise RuntimeError("empty generation")
+            except Exception as exc:
+                raise JudgeAPIError(
+                    "vllm_provider_test_failed",
+                    f"vLLM generation test failed: {exc.__class__.__name__}",
+                    "Check the local endpoint, served model, generation health, and logs.",
+                    status_code=502,
+                ) from exc
+            return {
+                "status": "passed",
+                "provider": "vllm",
+                "mode": "local",
+                "model": settings.vllm_model,
+                "generation_completed": True,
+                "duration_ms": round((time.monotonic() - started) * 1000, 3),
+            }
+
         key = self.environment.get("OPENAI_API_KEY", "").strip()
         if not key:
             raise JudgeAPIError(
@@ -216,7 +286,13 @@ class CampaignService:
             job = CampaignJob(
                 campaign_id=identifier,
                 request=request,
-                mode="live" if request.provider == "openai" else "prerecorded",
+                mode=(
+                    "prerecorded"
+                    if request.provider == "replay"
+                    else "local"
+                    if request.provider == "vllm"
+                    else "live"
+                ),
             )
             self._jobs[identifier] = job
         self._executor.submit(self._run, job)
@@ -242,7 +318,9 @@ class CampaignService:
     def _job(self, campaign_id: str) -> CampaignJob:
         if not _safe_id(campaign_id):
             raise JudgeAPIError(
-                "campaign_id_invalid", "Invalid campaign id", "Use the id returned by POST /api/campaigns."
+                "campaign_id_invalid",
+                "Invalid campaign id",
+                "Use the id returned by POST /api/campaigns.",
             )
         with self._lock:
             job = self._jobs.get(campaign_id)
@@ -290,9 +368,7 @@ class CampaignService:
             (bundle / "campaign_summary.json").read_text(encoding="utf-8")
         )
         requested_cells = {
-            (persona, seed)
-            for persona in job.request.personas
-            for seed in job.request.seeds
+            (persona, seed) for persona in job.request.personas for seed in job.request.seeds
         }
         records = []
         for line in (bundle / "persona_runs.jsonl").read_text(encoding="utf-8").splitlines():
@@ -333,26 +409,34 @@ class CampaignService:
         }
 
     def _run_live(self, job: CampaignJob) -> dict[str, object]:
-        status = self.providers.status()["providers"]["openai"]
-        if not status["api_key_configured"]:
+        provider = job.request.provider
+        status = self.providers.status()["providers"][provider]
+        if provider == "openai" and not status["api_key_configured"]:
             raise JudgeAPIError(
                 "openai_key_missing",
                 "Live campaign requires a server-side OpenAI key",
-                "Configure OPENAI_API_KEY on the server or choose Replay.",
+                "Configure OPENAI_API_KEY on the server or choose Replay/vLLM.",
+                status_code=503,
+            )
+        if provider == "vllm" and not status["endpoint_configured"]:
+            raise JudgeAPIError(
+                "vllm_endpoint_missing",
+                "Local campaign requires a configured vLLM endpoint",
+                "Configure VLLM_BASE_URL or choose Replay/OpenAI.",
                 status_code=503,
             )
         if not status["game_runtime_configured"]:
             raise JudgeAPIError(
                 "game_runtime_missing",
-                "Live campaign requires a configured real game runtime",
+                "Provider campaign requires a configured real game runtime",
                 "Set GAME_PROJECT_PATH and GODOT_BIN on the server or choose Replay.",
                 status_code=503,
             )
         if self.live_runner is None:
             raise JudgeAPIError(
                 "live_runner_unavailable",
-                "Live campaign runner is not enabled in this deployment",
-                "Use Replay or start the native Judge API with its governed live runner.",
+                "Provider campaign runner is not enabled in this deployment",
+                "Use Replay or start Judge API with its governed agent runner.",
                 status_code=503,
             )
         return self.live_runner(job)
@@ -383,6 +467,7 @@ class JudgeService:
         project_root: str | Path,
         environment: Mapping[str, str] | None = None,
         openai_client_factory: Callable[..., Any] = OpenAI,
+        local_client_factory: Callable[[Settings], Any] = LocalLLMClient.from_settings,
         live_runner: Callable[[CampaignJob], dict[str, object]] | None = None,
     ) -> None:
         self.project = Path(project_root).resolve()
@@ -390,6 +475,7 @@ class JudgeService:
             project_root=self.project,
             environment=environment,
             openai_client_factory=openai_client_factory,
+            local_client_factory=local_client_factory,
             live_runner_enabled=live_runner is not None,
         )
         self.campaigns = CampaignService(
@@ -407,14 +493,19 @@ class JudgeService:
                 status_code=404,
             )
         bundle = self.project / "examples/build_week_2026/experiment-v1"
+        record_path = bundle / "repair_experiment.json"
         gate = verify_public_repair_bundle(bundle)
-        record = RepairExperimentRecord.model_validate_json(
-            (bundle / "repair_experiment.json").read_text(encoding="utf-8")
-        )
+        record = RepairExperimentRecord.model_validate_json(record_path.read_text(encoding="utf-8"))
         patch_diff = (bundle / record.patch.patch_path).read_text(encoding="utf-8")
         return {
             "schema_version": "judge-public-experiment-v1",
             "experiment_id": gate.experiment_id,
+            "evidence_fingerprint": file_sha256(record_path),
+            "human_review": _read_human_review(
+                self.project,
+                experiment_id,
+                evidence_fingerprint=file_sha256(record_path),
+            ),
             "status": gate.status,
             "decision": record.decision.value,
             "decision_reason": record.decision_reason,
@@ -432,6 +523,41 @@ class JudgeService:
             "codex": record.codex.model_dump(mode="json"),
             "mode": "prerecorded",
         }
+
+    def review_experiment(
+        self,
+        experiment_id: str,
+        request: HumanReviewRequest,
+    ) -> dict[str, object]:
+        experiment = self.experiment(experiment_id)
+        current_fingerprint = str(experiment["evidence_fingerprint"])
+        if request.evidence_fingerprint != current_fingerprint:
+            raise JudgeAPIError(
+                "human_review_stale",
+                "Human review evidence fingerprint is stale",
+                "Reload the experiment and review the current evidence before deciding.",
+                status_code=409,
+            )
+        machine = str(experiment["decision"])
+        human_maps_to_machine = {
+            "approve": "accepted",
+            "reject": "rejected",
+            "needs_more_evidence": "undecided",
+        }[request.decision]
+        record = {
+            "schema_version": "judge-human-review-v1",
+            "experiment_id": experiment_id,
+            "evidence_fingerprint": current_fingerprint,
+            "machine_recommendation": machine,
+            "human_decision": request.decision,
+            "reviewer_note": request.reviewer_note.strip(),
+            "overrides_machine_recommendation": human_maps_to_machine != machine,
+            "reviewed_at": datetime.now(tz=UTC).isoformat(),
+            "merge_performed": False,
+        }
+        path = self.project / "reports/judge-reviews" / experiment_id / "human_review.json"
+        _write_json_atomic(path, record)
+        return record
 
 
 def parse_json_body(content: bytes, model: type[BaseModel]) -> BaseModel:
@@ -453,8 +579,36 @@ def parse_json_body(content: bytes, model: type[BaseModel]) -> BaseModel:
         ) from exc
 
 
+def _read_human_review(
+    project: Path,
+    experiment_id: str,
+    *,
+    evidence_fingerprint: str,
+) -> dict[str, object] | None:
+    path = project / "reports/judge-reviews" / experiment_id / "human_review.json"
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(value, dict) or value.get("evidence_fingerprint") != evidence_fingerprint:
+        return None
+    return value
+
+
+def _write_json_atomic(path: Path, payload: Mapping[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    temporary.replace(path)
+
+
 def _safe_id(value: str) -> bool:
-    return 1 <= len(value) <= 64 and all(char.islower() or char.isdigit() or char == "-" for char in value)
+    return 1 <= len(value) <= 64 and all(
+        char.islower() or char.isdigit() or char == "-" for char in value
+    )
 
 
 def _game_available(value: str | None) -> bool:
@@ -468,6 +622,7 @@ __all__ = [
     "CampaignCreateRequest",
     "JudgeAPIError",
     "JudgeService",
+    "HumanReviewRequest",
     "MAX_REQUEST_BYTES",
     "ProviderTestRequest",
     "parse_json_body",

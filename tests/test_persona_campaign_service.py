@@ -11,11 +11,17 @@ from game_analysis_agent.build_week_campaign import (
     TargetSelectionError,
     build_provider_source_identity,
 )
-from game_analysis_agent.campaign_contract import CampaignRequest, build_campaign_cells
+from game_analysis_agent.campaign_contract import (
+    CampaignCellResult,
+    CampaignManifest,
+    CampaignRequest,
+    build_campaign_cells,
+)
 from game_analysis_agent.persona_campaign_service import (
     PersonaCampaignServiceError,
     _CampaignSessionPublisher,
     _clear_view_evidence,
+    _provider_call_count,
     run_persona_campaign,
 )
 from game_analysis_agent.persona_gateway import PersonaProvider, PersonaProviderMode
@@ -209,6 +215,22 @@ def test_session_publisher_exposes_only_sanitized_week_progress(tmp_path: Path) 
     assert "llm_summary" not in session_text
     assert "persona_calls" not in session_text
 
+    publisher.progress(
+        cell,
+        output,
+        {
+            "phase": "completed",
+            "week": 19,
+            "completed_weeks": 19,
+            "finished": True,
+        },
+    )
+    finished_session = json.loads((view / "session.json").read_text(encoding="utf-8"))
+    assert finished_session["status"] == "running"
+    assert finished_session["cells"][0]["status"] == "running"
+    assert finished_session["cells"][0]["phase"] == "game_finished_pending_validation"
+    assert finished_session["latest"]["phase"] == "game_finished_pending_validation"
+
 
 def test_view_cleanup_preserves_live_session_file(tmp_path: Path) -> None:
     view = tmp_path / "live-playthrough"
@@ -222,3 +244,42 @@ def test_view_cleanup_preserves_live_session_file(tmp_path: Path) -> None:
     assert (view / "session.json").is_file()
     assert not (view / "manifest.json").exists()
     assert not (view / "cells").exists()
+
+
+def test_session_publisher_hydrates_resume_candidates_and_counts_retained_calls(
+    tmp_path: Path,
+) -> None:
+    root = Path(__file__).resolve().parents[1]
+    source = root / "examples/build_week_2026/playthrough-v1/source"
+    campaign = source / "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1"
+    manifest = CampaignManifest.model_validate_json(
+        (campaign / "campaign_manifest.json").read_text(encoding="utf-8")
+    )
+    cell = manifest.cells[0]
+    result = CampaignCellResult.model_validate_json(
+        (source / cell.output_dir / "cell_result.json").read_text(encoding="utf-8")
+    )
+    view = tmp_path / "live-playthrough"
+    publisher = _CampaignSessionPublisher(
+        view=view,
+        request=manifest.request,
+        truth_label="prerecorded-real-godot-replay",
+        model="fixture",
+    )
+
+    publisher.hydrate((result,))
+
+    session = json.loads((view / "session.json").read_text(encoding="utf-8"))
+    retained = next(item for item in session["cells"] if item["cell_id"] == cell.cell_id)
+    assert retained["status"] == "retained"
+    assert retained["phase"] == "resume_candidate_pending_validation"
+    assert session["progress"]["retained_cells"] == 1
+    assert session["progress"]["completed_cells"] == 0
+    rows = [
+        json.loads(line)
+        for line in (source / cell.output_dir / "playthrough.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+    ]
+    expected_calls = sum(len(row.get("persona_calls") or []) for row in rows)
+    assert _provider_call_count(source, (result,)) == expected_calls

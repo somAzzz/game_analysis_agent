@@ -16,6 +16,7 @@ from pydantic import ValidationError
 
 from game_analysis_agent.judge_api import (
     CampaignCreateRequest,
+    HumanReviewRequest,
     JudgeAPIError,
     JudgeService,
     ProviderTestRequest,
@@ -47,6 +48,29 @@ class _Factory:
 
     def __call__(self, **kwargs):  # noqa: ANN003
         self.kwargs = kwargs
+        return self.client
+
+
+class _LocalClient:
+    def __init__(self) -> None:
+        self.validated = False
+        self.calls: list[dict[str, object]] = []
+
+    def validate_model_available(self) -> None:
+        self.validated = True
+
+    def complete(self, prompt: str, **kwargs):  # noqa: ANN003, ANN202
+        self.calls.append({"prompt": prompt, **kwargs})
+        return "READY"
+
+
+class _LocalFactory:
+    def __init__(self) -> None:
+        self.client = _LocalClient()
+        self.settings = None
+
+    def __call__(self, settings):  # noqa: ANN001, ANN204
+        self.settings = settings
         return self.client
 
 
@@ -231,15 +255,15 @@ def test_http_surface_status_replay_events_and_experiment(tmp_path: Path) -> Non
         with urllib.request.urlopen(request) as response:
             created = json.load(response)
         completed = _wait(service, created["campaign_id"])
-        with urllib.request.urlopen(f"{base}/api/campaigns/{created['campaign_id']}/events") as response:
+        with urllib.request.urlopen(
+            f"{base}/api/campaigns/{created['campaign_id']}/events"
+        ) as response:
             events = response.read().decode()
         with urllib.request.urlopen(f"{base}/api/experiments/cashflow-drift-repair-v1") as response:
             experiment = json.load(response)
         with urllib.request.urlopen(f"{base}/") as response:
             index = response.read().decode()
-        asset_path = re.search(
-            r'src="(/(?:game_analysis_agent/)?assets/[^"]+\.js)"', index
-        )
+        asset_path = re.search(r'src="(/(?:game_analysis_agent/)?assets/[^"]+\.js)"', index)
         assert asset_path is not None
         with urllib.request.urlopen(f"{base}{asset_path.group(1)}") as response:
             javascript = response.read()
@@ -261,9 +285,7 @@ def test_http_unknown_route_is_typed_404() -> None:
     from http.server import ThreadingHTTPServer
 
     service = JudgeService(project_root=ROOT, environment={})
-    server = ThreadingHTTPServer(
-        ("127.0.0.1", 0), handler_factory(service, ROOT / "frontend/dist")
-    )
+    server = ThreadingHTTPServer(("127.0.0.1", 0), handler_factory(service, ROOT / "frontend/dist"))
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
@@ -277,3 +299,155 @@ def test_http_unknown_route_is_typed_404() -> None:
 
     assert error.value.code == 404
     assert payload["error"]["code"] == "route_not_found"
+
+
+def test_vllm_test_requires_a_real_generation() -> None:
+    factory = _LocalFactory()
+    service = JudgeService(
+        project_root=ROOT,
+        environment={
+            "VLLM_BASE_URL": "http://127.0.0.1:8000/v1",
+            "LLM_SERVED_MODEL_NAME": "local-test-model",
+        },
+        local_client_factory=factory,
+    )
+
+    result = service.providers.test(ProviderTestRequest(provider="vllm"))
+
+    assert result["status"] == "passed"
+    assert result["mode"] == "local"
+    assert result["generation_completed"] is True
+    assert factory.client.validated is True
+    assert factory.client.calls[0]["prompt"] == "Return exactly READY."
+    assert factory.settings.vllm_model == "local-test-model"
+
+
+def test_vllm_campaign_uses_the_same_enabled_runner(tmp_path: Path) -> None:
+    game = tmp_path / "game"
+    game.mkdir()
+    (game / "project.godot").write_text("[application]\n", encoding="utf-8")
+    seen: list[str] = []
+
+    def runner(job):  # noqa: ANN001, ANN202
+        seen.append(job.request.provider)
+        return {"source": "shared-campaign-service", "completed_cells": 1}
+
+    service = JudgeService(
+        project_root=ROOT,
+        environment={
+            "GAME_PROJECT_PATH": str(game),
+            "VLLM_BASE_URL": "http://127.0.0.1:8000/v1",
+            "LLM_SERVED_MODEL_NAME": "local-test-model",
+        },
+        live_runner=runner,
+    )
+    created = service.campaigns.create(
+        CampaignCreateRequest(provider="vllm", personas=("newbie",), seeds=(42,), max_weeks=1)
+    )
+
+    completed = _wait(service, str(created["campaign_id"]))
+
+    assert completed["status"] == "completed"
+    assert completed["mode"] == "local"
+    assert seen == ["vllm"]
+
+
+def test_human_review_is_bound_to_evidence_and_never_merges(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:  # noqa: ANN001
+    service = JudgeService(project_root=tmp_path, environment={})
+    fingerprint = "a" * 64
+    monkeypatch.setattr(
+        service,
+        "experiment",
+        lambda _experiment_id: {
+            "experiment_id": "cashflow-drift-repair-v1",
+            "evidence_fingerprint": fingerprint,
+            "decision": "rejected",
+        },
+    )
+
+    review = service.review_experiment(
+        "cashflow-drift-repair-v1",
+        HumanReviewRequest(
+            evidence_fingerprint=fingerprint,
+            decision="needs_more_evidence",
+            reviewer_note="Run an unseen pressure-sensitive cohort.",
+        ),
+    )
+
+    review_path = tmp_path / "reports/judge-reviews/cashflow-drift-repair-v1/human_review.json"
+    assert json.loads(review_path.read_text(encoding="utf-8")) == review
+    assert review["machine_recommendation"] == "rejected"
+    assert review["human_decision"] == "needs_more_evidence"
+    assert review["merge_performed"] is False
+    assert review["overrides_machine_recommendation"] is True
+    with pytest.raises(JudgeAPIError) as stale:
+        service.review_experiment(
+            "cashflow-drift-repair-v1",
+            HumanReviewRequest(
+                evidence_fingerprint="b" * 64,
+                decision="reject",
+                reviewer_note="Stale review must fail.",
+            ),
+        )
+    assert stale.value.code == "human_review_stale"
+    with pytest.raises(ValidationError):
+        HumanReviewRequest(
+            evidence_fingerprint=fingerprint,
+            decision="approve",
+            reviewer_note="   ",
+        )
+
+
+def test_http_human_review_route_exports_same_durable_record(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:  # noqa: ANN001
+    from http.server import ThreadingHTTPServer
+
+    service = JudgeService(project_root=tmp_path, environment={})
+    fingerprint = "f" * 64
+    monkeypatch.setattr(
+        service,
+        "experiment",
+        lambda _experiment_id: {
+            "evidence_fingerprint": fingerprint,
+            "decision": "rejected",
+        },
+    )
+    frontend = tmp_path / "dist"
+    frontend.mkdir()
+    (frontend / "index.html").write_text("<div></div>", encoding="utf-8")
+    server = ThreadingHTTPServer(("127.0.0.1", 0), handler_factory(service, frontend))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    request = urllib.request.Request(
+        f"http://127.0.0.1:{server.server_port}/api/experiments/cashflow-drift-repair-v1/human-review",
+        data=json.dumps(
+            {
+                "evidence_fingerprint": fingerprint,
+                "decision": "approve",
+                "reviewer_note": "Human approves the visible evidence, without merge.",
+            }
+        ).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request) as response:
+            review = json.load(response)
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+    stored = json.loads(
+        (tmp_path / "reports/judge-reviews/cashflow-drift-repair-v1/human_review.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert review == stored
+    assert review["human_decision"] == "approve"
+    assert review["merge_performed"] is False

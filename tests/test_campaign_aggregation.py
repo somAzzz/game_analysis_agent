@@ -62,9 +62,7 @@ def _executor(request, output_dir, context):  # noqa: ANN001
                 },
                 "chosen_actions": ["study_library"],
                 "validation": {"valid": not fallback, "fallback_used": fallback},
-                "persona_calls": [
-                    {"status": "failed" if fallback else "completed"}
-                ],
+                "persona_calls": [{"status": "failed" if fallback else "completed"}],
                 "week_context": {
                     "persona_strategy": {"alignment_action_tags": ["study"]},
                     "available_actions": [
@@ -86,20 +84,22 @@ def _executor(request, output_dir, context):  # noqa: ANN001
 
 
 def _run(tmp_path: Path):  # noqa: ANN202
-    return CampaignRunner(
-        project_root=tmp_path,
-        request=_request(),
-        source=_source(),
-        executor=_executor,
-    ).run().results
+    return (
+        CampaignRunner(
+            project_root=tmp_path,
+            request=_request(),
+            source=_source(),
+            executor=_executor,
+        )
+        .run()
+        .results
+    )
 
 
 def test_aggregation_recomputes_metrics_and_first_attractor_entry(tmp_path: Path) -> None:
     rules = load_failure_rules(ROOT / "config/build_week_2026_failure_rules.json")
 
-    aggregate = aggregate_campaign(
-        project_root=tmp_path, results=_run(tmp_path), rules=rules
-    )
+    aggregate = aggregate_campaign(project_root=tmp_path, results=_run(tmp_path), rules=rules)
 
     assert aggregate.metrics.expected_cells == 2
     assert aggregate.metrics.completed_cells == 2
@@ -134,4 +134,34 @@ def test_aggregation_rejects_row_changed_after_citation(tmp_path: Path) -> None:
     path.write_text(text, encoding="utf-8")
 
     with pytest.raises(CampaignAggregationError, match="citation hash mismatch"):
+        aggregate_campaign(project_root=tmp_path, results=results, rules=rules)
+
+
+def test_aggregation_rejects_completed_cell_with_unknown_ending(tmp_path: Path) -> None:
+    request = _request()
+
+    def unknown_ending_executor(cell, output_dir, context):  # noqa: ANN001, ANN202
+        outcome = _executor(cell, output_dir, context)
+        trace = output_dir / "playthrough.jsonl"
+        rows = [json.loads(line) for line in trace.read_text(encoding="utf-8").splitlines()]
+        rows[-1]["result"]["final_ending"] = "unknown"
+        trace.write_text(
+            "\n".join(json.dumps(row, sort_keys=True) for row in rows) + "\n",
+            encoding="utf-8",
+        )
+        return outcome
+
+    results = (
+        CampaignRunner(
+            project_root=tmp_path,
+            request=request,
+            source=_source(),
+            executor=unknown_ending_executor,
+        )
+        .run()
+        .results
+    )
+    rules = load_failure_rules(ROOT / "config/build_week_2026_failure_rules.json")
+
+    with pytest.raises(CampaignAggregationError, match="no structured ending"):
         aggregate_campaign(project_root=tmp_path, results=results, rules=rules)

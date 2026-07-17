@@ -17,6 +17,7 @@ VIEW_SCHEMA = "playthrough-view-v1"
 MANIFEST_SCHEMA = "playthrough-evidence-manifest-v1"
 PERSONAS_SCHEMA = "playthrough-personas-v1"
 TRUTH_LABEL = "prerecorded-real-godot-replay"
+CELL_INDEX_SCHEMA = "playthrough-cell-index-v1"
 TRUTH_LABELS = {
     ("replay", "replay"): TRUTH_LABEL,
     ("openai", "live"): "live-openai-real-godot",
@@ -98,6 +99,29 @@ def build_playthrough_views(
     _write_json(personas_destination, persona_view)
     derived_artifacts.append(_artifact(output, personas_destination, role="persona-view"))
 
+    cell_index_payload = {
+        "schema_version": CELL_INDEX_SCHEMA,
+        "campaign_id": manifest.request.campaign_id,
+        "truth_label": truth_label,
+        "cell_count": len(views),
+        "cells": [
+            {
+                "cell_id": view["cell_id"],
+                "persona": view["persona"],
+                "seed": view["seed"],
+                "path": f"cells/{view['persona']}-seed-{view['seed']}.json",
+                "completed_weeks": view["completed_weeks"],
+                "final_ending": view["final_ending"],
+                "stop_reason": view["stop_reason"],
+                "attractor_count": sum(bool(node["attractors"]) for node in view["nodes"]),
+            }
+            for view in sorted(views, key=lambda item: (item["persona"], item["seed"]))
+        ],
+    }
+    index_destination = output / "index.json"
+    _write_json(index_destination, cell_index_payload)
+    index_artifact = _artifact(output, index_destination, role="cell-index")
+    derived_artifacts.append(index_artifact)
     evidence_manifest = {
         "schema_version": MANIFEST_SCHEMA,
         "campaign_id": manifest.request.campaign_id,
@@ -110,6 +134,7 @@ def build_playthrough_views(
         "source_fingerprint": manifest.source_fingerprint,
         "cell_count": len(views),
         "node_count": sum(len(view["nodes"]) for view in views),
+        "cell_index": index_artifact,
         "actual_edge_count": sum(len(view["actual_edges"]) for view in views),
         "legal_event_choice_count": sum(
             len(node["event"]["legal_choices"]) for view in views for node in view["nodes"]
@@ -199,6 +224,27 @@ def verify_playthrough_evidence(
                 f"counterfactual branch truth is ambiguous: {artifact['path']}"
             )
         views.append(view)
+    index_artifact = manifest.get("cell_index")
+    if index_artifact is not None:
+        _verify_artifact(output, index_artifact)
+        cell_index = _load_json(output / str(index_artifact["path"]))
+        indexed = cell_index.get("cells")
+        expected_paths = {
+            str(artifact["path"])
+            for artifact in manifest.get("derived_artifacts") or []
+            if artifact.get("role") == "playthrough-view"
+        }
+        if (
+            cell_index.get("schema_version") != CELL_INDEX_SCHEMA
+            or cell_index.get("campaign_id") != manifest.get("campaign_id")
+            or cell_index.get("truth_label") != expected_truth_label
+            or cell_index.get("cell_count") != len(views)
+            or not isinstance(indexed, list)
+            or {str(item.get("path")) for item in indexed if isinstance(item, dict)}
+            != expected_paths
+        ):
+            raise PlaythroughViewError("playthrough cell index mismatch")
+
     node_count = sum(len(view.get("nodes") or []) for view in views)
     edge_count = sum(len(view.get("actual_edges") or []) for view in views)
     if len(views) != manifest.get("cell_count"):
@@ -658,6 +704,7 @@ def _verify_artifact(root: Path, artifact: Any) -> None:
 __all__ = [
     "MANIFEST_SCHEMA",
     "PERSONAS_SCHEMA",
+    "CELL_INDEX_SCHEMA",
     "TRUTH_LABEL",
     "VIEW_SCHEMA",
     "PlaythroughViewError",

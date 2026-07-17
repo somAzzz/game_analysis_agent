@@ -67,6 +67,7 @@ class InteractiveProbe:
             "state": self.state or {},
             "finished": self.finished,
             "last_event_id": self.last_event_id,
+            "final_ending": self.final_ending or "",
             "risk_guidance": self.risk_guidance,
         }
 
@@ -146,6 +147,7 @@ class InteractiveProbe:
             "event_choices": self.last_event_choices,
             "risk_guidance": self.risk_guidance,
             "finished": self.finished,
+            "final_ending": self.final_ending or "",
         }
 
     def preview_step(self, actions: list[str]) -> dict[str, Any]:

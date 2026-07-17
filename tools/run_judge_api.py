@@ -22,6 +22,7 @@ sys.path.insert(0, str(SRC))
 from game_analysis_agent.judge_api import (  # noqa: E402
     MAX_REQUEST_BYTES,
     CampaignCreateRequest,
+    HumanReviewRequest,
     JudgeAPIError,
     JudgeService,
     ProviderTestRequest,
@@ -36,6 +37,8 @@ CAMPAIGN_ROUTE = re.compile(r"^/api/campaigns/([a-z0-9-]{1,64})$")
 EVENTS_ROUTE = re.compile(r"^/api/campaigns/([a-z0-9-]{1,64})/events$")
 CANCEL_ROUTE = re.compile(r"^/api/campaigns/([a-z0-9-]{1,64})/cancel$")
 EXPERIMENT_ROUTE = re.compile(r"^/api/experiments/([a-z0-9-]{1,64})$")
+
+HUMAN_REVIEW_ROUTE = re.compile(r"^/api/experiments/([a-z0-9-]{1,64})/human-review$")
 
 
 def handler_factory(service: JudgeService, frontend: Path):
@@ -59,7 +62,10 @@ def handler_factory(service: JudgeService, frontend: Path):
                     return
                 if path.startswith("/api/"):
                     raise JudgeAPIError(
-                        "route_not_found", "API route does not exist", "Use the documented API routes.", status_code=404
+                        "route_not_found",
+                        "API route does not exist",
+                        "Use the documented API routes.",
+                        status_code=404,
                     )
                 self._static(path)
             except JudgeAPIError as exc:
@@ -76,12 +82,22 @@ def handler_factory(service: JudgeService, frontend: Path):
                     request = parse_json_body(self._body(), CampaignCreateRequest)
                     self._json(HTTPStatus.ACCEPTED, service.campaigns.create(request))
                     return
+                if match := HUMAN_REVIEW_ROUTE.fullmatch(path):
+                    request = parse_json_body(self._body(), HumanReviewRequest)
+                    self._json(
+                        HTTPStatus.OK,
+                        service.review_experiment(match.group(1), request),
+                    )
+                    return
                 if match := CANCEL_ROUTE.fullmatch(path):
                     self._reject_nonempty_body()
                     self._json(HTTPStatus.OK, service.campaigns.cancel(match.group(1)))
                     return
                 raise JudgeAPIError(
-                    "route_not_found", "API route does not exist", "Use the documented API routes.", status_code=404
+                    "route_not_found",
+                    "API route does not exist",
+                    "Use the documented API routes.",
+                    status_code=404,
                 )
             except JudgeAPIError as exc:
                 self._json(exc.status_code, exc.payload())
@@ -92,18 +108,25 @@ def handler_factory(service: JudgeService, frontend: Path):
                 length = int(raw)
             except ValueError as exc:
                 raise JudgeAPIError(
-                    "content_length_invalid", "Invalid Content-Length", "Send a bounded JSON request."
+                    "content_length_invalid",
+                    "Invalid Content-Length",
+                    "Send a bounded JSON request.",
                 ) from exc
             if length < 0 or length > MAX_REQUEST_BYTES:
                 raise JudgeAPIError(
-                    "request_too_large", "Request body exceeds 32 KiB", "Send only documented fields.", status_code=413
+                    "request_too_large",
+                    "Request body exceeds 32 KiB",
+                    "Send only documented fields.",
+                    status_code=413,
                 )
             return self.rfile.read(length)
 
         def _reject_nonempty_body(self) -> None:
             if self._body():
                 raise JudgeAPIError(
-                    "request_invalid", "Cancel does not accept a body", "Send an empty POST request."
+                    "request_invalid",
+                    "Cancel does not accept a body",
+                    "Send an empty POST request.",
                 )
 
         def _json(self, status: int, payload: object) -> None:
@@ -140,11 +163,17 @@ def handler_factory(service: JudgeService, frontend: Path):
                 candidate = frontend / "index.html"
             if not candidate.is_file():
                 raise JudgeAPIError(
-                    "frontend_unavailable", "Frontend build is unavailable", "Run npm run build.", status_code=404
+                    "frontend_unavailable",
+                    "Frontend build is unavailable",
+                    "Run npm run build.",
+                    status_code=404,
                 )
             body = candidate.read_bytes()
             self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", mimetypes.guess_type(candidate.name)[0] or "application/octet-stream")
+            self.send_header(
+                "Content-Type",
+                mimetypes.guess_type(candidate.name)[0] or "application/octet-stream",
+            )
             self.send_header("Content-Length", str(len(body)))
             self.send_header("X-Content-Type-Options", "nosniff")
             self.end_headers()
@@ -161,6 +190,11 @@ def main() -> int:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8080)
     parser.add_argument("--frontend", type=Path, default=ROOT / "frontend/dist")
+    parser.add_argument(
+        "--enable-agent-runs",
+        action="store_true",
+        help="Enable the governed vLLM/OpenAI campaign runner; credentials remain server-side.",
+    )
     parser.add_argument(
         "--enable-live-openai",
         action="store_true",
@@ -190,9 +224,11 @@ def main() -> int:
 
     service = JudgeService(
         project_root=ROOT,
-        live_runner=live_runner if args.enable_live_openai else None,
+        live_runner=live_runner if (args.enable_agent_runs or args.enable_live_openai) else None,
     )
-    server = ThreadingHTTPServer((args.host, args.port), handler_factory(service, args.frontend.resolve()))
+    server = ThreadingHTTPServer(
+        (args.host, args.port), handler_factory(service, args.frontend.resolve())
+    )
     print(f"Judge API listening on http://{args.host}:{server.server_port}", file=sys.stderr)
     try:
         server.serve_forever()

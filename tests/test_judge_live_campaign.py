@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 from game_analysis_agent.build_week_campaign import LiveCampaignExecutor
 from game_analysis_agent.campaign_contract import (
     CampaignCellState,
@@ -68,68 +70,61 @@ def test_live_executor_marks_fallback_evidence_partial(monkeypatch, tmp_path: Pa
     assert "fallback" in outcome.error
 
 
-def test_judge_live_campaign_returns_only_redacted_aggregate(monkeypatch, tmp_path: Path) -> None:  # noqa: ANN001
-    gateway = _Gateway()
-    built = SimpleNamespace(gateway=gateway)
-    manifest = tmp_path / "reports/judge-live/judge-test/campaign_manifest.json"
-    manifest.parent.mkdir(parents=True)
-    manifest.write_text("{}", encoding="utf-8")
-    result = SimpleNamespace(completed_weeks=2, artifacts=())
-    summary = SimpleNamespace(
-        campaign_id="judge-test",
-        manifest_path=manifest,
-        results=(result,),
-        status_counts={"completed": 1},
-        submittable=True,
-    )
+@pytest.mark.parametrize("provider", ["vllm", "openai"])
+def test_judge_provider_campaign_delegates_to_shared_service(
+    monkeypatch,
+    tmp_path: Path,
+    provider: str,
+) -> None:  # noqa: ANN001
+    captured: dict[str, object] = {}
 
-    class FakeRunner:
-        def __init__(self, **_kwargs) -> None:  # noqa: ANN003
-            pass
-
-        def run(self, *, resume: bool):  # noqa: ANN202
-            assert resume is False
-            return summary
+    def fake_campaign_service(**kwargs):  # noqa: ANN003, ANN202
+        captured.update(kwargs)
+        return {
+            "schema_version": "persona-campaign-service-result-v1",
+            "status": "passed",
+            "provider": provider,
+            "mode": "local" if provider == "vllm" else "live",
+            "model": "test-model",
+            "cells": {"completed": 1, "requested": 1},
+            "weeks": 2,
+            "calls_used": 2,
+        }
 
     monkeypatch.setattr(
-        "game_analysis_agent.judge_live_campaign.build_persona_gateway",
-        lambda *_args, **_kwargs: built,
+        "game_analysis_agent.judge_live_campaign.run_persona_campaign",
+        fake_campaign_service,
     )
-    monkeypatch.setattr(
-        "game_analysis_agent.judge_live_campaign.build_live_source_identity",
-        lambda **_kwargs: object(),
-    )
-    monkeypatch.setattr("game_analysis_agent.judge_live_campaign.CampaignRunner", FakeRunner)
-    monkeypatch.setattr(
-        "game_analysis_agent.judge_live_campaign._provider_evidence",
-        lambda *_args: {
-            "call_count": 2,
-            "models": ["gpt-test"],
-            "response_ids": ["resp_1"],
-            "usage": {"input_tokens": 10, "output_tokens": 4, "total_tokens": 14},
-            "outputs_recorded": False,
-        },
-    )
+    cancelled = SimpleNamespace(is_set=lambda: False)
     job = SimpleNamespace(
         campaign_id="judge-test",
-        request=SimpleNamespace(personas=("newbie",), seeds=(42,), max_weeks=2),
-        cancelled=SimpleNamespace(is_set=lambda: False),
+        request=SimpleNamespace(
+            provider=provider,
+            personas=("newbie",),
+            seeds=(42,),
+            max_weeks=2,
+        ),
+        cancelled=cancelled,
     )
-
     secret = "sk-" + "never-serialize-this"
+
     output = run_judge_live_campaign(
         job,
         project_root=tmp_path,
         environment={
             "OPENAI_API_KEY": secret,
-            "OPENAI_PERSONA_MODEL": "gpt-test",
             "GAME_PROJECT_PATH": str(tmp_path / "game"),
-            "GODOT_BIN": "godot4",
         },
     )
 
-    assert output["mode"] == "live"
+    request = captured["request"]
+    assert isinstance(request, CampaignRequest)
+    assert request.provider.value == provider
+    assert request.max_weeks == 2
+    assert captured["view_dir"] == "frontend/public/live-playthrough"
+    assert captured["resume"] is True
+    assert captured["external_cancelled"] == cancelled.is_set
     assert output["completed_cells"] == 1
-    assert output["provider_evidence"]["response_ids"] == ["resp_1"]
+    assert output["completed_weeks"] == 2
+    assert output["source"] == f"fresh-{provider}-godot-campaign"
     assert secret not in str(output)
-    assert gateway.validated == {"runs": 1, "weeks": 2, "concurrency": 1}

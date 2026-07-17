@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+if [ -f "$ROOT/.env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . "$ROOT/.env"
+  set +a
+fi
+
+: "${GODOT_BIN:=$ROOT/scripts/godot-docker-wrapper}"
+case "$GODOT_BIN" in
+  scripts/*) GODOT_BIN="$ROOT/$GODOT_BIN" ;;
+esac
+export GODOT_BIN
+
+cd "$ROOT"
+exec uv run python tools/run_judge_api.py --enable-agent-runs "$@"

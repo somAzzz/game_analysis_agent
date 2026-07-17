@@ -37,11 +37,7 @@ class FailureRule(BaseModel):
 
     @model_validator(mode="after")
     def _has_signal(self) -> FailureRule:
-        if (
-            self.money_lte is None
-            and self.stress_gte is None
-            and self.fallback_used is None
-        ):
+        if self.money_lte is None and self.stress_gte is None and self.fallback_used is None:
             raise ValueError("failure rule requires at least one signal")
         return self
 
@@ -286,9 +282,14 @@ def _cell_metrics(
         fallback_used = validation.get("fallback_used") is True
         valid += int(validation.get("valid") is True and not fallback_used)
         fallback += int(fallback_used)
-        persona_calls = row.get("persona_calls") if isinstance(row.get("persona_calls"), list) else []
+        persona_calls = (
+            row.get("persona_calls") if isinstance(row.get("persona_calls"), list) else []
+        )
         provider_errors += int(
-            any(isinstance(call, dict) and call.get("status") != "completed" for call in persona_calls)
+            any(
+                isinstance(call, dict) and call.get("status") != "completed"
+                for call in persona_calls
+            )
         )
         aligned = _alignment(row)
         if aligned is not None:
@@ -302,6 +303,10 @@ def _cell_metrics(
         if candidate:
             ending = candidate
 
+    if result.state == CampaignCellState.COMPLETED and ending in {"", "unknown"}:
+        raise CampaignAggregationError(
+            f"completed cell has no structured ending: {result.request.cell_id}"
+        )
     first_entries = {}
     for rule in rules.rules:
         week = _first_consecutive(signals[rule.cluster_id], rule.consecutive_weeks)
@@ -395,10 +400,7 @@ def _ending(row: dict[str, Any]) -> str:
     result = row.get("result") if isinstance(row.get("result"), dict) else {}
     state = _state_after(row)
     return str(
-        result.get("final_ending")
-        or result.get("ending_id")
-        or state.get("ending_id")
-        or ""
+        result.get("final_ending") or result.get("ending_id") or state.get("ending_id") or ""
     )
 
 
