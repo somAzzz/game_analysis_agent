@@ -34,8 +34,10 @@ provider configuration. Secret values are never included.
 ## Provider configuration
 
 Replay is a deterministically authored persona-policy fixture, not a recorded
-LLM playthrough, and needs no configuration. To enable the live provider test, set a
-restricted server-side environment variable before process startup:
+LLM playthrough, and needs no configuration. To enable the live provider test,
+create the ignored root `.env` described in
+[LIVE_OPENAI_EVIDENCE.md](LIVE_OPENAI_EVIDENCE.md), or export the same
+restricted server-side variables before process startup:
 
 ```bash
 export OPENAI_API_KEY=...
