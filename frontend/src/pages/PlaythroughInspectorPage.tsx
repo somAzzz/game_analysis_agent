@@ -24,8 +24,20 @@ import slackerRunner from "@/assets/competition/personas/persona-slacker-runner-
 import slackerRunnerFrameB from "@/assets/competition/personas/persona-slacker-runner-frame-b-v2.png";
 import missionMap from "@/assets/competition/judge-mission-map-v1.png";
 import { ForgeTopNav } from "@/components/competition/ForgeWorkspace";
+import {
+  DEFAULT_EVENT_LOCALE,
+  localizedChoice,
+  localizedEvent,
+  type EventLocale,
+} from "@/lib/eventLocalization";
 import { competitionPlaythrough } from "@/lib/playthrough";
-import type { PlaythroughNode, PlaythroughPersonaSlug } from "@/types";
+import { loadLivePlaythrough, loadPlaytestSession } from "@/lib/livePlaythrough";
+import type {
+  PlaytestSession,
+  PlaythroughBundle,
+  PlaythroughNode,
+  PlaythroughPersonaSlug,
+} from "@/types";
 
 const PERSONA_ORDER: PlaythroughPersonaSlug[] = [
   "newbie",
@@ -84,27 +96,34 @@ function selectedChoice(node: PlaythroughNode) {
 function isPersonaSlug(value: string | null): value is PlaythroughPersonaSlug {
   return PERSONA_ORDER.some((slug) => slug === value);
 }
-
 export function PlaythroughInspectorPage() {
-  const { manifest, cells } = competitionPlaythrough;
+  const [latestPlaythrough, setLatestPlaythrough] = useState<PlaythroughBundle | null>(null);
+  const [latestError, setLatestError] = useState("");
+  const [liveSession, setLiveSession] = useState<PlaytestSession | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const useLatest = Boolean(latestPlaythrough && searchParams.get("source") !== "replay");
+  const bundle = useLatest ? latestPlaythrough! : competitionPlaythrough;
+  const { manifest, cells } = bundle;
+  const availablePersonas = PERSONA_ORDER.filter((slug) => Boolean(cells[slug]));
   const requestedPersona = searchParams.get("persona");
-  const personaSlug = isPersonaSlug(requestedPersona) ? requestedPersona : "money";
+  const defaultPersona = useLatest ? (availablePersonas[0] ?? "newbie") : "money";
+  const personaSlug = isPersonaSlug(requestedPersona) && cells[requestedPersona]
+    ? requestedPersona : defaultPersona;
   const personaLabel = PERSONA_LABELS[personaSlug];
-  const cell = cells[personaSlug];
+  const cell = cells[personaSlug] ?? bundle.cell;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [eventLocale, setEventLocale] = useState<EventLocale>(DEFAULT_EVENT_LOCALE);
   const currentNode = cell.nodes[currentIndex];
   const runnerFrameIndex = (currentNode.week - 1) % 2;
   const runnerAsset = PERSONA_RUNNERS[personaSlug][runnerFrameIndex];
   const choice = selectedChoice(currentNode);
-  const progress = currentIndex / (cell.nodes.length - 1);
+  const eventCopy = localizedEvent(currentNode.event.id, eventLocale);
+  const progress = currentIndex / Math.max(1, cell.nodes.length - 1);
   const runnerPosition = 5 + progress * 90;
   const metricRows = useMemo(
     () => METRICS.map(([key, label, prefix]) => ({
-      key,
-      label,
-      prefix,
+      key, label, prefix,
       before: stateNumber(currentNode.state_before, key),
       after: stateNumber(currentNode.state_after, key),
     })),
@@ -112,11 +131,60 @@ export function PlaythroughInspectorPage() {
   );
   const stressMetric = metricRows.find((metric) => metric.key === "stress");
   const arrearsMetric = metricRows.find((metric) => metric.key === "arrears_amount");
+  const sessionPercent = liveSession
+    ? Math.min(100, Math.round(
+        liveSession.progress.completed_weeks
+        / Math.max(1, liveSession.progress.total_requested_weeks)
+        * 100,
+      ))
+    : 0;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    loadLivePlaythrough(controller.signal)
+      .then((value) => setLatestPlaythrough(value))
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setLatestError(error instanceof Error ? error.message : "Latest campaign unavailable");
+      });
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let refreshing = false;
+    const refresh = async () => {
+      if (refreshing) return;
+      refreshing = true;
+      try {
+        const session = await loadPlaytestSession(controller.signal);
+        setLiveSession(session);
+        if (
+          session?.status === "completed"
+          && latestPlaythrough?.manifest.campaign_id !== session.campaign_id
+        ) {
+          const completed = await loadLivePlaythrough(controller.signal);
+          setLatestPlaythrough(completed);
+        }
+      } catch (error: unknown) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setLatestError(error instanceof Error ? error.message : "Live session unavailable");
+      } finally {
+        refreshing = false;
+      }
+    };
+    void refresh();
+    const timer = window.setInterval(() => void refresh(), 1500);
+    return () => {
+      controller.abort();
+      window.clearInterval(timer);
+    };
+  }, [latestPlaythrough?.manifest.campaign_id]);
 
   useEffect(() => {
     setPlaying(false);
     setCurrentIndex(0);
-  }, [personaSlug]);
+  }, [personaSlug, manifest.campaign_id]);
 
   useEffect(() => {
     if (!playing) return undefined;
@@ -163,6 +231,19 @@ export function PlaythroughInspectorPage() {
     const index = cell.nodes.findIndex((node) => node.week === week);
     if (index >= 0) selectIndex(index);
   }
+  function selectPersona(slug: PlaythroughPersonaSlug): void {
+    const next = new URLSearchParams(searchParams);
+    next.set("persona", slug);
+    setSearchParams(next, { replace: true });
+  }
+
+  function selectSource(source: "replay" | "latest"): void {
+    const next = new URLSearchParams(searchParams);
+    if (source === "replay") next.set("source", "replay");
+    else next.delete("source");
+    setSearchParams(next, { replace: true });
+  }
+
 
   return (
     <div className="judge-shell playthrough-shell">
@@ -180,27 +261,79 @@ export function PlaythroughInspectorPage() {
             <div><dt>Seed</dt><dd>{cell.seed}</dd></div>
             <div><dt>Nodes</dt><dd>{cell.nodes.length}</dd></div>
             <div><dt>Edges</dt><dd>{cell.actual_edges.length}</dd></div>
+            <div className="playthrough-language-control">
+              <dt>Event language</dt>
+              <dd>
+                <button type="button" className={eventLocale === "en" ? "is-active" : ""} aria-pressed={eventLocale === "en"} onClick={() => setEventLocale("en")}>EN</button>
+                <button type="button" className={eventLocale === "zh" ? "is-active" : ""} aria-pressed={eventLocale === "zh"} onClick={() => setEventLocale("zh")}>中文</button>
+              </dd>
+            </div>
+            <div><dt>Default copy</dt><dd>English</dd></div>
           </dl>
+        </section>
+
+        {liveSession && (
+          <section
+            className={`playthrough-session is-${liveSession.status}`}
+            aria-label="Codex playtest session"
+            aria-live="polite"
+          >
+            <header>
+              <div><span>CODEX PLAYTEST SESSION</span><strong>{liveSession.campaign_id}</strong></div>
+              <b>{liveSession.status.toUpperCase()}</b>
+            </header>
+            <div className="playthrough-session-progress">
+              <span style={{ width: `${sessionPercent}%` }} />
+            </div>
+            <dl>
+              <div><dt>Provider</dt><dd>{liveSession.provider} · {liveSession.model}</dd></div>
+              <div><dt>Cells</dt><dd>{liveSession.progress.completed_cells}/{liveSession.progress.total_cells}</dd></div>
+              <div><dt>Weeks recorded</dt><dd>{liveSession.progress.completed_weeks}/{liveSession.progress.total_requested_weeks}</dd></div>
+              <div><dt>Truth</dt><dd>{liveSession.truth_label}</dd></div>
+            </dl>
+            {liveSession.latest && (
+              <p>
+                <strong>{PERSONA_LABELS[liveSession.latest.persona]} · seed {liveSession.latest.seed} · W{liveSession.latest.week}/{liveSession.latest.max_weeks}</strong>
+                <span>{liveSession.latest.phase} · {liveSession.latest.triggered_event_id || "choosing next action"}</span>
+              </p>
+            )}
+            <small>{liveSession.message}</small>
+          </section>
+        )}
+
+        <section className="playthrough-persona-switcher playthrough-source-switcher" aria-label="Evidence source">
+          <header>
+            <span>EVIDENCE SOURCE</span>
+            <small>{latestError || (latestPlaythrough ? "Generated campaign evidence is ready" : "Signed Replay fallback is active")}</small>
+          </header>
+          <div>
+            <button type="button" className={!useLatest ? "is-active" : ""} aria-pressed={!useLatest} onClick={() => selectSource("replay")}>
+              <span>Signed Replay</span><small>prerecorded · real Godot</small>
+            </button>
+            <button type="button" disabled={!latestPlaythrough} className={useLatest ? "is-active" : ""} aria-pressed={useLatest} onClick={() => selectSource("latest")}>
+              <span>Latest campaign</span><small>{latestPlaythrough?.manifest.truth_label ?? "not generated"}</small>
+            </button>
+          </div>
         </section>
 
         <section className="playthrough-persona-switcher" aria-label="Playthrough strategy">
           <header>
             <span>PLAY AS STRATEGY</span>
-            <small>Each Persona opens its own verified seed 42 path</small>
+            <small>{useLatest ? `${manifest.source.provider} · ${manifest.truth_label}` : "Each Persona opens its own verified seed 42 path"}</small>
           </header>
           <div>
-            {PERSONA_ORDER.map((slug) => (
+            {availablePersonas.map((slug) => (
               <button
                 key={slug}
                 type="button"
                 className={slug === personaSlug ? "is-active" : ""}
                 aria-pressed={slug === personaSlug}
                 aria-label={`Use ${PERSONA_LABELS[slug]} strategy playthrough`}
-                onClick={() => setSearchParams({ persona: slug }, { replace: true })}
+                onClick={() => selectPersona(slug)}
               >
                 <img src={PERSONA_RUNNERS[slug][0]} alt="" />
                 <span>{PERSONA_LABELS[slug]}</span>
-                <small>seed 42</small>
+                <small>seed {cells[slug]?.seed ?? cell.seed}</small>
               </button>
             ))}
           </div>
@@ -208,9 +341,9 @@ export function PlaythroughInspectorPage() {
 
         <section className="playthrough-route" aria-labelledby="playthrough-route-title">
           <header>
-            <span id="playthrough-route-title">ACTUAL REPLAY PATH</span>
+            <span id="playthrough-route-title">{useLatest ? `ACTUAL ${cell.provider_mode.toUpperCase()} PATH` : "ACTUAL REPLAY PATH"}</span>
             <div className="playthrough-live-signal" aria-live="polite">
-              <strong>{currentNode.event.id}</strong>
+              <strong>{eventCopy.title}</strong>
               <span>Stress {displayMetric(stressMetric?.before ?? null, "")} → {displayMetric(stressMetric?.after ?? null, "")}</span>
               <span>Arrears {displayMetric(arrearsMetric?.before ?? null, "€")} → {displayMetric(arrearsMetric?.after ?? null, "€")}</span>
             </div>
@@ -307,7 +440,7 @@ export function PlaythroughInspectorPage() {
           <article className="playthrough-week-record">
             <header>
               <span>W{currentNode.week.toString().padStart(2, "0")}</span>
-              <div><small>EVENT</small><h2>{currentNode.event.id}</h2></div>
+              <div className="playthrough-event-heading"><small>EVENT · {currentNode.event.id}</small><h2>{eventCopy.title}</h2><p>{eventCopy.body}</p></div>
               {currentNode.attractors.length > 0 && <b>FIRST ATTRACTOR</b>}
               {currentNode.finished && <b className="is-terminal">{cell.final_ending}</b>}
             </header>
@@ -324,7 +457,7 @@ export function PlaythroughInspectorPage() {
                     return (
                       <li key={item.choice_id} className={isSelected ? "is-selected" : ""}>
                         <span>{isSelected ? <Check weight="bold" /> : null}</span>
-                        <div><b>{item.text}</b><small>{isSelected ? "observed result" : "legal here · future not executed"}</small></div>
+                        <div><b>{localizedChoice(currentNode.event.id, item, eventLocale)}</b><small>{isSelected ? "observed result" : "legal here · future not executed"}</small></div>
                       </li>
                     );
                   })}
@@ -340,7 +473,7 @@ export function PlaythroughInspectorPage() {
                     </div>
                   ))}
                 </dl>
-                <div className="playthrough-selected-choice"><small>SELECTED CHOICE</small><strong>{choice?.text ?? "No event choice"}</strong></div>
+                <div className="playthrough-selected-choice"><small>SELECTED CHOICE</small><strong>{localizedChoice(currentNode.event.id, choice, eventLocale)}</strong></div>
               </section>
             </div>
           </article>
@@ -352,7 +485,7 @@ export function PlaythroughInspectorPage() {
               {cell.nodes.map((node, index) => (
                 <button key={node.id} type="button" className={index === currentIndex ? "is-active" : ""} onClick={() => selectIndex(index)}>
                   <span>W{node.week}</span>
-                  <span><b>{node.event.id}</b><small>{selectedChoice(node)?.text ?? "No event choice"}</small></span>
+                  <span><b>{localizedEvent(node.event.id, eventLocale).title}</b><small>{localizedChoice(node.event.id, selectedChoice(node), eventLocale)}</small></span>
                   <code>{node.evidence.source_record_sha256.slice(0, 8)}</code>
                 </button>
               ))}

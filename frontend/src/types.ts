@@ -301,6 +301,66 @@ export interface JudgeExperiment {
   mode: "prerecorded";
 }
 
+
+export type PlaythroughTruthLabel =
+  | "prerecorded-real-godot-replay"
+  | "live-openai-real-godot"
+  | "live-deepseek-real-godot"
+  | "local-vllm-real-godot"
+  | "local-sglang-real-godot";
+
+export type PlaytestSessionStatus = "running" | "finalizing" | "completed" | "failed";
+
+export interface PlaytestSessionCell {
+  cell_id: string;
+  persona: PlaythroughPersonaSlug;
+  seed: number;
+  status: string;
+  phase: string;
+  current_week: number;
+  completed_weeks: number;
+  max_weeks: number;
+}
+
+export interface PlaytestSession {
+  schema_version: "persona-campaign-session-v1";
+  campaign_id: string;
+  status: PlaytestSessionStatus;
+  truth_label: PlaythroughTruthLabel;
+  provider: string;
+  model: string;
+  request: {
+    personas: PlaythroughPersonaSlug[];
+    seeds: number[];
+    max_weeks: number;
+    provider: string;
+  };
+  progress: {
+    completed_cells: number;
+    running_cells: number;
+    failed_cells: number;
+    completed_weeks: number;
+    total_cells: number;
+    total_requested_weeks: number;
+  };
+  cells: PlaytestSessionCell[];
+  latest: null | {
+    cell_id: string;
+    persona: PlaythroughPersonaSlug;
+    seed: number;
+    phase: string;
+    week: number;
+    completed_weeks: number;
+    max_weeks: number;
+    selected_action_ids: string[];
+    triggered_event_id: string;
+    selected_choice_id: string;
+    state_after: Record<string, number>;
+  };
+  message: string;
+  calls_used?: number;
+  repair_target_eligible?: boolean;
+}
 export type PlaythroughPersonaSlug =
   | "newbie"
   | "study"
@@ -318,6 +378,7 @@ export interface PlaythroughPersona {
     risk_tolerance: number;
     exploration: number;
     failure_intent: boolean;
+    alignment_action_tags?: string[];
     alignment_risk_guided?: boolean;
   };
   observed: {
@@ -335,7 +396,13 @@ export interface PlaythroughPersona {
 export interface PlaythroughManifest {
   schema_version: string;
   campaign_id: string;
-  truth_label: "prerecorded-real-godot-replay";
+  request?: {
+    personas: PlaythroughPersonaSlug[];
+    seeds: number[];
+    max_weeks: number;
+    provider: string;
+  };
+  truth_label: PlaythroughTruthLabel;
   cell_count: number;
   node_count: number;
   actual_edge_count: number;
@@ -353,6 +420,8 @@ export interface PlaythroughManifest {
 export interface PlaythroughChoice {
   choice_id: string;
   text: string;
+  text_en?: string;
+  text_zh?: string;
   next_event_id: string;
   requirements: Record<string, unknown>;
   success_effects: Record<string, number>;
@@ -386,7 +455,7 @@ export interface PlaythroughCell {
   schema_version: string;
   campaign_id: string;
   cell_id: string;
-  truth_label: "prerecorded-real-godot-replay";
+  truth_label: PlaythroughTruthLabel;
   persona: PlaythroughPersonaSlug;
   seed: number;
   scenario: string;
@@ -417,5 +486,5 @@ export interface PlaythroughBundle {
   manifest: PlaythroughManifest;
   personas: PlaythroughPersona[];
   cell: PlaythroughCell;
-  cells: Record<PlaythroughPersonaSlug, PlaythroughCell>;
+  cells: Partial<Record<PlaythroughPersonaSlug, PlaythroughCell>>;
 }

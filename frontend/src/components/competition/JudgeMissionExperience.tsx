@@ -31,8 +31,21 @@ const PERSONA_LABELS: Record<PlaythroughPersonaSlug, string> = {
   slacker: "Slacker",
 };
 
+const PERSONA_DESCRIPTIONS: Record<PlaythroughPersonaSlug, string> = {
+  newbie: "A first-time player who follows visible risk guidance and tries understandable options.",
+  study: "An academic-first player focused on APS, TestDaF, coursework, and exam readiness.",
+  money: "A cashflow-first player who prioritizes paid work and career progress.",
+  social: "A relationship-first player who builds language confidence, contacts, and social support.",
+  visa: "A compliance-first player who protects registration, insurance, banking, and residence deadlines.",
+  slacker: "A comfort-first, failure-seeking player who lowers short-term stress and ignores some long-term risks.",
+};
+
 function percent(value: number, digits = 1): string {
   return `${(value * 100).toFixed(digits)}%`;
+}
+
+function humanizeToken(value: string): string {
+  return value.replaceAll("_", " ");
 }
 
 function firstEnding(persona: PlaythroughPersona): [string, number] {
@@ -190,9 +203,9 @@ export function JudgeMissionExperience() {
             </Link>
             <section>
               <h3>Strategy contract</h3>
-              <p>{drawerPersona.contract.description}</p>
-              <Record label="Priorities" value={drawerPersona.contract.priorities.join(" · ")} />
-              <Record label="Hard avoids" value={drawerPersona.contract.hard_avoid.join(" · ")} />
+              <p>{PERSONA_DESCRIPTIONS[drawerPersona.slug]}</p>
+              <Record label="Priorities" value={drawerPersona.contract.priorities.map(humanizeToken).join(" · ")} />
+              <Record label="Hard avoids" value={drawerPersona.contract.hard_avoid.map(humanizeToken).join(" · ")} />
               <Record label="Risk / explore" value={`${drawerPersona.contract.risk_tolerance.toFixed(2)} / ${drawerPersona.contract.exploration.toFixed(2)}`} />
             </section>
             <section>
@@ -223,27 +236,28 @@ function PersonaSummary({ persona }: { persona: PlaythroughPersona }) {
   const rates = Object.entries(persona.observed.action_tag_rates)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
+  const expectedTags = persona.contract.alignment_action_tags?.map(humanizeToken)
+    ?? (persona.contract.alignment_risk_guided ? ["risk-guided choices"] : []);
+  const topObserved = rates[0];
   return (
     <aside className="competition-persona-summary" aria-live="polite">
       <div className="competition-summary-heading">
         <div><span>HOVER SUMMARY</span><h2>{PERSONA_LABELS[persona.slug]}</h2></div>
         <Info weight="fill" />
       </div>
-      <p>{persona.contract.description}</p>
+      <p>{PERSONA_DESCRIPTIONS[persona.slug]}</p>
       <dl className="competition-contract-strip">
         <div><dt>Risk</dt><dd>{persona.contract.risk_tolerance.toFixed(2)}</dd></div>
         <div><dt>Explore</dt><dd>{persona.contract.exploration.toFixed(2)}</dd></div>
-        <div><dt>Seeds</dt><dd>{persona.observed.seeds.join(" · ")}</dd></div>
+        <div><dt>Intent</dt><dd>{persona.contract.failure_intent ? "Failure-seeking" : "Goal-seeking"}</dd></div>
       </dl>
-      <h3>Observed action mix</h3>
+      <h3>Observed divergence from strategy</h3>
       <div className="competition-rate-list">
         {rates.map(([label, value]) => (
           <div key={label}><span>{label}</span><b>{percent(value)}</b><progress max="1" value={value} /></div>
         ))}
       </div>
-      {persona.slug === "money" && (
-        <p className="competition-mismatch"><Info weight="fill" /> Career actions were only {percent(persona.observed.action_tag_rates.career, 2)}</p>
-      )}
+      <p className="competition-mismatch"><Info weight="fill" /> Strategy targets {expectedTags.join(" · ")}; observed top tag was {topObserved ? `${humanizeToken(topObserved[0])} at ${percent(topObserved[1])}` : "not recorded"}.</p>
       <div className="competition-summary-outcome">
         <span>First attractor</span><b>W{persona.observed.first_cashflow_stress_attractor_weeks.join(" / W")}</b>
         <span>Ending</span><b className="is-danger">{formatEnding(persona)}</b>

@@ -221,6 +221,10 @@ function renderRoute(path: string) {
 describe("application routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response("not found", { status: 404 })),
+    );
     apiMocks.fetchFrontManifest.mockResolvedValue(frontManifest);
     apiMocks.fetchIssueManifest.mockResolvedValue(issueManifest);
     apiMocks.fetchDecisionGraphManifest.mockResolvedValue(graphManifest);
@@ -299,27 +303,96 @@ describe("application routes", () => {
     expect(within(playthroughNav).getByRole("link", { name: "Playthrough Inspector" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("button", { name: "Go to recorded week 1" })).toHaveAttribute("aria-current", "step");
     expect(screen.getByLabelText("Money current state at recorded week 1")).toHaveAttribute("data-runner-frame", "1");
+    expect(screen.getByRole("heading", { name: "Arrival in Germany" })).toBeInTheDocument();
+    expect(screen.getByText("Go to the dorm to drop off luggage")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "中文" }));
+    expect(screen.getByRole("heading", { name: "抵达德国" })).toBeInTheDocument();
+    expect(screen.getByText("先去宿舍放行李")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "EN" }));
 
     await user.click(screen.getByRole("button", { name: "Next" }));
-    expect(screen.getByRole("heading", { name: "germany_language_track_start" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Continuing Language Studies in Germany" })).toBeInTheDocument();
     expect(screen.getByLabelText("Money current state at recorded week 2")).toHaveAttribute("data-runner-frame", "2");
 
     await user.click(screen.getByRole("button", { name: "Previous" }));
     expect(screen.getByLabelText("Money current state at recorded week 1")).toHaveAttribute("data-runner-frame", "1");
 
     await user.click(screen.getByRole("button", { name: "W3 Attractor" }));
-    expect(screen.getByRole("heading", { name: "missing_school_registration" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Unregistered, Can't Attend Class" })).toBeInTheDocument();
     expect(screen.getByLabelText("Money current state at recorded week 3")).toHaveAttribute("data-runner-frame", "1");
     expect(screen.getByText("Stress 49 → 82")).toBeInTheDocument();
     expect(screen.getByText("Arrears €373 → €628")).toBeInTheDocument();
     expect(within(screen.getByRole("article")).getByText("€628")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Go to recorded week 3" })).toHaveAttribute("aria-current", "step");
 
-    await user.click(screen.getByRole("button", { name: /W19 after_exam_void/i }));
-    expect(screen.getByRole("heading", { name: "after_exam_void" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /W19 Post-Exam Void/i }));
+    expect(screen.getByRole("heading", { name: "Post-Exam Void" })).toBeInTheDocument();
     expect(screen.getByText("cashflow_collapse")).toBeInTheDocument();
     expect(within(screen.getByRole("article")).getByText("€3,862")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Go to recorded week 19" })).toHaveAttribute("aria-current", "step");
+  });
+
+  it("shows sanitized weekly progress from a Codex playtest session", async () => {
+    const session = {
+      schema_version: "persona-campaign-session-v1",
+      campaign_id: "vllm-newbie-seed-42-20w",
+      status: "running",
+      truth_label: "local-vllm-real-godot",
+      provider: "vllm",
+      model: "qwen-local",
+      request: { personas: ["newbie"], seeds: [42], max_weeks: 20, provider: "vllm" },
+      progress: {
+        completed_cells: 0,
+        running_cells: 1,
+        failed_cells: 0,
+        completed_weeks: 7,
+        total_cells: 1,
+        total_requested_weeks: 20,
+      },
+      cells: [{
+        cell_id: "newbie-seed-42",
+        persona: "newbie",
+        seed: 42,
+        status: "running",
+        phase: "completed",
+        current_week: 7,
+        completed_weeks: 7,
+        max_weeks: 20,
+      }],
+      latest: {
+        cell_id: "newbie-seed-42",
+        persona: "newbie",
+        seed: 42,
+        phase: "completed",
+        week: 7,
+        completed_weeks: 7,
+        max_weeks: 20,
+        selected_action_ids: ["study_library"],
+        triggered_event_id: "student_job_offer",
+        selected_choice_id: "student_job_offer.choice_01",
+        state_after: { week: 8, money: 410 },
+      },
+      message: "newbie seed 42: week 7/20 completed",
+    };
+    vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("live-playthrough/session.json")) {
+        return Promise.resolve(new Response(JSON.stringify(session), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }));
+      }
+      return Promise.resolve(new Response("not found", { status: 404 }));
+    }));
+
+    renderRoute("/playthrough-inspector");
+
+    const card = await screen.findByRole("region", { name: "Codex playtest session" });
+    expect(within(card).getByText("vllm-newbie-seed-42-20w")).toBeInTheDocument();
+    expect(within(card).getByText("RUNNING")).toBeInTheDocument();
+    expect(within(card).getByText("Newbie · seed 42 · W7/20")).toBeInTheDocument();
+    expect(within(card).getByText("7/20")).toBeInTheDocument();
+    expect(within(card).getByText("local-vllm-real-godot")).toBeInTheDocument();
   });
 
   it("switches verified Persona paths and exposes a current-state-only runner tooltip", async () => {
