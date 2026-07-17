@@ -179,6 +179,23 @@ for playthrough_cell in sorted((PLAYTHROUGH_ROOT / "cells").glob("*.json")):
         "playthrough-view-v1",
     )
 
+ARTIFACTS["frontend/public-demo/judge-demo.json"] = ("judge-static-experiment", None)
+ARTIFACTS["frontend/public-demo/experiment-index.json"] = ("judge-static-index", None)
+
+for experiment_file in sorted((ROOT / "frontend/public-demo/experiments").rglob("*")):
+    if experiment_file.is_file():
+        ARTIFACTS[experiment_file.relative_to(ROOT).as_posix()] = (
+            "local-vllm-playthrough-evidence",
+            None,
+        )
+
+for experiment_file in sorted((ROOT / "examples/build_week_2026/experiments").rglob("*")):
+    if experiment_file.is_file():
+        ARTIFACTS[experiment_file.relative_to(ROOT).as_posix()] = (
+            "local-vllm-experiment-evidence",
+            None,
+        )
+
 CLAIMS = [
     {
         "id": "playthrough_inspector_evidence",

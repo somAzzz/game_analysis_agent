@@ -1,0 +1,352 @@
+{
+  "codex": {
+    "decision_owned_by_codex": true,
+    "feedback_session_id": "primary-codex-build-thread",
+    "hypothesis_owned_by_codex": true,
+    "model": "codex-runtime",
+    "patch_owned_by_codex": true,
+    "skill": "playtest-forge",
+    "task_reference": "OpenAI-build-week-2026/A"
+  },
+  "comparison": {
+    "fixed_member_delta": 0,
+    "fixed_persona_alignment_delta": 0.0,
+    "fixed_relative_reduction": 0.0,
+    "holdout_member_delta": 0,
+    "holdout_persona_alignment_delta": 0.0,
+    "holdout_relative_reduction": 0.0
+  },
+  "completed_at": "2026-07-17T22:29:33.523958Z",
+  "decision": "rejected",
+  "decision_reason": "Repair rejected because required proof failed: fixed_target, holdout_target",
+  "focused_tests": [
+    {
+      "command": [
+        "godot-docker-wrapper",
+        "--headless",
+        "--path",
+        "/tmp/playtest-forge-ab.aNpnaX/a",
+        "-s",
+        "res://scripts/tools/ValidateEconomyRules.gd"
+      ],
+      "duration_seconds": 1.18,
+      "exit_code": 0,
+      "output_sha256": "f5de22d6b9c777f88e1dc0f44554805f85f0697cb32d030c202f9277ce3fd7cb"
+    }
+  ],
+  "gates": [
+    {
+      "detail": "48 <= 27",
+      "evidence_paths": [],
+      "gate_id": "fixed_target",
+      "status": "failed"
+    },
+    {
+      "detail": "0.000000 >= 0.250000",
+      "evidence_paths": [],
+      "gate_id": "holdout_target",
+      "status": "failed"
+    },
+    {
+      "detail": "patched fixed and holdout critical counters are zero",
+      "evidence_paths": [],
+      "gate_id": "critical_invariants",
+      "status": "passed"
+    },
+    {
+      "detail": "patched fixed and holdout validity meet threshold",
+      "evidence_paths": [],
+      "gate_id": "decision_validity",
+      "status": "passed"
+    },
+    {
+      "detail": "deterministic policy produced no hidden failure",
+      "evidence_paths": [],
+      "gate_id": "provider_health",
+      "status": "passed"
+    },
+    {
+      "detail": "fixed and holdout persona alignment decline is bounded",
+      "evidence_paths": [],
+      "gate_id": "persona_preservation",
+      "status": "passed"
+    },
+    {
+      "detail": "patched cohorts do not add unknown or pipeline-stalled endings",
+      "evidence_paths": [],
+      "gate_id": "no_new_invalid_endings",
+      "status": "passed"
+    },
+    {
+      "detail": "designed failure remains possible and is not reclassified",
+      "evidence_paths": [],
+      "gate_id": "designed_failure_preserved",
+      "status": "passed"
+    }
+  ],
+  "patch": {
+    "added_lines": 32,
+    "baseline_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "changed_files": 2,
+    "deleted_lines": 1,
+    "mechanism_class": "cashflow_crisis_stress_feedback",
+    "modified_paths": [
+      "scripts/simulation/SimulationEngine.gd",
+      "scripts/tools/ValidateEconomyRules.gd"
+    ],
+    "patch_path": "patch.diff",
+    "patch_sha256": "d4531b3c2655b13f1a64b4017615e78d1cd9ebf595a79e196e3fbc3870dfdb63",
+    "patched_commit": "622027502b1dc04a9572291ce2f2a2a05106f333",
+    "patched_tree": "d53f577ce6f62eccf2c1934fe1f74ebdb9d93f94"
+  },
+  "plan": {
+    "allowlist": [
+      "scripts/simulation/SimulationEngine.gd",
+      "scripts/tools/ValidateEconomyRules.gd"
+    ],
+    "baseline_game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "baseline_game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "created_at": "2026-07-17T21:29:13Z",
+    "design_contract_path": "config/build_week_2026_design_contract.json",
+    "design_contract_sha256": "f6e0e2217f5d278764f1321aaf22c7212301c7145fc4f973f5ece4f41b9a8af0",
+    "experiment_id": "vllm-cohort-a-pressure-feedback-v1",
+    "facts": [
+      {
+        "artifact_path": "persona_runs.jsonl",
+        "campaign_id": "vllm-audit-25seed-cohort-a",
+        "cell_id": "money-seed-48-4d815424010f",
+        "line_number": 436,
+        "persona": "money",
+        "record_sha256": "7c0a0bf8d1e5f9806fe5078788d9e1b7da5a4a070fde21e5625fa7d02ade76a9",
+        "seed": 48,
+        "week": 18
+      },
+      {
+        "artifact_path": "persona_runs.jsonl",
+        "campaign_id": "vllm-audit-25seed-cohort-a",
+        "cell_id": "newbie-seed-42-58fbd1f01c4a",
+        "line_number": 6,
+        "persona": "newbie",
+        "record_sha256": "a64e787b148505eecff79af1f90b920724c7b9382f9a78bcb6c2c8d9cf1d3fd0",
+        "seed": 42,
+        "week": 6
+      },
+      {
+        "artifact_path": "persona_runs.jsonl",
+        "campaign_id": "vllm-audit-25seed-cohort-a",
+        "cell_id": "slacker-seed-42-e2cfa2477f47",
+        "line_number": 770,
+        "persona": "slacker",
+        "record_sha256": "2acc789cec3964c8e23a2fcc62f393127f69c8973764f94eb71b7dcce18f5c8b",
+        "seed": 42,
+        "week": 10
+      }
+    ],
+    "fixed_seeds": [
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49
+    ],
+    "holdout_seeds": [
+      1042,
+      1043,
+      1044
+    ],
+    "hypothesis": "When spendable cash reaches crisis range, the recurring cash-shortfall stress feedback is applied strongly enough that aligned non-failure personas cannot recover before entering the cashflow/stress attractor; one bounded reduction or cap in that feedback should delay or prevent first entry without removing designed failure endings.",
+    "maximum_changed_files": 2,
+    "maximum_changed_lines": 80,
+    "mechanism_class": "cashflow_crisis_stress_feedback",
+    "predicted_effect": "Reduce cohort A target membership from 41 to at most 27 cells and reduce unseen-holdout membership by at least 25%, while keeping decision validity at or above 95%, provider errors and fallback at or below 5%, persona-alignment decline within five points, all critical invariants clean, and designed failure possible.",
+    "schema_version": "repair-experiment-plan-v1",
+    "selected_cluster_id": "cashflow-stress-attractor",
+    "target_path": "config/build_week_2026_target_vllm_a.json",
+    "target_sha256": "987e94d292fabe23f06928749c30b3b57eefab2403c48f704e44dfec3c094f71",
+    "thresholds": {
+      "acceptance_max_fixed_members": 27,
+      "maximum_fallback_rate": 0.05,
+      "maximum_persona_alignment_decline": 0.05,
+      "maximum_provider_error_rate": 0.05,
+      "minimum_holdout_relative_reduction": 0.25,
+      "minimum_valid_rate": 0.95
+    }
+  },
+  "plan_fingerprint": "87875a46784380415f04ab9d000d03e9e941813d821d4cf469b8e2884d014447",
+  "schema_version": "repair-experiment-record-v1",
+  "snapshots": [
+    {
+      "artifact_path": "baseline/fixed.json",
+      "artifact_sha256": "7213bcdd66444d18c13e243ddda5a567f57488298f184dc57f8ae0557acd1bab",
+      "cells": 48,
+      "cohort": "baseline_fixed",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 48
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.501096,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49
+      ],
+      "target_members": 48,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 912
+    },
+    {
+      "artifact_path": "patched/fixed.json",
+      "artifact_sha256": "56f48425d60a7a10fee0d8196a28eeb0a0919b640fa40ed956b89a0549271efd",
+      "cells": 48,
+      "cohort": "patched_fixed",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 48
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "622027502b1dc04a9572291ce2f2a2a05106f333",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.501096,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49
+      ],
+      "target_members": 48,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 912
+    },
+    {
+      "artifact_path": "baseline/holdout.json",
+      "artifact_sha256": "0cd4ec4be3ea1f4dd35c4ca9d579ac10016250e9ad34cfae07759f7c6375a6c5",
+      "cells": 18,
+      "cohort": "baseline_holdout",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.5,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        1042,
+        1043,
+        1044
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    },
+    {
+      "artifact_path": "patched/holdout.json",
+      "artifact_sha256": "a4c17b19dafbf9fb9f8ed5461aaf796911cfe66c2e0cedc7add7d09b84f514e1",
+      "cells": 18,
+      "cohort": "patched_holdout",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "622027502b1dc04a9572291ce2f2a2a05106f333",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.5,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        1042,
+        1043,
+        1044
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    }
+  ]
+}

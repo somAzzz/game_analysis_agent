@@ -179,12 +179,24 @@ export function submitHumanReview(
   );
 }
 
-export async function fetchStaticJudgeExperiment(): Promise<JudgeExperiment> {
-  const response = await fetch(assetPath("judge-demo.json"), {
-    headers: { Accept: "application/json" },
-  });
+export async function fetchStaticJudgeExperiments(): Promise<JudgeExperimentIndex> {
+  const path = assetPath("experiment-index.json");
+  const response = await fetch(path, { headers: { Accept: "application/json" } });
   if (!response.ok) {
-    throw new ManifestError(`${assetPath("judge-demo.json")} → HTTP ${response.status}`, response.status);
+    throw new ManifestError(`${path} → HTTP ${response.status}`, response.status);
+  }
+  return response.json() as Promise<JudgeExperimentIndex>;
+}
+
+export async function fetchStaticJudgeExperiment(
+  experimentId = "cashflow-drift-repair-v1",
+): Promise<JudgeExperiment> {
+  const path = experimentId === "cashflow-drift-repair-v1"
+    ? assetPath("judge-demo.json")
+    : assetPath(`experiments/${encodeURIComponent(experimentId)}/judge-experiment.json`);
+  const response = await fetch(path, { headers: { Accept: "application/json" } });
+  if (!response.ok) {
+    throw new ManifestError(`${path} → HTTP ${response.status}`, response.status);
   }
   return response.json() as Promise<JudgeExperiment>;
 }

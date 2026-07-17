@@ -1,0 +1,235 @@
+{
+  "artifacts": [
+    {
+      "media_type": "application/x-ndjson",
+      "path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "record_count": 19,
+      "sha256": "0bd5d5412a1b44b892b52a131bcdc6d4188f2780c4fe34afa6f1fb5f12f3ba14"
+    }
+  ],
+  "citations": [
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 1,
+      "persona": "slacker",
+      "record_sha256": "04737cb920bd20abbfc2cca74df4f2940ccdd9e9e46bd0a863693a9c86a6b0c5",
+      "seed": 47,
+      "week": 1
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 2,
+      "persona": "slacker",
+      "record_sha256": "843675645e6225887a92c2098e3f95a7637e7b8091e6291c11080d5de0c56b85",
+      "seed": 47,
+      "week": 2
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 3,
+      "persona": "slacker",
+      "record_sha256": "24c0153c891b8f4127e8be94dd7be1b6e1ee13b15ee3da696629aced676e22c0",
+      "seed": 47,
+      "week": 3
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 4,
+      "persona": "slacker",
+      "record_sha256": "49ac3e79ba9d238b0e4a8826ba01b2f223c29b9b8bae2de4606c97be621ff8b5",
+      "seed": 47,
+      "week": 4
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 5,
+      "persona": "slacker",
+      "record_sha256": "1a5ec75b6f4ea20de60f1f7f46263b5c9ab42c73c39c0c6fe72839a31184afad",
+      "seed": 47,
+      "week": 5
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 6,
+      "persona": "slacker",
+      "record_sha256": "a17c2c3c9f807d6ecea5d190678b01a7ec1d332a2883a589595bbbb41d484172",
+      "seed": 47,
+      "week": 6
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 7,
+      "persona": "slacker",
+      "record_sha256": "5e3590af5a15c485e270b217a1405ac07e115bde364ac2d413af1fe2663d9770",
+      "seed": 47,
+      "week": 7
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 8,
+      "persona": "slacker",
+      "record_sha256": "76428a88371b2d9b79727acf8bea85228951c533812278c1982bce2dfa786331",
+      "seed": 47,
+      "week": 8
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 9,
+      "persona": "slacker",
+      "record_sha256": "1fb3a6d702fa731e15c44eb4c76a84029d3c28d1cbd85923c5e11c6f69f6ff6d",
+      "seed": 47,
+      "week": 9
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 10,
+      "persona": "slacker",
+      "record_sha256": "5d5d23c955800c1a8fc604f69d35cf4499c569fc5505f17a903a01ae15a5d250",
+      "seed": 47,
+      "week": 10
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 11,
+      "persona": "slacker",
+      "record_sha256": "15bfeff0421b09ffdb0b93877014fcb165897b492179c16912790974499c443d",
+      "seed": 47,
+      "week": 11
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 12,
+      "persona": "slacker",
+      "record_sha256": "5978f121f32444c1bd92a2d28ebc260a70f3d4e1ea4ebfb03316f8078e70d21f",
+      "seed": 47,
+      "week": 12
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 13,
+      "persona": "slacker",
+      "record_sha256": "f593334f6e2f7fa46fea610d1da9d02bae84186211de3ff1faf02aa4a668a94c",
+      "seed": 47,
+      "week": 13
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 14,
+      "persona": "slacker",
+      "record_sha256": "49fe75acf3e363359af068b5686bb62c7e1f5a55bb2aa941860991e493acfb57",
+      "seed": 47,
+      "week": 14
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 15,
+      "persona": "slacker",
+      "record_sha256": "cce10f43cad948cdb357c819f2ca2d11cfd28e6a2b99c4fb10a2e916bffe9d0f",
+      "seed": 47,
+      "week": 15
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 16,
+      "persona": "slacker",
+      "record_sha256": "52495038470f5830182481bbc47af9c750549b7c183b6932c01d8af4837ce4dc",
+      "seed": 47,
+      "week": 16
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 17,
+      "persona": "slacker",
+      "record_sha256": "0ef41ff5dda9756c194754511bc6df16568d7f4bc6248a5b11ec9c58e5b41af0",
+      "seed": 47,
+      "week": 17
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 18,
+      "persona": "slacker",
+      "record_sha256": "b51b7861ad0ac94dc8d3424db54d13e8184bc9b928a0a0942ed10857575c08d4",
+      "seed": 47,
+      "week": 18
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-47-5dc775975215",
+      "line_number": 19,
+      "persona": "slacker",
+      "record_sha256": "a9b04892d8704e87607586e4c57e9e504e0ac738557eb2e3330dc9b9a9642738",
+      "seed": 47,
+      "week": 19
+    }
+  ],
+  "completed_at": "2026-07-17T17:02:24.534106Z",
+  "completed_weeks": 19,
+  "error": "",
+  "request": {
+    "campaign_fingerprint": "9cf036933710be7b0cddc0d3c11b4b3d598c38621ee519a1f04bcc92f08babbb",
+    "campaign_id": "vllm-audit-25seed-cohort-a",
+    "cell_id": "slacker-seed-47-5dc775975215",
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "output_dir": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/slacker-seed-47-5dc775975215",
+    "persona": "slacker",
+    "provider": "vllm",
+    "scenario": "default_first_semester",
+    "seed": 47
+  },
+  "request_fingerprint": "4fb373d2364b2cc022082f4fd50de05df0e66d0fc9b1c144a4d441334652563c",
+  "schema_version": "persona-campaign-cell-result-v1",
+  "source": {
+    "agent_commit": "cb142f99b4e24470fe2aa028233aa78212393429",
+    "agent_dirty": false,
+    "agent_tree": "6f86561b59348a60ddf6ce92d79cae91de1e9d87",
+    "campaign_config_sha256": "9cf036933710be7b0cddc0d3c11b4b3d598c38621ee519a1f04bcc92f08babbb",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "vllm",
+    "provider_mode": "local",
+    "provider_revision": "model:qwen3.6-27b-nvfp4"
+  },
+  "source_fingerprint": "9406c37845e5dbbd61bc620519710dcb0e8aa25f7bb6ec8c80ca9530e663991b",
+  "started_at": "2026-07-17T17:00:15.711407Z",
+  "state": "completed",
+  "stop_reason": "game_finished"
+}

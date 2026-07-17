@@ -1,0 +1,76 @@
+{
+  "schema_version": "repair-experiment-plan-v1",
+  "experiment_id": "vllm-cohort-a-pressure-feedback-v1",
+  "created_at": "2026-07-17T21:29:13Z",
+  "design_contract_path": "config/build_week_2026_design_contract.json",
+  "design_contract_sha256": "f6e0e2217f5d278764f1321aaf22c7212301c7145fc4f973f5ece4f41b9a8af0",
+  "target_path": "config/build_week_2026_target_vllm_a.json",
+  "target_sha256": "987e94d292fabe23f06928749c30b3b57eefab2403c48f704e44dfec3c094f71",
+  "selected_cluster_id": "cashflow-stress-attractor",
+  "baseline_game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+  "baseline_game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+  "hypothesis": "When spendable cash reaches crisis range, the recurring cash-shortfall stress feedback is applied strongly enough that aligned non-failure personas cannot recover before entering the cashflow/stress attractor; one bounded reduction or cap in that feedback should delay or prevent first entry without removing designed failure endings.",
+  "predicted_effect": "Reduce cohort A target membership from 41 to at most 27 cells and reduce unseen-holdout membership by at least 25%, while keeping decision validity at or above 95%, provider errors and fallback at or below 5%, persona-alignment decline within five points, all critical invariants clean, and designed failure possible.",
+  "mechanism_class": "cashflow_crisis_stress_feedback",
+  "allowlist": [
+    "scripts/simulation/SimulationEngine.gd",
+    "scripts/tools/ValidateEconomyRules.gd"
+  ],
+  "maximum_changed_files": 2,
+  "maximum_changed_lines": 80,
+  "fixed_seeds": [
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49
+  ],
+  "holdout_seeds": [
+    1042,
+    1043,
+    1044
+  ],
+  "thresholds": {
+    "acceptance_max_fixed_members": 27,
+    "minimum_holdout_relative_reduction": 0.25,
+    "minimum_valid_rate": 0.95,
+    "maximum_fallback_rate": 0.05,
+    "maximum_provider_error_rate": 0.05,
+    "maximum_persona_alignment_decline": 0.05
+  },
+  "facts": [
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-48-4d815424010f",
+      "persona": "money",
+      "seed": 48,
+      "week": 18,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 436,
+      "record_sha256": "7c0a0bf8d1e5f9806fe5078788d9e1b7da5a4a070fde21e5625fa7d02ade76a9"
+    },
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "newbie-seed-42-58fbd1f01c4a",
+      "persona": "newbie",
+      "seed": 42,
+      "week": 6,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 6,
+      "record_sha256": "a64e787b148505eecff79af1f90b920724c7b9382f9a78bcb6c2c8d9cf1d3fd0"
+    },
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-42-e2cfa2477f47",
+      "persona": "slacker",
+      "seed": 42,
+      "week": 10,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 770,
+      "record_sha256": "2acc789cec3964c8e23a2fcc62f393127f69c8973764f94eb71b7dcce18f5c8b"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "schema_version": "judge-committed-experiment-v1",
+  "experiment_id": "vllm-cohort-b-survival-recovery-v1",
+  "title": "Cohort B · survival recovery action",
+  "campaign_bundle_path": "examples/build_week_2026/experiments/vllm-cohort-b-survival-recovery-v1/campaign",
+  "repair_bundle_path": "examples/build_week_2026/experiments/vllm-cohort-b-survival-recovery-v1/repair"
+}

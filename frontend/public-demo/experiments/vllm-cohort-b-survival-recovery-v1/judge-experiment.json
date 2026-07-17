@@ -1,0 +1,313 @@
+{
+  "campaign": {
+    "cells": 48,
+    "fallback_rate": 0.0,
+    "gate_status": "passed",
+    "max_weeks": 20,
+    "mean_final_money": 27.458333,
+    "mean_max_stress": 99.916667,
+    "personas": [
+      "newbie",
+      "study",
+      "money",
+      "social",
+      "visa",
+      "slacker"
+    ],
+    "provider_error_rate": 0.0,
+    "request_fingerprint": "d999b53c9d6ab15b43eeea7acfe58d3e1150a98327e831b8773cee9a9c3a28fc",
+    "seeds": [
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57
+    ],
+    "source_fingerprint": "c4fc40a6582a6bc3dac4771c512b4a80c4371324ef3a019306e5d7e999c9aa06",
+    "target_members": 43,
+    "target_personas": 6,
+    "valid_rate": 1.0,
+    "weeks": 912
+  },
+  "campaign_bundle_path": "examples/build_week_2026/experiments/vllm-cohort-b-survival-recovery-v1/campaign",
+  "campaign_id": "vllm-audit-25seed-cohort-b",
+  "codex": {
+    "decision_owned_by_codex": true,
+    "feedback_session_id": "primary-codex-build-thread",
+    "hypothesis_owned_by_codex": true,
+    "model": "codex-runtime",
+    "patch_owned_by_codex": true,
+    "skill": "playtest-forge",
+    "task_reference": "OpenAI-build-week-2026/B"
+  },
+  "cohorts": [
+    {
+      "artifact_path": "baseline/fixed.json",
+      "artifact_sha256": "66bdefc8abb0120067d5026706b7cc03e1a1e84334496286f7a70b7adec01207",
+      "cells": 48,
+      "cohort": "baseline_fixed",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 48
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.501096,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57
+      ],
+      "target_members": 48,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 912
+    },
+    {
+      "artifact_path": "patched/fixed.json",
+      "artifact_sha256": "d69be5556a69c06041d462bb3110da68c1f83776b40354a25359f53f438a394b",
+      "cells": 48,
+      "cohort": "patched_fixed",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 48
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "211cebe93d2452d1850ba1eeaa3160ffc823b82f",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.501096,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57
+      ],
+      "target_members": 48,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 912
+    },
+    {
+      "artifact_path": "baseline/holdout.json",
+      "artifact_sha256": "0cd4ec4be3ea1f4dd35c4ca9d579ac10016250e9ad34cfae07759f7c6375a6c5",
+      "cells": 18,
+      "cohort": "baseline_holdout",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.5,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        1042,
+        1043,
+        1044
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    },
+    {
+      "artifact_path": "patched/holdout.json",
+      "artifact_sha256": "68bf25b35e66879b40564699353d022918906799961d1d445e670003aa1f4f58",
+      "cells": 18,
+      "cohort": "patched_holdout",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "211cebe93d2452d1850ba1eeaa3160ffc823b82f",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.5,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        1042,
+        1043,
+        1044
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    }
+  ],
+  "comparison": {
+    "fixed_member_delta": 0,
+    "fixed_persona_alignment_delta": 0.0,
+    "fixed_relative_reduction": 0.0,
+    "holdout_member_delta": 0,
+    "holdout_persona_alignment_delta": 0.0,
+    "holdout_relative_reduction": 0.0
+  },
+  "completed_at": "2026-07-17T22:29:36.617512+00:00",
+  "decision": "rejected",
+  "decision_reason": "Repair rejected because required proof failed: fixed_target, holdout_target",
+  "evidence_fingerprint": "423a9820fa55a6ff3f692f9eee339a5d9f9192ba6a70c5d6b9dab653d2c082a1",
+  "experiment_id": "vllm-cohort-b-survival-recovery-v1",
+  "gates": [
+    {
+      "detail": "48 <= 28",
+      "evidence_paths": [],
+      "gate_id": "fixed_target",
+      "status": "failed"
+    },
+    {
+      "detail": "0.000000 >= 0.250000",
+      "evidence_paths": [],
+      "gate_id": "holdout_target",
+      "status": "failed"
+    },
+    {
+      "detail": "patched fixed and holdout critical counters are zero",
+      "evidence_paths": [],
+      "gate_id": "critical_invariants",
+      "status": "passed"
+    },
+    {
+      "detail": "patched fixed and holdout validity meet threshold",
+      "evidence_paths": [],
+      "gate_id": "decision_validity",
+      "status": "passed"
+    },
+    {
+      "detail": "deterministic policy produced no hidden failure",
+      "evidence_paths": [],
+      "gate_id": "provider_health",
+      "status": "passed"
+    },
+    {
+      "detail": "fixed and holdout persona alignment decline is bounded",
+      "evidence_paths": [],
+      "gate_id": "persona_preservation",
+      "status": "passed"
+    },
+    {
+      "detail": "patched cohorts do not add unknown or pipeline-stalled endings",
+      "evidence_paths": [],
+      "gate_id": "no_new_invalid_endings",
+      "status": "passed"
+    },
+    {
+      "detail": "designed failure remains possible and is not reclassified",
+      "evidence_paths": [],
+      "gate_id": "designed_failure_preserved",
+      "status": "passed"
+    }
+  ],
+  "human_review": null,
+  "hypothesis": "Aligned non-failure personas enter the cashflow/stress attractor because the existing crisis-negotiation recovery action removes too little arrears while adding stress once crisis begins; one bounded improvement to that action effect should create liability and stress headroom without weakening ordinary costs or guaranteeing success.",
+  "lifecycle_status": "proof_complete",
+  "mechanism_class": "survival_recovery_action_effect",
+  "mode": "local",
+  "model": "qwen3.6-27b-nvfp4",
+  "patch": {
+    "added_lines": 14,
+    "baseline_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "canonical_source_path": "demo/study-in-germany",
+    "changed_files": 2,
+    "deleted_lines": 2,
+    "diff": "diff --git a/data/actions/generated_actions.json b/data/actions/generated_actions.json\nindex 8d3454170e238488ceece55bb08bdfb66d4579ee..d42e9051053579d290ba36692bd89f245308755a 100644\n--- a/data/actions/generated_actions.json\n+++ b/data/actions/generated_actions.json\n@@ -889,8 +889,8 @@\n \t\t\t\"diminishing_factor\": 0.6,\n \t\t\t\"diminishing_window\": 6,\n \t\t\t\"effects\": {\n-\t\t\t\t\"arrears_amount\": -180,\n-\t\t\t\t\"stress\": 6\n+\t\t\t\t\"arrears_amount\": -360,\n+\t\t\t\t\"stress\": -4\n \t\t\t},\n \t\t\t\"id\": \"rent_talk_extension\",\n \t\t\t\"max_per_week\": 1,\ndiff --git a/scripts/tools/ValidateEconomyRules.gd b/scripts/tools/ValidateEconomyRules.gd\nindex 084016a414f7b0fd93c07932a09360896ba04064..35cf24b0733a078016c74c0c37529797a831c9b4 100644\n--- a/scripts/tools/ValidateEconomyRules.gd\n+++ b/scripts/tools/ValidateEconomyRules.gd\n@@ -24,6 +24,7 @@ func _run() -> void:\n \n \t_validate_runtime_work_income(game_state, errors)\n \t_validate_cashflow_guardrails(game_state, errors)\n+\t_validate_crisis_recovery_action(errors)\n \t_validate_monthly_rent(game_state, errors)\n \t_validate_social_maintenance(game_state, errors)\n \t_validate_friend_borrowing(game_state, errors)\n@@ -85,6 +86,17 @@ func _validate_cashflow_guardrails(game_state: Node, errors: Array[String]) -> v\n \tif not game_state.flags.has(\"arrears\") or not game_state.flags.has(\"cash_shortfall\"):\n \t\terrors.append(\"cash shortfall should set arrears and cash_shortfall flags\")\n \n+func _validate_crisis_recovery_action(errors: Array[String]) -> void:\n+\tvar registry: Node = root.get_node(\"/root/DataRegistry\")\n+\tvar action = registry.get_action_by_id(\"rent_talk_extension\")\n+\tif action == null:\n+\t\terrors.append(\"rent_talk_extension should exist for crisis recovery validation\")\n+\t\treturn\n+\tif int(action.effects.get(\"arrears_amount\", 0)) >= 0:\n+\t\terrors.append(\"rent_talk_extension should reduce arrears\")\n+\tif int(action.effects.get(\"stress\", 0)) > 0:\n+\t\terrors.append(\"rent_talk_extension should create stress headroom\")\n+\n func _validate_monthly_rent(game_state: Node, errors: Array[String]) -> void:\n \tgame_state.reset()\n \tgame_state.week = 1\n",
+    "disposition": "candidate_not_merged",
+    "mechanism_class": "survival_recovery_action_effect",
+    "modified_paths": [
+      "data/actions/generated_actions.json",
+      "scripts/tools/ValidateEconomyRules.gd"
+    ],
+    "patch_path": "patch.diff",
+    "patch_sha256": "7818b2e9e8beab8dd6ccc1f2bbb0da300cf77567dd1929bbd04964bb7709cdac",
+    "patched_commit": "211cebe93d2452d1850ba1eeaa3160ffc823b82f",
+    "patched_tree": "598ab4fdb6589a1f4236cfb1189b0377c391993e"
+  },
+  "provider": "vllm",
+  "provider_mode": "local",
+  "repair_bundle_path": "reports/repair-experiments/vllm-cohort-b-survival-recovery-v1/public",
+  "schema_version": "judge-public-experiment-v2",
+  "source_kind": "local_vllm",
+  "source_label": "LOCAL vLLM",
+  "status": "passed",
+  "title": "Cohort B \u00b7 survival recovery action effect"
+}

@@ -37,11 +37,11 @@ def test_signed_and_runtime_experiments_share_one_index(monkeypatch) -> None:  #
 
     index = registry.list()
 
-    assert [item["source_label"] for item in index["experiments"]] == [
-        "SIGNED REPLAY",
-        "LOCAL vLLM",
-    ]
-    assert index["experiments"][1]["lifecycle_status"] == "campaign_complete"
+    experiments = index["experiments"]
+    assert experiments[0]["source_label"] == "SIGNED REPLAY"
+    runtime = next(item for item in experiments if item["experiment_id"] == local.experiment_id)
+    assert runtime["source_label"] == "LOCAL vLLM"
+    assert runtime["lifecycle_status"] == "campaign_complete"
 
 
 def test_campaign_only_detail_does_not_borrow_repair_evidence(monkeypatch) -> None:  # noqa: ANN001

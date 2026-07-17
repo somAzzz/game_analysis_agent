@@ -1,0 +1,488 @@
+{
+  "campaign_id": "vllm-audit-25seed-cohort-b",
+  "cell_count": 48,
+  "cells": [
+    {
+      "attractor_count": 1,
+      "cell_id": "money-seed-50-8530d7f63527",
+      "completed_weeks": 19,
+      "final_ending": "burnout_pause",
+      "path": "cells/money-seed-50.json",
+      "persona": "money",
+      "seed": 50,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 1,
+      "cell_id": "money-seed-51-fa9dac5b17b0",
+      "completed_weeks": 19,
+      "final_ending": "living_imbalance",
+      "path": "cells/money-seed-51.json",
+      "persona": "money",
+      "seed": 51,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "money-seed-52-59509cf55dcc",
+      "completed_weeks": 19,
+      "final_ending": "living_imbalance",
+      "path": "cells/money-seed-52.json",
+      "persona": "money",
+      "seed": 52,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "money-seed-53-b9724d1a4b08",
+      "completed_weeks": 19,
+      "final_ending": "burnout_pause",
+      "path": "cells/money-seed-53.json",
+      "persona": "money",
+      "seed": 53,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 0,
+      "cell_id": "money-seed-54-0c435ae8004d",
+      "completed_weeks": 19,
+      "final_ending": "survival_struggle",
+      "path": "cells/money-seed-54.json",
+      "persona": "money",
+      "seed": 54,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "money-seed-55-539ddbf9a78b",
+      "completed_weeks": 19,
+      "final_ending": "living_imbalance",
+      "path": "cells/money-seed-55.json",
+      "persona": "money",
+      "seed": 55,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 0,
+      "cell_id": "money-seed-56-b70cd52791ba",
+      "completed_weeks": 19,
+      "final_ending": "academic_failure",
+      "path": "cells/money-seed-56.json",
+      "persona": "money",
+      "seed": 56,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 1,
+      "cell_id": "money-seed-57-007c026f08a6",
+      "completed_weeks": 19,
+      "final_ending": "burnout_pause",
+      "path": "cells/money-seed-57.json",
+      "persona": "money",
+      "seed": 57,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "completed_weeks": 19,
+      "final_ending": "burnout_pause",
+      "path": "cells/newbie-seed-50.json",
+      "persona": "newbie",
+      "seed": 50,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "newbie-seed-51-7ab55dbadee3",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/newbie-seed-51.json",
+      "persona": "newbie",
+      "seed": 51,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "newbie-seed-52-a168365c2589",
+      "completed_weeks": 19,
+      "final_ending": "burnout_pause",
+      "path": "cells/newbie-seed-52.json",
+      "persona": "newbie",
+      "seed": 52,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "newbie-seed-53-1a1f5e55f1a3",
+      "completed_weeks": 19,
+      "final_ending": "living_imbalance",
+      "path": "cells/newbie-seed-53.json",
+      "persona": "newbie",
+      "seed": 53,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "newbie-seed-54-75d8157396c9",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/newbie-seed-54.json",
+      "persona": "newbie",
+      "seed": 54,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "newbie-seed-55-bbb9e6a2c162",
+      "completed_weeks": 19,
+      "final_ending": "living_imbalance",
+      "path": "cells/newbie-seed-55.json",
+      "persona": "newbie",
+      "seed": 55,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "newbie-seed-56-e5ec30141bb4",
+      "completed_weeks": 19,
+      "final_ending": "burnout_pause",
+      "path": "cells/newbie-seed-56.json",
+      "persona": "newbie",
+      "seed": 56,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "newbie-seed-57-911745157422",
+      "completed_weeks": 19,
+      "final_ending": "survival_struggle",
+      "path": "cells/newbie-seed-57.json",
+      "persona": "newbie",
+      "seed": 57,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 1,
+      "cell_id": "slacker-seed-50-306ab91762c7",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/slacker-seed-50.json",
+      "persona": "slacker",
+      "seed": 50,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "slacker-seed-51-b48c330d9e32",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/slacker-seed-51.json",
+      "persona": "slacker",
+      "seed": 51,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "slacker-seed-52-58e85a1dd107",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/slacker-seed-52.json",
+      "persona": "slacker",
+      "seed": 52,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 1,
+      "cell_id": "slacker-seed-53-6a09466cf50a",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/slacker-seed-53.json",
+      "persona": "slacker",
+      "seed": 53,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "slacker-seed-54-c8ee6e28b81e",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/slacker-seed-54.json",
+      "persona": "slacker",
+      "seed": 54,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "slacker-seed-55-587167fe7b88",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/slacker-seed-55.json",
+      "persona": "slacker",
+      "seed": 55,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "slacker-seed-56-f908b4e59d1c",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/slacker-seed-56.json",
+      "persona": "slacker",
+      "seed": 56,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "slacker-seed-57-04f0e8472676",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/slacker-seed-57.json",
+      "persona": "slacker",
+      "seed": 57,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "social-seed-50-514d128d666b",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/social-seed-50.json",
+      "persona": "social",
+      "seed": 50,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "social-seed-51-35ae99b58ae4",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/social-seed-51.json",
+      "persona": "social",
+      "seed": 51,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "social-seed-52-385d4e15861f",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/social-seed-52.json",
+      "persona": "social",
+      "seed": 52,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "social-seed-53-bec522d7682c",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/social-seed-53.json",
+      "persona": "social",
+      "seed": 53,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "social-seed-54-016c51939d4e",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/social-seed-54.json",
+      "persona": "social",
+      "seed": 54,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "social-seed-55-ed6222e93217",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/social-seed-55.json",
+      "persona": "social",
+      "seed": 55,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "social-seed-56-990eaf7607cf",
+      "completed_weeks": 19,
+      "final_ending": "burnout_pause",
+      "path": "cells/social-seed-56.json",
+      "persona": "social",
+      "seed": 56,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "social-seed-57-02160f69793a",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/social-seed-57.json",
+      "persona": "social",
+      "seed": 57,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "study-seed-50-d9054f2bb72b",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/study-seed-50.json",
+      "persona": "study",
+      "seed": 50,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "study-seed-51-1e29591580aa",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/study-seed-51.json",
+      "persona": "study",
+      "seed": 51,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "study-seed-52-74c11cd5dec8",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/study-seed-52.json",
+      "persona": "study",
+      "seed": 52,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/study-seed-53.json",
+      "persona": "study",
+      "seed": 53,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "study-seed-54-6090b81ecd8f",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/study-seed-54.json",
+      "persona": "study",
+      "seed": 54,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 1,
+      "cell_id": "study-seed-55-01287f1042f8",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/study-seed-55.json",
+      "persona": "study",
+      "seed": 55,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "study-seed-56-2c9662f9a961",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/study-seed-56.json",
+      "persona": "study",
+      "seed": 56,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "study-seed-57-f5b653547558",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/study-seed-57.json",
+      "persona": "study",
+      "seed": 57,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "visa-seed-50-44b3e7d40041",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/visa-seed-50.json",
+      "persona": "visa",
+      "seed": 50,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "visa-seed-51-ca2e173173a5",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/visa-seed-51.json",
+      "persona": "visa",
+      "seed": 51,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "visa-seed-52-af3ba439e2d4",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/visa-seed-52.json",
+      "persona": "visa",
+      "seed": 52,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "visa-seed-53-89ee29eb8e12",
+      "completed_weeks": 19,
+      "final_ending": "living_imbalance",
+      "path": "cells/visa-seed-53.json",
+      "persona": "visa",
+      "seed": 53,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 1,
+      "cell_id": "visa-seed-54-3b2b51ba5425",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/visa-seed-54.json",
+      "persona": "visa",
+      "seed": 54,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/visa-seed-55.json",
+      "persona": "visa",
+      "seed": 55,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "visa-seed-56-b0f5bd6ed2ac",
+      "completed_weeks": 19,
+      "final_ending": "cashflow_collapse",
+      "path": "cells/visa-seed-56.json",
+      "persona": "visa",
+      "seed": 56,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "visa-seed-57-76f7112df14b",
+      "completed_weeks": 19,
+      "final_ending": "burnout_pause",
+      "path": "cells/visa-seed-57.json",
+      "persona": "visa",
+      "seed": 57,
+      "stop_reason": "game_finished"
+    }
+  ],
+  "schema_version": "playthrough-cell-index-v1",
+  "truth_label": "local-vllm-real-godot"
+}

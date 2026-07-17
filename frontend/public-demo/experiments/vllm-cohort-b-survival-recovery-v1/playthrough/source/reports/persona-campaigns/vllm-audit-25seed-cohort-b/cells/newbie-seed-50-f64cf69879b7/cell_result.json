@@ -1,0 +1,235 @@
+{
+  "artifacts": [
+    {
+      "media_type": "application/x-ndjson",
+      "path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "record_count": 19,
+      "sha256": "0e5da03c15d14d0e2b231856010615805bea2cbe97c564b3a5730bc7912f02eb"
+    }
+  ],
+  "citations": [
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 1,
+      "persona": "newbie",
+      "record_sha256": "34686d52c5f5e2342c7f6d2e06b267f3e8d06ee42b9bc69265e02641f89e4c16",
+      "seed": 50,
+      "week": 1
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 2,
+      "persona": "newbie",
+      "record_sha256": "3c389e1afb24d3168d1fecf694a1fa9cbc411dbf9519da8a054f82af34fa9a20",
+      "seed": 50,
+      "week": 2
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 3,
+      "persona": "newbie",
+      "record_sha256": "1ac3db5bf3137097d82509e3fff66a396f880a739d4816223f6eb3a81379ec75",
+      "seed": 50,
+      "week": 3
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 4,
+      "persona": "newbie",
+      "record_sha256": "902db0318183262a9ee5cde956aee5f3e806e8ded89b359b999534b9f92c77f7",
+      "seed": 50,
+      "week": 4
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 5,
+      "persona": "newbie",
+      "record_sha256": "6cb0bed58d777f16a135e99cd5570082501b8d46467fd2da1f94bdf0d6d9af60",
+      "seed": 50,
+      "week": 5
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 6,
+      "persona": "newbie",
+      "record_sha256": "8ca73f67b4d55b8c17231f1564dcf8bc42bdcad690029c3be047444a4a98ad82",
+      "seed": 50,
+      "week": 6
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 7,
+      "persona": "newbie",
+      "record_sha256": "54dd0502e92c82046b32398d5eb4cf470a2d718f001f4ea95abc0c4fc1c34305",
+      "seed": 50,
+      "week": 7
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 8,
+      "persona": "newbie",
+      "record_sha256": "a0c8b5f518c39dbedc93f2bbf778287c52c0cb9b7705288f4d6f671869afc8c7",
+      "seed": 50,
+      "week": 8
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 9,
+      "persona": "newbie",
+      "record_sha256": "f80bd5b2e1ed70c43667975a162660bf414f8b3c3f5fc4c040f213a216f9e25d",
+      "seed": 50,
+      "week": 9
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 10,
+      "persona": "newbie",
+      "record_sha256": "0a701882ab24d15ace47d4252461a20cd9046cd5a8d4b99f9da15addb1f4a3fb",
+      "seed": 50,
+      "week": 10
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 11,
+      "persona": "newbie",
+      "record_sha256": "45d18aef48e213680cedb292ef18bf07262a3c22c5f2f3864514321a5e0c2af9",
+      "seed": 50,
+      "week": 11
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 12,
+      "persona": "newbie",
+      "record_sha256": "14daf36cc02f3a80700fcb4ae57984e71bb64a12ad8d29f5329b74ff20bb0ce5",
+      "seed": 50,
+      "week": 12
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 13,
+      "persona": "newbie",
+      "record_sha256": "463aa7c29da4e68d41f213882d04b748da294c2671caf650086b986420e97208",
+      "seed": 50,
+      "week": 13
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 14,
+      "persona": "newbie",
+      "record_sha256": "58938e38139d34a605f3e124ccfb4a0589550b996314e5dd016742bd13f890b9",
+      "seed": 50,
+      "week": 14
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 15,
+      "persona": "newbie",
+      "record_sha256": "77ec684e32eb398984d23cdae4216ea738c9d77a8d6b678a45dea6c70867af88",
+      "seed": 50,
+      "week": 15
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 16,
+      "persona": "newbie",
+      "record_sha256": "e10807f5b2ba49858c64dfe24af3415c01628c872c6ac44ffc377ef0119f8715",
+      "seed": 50,
+      "week": 16
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 17,
+      "persona": "newbie",
+      "record_sha256": "7d1ddb8cb06214ae811fec9861967a9989b3e894486b7c194d77dd9cea82bc8e",
+      "seed": 50,
+      "week": 17
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 18,
+      "persona": "newbie",
+      "record_sha256": "cd49cbdda21ed6d73d6d2d7d32cfc564d4579bb95d22247262e5114bf821a1b1",
+      "seed": 50,
+      "week": 18
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "line_number": 19,
+      "persona": "newbie",
+      "record_sha256": "efe44cff8171eed3121c7a80e3e708a5fb96f81d6b4955f4a2a1207167aa58cb",
+      "seed": 50,
+      "week": 19
+    }
+  ],
+  "completed_at": "2026-07-17T17:10:26.624906Z",
+  "completed_weeks": 19,
+  "error": "",
+  "request": {
+    "campaign_fingerprint": "d999b53c9d6ab15b43eeea7acfe58d3e1150a98327e831b8773cee9a9c3a28fc",
+    "campaign_id": "vllm-audit-25seed-cohort-b",
+    "cell_id": "newbie-seed-50-f64cf69879b7",
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "output_dir": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/newbie-seed-50-f64cf69879b7",
+    "persona": "newbie",
+    "provider": "vllm",
+    "scenario": "default_first_semester",
+    "seed": 50
+  },
+  "request_fingerprint": "e012315ec41a342043eb21573be6bd8fbbbba848a2679cb78b0efdfab6e73b34",
+  "schema_version": "persona-campaign-cell-result-v1",
+  "source": {
+    "agent_commit": "cb142f99b4e24470fe2aa028233aa78212393429",
+    "agent_dirty": false,
+    "agent_tree": "6f86561b59348a60ddf6ce92d79cae91de1e9d87",
+    "campaign_config_sha256": "d999b53c9d6ab15b43eeea7acfe58d3e1150a98327e831b8773cee9a9c3a28fc",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "vllm",
+    "provider_mode": "local",
+    "provider_revision": "model:qwen3.6-27b-nvfp4"
+  },
+  "source_fingerprint": "c4fc40a6582a6bc3dac4771c512b4a80c4371324ef3a019306e5d7e999c9aa06",
+  "started_at": "2026-07-17T17:08:09.757601Z",
+  "state": "completed",
+  "stop_reason": "game_finished"
+}

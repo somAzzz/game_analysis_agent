@@ -1,0 +1,144 @@
+{
+  "experiments": [
+    {
+      "campaign": {
+        "cells": 18,
+        "fallback_rate": 0.0,
+        "gate_status": "passed",
+        "max_weeks": 20,
+        "mean_final_money": 0.0,
+        "mean_max_stress": 100.0,
+        "personas": [
+          "newbie",
+          "study",
+          "money",
+          "social",
+          "visa",
+          "slacker"
+        ],
+        "provider_error_rate": 0.0,
+        "request_fingerprint": "8fa65234cb151a16534cfdbad7a2a26b330a9efc0610c701f7e20e87a41b7538",
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "source_fingerprint": "01dbba63744eec8f0c055fe6cc75bc0dd9ddf02a9ea6192238193dd009eee49b",
+        "target_members": 18,
+        "target_personas": 6,
+        "valid_rate": 1.0,
+        "weeks": 342
+      },
+      "campaign_bundle_path": "examples/build_week_2026/campaign-v1",
+      "campaign_id": "build-week-2026-evidence-v1",
+      "completed_at": "2026-07-16T16:11:12.705580+00:00",
+      "experiment_id": "cashflow-drift-repair-v1",
+      "lifecycle_status": "proof_complete",
+      "model": "deterministic-persona-policy-fixture",
+      "provider": "replay",
+      "provider_mode": "prerecorded",
+      "repair_bundle_path": "examples/build_week_2026/experiment-v1",
+      "schema_version": "judge-experiment-summary-v1",
+      "source_kind": "signed",
+      "source_label": "SIGNED REPLAY",
+      "title": "Signed cashflow repair replay"
+    },
+    {
+      "campaign": {
+        "cells": 48,
+        "fallback_rate": 0.0,
+        "gate_status": "passed",
+        "max_weeks": 20,
+        "mean_final_money": 27.458333,
+        "mean_max_stress": 99.916667,
+        "personas": [
+          "newbie",
+          "study",
+          "money",
+          "social",
+          "visa",
+          "slacker"
+        ],
+        "provider_error_rate": 0.0,
+        "request_fingerprint": "d999b53c9d6ab15b43eeea7acfe58d3e1150a98327e831b8773cee9a9c3a28fc",
+        "seeds": [
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57
+        ],
+        "source_fingerprint": "c4fc40a6582a6bc3dac4771c512b4a80c4371324ef3a019306e5d7e999c9aa06",
+        "target_members": 43,
+        "target_personas": 6,
+        "valid_rate": 1.0,
+        "weeks": 912
+      },
+      "campaign_bundle_path": "examples/build_week_2026/experiments/vllm-cohort-b-survival-recovery-v1/campaign",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "completed_at": "2026-07-17T22:29:36.617512+00:00",
+      "experiment_id": "vllm-cohort-b-survival-recovery-v1",
+      "lifecycle_status": "proof_complete",
+      "model": "qwen3.6-27b-nvfp4",
+      "provider": "vllm",
+      "provider_mode": "local",
+      "repair_bundle_path": "reports/repair-experiments/vllm-cohort-b-survival-recovery-v1/public",
+      "schema_version": "judge-experiment-summary-v1",
+      "source_kind": "local_vllm",
+      "source_label": "LOCAL vLLM",
+      "title": "Cohort B \u00b7 survival recovery action effect"
+    },
+    {
+      "campaign": {
+        "cells": 48,
+        "fallback_rate": 0.0,
+        "gate_status": "passed",
+        "max_weeks": 20,
+        "mean_final_money": 18.729167,
+        "mean_max_stress": 99.5625,
+        "personas": [
+          "newbie",
+          "study",
+          "money",
+          "social",
+          "visa",
+          "slacker"
+        ],
+        "provider_error_rate": 0.0,
+        "request_fingerprint": "9cf036933710be7b0cddc0d3c11b4b3d598c38621ee519a1f04bcc92f08babbb",
+        "seeds": [
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "source_fingerprint": "9406c37845e5dbbd61bc620519710dcb0e8aa25f7bb6ec8c80ca9530e663991b",
+        "target_members": 41,
+        "target_personas": 6,
+        "valid_rate": 1.0,
+        "weeks": 912
+      },
+      "campaign_bundle_path": "examples/build_week_2026/experiments/vllm-cohort-a-pressure-feedback-v1/campaign",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "completed_at": "2026-07-17T22:29:33.523958+00:00",
+      "experiment_id": "vllm-cohort-a-pressure-feedback-v1",
+      "lifecycle_status": "proof_complete",
+      "model": "qwen3.6-27b-nvfp4",
+      "provider": "vllm",
+      "provider_mode": "local",
+      "repair_bundle_path": "reports/repair-experiments/vllm-cohort-a-pressure-feedback-v1/public",
+      "schema_version": "judge-experiment-summary-v1",
+      "source_kind": "local_vllm",
+      "source_label": "LOCAL vLLM",
+      "title": "Cohort A \u00b7 cashflow crisis stress feedback"
+    }
+  ],
+  "schema_version": "judge-experiment-index-v1"
+}

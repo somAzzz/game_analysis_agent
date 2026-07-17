@@ -1,0 +1,7 @@
+{
+  "schema_version": "judge-committed-experiment-v1",
+  "experiment_id": "vllm-cohort-a-pressure-feedback-v1",
+  "title": "Cohort A · crisis stress feedback",
+  "campaign_bundle_path": "examples/build_week_2026/experiments/vllm-cohort-a-pressure-feedback-v1/campaign",
+  "repair_bundle_path": "examples/build_week_2026/experiments/vllm-cohort-a-pressure-feedback-v1/repair"
+}

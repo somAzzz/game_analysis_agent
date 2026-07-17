@@ -1,0 +1,235 @@
+{
+  "artifacts": [
+    {
+      "media_type": "application/x-ndjson",
+      "path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "record_count": 19,
+      "sha256": "03c662f61e1996f58a3c97d2933f5c0bb6d5bb4ff22a56b1ecda6b74e1a5ed01"
+    }
+  ],
+  "citations": [
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 1,
+      "persona": "money",
+      "record_sha256": "57490b3e5b3a40ec5d09e4fb5ce52ece9fef2bdebcb115a6d5fe59050a6e2c18",
+      "seed": 42,
+      "week": 1
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 2,
+      "persona": "money",
+      "record_sha256": "3039a2f43ce1f2eb9d6649ed02be5aee7e0daabc338e7124252724b4328b00a4",
+      "seed": 42,
+      "week": 2
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 3,
+      "persona": "money",
+      "record_sha256": "bd6ec1fd2ad7fae67c356553ab0181969a4ecfc1c04639ba6c41444c4b6ca9d8",
+      "seed": 42,
+      "week": 3
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 4,
+      "persona": "money",
+      "record_sha256": "c5d0e1e7fa8810f585023d81e65de9d6d61c29244c84acf9236ce1bbd69e4cde",
+      "seed": 42,
+      "week": 4
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 5,
+      "persona": "money",
+      "record_sha256": "3c254f10993f2a26511dbe966e4053aa0625c1d6e3bf78d46bbe94f5ec52c362",
+      "seed": 42,
+      "week": 5
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 6,
+      "persona": "money",
+      "record_sha256": "121c5f882ac5cec744664fbaae8c486bcb2c3b14889c517b8516a6f86c9dd636",
+      "seed": 42,
+      "week": 6
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 7,
+      "persona": "money",
+      "record_sha256": "156cd10442d74ac44c864023c7e126cbbe97716f7fbb60b3662ddeec5e7b55a4",
+      "seed": 42,
+      "week": 7
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 8,
+      "persona": "money",
+      "record_sha256": "30768f3d56a4fed3f1b6fa2e9dd878684a09cff96120c9ed88185c237ff7637c",
+      "seed": 42,
+      "week": 8
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 9,
+      "persona": "money",
+      "record_sha256": "9583c2d34b9ed63edd36e775e18a80245d3b60a99b314f765ff126f31219185d",
+      "seed": 42,
+      "week": 9
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 10,
+      "persona": "money",
+      "record_sha256": "3cf29c5fe0f56a05cd1e3ce8b4dbf2987c116d11be5be30c8eb94f65f2c1bbed",
+      "seed": 42,
+      "week": 10
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 11,
+      "persona": "money",
+      "record_sha256": "bdf945fa571e5dd4fa303fa9d42a2f4ba026170517d869d1ee8f854c863e5947",
+      "seed": 42,
+      "week": 11
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 12,
+      "persona": "money",
+      "record_sha256": "a6e2d26fecd08b5b5a18ed52f42375159cdedf0e7dbb41b0be834af28e8a33a6",
+      "seed": 42,
+      "week": 12
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 13,
+      "persona": "money",
+      "record_sha256": "60e5ce820e39f1e853eb821e2c22cdc3dbb7d0eccdd28e120ed3d1a798130eeb",
+      "seed": 42,
+      "week": 13
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 14,
+      "persona": "money",
+      "record_sha256": "fec2d1fc6d9184244b6e1078e5de87d1bdaf7b5730f87907d1d4a5e586b3c072",
+      "seed": 42,
+      "week": 14
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 15,
+      "persona": "money",
+      "record_sha256": "ab02214c095c0363b61df988fcabeb7005718384ed04caf4bd557c8cdf4afb89",
+      "seed": 42,
+      "week": 15
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 16,
+      "persona": "money",
+      "record_sha256": "840d60068bdb1162126b5a68b74b930423a4b08758fd6a8665c78dcbe1ca26f9",
+      "seed": 42,
+      "week": 16
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 17,
+      "persona": "money",
+      "record_sha256": "4dd67e371ce487f86ede1e40630f21fe4bb15a7d70be7f831c4589029e6be7d1",
+      "seed": 42,
+      "week": 17
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 18,
+      "persona": "money",
+      "record_sha256": "258a738654a03d7f22fb16a4d09be7315b1a90bc4292e6e073b6b4c8d880e1a0",
+      "seed": 42,
+      "week": 18
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-42-18743485575a",
+      "line_number": 19,
+      "persona": "money",
+      "record_sha256": "5f48571b5055a0873bff160a9618ee7f5fb53fdff33ca9a36082ebf77244e3ea",
+      "seed": 42,
+      "week": 19
+    }
+  ],
+  "completed_at": "2026-07-17T17:05:45.904533Z",
+  "completed_weeks": 19,
+  "error": "",
+  "request": {
+    "campaign_fingerprint": "9cf036933710be7b0cddc0d3c11b4b3d598c38621ee519a1f04bcc92f08babbb",
+    "campaign_id": "vllm-audit-25seed-cohort-a",
+    "cell_id": "money-seed-42-18743485575a",
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "output_dir": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/cells/money-seed-42-18743485575a",
+    "persona": "money",
+    "provider": "vllm",
+    "scenario": "default_first_semester",
+    "seed": 42
+  },
+  "request_fingerprint": "f4b50a5fa5c6b9dae9904ffdb151bdc94f2777da673740af03016d656a8306f2",
+  "schema_version": "persona-campaign-cell-result-v1",
+  "source": {
+    "agent_commit": "cb142f99b4e24470fe2aa028233aa78212393429",
+    "agent_dirty": false,
+    "agent_tree": "6f86561b59348a60ddf6ce92d79cae91de1e9d87",
+    "campaign_config_sha256": "9cf036933710be7b0cddc0d3c11b4b3d598c38621ee519a1f04bcc92f08babbb",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "vllm",
+    "provider_mode": "local",
+    "provider_revision": "model:qwen3.6-27b-nvfp4"
+  },
+  "source_fingerprint": "9406c37845e5dbbd61bc620519710dcb0e8aa25f7bb6ec8c80ca9530e663991b",
+  "started_at": "2026-07-17T17:03:29.977946Z",
+  "state": "completed",
+  "stop_reason": "game_finished"
+}

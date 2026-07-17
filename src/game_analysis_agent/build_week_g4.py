@@ -38,7 +38,9 @@ def _read(path: Path) -> dict[str, Any]:
     return value
 
 
-def _capture(checks: list[dict[str, Any]], identifier: str, operation: Callable[[], dict[str, Any]]) -> None:
+def _capture(
+    checks: list[dict[str, Any]], identifier: str, operation: Callable[[], dict[str, Any]]
+) -> None:
     try:
         evidence = operation()
         checks.append({"id": identifier, "status": "passed", "evidence": evidence, "error": ""})
@@ -54,10 +56,27 @@ def review_g4(*, project_root: str | Path, execute_commands: bool = True) -> dic
     _capture(checks, "platform_delivery", lambda: _platform(project))
     _capture(checks, "published_multiarch_image", lambda: _image(project))
     if execute_commands:
-        _capture(checks, "offline_inspect", lambda: _command(project, ["./judge", "--mode", "inspect", "--offline", "--json", "--output-dir", "-"]))
-        _capture(checks, "offline_replay", lambda: _command(project, ["./judge", "--mode", "replay", "--offline", "--json", "--output-dir", "-"]))
+        _capture(
+            checks,
+            "offline_inspect",
+            lambda: _command(
+                project,
+                ["./judge", "--mode", "inspect", "--offline", "--json", "--output-dir", "-"],
+            ),
+        )
+        _capture(
+            checks,
+            "offline_replay",
+            lambda: _command(
+                project, ["./judge", "--mode", "replay", "--offline", "--json", "--output-dir", "-"]
+            ),
+        )
         _capture(checks, "frontend_tests", lambda: _command(project / "frontend", ["npm", "test"]))
-        _capture(checks, "frontend_public_build", lambda: _command(project / "frontend", ["npm", "run", "build:public"]))
+        _capture(
+            checks,
+            "frontend_public_build",
+            lambda: _command(project / "frontend", ["npm", "run", "build:public"]),
+        )
     failures = [item for item in checks if item["status"] == "failed"]
     return {
         "schema_version": G4_SCHEMA,
@@ -78,14 +97,23 @@ def review_g4(*, project_root: str | Path, execute_commands: bool = True) -> dic
 
 
 def _restricted(project: Path) -> dict[str, Any]:
-    review = _read(project / "docs/reviews/openai_build_week_2026/P4-restricted-environment.review.json")
+    review = _read(
+        project / "docs/reviews/openai_build_week_2026/P4-restricted-environment.review.json"
+    )
     scenarios = {item["id"]: item["status"] for item in review.get("scenarios", [])}
     required = {
-        "system_python_inspect", "locked_offline_replay",
-        "no_network_docker_gpu_secret_tty_browser_port", "repository_only_no_sibling_game",
-        "stdout_only_read_only_output", "missing_corrupt_wrong_hash_and_claim",
-        "unsupported_python", "timeout_cleanup", "signal_cleanup", "dependency_failure",
-        "absent_api_key", "mid_run_provider_failure",
+        "system_python_inspect",
+        "locked_offline_replay",
+        "no_network_docker_gpu_secret_tty_browser_port",
+        "repository_only_no_sibling_game",
+        "stdout_only_read_only_output",
+        "missing_corrupt_wrong_hash_and_claim",
+        "unsupported_python",
+        "timeout_cleanup",
+        "signal_cleanup",
+        "dependency_failure",
+        "absent_api_key",
+        "mid_run_provider_failure",
     }
     missing = sorted(item for item in required if scenarios.get(item) != "passed")
     if review.get("status") != "passed" or missing:
@@ -96,8 +124,15 @@ def _restricted(project: Path) -> dict[str, Any]:
 def _ui(project: Path) -> dict[str, Any]:
     source = (project / "frontend/src/pages/JudgePage.tsx").read_text(encoding="utf-8")
     required = (
-        "CAMPAIGN", "REPAIR", "PROOF", "prerecorded evidence", "OpenAI live subagent",
-        "fixed", "holdout", "REJECTED", 'role="status"',
+        "CAMPAIGN",
+        "REPAIR",
+        "PROOF",
+        "OpenAI live subagent",
+        "fixed",
+        "holdout",
+        "displayedDecision",
+        "experiment.source_label",
+        'role="status"',
     )
     missing = [token for token in required if token not in source]
     fixture = _read(project / "frontend/public-demo/judge-demo.json")
@@ -114,9 +149,7 @@ def _platform(project: Path) -> dict[str, Any]:
     rows = {item["id"]: item for item in review.get("checks", [])}
     by_id = {identifier: item.get("status") for identifier, item in rows.items()}
     absent = sorted(REQUIRED_PLATFORM_CHECKS - set(by_id))
-    incomplete = {
-        item for item in REQUIRED_PLATFORM_CHECKS if by_id.get(item) != "passed"
-    }
+    incomplete = {item for item in REQUIRED_PLATFORM_CHECKS if by_id.get(item) != "passed"}
     stale = {
         item
         for item in REQUIRED_PLATFORM_CHECKS
@@ -138,7 +171,9 @@ def _platform(project: Path) -> dict[str, Any]:
         try:
             evidence_path.relative_to(review_dir.resolve())
         except ValueError as exc:
-            raise G4ReviewError(f"platform evidence escapes review directory: {identifier}") from exc
+            raise G4ReviewError(
+                f"platform evidence escapes review directory: {identifier}"
+            ) from exc
         evidence = _read(evidence_path)
         evidence_checks = {
             item.get("id"): item.get("status")
@@ -165,8 +200,13 @@ def _image(project: Path) -> dict[str, Any]:
     if not path.is_file():
         raise G4ReviewError("judge-image-metadata.json is missing; no image publication claim")
     value = _read(path)
-    if value.get("status") != "built_and_pushed" or value.get("platforms") != ["linux/amd64", "linux/arm64"]:
-        raise G4ReviewError("multi-architecture image metadata is not a published two-platform index")
+    if value.get("status") != "built_and_pushed" or value.get("platforms") != [
+        "linux/amd64",
+        "linux/arm64",
+    ]:
+        raise G4ReviewError(
+            "multi-architecture image metadata is not a published two-platform index"
+        )
     digest = str(value.get("index_digest", ""))
     if not digest.startswith("sha256:") or len(digest) != 71:
         raise G4ReviewError("published image index digest is invalid")
@@ -182,7 +222,9 @@ def _image(project: Path) -> dict[str, Any]:
 
 
 def _command(cwd: Path, command: list[str]) -> dict[str, Any]:
-    completed = subprocess.run(command, cwd=cwd, capture_output=True, check=False, text=True, timeout=180)
+    completed = subprocess.run(
+        command, cwd=cwd, capture_output=True, check=False, text=True, timeout=180
+    )
     if completed.returncode != 0:
         tail = (completed.stderr or completed.stdout)[-1200:]
         raise G4ReviewError(f"command failed ({completed.returncode}): {' '.join(command)}: {tail}")
@@ -205,16 +247,27 @@ def _git_revision(project: Path) -> str:
     return completed.stdout.strip() if completed.returncode == 0 else "unknown"
 
 
-def write_g4_review(*, json_path: str | Path, markdown_path: str | Path, review: Mapping[str, Any]) -> None:
+def write_g4_review(
+    *, json_path: str | Path, markdown_path: str | Path, review: Mapping[str, Any]
+) -> None:
     json_destination = Path(json_path)
     markdown_destination = Path(markdown_path)
     json_destination.parent.mkdir(parents=True, exist_ok=True)
-    json_destination.write_text(json.dumps(review, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    json_destination.write_text(
+        json.dumps(review, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     lines = [
-        "# G4 Evaluator and Judge Experience Review", "",
-        f"- Decision: **{review['status']}**", f"- Reviewed commit: `{review['reviewed_commit']}`",
-        f"- Checks: {review['check_count']}", f"- Failures: {review['failure_count']}", "",
-        "## Checks", "", "| Check | Status | Error |", "| --- | --- | --- |",
+        "# G4 Evaluator and Judge Experience Review",
+        "",
+        f"- Decision: **{review['status']}**",
+        f"- Reviewed commit: `{review['reviewed_commit']}`",
+        f"- Checks: {review['check_count']}",
+        f"- Failures: {review['failure_count']}",
+        "",
+        "## Checks",
+        "",
+        "| Check | Status | Error |",
+        "| --- | --- | --- |",
     ]
     for item in review["checks"]:
         lines.append(f"| {item['id']} | {item['status']} | {item['error']} |")

@@ -1,0 +1,76 @@
+{
+  "schema_version": "repair-experiment-plan-v1",
+  "experiment_id": "vllm-cohort-b-survival-recovery-v1",
+  "created_at": "2026-07-17T21:29:13Z",
+  "design_contract_path": "config/build_week_2026_design_contract.json",
+  "design_contract_sha256": "f6e0e2217f5d278764f1321aaf22c7212301c7145fc4f973f5ece4f41b9a8af0",
+  "target_path": "config/build_week_2026_target_vllm_b.json",
+  "target_sha256": "58e24cb437356d85954572814755eec0a5586b292dbcae751f290042ad028593",
+  "selected_cluster_id": "cashflow-stress-attractor",
+  "baseline_game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+  "baseline_game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+  "hypothesis": "Aligned non-failure personas enter the cashflow/stress attractor because the existing crisis-negotiation recovery action removes too little arrears while adding stress once crisis begins; one bounded improvement to that action effect should create liability and stress headroom without weakening ordinary costs or guaranteeing success.",
+  "predicted_effect": "Reduce cohort B target membership from 43 to at most 28 cells and reduce unseen-holdout membership by at least 25%, while keeping decision validity at or above 95%, provider errors and fallback at or below 5%, persona-alignment decline within five points, all critical invariants clean, and designed failure possible.",
+  "mechanism_class": "survival_recovery_action_effect",
+  "allowlist": [
+    "data/actions/generated_actions.json",
+    "scripts/tools/ValidateEconomyRules.gd"
+  ],
+  "maximum_changed_files": 2,
+  "maximum_changed_lines": 80,
+  "fixed_seeds": [
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57
+  ],
+  "holdout_seeds": [
+    1042,
+    1043,
+    1044
+  ],
+  "thresholds": {
+    "acceptance_max_fixed_members": 28,
+    "minimum_holdout_relative_reduction": 0.25,
+    "minimum_valid_rate": 0.95,
+    "maximum_fallback_rate": 0.05,
+    "maximum_provider_error_rate": 0.05,
+    "maximum_persona_alignment_decline": 0.05
+  },
+  "facts": [
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "money-seed-52-59509cf55dcc",
+      "persona": "money",
+      "seed": 52,
+      "week": 18,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 360,
+      "record_sha256": "52029251802501387dfe5bbfb24ecba299b145f1d7c483320d722fe2f0e9b04a"
+    },
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "newbie-seed-50-f64cf69879b7",
+      "persona": "newbie",
+      "seed": 50,
+      "week": 15,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 15,
+      "record_sha256": "b91bd515a9e1c4fe455928e528ec59a1573b27dfb7948416495a124396d7f102"
+    },
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "slacker-seed-50-306ab91762c7",
+      "persona": "slacker",
+      "seed": 50,
+      "week": 11,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 771,
+      "record_sha256": "77b121097756de1c2e1c1831e42169e4155bac03e5ccbc4f4f20bf82d3c4da92"
+    }
+  ]
+}

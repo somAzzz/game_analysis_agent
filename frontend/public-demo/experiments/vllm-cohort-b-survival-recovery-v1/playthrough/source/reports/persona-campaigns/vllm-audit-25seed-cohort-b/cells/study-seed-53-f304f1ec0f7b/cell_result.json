@@ -1,0 +1,235 @@
+{
+  "artifacts": [
+    {
+      "media_type": "application/x-ndjson",
+      "path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "record_count": 19,
+      "sha256": "7f6bebec8f9a6d5b75b9f8e539ab59ccb227612706381f959167f648f884e4db"
+    }
+  ],
+  "citations": [
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 1,
+      "persona": "study",
+      "record_sha256": "0b7edee5fab838382c8939865efff1c76fad8cb41e81cf50e550287fd6193cd2",
+      "seed": 53,
+      "week": 1
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 2,
+      "persona": "study",
+      "record_sha256": "eaf68790b4afcd5b1b19fec4a67b20c7d7df12db1f64583e99eb22c905492356",
+      "seed": 53,
+      "week": 2
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 3,
+      "persona": "study",
+      "record_sha256": "3785e33eebb99ac1a5976e4df9a25b1015d04b57df0bcba3b173e6edfa30cf4c",
+      "seed": 53,
+      "week": 3
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 4,
+      "persona": "study",
+      "record_sha256": "511b05abcd4c9b0aeb870ba7cefba5fdaded5e453a5f8521ec7b4e66307fa24e",
+      "seed": 53,
+      "week": 4
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 5,
+      "persona": "study",
+      "record_sha256": "e29aed343ac38ae52c224912c1824c24faef347a882b82443e33dbc52764d011",
+      "seed": 53,
+      "week": 5
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 6,
+      "persona": "study",
+      "record_sha256": "6b2e8206f1b6a36e70f116bd0ef23f5ccf4eaa6b4da05b450f94a5fbd229acd3",
+      "seed": 53,
+      "week": 6
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 7,
+      "persona": "study",
+      "record_sha256": "18c9680a2228e3f6b853d9a942049465f53d04f8c56a5bac6cbcab8d816d1a7d",
+      "seed": 53,
+      "week": 7
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 8,
+      "persona": "study",
+      "record_sha256": "0fff21e9e103d40aa3c980595f17620e1688ab57dad014108a3e3f656fa7e7f2",
+      "seed": 53,
+      "week": 8
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 9,
+      "persona": "study",
+      "record_sha256": "04f96d9add59d4492155e90cce9179aa7c93799732bc5dd96856e45b124a21c7",
+      "seed": 53,
+      "week": 9
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 10,
+      "persona": "study",
+      "record_sha256": "5793241047f0a2cb925bab1ecbfd3bb1426795fb75c90bb7fc2a8dd5452428d8",
+      "seed": 53,
+      "week": 10
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 11,
+      "persona": "study",
+      "record_sha256": "2332ee027cd4106542ae42bccd2562fad2a8556c7dd3068dab4b4d98e2fd4b3e",
+      "seed": 53,
+      "week": 11
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 12,
+      "persona": "study",
+      "record_sha256": "6b5c0867b65c36d01411580c09c6f479393d269afca9251666e87242a4c4bae6",
+      "seed": 53,
+      "week": 12
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 13,
+      "persona": "study",
+      "record_sha256": "01b892d49f6c289002cb69f9841dbeeb3109431773d8b9dc99096104c1880ff1",
+      "seed": 53,
+      "week": 13
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 14,
+      "persona": "study",
+      "record_sha256": "944f2a6c92121c869bb2c2226dc5af97ccb5b6f623eaf1b9d4d088a62912649a",
+      "seed": 53,
+      "week": 14
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 15,
+      "persona": "study",
+      "record_sha256": "2f95ef61907d9a69e1d44e6415ab823efc5166501b400ee44d4f06aaa50f3eea",
+      "seed": 53,
+      "week": 15
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 16,
+      "persona": "study",
+      "record_sha256": "215ee41a6010bcb9b65fdc836a0f385ad14a985336ce322dbc4d2b9184691bea",
+      "seed": 53,
+      "week": 16
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 17,
+      "persona": "study",
+      "record_sha256": "bd03f3339f63cc3ad3d754d73e77f4b71a58642747e04588eb6fc3825a1b003c",
+      "seed": 53,
+      "week": 17
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 18,
+      "persona": "study",
+      "record_sha256": "e099162b2c8e836bea964b9956d9f7476c906cedca5265ae1fbeced9c4eb185c",
+      "seed": 53,
+      "week": 18
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "study-seed-53-f304f1ec0f7b",
+      "line_number": 19,
+      "persona": "study",
+      "record_sha256": "a4dd1f53c2e508f38bb0bc17af7fbc79d353e0a96d6dd9588f53999f84410dfe",
+      "seed": 53,
+      "week": 19
+    }
+  ],
+  "completed_at": "2026-07-17T17:15:15.127836Z",
+  "completed_weeks": 19,
+  "error": "",
+  "request": {
+    "campaign_fingerprint": "d999b53c9d6ab15b43eeea7acfe58d3e1150a98327e831b8773cee9a9c3a28fc",
+    "campaign_id": "vllm-audit-25seed-cohort-b",
+    "cell_id": "study-seed-53-f304f1ec0f7b",
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "output_dir": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/study-seed-53-f304f1ec0f7b",
+    "persona": "study",
+    "provider": "vllm",
+    "scenario": "default_first_semester",
+    "seed": 53
+  },
+  "request_fingerprint": "e056626f466a46612070884fa4816313709db2e76b60e878e321d05b2e5cb108",
+  "schema_version": "persona-campaign-cell-result-v1",
+  "source": {
+    "agent_commit": "cb142f99b4e24470fe2aa028233aa78212393429",
+    "agent_dirty": false,
+    "agent_tree": "6f86561b59348a60ddf6ce92d79cae91de1e9d87",
+    "campaign_config_sha256": "d999b53c9d6ab15b43eeea7acfe58d3e1150a98327e831b8773cee9a9c3a28fc",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "vllm",
+    "provider_mode": "local",
+    "provider_revision": "model:qwen3.6-27b-nvfp4"
+  },
+  "source_fingerprint": "c4fc40a6582a6bc3dac4771c512b4a80c4371324ef3a019306e5d7e999c9aa06",
+  "started_at": "2026-07-17T17:12:50.918006Z",
+  "state": "completed",
+  "stop_reason": "game_finished"
+}

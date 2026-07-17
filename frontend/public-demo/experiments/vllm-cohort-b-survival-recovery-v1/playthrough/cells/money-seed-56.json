@@ -1,0 +1,5530 @@
+{
+  "actual_edges": [
+    {
+      "from": "w1",
+      "id": "w1-to-w2",
+      "kind": "actual",
+      "to": "w2"
+    },
+    {
+      "from": "w2",
+      "id": "w2-to-w3",
+      "kind": "actual",
+      "to": "w3"
+    },
+    {
+      "from": "w3",
+      "id": "w3-to-w4",
+      "kind": "actual",
+      "to": "w4"
+    },
+    {
+      "from": "w4",
+      "id": "w4-to-w5",
+      "kind": "actual",
+      "to": "w5"
+    },
+    {
+      "from": "w5",
+      "id": "w5-to-w6",
+      "kind": "actual",
+      "to": "w6"
+    },
+    {
+      "from": "w6",
+      "id": "w6-to-w7",
+      "kind": "actual",
+      "to": "w7"
+    },
+    {
+      "from": "w7",
+      "id": "w7-to-w8",
+      "kind": "actual",
+      "to": "w8"
+    },
+    {
+      "from": "w8",
+      "id": "w8-to-w9",
+      "kind": "actual",
+      "to": "w9"
+    },
+    {
+      "from": "w9",
+      "id": "w9-to-w10",
+      "kind": "actual",
+      "to": "w10"
+    },
+    {
+      "from": "w10",
+      "id": "w10-to-w11",
+      "kind": "actual",
+      "to": "w11"
+    },
+    {
+      "from": "w11",
+      "id": "w11-to-w12",
+      "kind": "actual",
+      "to": "w12"
+    },
+    {
+      "from": "w12",
+      "id": "w12-to-w13",
+      "kind": "actual",
+      "to": "w13"
+    },
+    {
+      "from": "w13",
+      "id": "w13-to-w14",
+      "kind": "actual",
+      "to": "w14"
+    },
+    {
+      "from": "w14",
+      "id": "w14-to-w15",
+      "kind": "actual",
+      "to": "w15"
+    },
+    {
+      "from": "w15",
+      "id": "w15-to-w16",
+      "kind": "actual",
+      "to": "w16"
+    },
+    {
+      "from": "w16",
+      "id": "w16-to-w17",
+      "kind": "actual",
+      "to": "w17"
+    },
+    {
+      "from": "w17",
+      "id": "w17-to-w18",
+      "kind": "actual",
+      "to": "w18"
+    },
+    {
+      "from": "w18",
+      "id": "w18-to-w19",
+      "kind": "actual",
+      "to": "w19"
+    }
+  ],
+  "agent_commit": "cb142f99b4e24470fe2aa028233aa78212393429",
+  "branch_semantics": {
+    "available_actions": "legal-actions-not-future-state-branches",
+    "event_choices": "legal-options-not-executed-unless-selected",
+    "projected_counterfactual_states": false
+  },
+  "campaign_id": "vllm-audit-25seed-cohort-b",
+  "cell_id": "money-seed-56-b70cd52791ba",
+  "completed_weeks": 19,
+  "difficulty": "normal",
+  "final_ending": "academic_failure",
+  "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+  "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+  "nodes": [
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "problem_set",
+        "library_day",
+        "language_school_germany",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "insurance_paperwork",
+        "bank_account",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "go_running",
+        "bilibili_rest"
+      ],
+      "decision": {
+        "confidence": 0.9,
+        "expected_tradeoff": "Prioritize unlocking financial resources and securing income over immediate academic progress to align with money persona strategy.",
+        "risk_awareness": [
+          "Blocked funds must be activated to access monthly allowance",
+          "Immediate cash flow is critical for survival",
+          "Hunger management prevents stat decay"
+        ],
+        "strategic_goal": "Prioritize unlocking financial resources and securing income over immediate academic progress to align with money persona strategy."
+      },
+      "delta": {
+        "energy": -10,
+        "hunger": -23,
+        "language": 6,
+        "loneliness": -2,
+        "money": 50,
+        "social": 5,
+        "stress": 3,
+        "visa_progress": 8
+      },
+      "event": {
+        "id": "arrival",
+        "legal_choices": [
+          {
+            "choice_id": "arrival.choice_01_go_to_the_dorm_to_drop_off_luggage",
+            "failure_effects": {
+              "energy": -4.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "arrived",
+            "success_effects": {
+              "energy": 10.0,
+              "stress": -4.0
+            },
+            "success_rate": 1.0,
+            "text": "Go to the dorm to drop off luggage",
+            "text_en": "Go to the dorm to drop off luggage",
+            "text_zh": "先去宿舍放行李"
+          },
+          {
+            "choice_id": "arrival.choice_02_head_straight_to_the_supermarket_and_dm_for_essentials",
+            "failure_effects": {
+              "energy": -6.0,
+              "hunger": 6.0,
+              "money": -55.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "arrived_supplied",
+            "success_effects": {
+              "energy": -6.0,
+              "hunger": -10.0,
+              "money": -55.0,
+              "stress": -3.0
+            },
+            "success_rate": 1.0,
+            "text": "Head straight to the supermarket and dm for essentials",
+            "text_en": "Head straight to the supermarket and dm for essentials",
+            "text_zh": "立刻去超市和 dm 补生活用品"
+          },
+          {
+            "choice_id": "arrival.choice_03_activate_sim_card_and_banking_app_first",
+            "failure_effects": {
+              "stress": 8.0,
+              "visa_progress": -2.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "language": 0.003
+            },
+            "set_flag": "arrived",
+            "success_effects": {
+              "language": 1.0,
+              "stress": 4.0,
+              "visa_progress": 4.0
+            },
+            "success_rate": 0.776,
+            "text": "Activate SIM card and banking app first",
+            "text_en": "Activate SIM card and banking app first",
+            "text_zh": "先激活 SIM 卡和银行 App"
+          },
+          {
+            "choice_id": "arrival.choice_04_sit_at_the_station_to_catch_your_breath",
+            "failure_effects": {
+              "money": -25.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "arrived",
+            "success_effects": {
+              "loneliness": 4.0,
+              "money": -25.0,
+              "stress": -8.0,
+              "visa_progress": -2.0
+            },
+            "success_rate": 1.0,
+            "text": "Sit at the station to catch your breath",
+            "text_en": "Sit at the station to catch your breath",
+            "text_zh": "坐在车站缓一缓"
+          }
+        ],
+        "selected_choice_id": "arrival.choice_02_head_straight_to_the_supermarket_and_dm_for_essentials"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "6b023b40797a0e187191e7aad17332e4b406ae926e58e58ba25ca162b57abd35",
+        "event_request_fingerprint": "ff5cea1c5016dcb21e8881b22d65c29f58869da3b31d88027cbdbeb78bd8cec5",
+        "source_line": 1,
+        "source_record_sha256": "5f28cae64b4e1921fa1d7d5484b6a9893b8a1260c18f4dc196f48fc06c1989bf"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "blocked_account_balance": -992,
+        "energy": -10,
+        "hunger": -23,
+        "language": 6,
+        "loneliness": -2,
+        "money": 50,
+        "social": 5,
+        "stress": 3,
+        "unpaid_social_streak": 2,
+        "visa_progress": 8,
+        "week": 1
+      },
+      "id": "w1",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 2,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "还剩 4 周。没有 TestDaF 4x4 或注册材料，本学期会被拖后。",
+            "id": "registration",
+            "score": 84,
+            "suggested_actions": [
+              "school_registration",
+              "insurance_paperwork",
+              "testdaf_exam_germany"
+            ],
+            "title": "学校注册窗口"
+          },
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 70,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "当前可支配现金 550 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 40,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "bank_account",
+        "cook_at_home",
+        "language_tandem"
+      ],
+      "state_after": {
+        "academic_progress": 10,
+        "annual_work_half_days": 0,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 10912,
+        "career_progress": 0,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 90,
+        "exam_readiness": 14,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "housing_contract_active": true
+        },
+        "gpa_score": 80,
+        "hunger": 2,
+        "language": 26,
+        "loneliness": 28,
+        "money": 550,
+        "no_social_streak": 0,
+        "parent_pressure": 0,
+        "reciprocity_debt": 0,
+        "social": 20,
+        "stress": 23,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 2,
+        "visa_progress": 23,
+        "week": 2,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 10,
+        "annual_work_half_days": 0,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 11904,
+        "career_progress": 0,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 100,
+        "exam_readiness": 14,
+        "failed_courses": 0,
+        "flags": {},
+        "gpa_score": 80,
+        "hunger": 25,
+        "language": 20,
+        "loneliness": 30,
+        "money": 500,
+        "no_social_streak": 0,
+        "parent_pressure": 0,
+        "reciprocity_debt": 0,
+        "social": 15,
+        "stress": 20,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 15,
+        "week": 1,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 1
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "problem_set",
+        "library_day",
+        "language_school_germany",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "insurance_paperwork",
+        "bank_account",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "go_running",
+        "bilibili_rest"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Prioritize immediate income generation via part-time job to address cash flow risk, while maintaining minimal academic and language progress to avoid falling behind on registration requirements.",
+        "risk_awareness": [
+          "cash_flow_shortage",
+          "testdaf_deadline"
+        ],
+        "strategic_goal": "Prioritize immediate income generation via part-time job to address cash flow risk, while maintaining minimal academic and language progress to avoid falling be"
+      },
+      "delta": {
+        "academic_progress": 8,
+        "exam_readiness": 5,
+        "hunger": 12,
+        "language": 6,
+        "loneliness": 1,
+        "money": -225,
+        "social": 3,
+        "stress": -6,
+        "visa_progress": 4
+      },
+      "event": {
+        "id": "semester_ticket",
+        "legal_choices": [
+          {
+            "choice_id": "semester_ticket.choice_01_activate_now",
+            "failure_effects": {
+              "money": -35.0,
+              "stress": 2.0,
+              "visa_progress": -1.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "money": 30.0,
+              "visa_progress": 4.0
+            },
+            "success_rate": 1.0,
+            "text": "Activate now",
+            "text_en": "Activate now",
+            "text_zh": "立刻激活"
+          },
+          {
+            "choice_id": "semester_ticket.choice_02_screenshot_and_ask_classmates",
+            "failure_effects": {
+              "social": -1.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "social": 2.0,
+              "stress": -1.0
+            },
+            "success_rate": 1.0,
+            "text": "Screenshot and ask classmates",
+            "text_en": "Screenshot and ask classmates",
+            "text_zh": "先截图问同学"
+          },
+          {
+            "choice_id": "semester_ticket.choice_03_handle_carefully",
+            "failure_effects": {
+              "stress": 4.0,
+              "visa_progress": 1.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "stress": 1.0,
+              "visa_progress": 3.0
+            },
+            "success_rate": 0.73,
+            "text": "Handle carefully",
+            "text_en": "Handle carefully",
+            "text_zh": "稳妥处理"
+          },
+          {
+            "choice_id": "semester_ticket.choice_04_ask_for_help",
+            "failure_effects": {
+              "social": -1.0,
+              "stress": 3.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "social": 2.0,
+              "stress": -2.0,
+              "visa_progress": 2.0
+            },
+            "success_rate": 0.611,
+            "text": "Ask for help",
+            "text_en": "Ask for help",
+            "text_zh": "寻求帮助"
+          }
+        ],
+        "selected_choice_id": "semester_ticket.choice_01_activate_now"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "ccc0712172cfb3bde29c1c106aec8a66cff4c771de2abed6549531a517fc5238",
+        "event_request_fingerprint": "d88f256f8a83ebcda7e4da3526c501150515b0e7d930c7dd11c0fe7101ecfe0c",
+        "source_line": 2,
+        "source_record_sha256": "8b3a962e6b27b0576b774874ac3b50ad0576cbfacbd1f7057703f1f911bcbf27"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": 8,
+        "exam_readiness": 5,
+        "hunger": 12,
+        "language": 6,
+        "loneliness": 1,
+        "money": -225,
+        "social": 3,
+        "stress": -6,
+        "unpaid_social_streak": 2,
+        "visa_progress": 4,
+        "week": 1
+      },
+      "id": "w2",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 3,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "还剩 3 周。没有 TestDaF 4x4 或注册材料，本学期会被拖后。",
+            "id": "registration",
+            "score": 91,
+            "suggested_actions": [
+              "school_registration",
+              "insurance_paperwork",
+              "testdaf_exam_germany"
+            ],
+            "title": "学校注册窗口"
+          },
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 70,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "当前可支配现金 325 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "library_day",
+        "language_tandem",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 18,
+        "annual_work_half_days": 0,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 10912,
+        "career_progress": 0,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 90,
+        "exam_readiness": 19,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "housing_contract_active": true,
+          "shallow_friendships": true
+        },
+        "gpa_score": 80,
+        "hunger": 14,
+        "language": 32,
+        "loneliness": 29,
+        "money": 325,
+        "no_social_streak": 0,
+        "parent_pressure": 0,
+        "reciprocity_debt": 0,
+        "social": 23,
+        "stress": 17,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 4,
+        "visa_progress": 27,
+        "week": 3,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 10,
+        "annual_work_half_days": 0,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 10912,
+        "career_progress": 0,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 90,
+        "exam_readiness": 14,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "housing_contract_active": true
+        },
+        "gpa_score": 80,
+        "hunger": 2,
+        "language": 26,
+        "loneliness": 28,
+        "money": 550,
+        "no_social_streak": 0,
+        "parent_pressure": 0,
+        "reciprocity_debt": 0,
+        "social": 20,
+        "stress": 23,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 2,
+        "visa_progress": 23,
+        "week": 2,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 2
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "problem_set",
+        "library_day",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "insurance_paperwork",
+        "bank_account",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "go_running",
+        "bilibili_rest"
+      ],
+      "decision": {
+        "confidence": 0.95,
+        "expected_tradeoff": "Prioritize financial liquidity and stress management over academic progress this week to secure the foundation for the 'money' route.",
+        "risk_awareness": [
+          "Unlocking blocked funds is critical for survival and registration fees.",
+          "Immediate cash injection needed to prevent hunger/stress spiral.",
+          "Maintaining low stress is essential for future work capacity."
+        ],
+        "strategic_goal": "Prioritize financial liquidity and stress management over academic progress this week to secure the foundation for the 'money' route."
+      },
+      "delta": {
+        "academic_progress": -3,
+        "energy": -5,
+        "hunger": -2,
+        "loneliness": 1,
+        "money": -7,
+        "social": -2,
+        "stress": 13,
+        "visa_progress": 11
+      },
+      "event": {
+        "id": "missing_school_registration",
+        "legal_choices": [
+          {
+            "choice_id": "missing_school_registration.choice_02_visit_the_international_office_first",
+            "failure_effects": {
+              "academic_progress": -7.0,
+              "stress": 8.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "school_registered",
+            "success_effects": {
+              "academic_progress": -3.0,
+              "stress": 4.0,
+              "visa_progress": 3.0
+            },
+            "success_rate": 0.877,
+            "text": "Visit the International Office first",
+            "text_en": "Visit the International Office first",
+            "text_zh": "先找 International Office"
+          },
+          {
+            "choice_id": "missing_school_registration.choice_03_rely_on_self-study_for_a_week",
+            "failure_effects": {
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": -6.0,
+              "hunger": 5.0,
+              "stress": 3.0
+            },
+            "success_rate": 1.0,
+            "text": "Rely on self-study for a week",
+            "text_en": "Rely on self-study for a week",
+            "text_zh": "只靠自学顶一周"
+          },
+          {
+            "choice_id": "missing_school_registration.choice_04_keep_procrastinating",
+            "failure_effects": {
+              "money": -80.0,
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": -10.0,
+              "money": -80.0,
+              "stress": 8.0
+            },
+            "success_rate": 1.0,
+            "text": "Keep procrastinating",
+            "text_en": "Keep procrastinating",
+            "text_zh": "继续拖延"
+          }
+        ],
+        "selected_choice_id": "missing_school_registration.choice_02_visit_the_international_office_first"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "b48a34a448f925eb93a54c59aaa4d8e0b5e5feddaed0bae6c94fe93e47e3cb86",
+        "event_request_fingerprint": "95ea3b175ca34f7a5ae337854e46cc452d15c2f4847d82e303f2b3758aade2df",
+        "source_line": 3,
+        "source_record_sha256": "c221e103f42b660e340ca444433710c01ff4395607974c91979c4808650445ad"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": -3,
+        "energy": -5,
+        "hunger": -2,
+        "loneliness": 1,
+        "money": -7,
+        "no_social_streak": 2,
+        "parent_pressure": 16,
+        "social": -2,
+        "stress": 13,
+        "unpaid_social_streak": -4,
+        "visa_progress": 11,
+        "week": 1
+      },
+      "id": "w3",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 4,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "当前可支配现金 318 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "bank_account",
+        "budget_call",
+        "cook_at_home",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 15,
+        "annual_work_half_days": 0,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 10912,
+        "career_progress": 0,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 85,
+        "exam_readiness": 19,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 32,
+        "loneliness": 30,
+        "money": 318,
+        "no_social_streak": 2,
+        "parent_pressure": 16,
+        "reciprocity_debt": 0,
+        "social": 21,
+        "stress": 30,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 38,
+        "week": 4,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 18,
+        "annual_work_half_days": 0,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 10912,
+        "career_progress": 0,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 90,
+        "exam_readiness": 19,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "housing_contract_active": true,
+          "shallow_friendships": true
+        },
+        "gpa_score": 80,
+        "hunger": 14,
+        "language": 32,
+        "loneliness": 29,
+        "money": 325,
+        "no_social_streak": 0,
+        "parent_pressure": 0,
+        "reciprocity_debt": 0,
+        "social": 23,
+        "stress": 17,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 4,
+        "visa_progress": 27,
+        "week": 3,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 3
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "library_day",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "insurance_paperwork",
+        "bank_account",
+        "anmeldung",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "go_running",
+        "bilibili_rest"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Prioritize cash flow and survival by working part-time, while maintaining minimal academic progress and stress management to avoid burnout.",
+        "risk_awareness": [
+          "Low cash flow requires immediate income generation via part-time work.",
+          "Academic progress is lagging; library study mitigates risk of falling behind.",
+          "Stress management is critical to maintain work capacity."
+        ],
+        "strategic_goal": "Prioritize cash flow and survival by working part-time, while maintaining minimal academic progress and stress management to avoid burnout."
+      },
+      "delta": {
+        "academic_progress": 8,
+        "energy": 1,
+        "exam_readiness": 5,
+        "loneliness": 6,
+        "money": -147,
+        "social": -2,
+        "stress": 3
+      },
+      "event": {
+        "id": "wg_interview",
+        "legal_choices": [
+          {
+            "choice_id": "wg_interview.choice_01_act_very_german",
+            "failure_effects": {
+              "stress": 5.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "housing_stable",
+            "success_effects": {
+              "social": 3.0,
+              "visa_progress": 6.0
+            },
+            "success_rate": 0.855,
+            "text": "Act very German",
+            "text_en": "Act very German",
+            "text_zh": "表现得非常德式"
+          },
+          {
+            "choice_id": "wg_interview.choice_02_offer_to_cook_chinese_food",
+            "failure_effects": {
+              "stress": 3.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "wg_cooking",
+            "success_effects": {
+              "hunger": -6.0,
+              "loneliness": -4.0,
+              "social": 7.0
+            },
+            "success_rate": 0.9,
+            "text": "Offer to cook Chinese food",
+            "text_en": "Offer to cook Chinese food",
+            "text_zh": "说自己会做中餐"
+          },
+          {
+            "choice_id": "wg_interview.choice_03_admit_your_budget_is_tight",
+            "failure_effects": {
+              "social": -3.0,
+              "stress": 8.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "social": 0.003
+            },
+            "set_flag": "cheap_room_hint",
+            "success_effects": {
+              "money": 120.0,
+              "stress": 5.0
+            },
+            "success_rate": 0.553457142857143,
+            "text": "Admit your budget is tight",
+            "text_en": "Admit your budget is tight",
+            "text_zh": "坦白预算很紧"
+          },
+          {
+            "choice_id": "wg_interview.choice_04_over-accommodate_every_rule",
+            "failure_effects": {
+              "stress": 12.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "language": 0.002
+            },
+            "set_flag": "housing_stable",
+            "success_effects": {
+              "energy": -6.0,
+              "social": 2.0,
+              "stress": 8.0
+            },
+            "success_rate": 0.679,
+            "text": "Over-accommodate every rule",
+            "text_en": "Over-accommodate every rule",
+            "text_zh": "过度迎合每条规则"
+          }
+        ],
+        "selected_choice_id": "wg_interview.choice_03_admit_your_budget_is_tight"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "9f997db413929294688db3380d42c95cf83978560b74e24bbdc048dae0bc40e6",
+        "event_request_fingerprint": "830444b31e980956b43d8317f6360d7bea7559e1a090f908d76b70c99505527e",
+        "source_line": 4,
+        "source_record_sha256": "cd7f47426978d31cb89b5ee0daa3619f12e627c1948efeeb54fce24a3b222986"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": 8,
+        "energy": 1,
+        "exam_readiness": 5,
+        "loneliness": 6,
+        "money": -147,
+        "no_social_streak": 2,
+        "social": -2,
+        "stress": 3,
+        "week": 1
+      },
+      "id": "w4",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 5,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "当前可支配现金 171 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "cook_at_home",
+        "library_day",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 23,
+        "annual_work_half_days": 0,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 10912,
+        "career_progress": 0,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 86,
+        "exam_readiness": 24,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 32,
+        "loneliness": 36,
+        "money": 171,
+        "no_social_streak": 4,
+        "parent_pressure": 16,
+        "reciprocity_debt": 0,
+        "social": 19,
+        "stress": 33,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 38,
+        "week": 5,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 15,
+        "annual_work_half_days": 0,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 10912,
+        "career_progress": 0,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 85,
+        "exam_readiness": 19,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 32,
+        "loneliness": 30,
+        "money": 318,
+        "no_social_streak": 2,
+        "parent_pressure": 16,
+        "reciprocity_debt": 0,
+        "social": 21,
+        "stress": 30,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 38,
+        "week": 4,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 4
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "library_day",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "insurance_paperwork",
+        "bank_account",
+        "anmeldung",
+        "international_office",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "go_running",
+        "bilibili_rest"
+      ],
+      "decision": {
+        "confidence": 0.95,
+        "expected_tradeoff": "Gain 260 EUR and unlock monthly stipend access at cost of stress and parent pressure, while maintaining basic survival needs.",
+        "risk_awareness": [
+          "Low cash flow requires immediate liquidity via budget_call",
+          "Bank account activation is critical for long-term financial stability",
+          "Stress management via go_running prevents burnout from financial pressure"
+        ],
+        "strategic_goal": "Gain 260 EUR and unlock monthly stipend access at cost of stress and parent pressure, while maintaining basic survival needs."
+      },
+      "delta": {
+        "career_progress": 3,
+        "energy": -7,
+        "loneliness": 3,
+        "money": 325,
+        "social": -2,
+        "stress": 11,
+        "visa_progress": 10
+      },
+      "event": {
+        "id": "legal_work_limit_notice",
+        "legal_choices": [
+          {
+            "choice_id": "legal_work_limit_notice.choice_01_log_hours_in_your_calendar",
+            "failure_effects": {
+              "stress": 2.0,
+              "visa_progress": -1.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "work_law_briefed",
+            "success_effects": {
+              "stress": 2.0,
+              "visa_progress": 3.0
+            },
+            "success_rate": 1.0,
+            "text": "Log hours in your calendar",
+            "text_en": "Log hours in your calendar",
+            "text_zh": "把工时记进日历"
+          },
+          {
+            "choice_id": "legal_work_limit_notice.choice_02_only_take_jobs_with_clear_contracts",
+            "failure_effects": {
+              "career_progress": -1.0,
+              "money": -40.0,
+              "stress": 2.0,
+              "visa_progress": -1.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "work_law_briefed",
+            "success_effects": {
+              "career_progress": 3.0,
+              "money": -40.0,
+              "visa_progress": 2.0
+            },
+            "success_rate": 1.0,
+            "text": "Only take jobs with clear contracts",
+            "text_en": "Only take jobs with clear contracts",
+            "text_zh": "只接合同清楚的班"
+          },
+          {
+            "choice_id": "legal_work_limit_notice.choice_03_ask_the_asta/international_office",
+            "failure_effects": {
+              "language": -1.0,
+              "stress": 4.0,
+              "visa_progress": -1.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "work_law_briefed",
+            "success_effects": {
+              "language": 2.0,
+              "stress": -1.0,
+              "visa_progress": 4.0
+            },
+            "success_rate": 1.0,
+            "text": "Ask the AStA/International Office",
+            "text_en": "Ask the AStA/International Office",
+            "text_zh": "问 AStA/International Office"
+          },
+          {
+            "choice_id": "legal_work_limit_notice.choice_04_assume_you_won't_exceed_the_limit",
+            "failure_effects": {
+              "stress": 4.0,
+              "visa_progress": -2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "work_law_briefed",
+            "success_effects": {
+              "stress": -2.0
+            },
+            "success_rate": 0.547,
+            "text": "Assume you won't exceed the limit",
+            "text_en": "Assume you won't exceed the limit",
+            "text_zh": "觉得自己不会超"
+          }
+        ],
+        "selected_choice_id": "legal_work_limit_notice.choice_02_only_take_jobs_with_clear_contracts"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "f134976841b6d2e20db8a6f8fd94b3ed91433cac97a421f703aa144f92a3a264",
+        "event_request_fingerprint": "9a2dcd02019b4c5dd7d17b977ab534dd20397b1fd627c2c069dff5ee33378fc1",
+        "source_line": 5,
+        "source_record_sha256": "2997cb9112f25b3b9be3544d40fc89f31405da695b063287f8f4281231aaa8da"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "blocked_account_balance": -992,
+        "career_progress": 3,
+        "energy": -7,
+        "loneliness": 3,
+        "money": 325,
+        "no_social_streak": 2,
+        "parent_pressure": 16,
+        "social": -2,
+        "stress": 11,
+        "visa_progress": 10,
+        "week": 1
+      },
+      "id": "w5",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 6,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "当前可支配现金 496 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "bank_account",
+        "budget_call",
+        "cook_at_home",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 23,
+        "annual_work_half_days": 0,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 9920,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 79,
+        "exam_readiness": 24,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 32,
+        "loneliness": 39,
+        "money": 496,
+        "no_social_streak": 6,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 17,
+        "stress": 44,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 48,
+        "week": 6,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 23,
+        "annual_work_half_days": 0,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 10912,
+        "career_progress": 0,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 86,
+        "exam_readiness": 24,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 32,
+        "loneliness": 36,
+        "money": 171,
+        "no_social_streak": 4,
+        "parent_pressure": 16,
+        "reciprocity_debt": 0,
+        "social": 19,
+        "stress": 33,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 38,
+        "week": 5,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 5
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "library_day",
+        "office_hour",
+        "language_school_germany",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "insurance_paperwork",
+        "bank_account",
+        "anmeldung",
+        "international_office",
+        "part_time_job",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "go_running",
+        "bilibili_rest"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Prioritize immediate income via part-time job to stabilize cash flow, while maintaining minimal academic progress and stress management to avoid burnout.",
+        "risk_awareness": [
+          "cash_flow_stress",
+          "academic_decline"
+        ],
+        "strategic_goal": "Prioritize immediate income via part-time job to stabilize cash flow, while maintaining minimal academic progress and stress management to avoid burnout."
+      },
+      "delta": {
+        "academic_progress": 4,
+        "energy": -27,
+        "exam_readiness": 2,
+        "language": 1,
+        "loneliness": 6,
+        "money": -128,
+        "social": -2,
+        "visa_progress": 5
+      },
+      "event": {
+        "id": "anmeldung_deadline",
+        "legal_choices": [
+          {
+            "choice_id": "anmeldung_deadline.choice_01_submit_documents_immediately",
+            "failure_effects": {
+              "energy": -4.0,
+              "stress": 2.0,
+              "visa_progress": -1.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "energy": -4.0,
+              "stress": 4.0,
+              "visa_progress": 7.0
+            },
+            "success_rate": 1.0,
+            "text": "Submit documents immediately",
+            "text_en": "Submit documents immediately",
+            "text_zh": "立刻补材料"
+          },
+          {
+            "choice_id": "anmeldung_deadline.choice_02_ask_the_international_office_first",
+            "failure_effects": {
+              "language": -1.0,
+              "stress": 4.0,
+              "visa_progress": -1.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "language": 1.0,
+              "stress": -2.0,
+              "visa_progress": 5.0
+            },
+            "success_rate": 1.0,
+            "text": "Ask the International Office first",
+            "text_en": "Ask the International Office first",
+            "text_zh": "先问 International Office"
+          },
+          {
+            "choice_id": "anmeldung_deadline.choice_03_ask_your_roommate_to_confirm_the_wohnungsgeberbestätigung",
+            "failure_effects": {
+              "stress": 6.0,
+              "visa_progress": -2.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "language": 0.002,
+              "social": 0.003
+            },
+            "set_flag": "",
+            "success_effects": {
+              "social": 3.0,
+              "stress": 1.0,
+              "visa_progress": 6.0
+            },
+            "success_rate": 0.815,
+            "text": "Ask your roommate to confirm the Wohnungsgeberbestätigung",
+            "text_en": "Ask your roommate to confirm the Wohnungsgeberbestätigung",
+            "text_zh": "请室友确认 Wohnungsgeberbestätigung"
+          },
+          {
+            "choice_id": "anmeldung_deadline.choice_04_shove_the_envelope_in_a_drawer",
+            "failure_effects": {
+              "money": -30.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "admin_avoidance",
+            "success_effects": {
+              "money": -30.0,
+              "stress": -5.0,
+              "visa_progress": -8.0
+            },
+            "success_rate": 1.0,
+            "text": "Shove the envelope in a drawer",
+            "text_en": "Shove the envelope in a drawer",
+            "text_zh": "把信封塞进抽屉"
+          }
+        ],
+        "selected_choice_id": "anmeldung_deadline.choice_02_ask_the_international_office_first"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "ceb37d3bd719858201ce693f740ce8265cf553ea95aa6561a6b038c51de13071",
+        "event_request_fingerprint": "ee877fc0f3d03844632ed2c8ed7d9de313ca9c8662778c8f3dc2b928762af14e",
+        "source_line": 6,
+        "source_record_sha256": "4d285ac3952a1d6ac34d6534a58674ff5d19dea31d2754c007df5e68b88f0498"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": 4,
+        "annual_work_half_days": 3,
+        "energy": -27,
+        "exam_readiness": 2,
+        "language": 1,
+        "loneliness": 6,
+        "money": -128,
+        "no_social_streak": 2,
+        "social": -2,
+        "visa_progress": 5,
+        "week": 1
+      },
+      "id": "w6",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 7,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "当前可支配现金 368 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "library_day",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 27,
+        "annual_work_half_days": 3,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 9920,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 52,
+        "exam_readiness": 26,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 33,
+        "loneliness": 45,
+        "money": 368,
+        "no_social_streak": 8,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 15,
+        "stress": 44,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 53,
+        "week": 7,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 23,
+        "annual_work_half_days": 0,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 9920,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 79,
+        "exam_readiness": 24,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 32,
+        "loneliness": 39,
+        "money": 496,
+        "no_social_streak": 6,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 17,
+        "stress": 44,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 48,
+        "week": 6,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 6
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "insurance_paperwork",
+        "bank_account",
+        "anmeldung",
+        "international_office",
+        "part_time_job",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "sleep_recover",
+        "go_running",
+        "bilibili_rest"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Income and survival priority over academic depth; stress managed via exercise.",
+        "risk_awareness": [
+          "cash_flow_stress",
+          "academic_slip"
+        ],
+        "strategic_goal": "Income and survival priority over academic depth; stress managed via exercise."
+      },
+      "delta": {
+        "academic_progress": 9,
+        "energy": -20,
+        "exam_readiness": 2,
+        "loneliness": 6,
+        "money": -128,
+        "social": -2,
+        "stress": 5
+      },
+      "event": {
+        "id": "moodle_quiz",
+        "legal_choices": [
+          {
+            "choice_id": "moodle_quiz.choice_01_complete_it_now",
+            "failure_effects": {
+              "academic_progress": -1.0,
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": 5.0,
+              "stress": 3.0
+            },
+            "success_rate": 1.0,
+            "text": "Complete it now",
+            "text_en": "Complete it now",
+            "text_zh": "立刻补做"
+          },
+          {
+            "choice_id": "moodle_quiz.choice_02_accept_the_loss",
+            "failure_effects": {
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": -3.0,
+              "stress": -2.0
+            },
+            "success_rate": 1.0,
+            "text": "Accept the loss",
+            "text_en": "Accept the loss",
+            "text_zh": "接受损失"
+          },
+          {
+            "choice_id": "moodle_quiz.choice_03_handle_carefully",
+            "failure_effects": {
+              "academic_progress": 1.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": 3.0,
+              "stress": 1.0
+            },
+            "success_rate": 0.582,
+            "text": "Handle carefully",
+            "text_en": "Handle carefully",
+            "text_zh": "稳妥处理"
+          },
+          {
+            "choice_id": "moodle_quiz.choice_04_ask_for_help",
+            "failure_effects": {
+              "social": -1.0,
+              "stress": 3.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": 2.0,
+              "social": 2.0,
+              "stress": -2.0
+            },
+            "success_rate": 0.57,
+            "text": "Ask for help",
+            "text_en": "Ask for help",
+            "text_zh": "寻求帮助"
+          }
+        ],
+        "selected_choice_id": "moodle_quiz.choice_01_complete_it_now"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "812ecb78f60b8fa2972f8f1525a9185b06e2cfca880aed1a111cce963abb99c2",
+        "event_request_fingerprint": "e20f40db108e86fb65625d76bab0b475461f15353991de76fca1a3801780773d",
+        "source_line": 7,
+        "source_record_sha256": "3734a022d47b3675ca002d9abaaae83f6e328074f43f378432bb7deec11b69a3"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": 9,
+        "annual_work_half_days": 3,
+        "energy": -20,
+        "exam_readiness": 2,
+        "loneliness": 6,
+        "money": -128,
+        "no_social_streak": 2,
+        "social": -2,
+        "stress": 5,
+        "week": 1
+      },
+      "id": "w7",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 8,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "学业进度 36，备考 28。考试周越近，补掌握度的成本越高。",
+            "id": "academic",
+            "score": 62,
+            "suggested_actions": [
+              "attend_lecture",
+              "problem_set",
+              "office_hour"
+            ],
+            "title": "学业/考试"
+          },
+          {
+            "body": "当前可支配现金 240 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "library_day",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 36,
+        "annual_work_half_days": 6,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 9920,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 28,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 33,
+        "loneliness": 51,
+        "money": 240,
+        "no_social_streak": 10,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 13,
+        "stress": 49,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 53,
+        "week": 8,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 27,
+        "annual_work_half_days": 3,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 9920,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 52,
+        "exam_readiness": 26,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 33,
+        "loneliness": 45,
+        "money": 368,
+        "no_social_streak": 8,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 15,
+        "stress": 44,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 53,
+        "week": 7,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 7
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "insurance_paperwork",
+        "bank_account",
+        "anmeldung",
+        "visa_appointment",
+        "international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "bilibili_rest"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Prioritize income generation and survival needs; accept minor academic regression to maintain financial stability and mental health.",
+        "risk_awareness": [
+          "cash_flow_stress",
+          "academic_slip",
+          "energy_depletion"
+        ],
+        "strategic_goal": "Prioritize income generation and survival needs; accept minor academic regression to maintain financial stability and mental health."
+      },
+      "delta": {
+        "academic_progress": 4,
+        "exam_readiness": 2,
+        "loneliness": 6,
+        "money": -8,
+        "social": -2,
+        "stress": 5
+      },
+      "event": {
+        "id": "parents_money_hint",
+        "legal_choices": [
+          {
+            "choice_id": "parents_money_hint.choice_01_show_them_a_budget",
+            "failure_effects": {
+              "money": -35.0,
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "money": 120.0,
+              "stress": 3.0
+            },
+            "success_rate": 1.0,
+            "text": "Show them a budget",
+            "text_en": "Show them a budget",
+            "text_zh": "做预算表给他们看"
+          },
+          {
+            "choice_id": "parents_money_hint.choice_02_reassure_them_first",
+            "failure_effects": {
+              "loneliness": 2.0,
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "loneliness": -3.0,
+              "stress": 2.0
+            },
+            "success_rate": 1.0,
+            "text": "Reassure them first",
+            "text_en": "Reassure them first",
+            "text_zh": "先安慰他们"
+          },
+          {
+            "choice_id": "parents_money_hint.choice_03_play_it_safe",
+            "failure_effects": {
+              "money": 35.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "money": 105.0,
+              "stress": 1.0
+            },
+            "success_rate": 0.5452,
+            "text": "Play it safe",
+            "text_en": "Play it safe",
+            "text_zh": "稳妥处理"
+          },
+          {
+            "choice_id": "parents_money_hint.choice_04_ask_for_help",
+            "failure_effects": {
+              "social": -1.0,
+              "stress": 3.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "money": 70.0,
+              "social": 2.0,
+              "stress": -2.0
+            },
+            "success_rate": 0.5332,
+            "text": "Ask for help",
+            "text_en": "Ask for help",
+            "text_zh": "寻求帮助"
+          }
+        ],
+        "selected_choice_id": "parents_money_hint.choice_01_show_them_a_budget"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "268433f116f6276e16707e1c28dc7ce84a5e68bf43c335bb3886e56a9a08c9e7",
+        "event_request_fingerprint": "0f1d5ce58a4f2d493b1a64825e603202a322ae4928e959c9df1444213994f3e1",
+        "source_line": 8,
+        "source_record_sha256": "0a5aaf7e5bc96c789d04497e7c7cacb1a9bc5e2494f6ef16415b72928922ed23"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": 4,
+        "annual_work_half_days": 3,
+        "exam_readiness": 2,
+        "loneliness": 6,
+        "money": -8,
+        "no_social_streak": 2,
+        "social": -2,
+        "stress": 5,
+        "week": 1
+      },
+      "id": "w8",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 9,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "学业进度 40，备考 30。考试周越近，补掌握度的成本越高。",
+            "id": "academic",
+            "score": 60,
+            "suggested_actions": [
+              "attend_lecture",
+              "problem_set",
+              "office_hour"
+            ],
+            "title": "学业/考试"
+          },
+          {
+            "body": "当前可支配现金 232 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "library_day",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 40,
+        "annual_work_half_days": 9,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 9920,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 30,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 33,
+        "loneliness": 57,
+        "money": 232,
+        "no_social_streak": 12,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 11,
+        "stress": 54,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 53,
+        "week": 9,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 36,
+        "annual_work_half_days": 6,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 9920,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 28,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 33,
+        "loneliness": 51,
+        "money": 240,
+        "no_social_streak": 10,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 13,
+        "stress": 49,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 53,
+        "week": 8,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 8
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "bank_account",
+        "anmeldung",
+        "visa_appointment",
+        "international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "bilibili_rest",
+        "cv_workshop"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Prioritize immediate income and survival to prevent financial crisis, accepting minor academic delay and stress increase.",
+        "risk_awareness": [
+          "cash_flow_depletion",
+          "academic_regression",
+          "visa_deadline_approaching"
+        ],
+        "strategic_goal": "Prioritize immediate income and survival to prevent financial crisis, accepting minor academic delay and stress increase."
+      },
+      "delta": {
+        "academic_progress": 5,
+        "exam_readiness": 9,
+        "loneliness": 6,
+        "money": 244,
+        "social": -2,
+        "stress": 3
+      },
+      "event": {
+        "id": "exam_registration",
+        "legal_choices": [
+          {
+            "choice_id": "exam_registration.choice_01_register_now",
+            "failure_effects": {
+              "academic_progress": -1.0,
+              "stress": 4.0,
+              "visa_progress": -1.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "exam_registered",
+            "success_effects": {
+              "academic_progress": 2.0,
+              "exam_readiness": 4.0,
+              "stress": -3.0,
+              "visa_progress": 2.0
+            },
+            "success_rate": 1.0,
+            "text": "Register now",
+            "text_en": "Register now",
+            "text_zh": "马上报名"
+          },
+          {
+            "choice_id": "exam_registration.choice_02_register_and_check_the_syllabus",
+            "failure_effects": {
+              "academic_progress": -1.0,
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "exam_registered",
+            "success_effects": {
+              "academic_progress": 1.0,
+              "exam_readiness": 7.0,
+              "stress": 1.0
+            },
+            "success_rate": 1.0,
+            "text": "Register and check the syllabus",
+            "text_en": "Register and check the syllabus",
+            "text_zh": "报名后顺手查考纲"
+          },
+          {
+            "choice_id": "exam_registration.choice_03_ask_classmates_about_the_process",
+            "failure_effects": {
+              "stress": 5.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "social": 0.003
+            },
+            "set_flag": "exam_registered",
+            "success_effects": {
+              "exam_readiness": 3.0,
+              "social": 3.0,
+              "stress": 1.0
+            },
+            "success_rate": 0.711,
+            "text": "Ask classmates about the process",
+            "text_en": "Ask classmates about the process",
+            "text_zh": "先问同学报名流程"
+          },
+          {
+            "choice_id": "exam_registration.choice_04_wait_a_bit",
+            "failure_effects": {
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "exam_readiness": -4.0,
+              "stress": 5.0
+            },
+            "success_rate": 1.0,
+            "text": "Wait a bit",
+            "text_en": "Wait a bit",
+            "text_zh": "晚点再说"
+          }
+        ],
+        "selected_choice_id": "exam_registration.choice_02_register_and_check_the_syllabus"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "cbe27a41e110ef849b080ab5945f04dee3517d4c5c5bc529143ea263ea1b77e1",
+        "event_request_fingerprint": "735f182315e3cfc4bf40889e229afa2dee51059e709b077070008ca6ffb0eeb5",
+        "source_line": 9,
+        "source_record_sha256": "1dc79a2af9af3ffa455381051ed63e6014c3a63269d307d78cef9a6e75414c42"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": 5,
+        "annual_work_half_days": 3,
+        "blocked_account_balance": -992,
+        "exam_readiness": 9,
+        "loneliness": 6,
+        "money": 244,
+        "no_social_streak": 2,
+        "social": -2,
+        "stress": 3,
+        "week": 1
+      },
+      "id": "w9",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 10,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "当前可支配现金 476 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          },
+          {
+            "body": "居留状态还没确认。Termin、材料和学校支持要尽快接上。",
+            "id": "visa",
+            "score": 55,
+            "suggested_actions": [
+              "emergency_international_office",
+              "write_formal_email_to_abh",
+              "visa_appointment",
+              "international_office"
+            ],
+            "title": "居留许可"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "library_day",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 45,
+        "annual_work_half_days": 12,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 8928,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 39,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 33,
+        "loneliness": 63,
+        "money": 476,
+        "no_social_streak": 14,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 9,
+        "stress": 57,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 53,
+        "week": 10,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 40,
+        "annual_work_half_days": 9,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 9920,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 30,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 33,
+        "loneliness": 57,
+        "money": 232,
+        "no_social_streak": 12,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 11,
+        "stress": 54,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 53,
+        "week": 9,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 9
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "language_school_germany",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "anmeldung",
+        "visa_appointment",
+        "international_office",
+        "emergency_international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "mini_job_extra",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "bilibili_rest",
+        "cv_workshop"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Prioritize income and critical admin progress; accept minor academic delay and stress increase.",
+        "risk_awareness": [
+          "visa_progress_lag",
+          "cash_flow_stability"
+        ],
+        "strategic_goal": "Prioritize income and critical admin progress; accept minor academic delay and stress increase."
+      },
+      "delta": {
+        "academic_progress": 1,
+        "exam_readiness": 1,
+        "language": 4,
+        "loneliness": 4,
+        "money": -128,
+        "social": -2,
+        "stress": 9,
+        "visa_progress": 11
+      },
+      "event": {
+        "id": "midterm_pressure",
+        "legal_choices": [
+          {
+            "choice_id": "midterm_pressure.choice_01_organize_a_study_plan",
+            "failure_effects": {
+              "academic_progress": -1.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": 5.0,
+              "exam_readiness": 4.0,
+              "stress": -2.0
+            },
+            "success_rate": 1.0,
+            "text": "Organize a study plan",
+            "text_en": "Organize a study plan",
+            "text_zh": "整理学习计划"
+          },
+          {
+            "choice_id": "midterm_pressure.choice_02_take_a_nap_first",
+            "failure_effects": {
+              "energy": -4.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": -2.0,
+              "energy": 16.0,
+              "exam_readiness": -2.0,
+              "stress": -6.0
+            },
+            "success_rate": 1.0,
+            "text": "Take a nap first",
+            "text_en": "Take a nap first",
+            "text_zh": "先睡一觉"
+          },
+          {
+            "choice_id": "midterm_pressure.choice_03_skip_a_work_shift_to_finish_homework",
+            "failure_effects": {
+              "academic_progress": -1.0,
+              "money": -139.0,
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": 7.0,
+              "exam_readiness": 5.0,
+              "money": -139.0,
+              "stress": 3.0
+            },
+            "success_rate": 1.0,
+            "text": "Skip a work shift to finish homework",
+            "text_en": "Skip a work shift to finish homework",
+            "text_zh": "砍掉一班打工补作业"
+          },
+          {
+            "choice_id": "midterm_pressure.choice_04_power_through_with_coffee",
+            "failure_effects": {
+              "academic_progress": -1.0,
+              "energy": -12.0,
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": 4.0,
+              "energy": -12.0,
+              "exam_readiness": 2.0,
+              "stress": 10.0
+            },
+            "success_rate": 1.0,
+            "text": "Power through with coffee",
+            "text_en": "Power through with coffee",
+            "text_zh": "靠咖啡硬顶"
+          }
+        ],
+        "selected_choice_id": "midterm_pressure.choice_01_organize_a_study_plan"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "e1096eb5f6659a3ae5dad8af91df384dad45d8f4989a684357b64be777d07452",
+        "event_request_fingerprint": "eb16f886cd4d48a2b91b3195aaf47f3c822c6b787c668a8b5bcd0d8bd6926455",
+        "source_line": 10,
+        "source_record_sha256": "8797bed2b8e8437df99012e25b366c05eee9d510798068fa3608f6b6631d418f"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": 1,
+        "annual_work_half_days": 3,
+        "exam_readiness": 1,
+        "language": 4,
+        "loneliness": 4,
+        "money": -128,
+        "no_social_streak": 2,
+        "social": -2,
+        "stress": 9,
+        "visa_progress": 11,
+        "week": 1
+      },
+      "id": "w10",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 11,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "压力 66。高压会拖累学业和考试，并可能覆盖普通成功结局。",
+            "id": "stress",
+            "score": 66,
+            "suggested_actions": [
+              "take_a_real_break",
+              "therapy",
+              "sleep_recover",
+              "go_running"
+            ],
+            "title": "压力"
+          },
+          {
+            "body": "当前可支配现金 348 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "visa_appointment",
+        "write_email_practice"
+      ],
+      "state_after": {
+        "academic_progress": 46,
+        "annual_work_half_days": 15,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 8928,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 40,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 37,
+        "loneliness": 67,
+        "money": 348,
+        "no_social_streak": 16,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 7,
+        "stress": 66,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 64,
+        "week": 11,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 45,
+        "annual_work_half_days": 12,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 8928,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 39,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 33,
+        "loneliness": 63,
+        "money": 476,
+        "no_social_streak": 14,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 9,
+        "stress": 57,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 53,
+        "week": 10,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 10
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "international_office",
+        "emergency_international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "mini_job_extra",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "therapy",
+        "bilibili_rest",
+        "cv_workshop"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Prioritize cash flow via work and low-cost survival; use running for stress relief and email for visa progress to mitigate admin risks.",
+        "risk_awareness": [
+          "stress_increase",
+          "academic_delay"
+        ],
+        "strategic_goal": "Prioritize cash flow via work and low-cost survival; use running for stress relief and email for visa progress to mitigate admin risks."
+      },
+      "delta": {
+        "academic_progress": -4,
+        "exam_readiness": -3,
+        "language": 4,
+        "loneliness": -1,
+        "money": -128,
+        "social": -2,
+        "stress": -11,
+        "visa_progress": 2
+      },
+      "event": {
+        "id": "mental_health_webinar",
+        "legal_choices": [
+          {
+            "choice_id": "mental_health_webinar.choice_01_attend",
+            "failure_effects": {
+              "loneliness": 2.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "loneliness": -4.0,
+              "stress": -10.0
+            },
+            "success_rate": 1.0,
+            "text": "Attend",
+            "text_en": "Attend",
+            "text_zh": "参加"
+          },
+          {
+            "choice_id": "mental_health_webinar.choice_02_save_for_later",
+            "failure_effects": {
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "stress": -1.0
+            },
+            "success_rate": 1.0,
+            "text": "Save for later",
+            "text_en": "Save for later",
+            "text_zh": "收藏不看"
+          },
+          {
+            "choice_id": "mental_health_webinar.choice_03_handle_it_safely",
+            "failure_effects": {
+              "energy": 0.0,
+              "stress": 3.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "energy": 1.0,
+              "stress": -2.0
+            },
+            "success_rate": 0.352,
+            "text": "Handle it safely",
+            "text_en": "Handle it safely",
+            "text_zh": "稳妥处理"
+          },
+          {
+            "choice_id": "mental_health_webinar.choice_04_ask_for_help",
+            "failure_effects": {
+              "social": -1.0,
+              "stress": 3.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "energy": 1.0,
+              "social": 2.0,
+              "stress": -4.0
+            },
+            "success_rate": 0.351,
+            "text": "Ask for help",
+            "text_en": "Ask for help",
+            "text_zh": "寻求帮助"
+          }
+        ],
+        "selected_choice_id": "mental_health_webinar.choice_01_attend"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "96c3d8363b662bb39e6ddc91af3d2cf034f95f02cecf04d7c6c0782dd3cb6964",
+        "event_request_fingerprint": "ffb537fb9ca893b28f8050585a8e9697fdee59c99304f158efbf04d4e006ffb0",
+        "source_line": 11,
+        "source_record_sha256": "93b8299b5452d7275e2ce9ace27271ba7ee2ac3c7d6d39484173a2e2df43cfb2"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": -4,
+        "annual_work_half_days": 3,
+        "exam_readiness": -3,
+        "language": 4,
+        "loneliness": -1,
+        "money": -128,
+        "no_social_streak": 2,
+        "social": -2,
+        "stress": -11,
+        "visa_progress": 2,
+        "week": 1
+      },
+      "id": "w11",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 12,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "当前可支配现金 220 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          },
+          {
+            "body": "学业进度 42，备考 37。考试周越近，补掌握度的成本越高。",
+            "id": "academic",
+            "score": 53,
+            "suggested_actions": [
+              "attend_lecture",
+              "problem_set",
+              "office_hour"
+            ],
+            "title": "学业/考试"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "go_running",
+        "write_email_practice"
+      ],
+      "state_after": {
+        "academic_progress": 42,
+        "annual_work_half_days": 18,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 8928,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 37,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 41,
+        "loneliness": 66,
+        "money": 220,
+        "no_social_streak": 18,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 5,
+        "stress": 55,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 66,
+        "week": 12,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 46,
+        "annual_work_half_days": 15,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 8928,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 40,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 37,
+        "loneliness": 67,
+        "money": 348,
+        "no_social_streak": 16,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 7,
+        "stress": 66,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 64,
+        "week": 11,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 11
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "write_hausarbeit",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "international_office",
+        "emergency_international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "mini_job_extra",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "bilibili_rest",
+        "cv_workshop",
+        "apply_howi"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Prioritize immediate income and long-term career setup (HiWi) to secure financial stability, accepting academic delay and stress increase.",
+        "risk_awareness": [
+          "cash_flow_strain",
+          "academic_regression",
+          "visa_deadline_proximity"
+        ],
+        "strategic_goal": "Prioritize immediate income and long-term career setup (HiWi) to secure financial stability, accepting academic delay and stress increase."
+      },
+      "delta": {
+        "career_progress": 12,
+        "exam_readiness": -1,
+        "loneliness": 3,
+        "money": -128,
+        "social": 1,
+        "stress": 6
+      },
+      "event": {
+        "id": "group_invite",
+        "legal_choices": [
+          {
+            "choice_id": "group_invite.choice_01_agree_and_take_the_lead_on_dividing_tasks",
+            "failure_effects": {
+              "stress": 5.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "language": 0.002,
+              "social": 0.003
+            },
+            "set_flag": "anna_group",
+            "success_effects": {
+              "academic_progress": 6.0,
+              "exam_readiness": 4.0,
+              "language": 3.0,
+              "social": 8.0
+            },
+            "success_rate": 0.9,
+            "text": "Agree and take the lead on dividing tasks",
+            "text_en": "Agree and take the lead on dividing tasks",
+            "text_zh": "答应并主动分工"
+          },
+          {
+            "choice_id": "group_invite.choice_02_only_take_the_research_part",
+            "failure_effects": {
+              "academic_progress": -1.0,
+              "social": -1.0,
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "anna_group",
+            "success_effects": {
+              "academic_progress": 4.0,
+              "exam_readiness": 2.0,
+              "social": 3.0,
+              "stress": 2.0
+            },
+            "success_rate": 1.0,
+            "text": "Only take the research part",
+            "text_en": "Only take the research part",
+            "text_zh": "只接资料整理的部分"
+          },
+          {
+            "choice_id": "group_invite.choice_03_ask_her_to_explain_the_grading_criteria_first",
+            "failure_effects": {
+              "stress": 6.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "language": 0.003,
+              "social": 0.002
+            },
+            "set_flag": "anna_group",
+            "success_effects": {
+              "exam_readiness": 6.0,
+              "language": 3.0,
+              "social": 5.0
+            },
+            "success_rate": 0.707,
+            "text": "Ask her to explain the grading criteria first",
+            "text_en": "Ask her to explain the grading criteria first",
+            "text_zh": "请她先解释评分标准"
+          },
+          {
+            "choice_id": "group_invite.choice_04_politely_decline",
+            "failure_effects": {
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": -3.0,
+              "social": -4.0,
+              "stress": -3.0
+            },
+            "success_rate": 1.0,
+            "text": "Politely decline",
+            "text_en": "Politely decline",
+            "text_zh": "委婉拒绝"
+          }
+        ],
+        "selected_choice_id": "group_invite.choice_02_only_take_the_research_part"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "a4665e1ad30d8d545c4b1d481edefcd28c9257b933b61a4de19e00760d992fe1",
+        "event_request_fingerprint": "42d2cd3c045a54a3a211420c8860128efaf2a87b27ccaef815387215975d90fc",
+        "source_line": 12,
+        "source_record_sha256": "1dcb09aa4e8325d374e0bef33d19ea1e59cea58791f939a68521aa4a8fe6bf5a"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "annual_work_half_days": 3,
+        "career_progress": 12,
+        "exam_readiness": -1,
+        "loneliness": 3,
+        "money": -128,
+        "no_social_streak": 2,
+        "social": 1,
+        "stress": 6,
+        "week": 1
+      },
+      "id": "w12",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 13,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "压力 61。高压会拖累学业和考试，并可能覆盖普通成功结局。",
+            "id": "stress",
+            "score": 61,
+            "suggested_actions": [
+              "take_a_real_break",
+              "therapy",
+              "sleep_recover",
+              "go_running"
+            ],
+            "title": "压力"
+          },
+          {
+            "body": "当前可支配现金 92 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "apply_howi",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 42,
+        "annual_work_half_days": 21,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 8928,
+        "career_progress": 15,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 36,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 41,
+        "loneliness": 69,
+        "money": 92,
+        "no_social_streak": 20,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 6,
+        "stress": 61,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 66,
+        "week": 13,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 42,
+        "annual_work_half_days": 18,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 8928,
+        "career_progress": 3,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 37,
+        "failed_courses": 0,
+        "flags": {
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 41,
+        "loneliness": 66,
+        "money": 220,
+        "no_social_streak": 18,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 5,
+        "stress": 55,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 66,
+        "week": 12,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 12
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "write_hausarbeit",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "international_office",
+        "emergency_international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "mini_job_extra",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "bilibili_rest",
+        "cv_workshop",
+        "apply_howi"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Prioritize cash flow and career setup (HiWi) to secure long-term financial stability, accepting short-term academic delay and stress increase.",
+        "risk_awareness": [
+          "energy_depletion",
+          "academic_decline",
+          "stress_accumulation"
+        ],
+        "strategic_goal": "Prioritize cash flow and career setup (HiWi) to secure long-term financial stability, accepting short-term academic delay and stress increase."
+      },
+      "delta": {
+        "academic_progress": -4,
+        "career_progress": 12,
+        "exam_readiness": 4,
+        "language": 2,
+        "loneliness": 4,
+        "money": 244,
+        "social": -2,
+        "stress": 9
+      },
+      "event": {
+        "id": "exercise_sheet_warning",
+        "legal_choices": [
+          {
+            "choice_id": "exercise_sheet_warning.choice_01_do_three_practice_sets",
+            "failure_effects": {
+              "exam_readiness": 2.0,
+              "stress": 10.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "academic_progress": 0.003
+            },
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": 3.0,
+              "exam_readiness": 10.0,
+              "stress": 6.0
+            },
+            "success_rate": 0.725,
+            "text": "Do three practice sets",
+            "text_en": "Do three practice sets",
+            "text_zh": "补三套练习题"
+          },
+          {
+            "choice_id": "exercise_sheet_warning.choice_02_clarify_in_tutorium",
+            "failure_effects": {
+              "stress": 7.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "language": 0.003
+            },
+            "set_flag": "",
+            "success_effects": {
+              "exam_readiness": 7.0,
+              "language": 2.0,
+              "stress": 3.0
+            },
+            "success_rate": 0.694,
+            "text": "Clarify in Tutorium",
+            "text_en": "Clarify in Tutorium",
+            "text_zh": "去 Tutorium 问清楚"
+          },
+          {
+            "choice_id": "exercise_sheet_warning.choice_03_compare_answers_with_classmates",
+            "failure_effects": {
+              "exam_readiness": -2.0,
+              "stress": 6.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "social": 0.003
+            },
+            "set_flag": "",
+            "success_effects": {
+              "exam_readiness": 6.0,
+              "social": 4.0,
+              "stress": 2.0
+            },
+            "success_rate": 0.523,
+            "text": "Compare answers with classmates",
+            "text_en": "Compare answers with classmates",
+            "text_zh": "和同学对答案"
+          },
+          {
+            "choice_id": "exercise_sheet_warning.choice_04_focus_on_other_things_first",
+            "failure_effects": {
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": -3.0,
+              "exam_readiness": -8.0,
+              "stress": -2.0
+            },
+            "success_rate": 1.0,
+            "text": "Focus on other things first",
+            "text_en": "Focus on other things first",
+            "text_zh": "先忙别的"
+          }
+        ],
+        "selected_choice_id": "exercise_sheet_warning.choice_02_clarify_in_tutorium"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "5e5d1bfbbbb5cd3f44ac63a11252e563a1142a56e84b9b4a6d3bbe95a6fb5312",
+        "event_request_fingerprint": "3631373bcdcade7ebd92cf99012c721f47dd938c36449887e6b7646a266f3255",
+        "source_line": 13,
+        "source_record_sha256": "2bb8b955b99b52545541d10b508d47fb5fd8f76b6f94c78a545ff2cb97169598"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": -4,
+        "annual_work_half_days": 3,
+        "blocked_account_balance": -992,
+        "career_progress": 12,
+        "exam_readiness": 4,
+        "language": 2,
+        "loneliness": 4,
+        "money": 244,
+        "no_social_streak": 2,
+        "social": -2,
+        "stress": 9,
+        "week": 1
+      },
+      "id": "w13",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 14,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "压力 70。高压会拖累学业和考试，并可能覆盖普通成功结局。",
+            "id": "stress",
+            "score": 70,
+            "suggested_actions": [
+              "take_a_real_break",
+              "therapy",
+              "sleep_recover",
+              "go_running"
+            ],
+            "title": "压力"
+          },
+          {
+            "body": "当前可支配现金 336 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "apply_howi",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 38,
+        "annual_work_half_days": 24,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 7936,
+        "career_progress": 27,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 40,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 43,
+        "loneliness": 73,
+        "money": 336,
+        "no_social_streak": 22,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 4,
+        "stress": 70,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 66,
+        "week": 14,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 42,
+        "annual_work_half_days": 21,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 8928,
+        "career_progress": 15,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 36,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 41,
+        "loneliness": 69,
+        "money": 92,
+        "no_social_streak": 20,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 6,
+        "stress": 61,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 66,
+        "week": 13,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 13
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "write_hausarbeit",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "international_office",
+        "emergency_international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "mini_job_extra",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "take_a_real_break",
+        "therapy",
+        "bilibili_rest",
+        "cv_workshop",
+        "apply_howi"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Secure cash flow and career progress while managing stress through exercise; accept minor academic setback.",
+        "risk_awareness": [
+          "stress_increase",
+          "academic_delay"
+        ],
+        "strategic_goal": "Secure cash flow and career progress while managing stress through exercise; accept minor academic setback."
+      },
+      "delta": {
+        "academic_progress": -4,
+        "career_progress": 12,
+        "exam_readiness": -3,
+        "loneliness": 4,
+        "money": -128,
+        "social": -2,
+        "stress": 4,
+        "visa_progress": 1
+      },
+      "event": {
+        "id": "doctor_appointment",
+        "legal_choices": [
+          {
+            "choice_id": "doctor_appointment.choice_01_call_to_book",
+            "failure_effects": {
+              "stress": 6.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "language": 4.0,
+              "stress": 3.0
+            },
+            "success_rate": 0.633,
+            "text": "Call to book",
+            "text_en": "Call to book",
+            "text_zh": "打电话预约"
+          },
+          {
+            "choice_id": "doctor_appointment.choice_02_book_online",
+            "failure_effects": {
+              "stress": 4.0,
+              "visa_progress": -1.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "stress": -2.0,
+              "visa_progress": 1.0
+            },
+            "success_rate": 1.0,
+            "text": "Book online",
+            "text_en": "Book online",
+            "text_zh": "找线上预约"
+          },
+          {
+            "choice_id": "doctor_appointment.choice_03_handle_it_safely",
+            "failure_effects": {
+              "language": 1.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "language": 3.0,
+              "stress": 1.0
+            },
+            "success_rate": 0.5675,
+            "text": "Handle it safely",
+            "text_en": "Handle it safely",
+            "text_zh": "稳妥处理"
+          },
+          {
+            "choice_id": "doctor_appointment.choice_04_ask_for_help",
+            "failure_effects": {
+              "social": -1.0,
+              "stress": 3.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "language": 2.0,
+              "social": 2.0,
+              "stress": -2.0
+            },
+            "success_rate": 0.5345,
+            "text": "Ask for help",
+            "text_en": "Ask for help",
+            "text_zh": "寻求帮助"
+          }
+        ],
+        "selected_choice_id": "doctor_appointment.choice_02_book_online"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "8b1bd8ddb7859a1598ad5b0ea3add605bd3b8134321635568808137773644648",
+        "event_request_fingerprint": "b0e71916eb52a5520b40efe66269b12b599e1b3d1ffe1e1dd80dc5789b8a49dc",
+        "source_line": 14,
+        "source_record_sha256": "733a754bc5802e943ed422ed315e87f7c46c6ec0a91920e7ed8dc39b66665cef"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": -4,
+        "annual_work_half_days": 3,
+        "career_progress": 12,
+        "exam_readiness": -3,
+        "loneliness": 4,
+        "money": -128,
+        "no_social_streak": 2,
+        "social": -2,
+        "stress": 4,
+        "visa_progress": 1,
+        "week": 1
+      },
+      "id": "w14",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 15,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "压力 74。高压会拖累学业和考试，并可能覆盖普通成功结局。",
+            "id": "stress",
+            "score": 74,
+            "suggested_actions": [
+              "take_a_real_break",
+              "therapy",
+              "sleep_recover",
+              "go_running"
+            ],
+            "title": "压力"
+          },
+          {
+            "body": "当前可支配现金 208 EUR，逾期 0 EUR。逾期会推高压力和饥饿，并诱发黑工选择。",
+            "id": "money",
+            "score": 58,
+            "suggested_actions": [
+              "rent_talk_extension",
+              "budget_call",
+              "part_time_job",
+              "sell_unused_stuff",
+              "cook_at_home"
+            ],
+            "title": "现金流"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "apply_howi",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 34,
+        "annual_work_half_days": 27,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 7936,
+        "career_progress": 39,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 37,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 43,
+        "loneliness": 77,
+        "money": 208,
+        "no_social_streak": 24,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 2,
+        "stress": 74,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 67,
+        "week": 15,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 38,
+        "annual_work_half_days": 24,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 7936,
+        "career_progress": 27,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 40,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 43,
+        "loneliness": 73,
+        "money": 336,
+        "no_social_streak": 22,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 4,
+        "stress": 70,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 66,
+        "week": 14,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 14
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "write_hausarbeit",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "international_office",
+        "emergency_international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "mini_job_extra",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "take_a_real_break",
+        "therapy",
+        "bilibili_rest",
+        "cv_workshop",
+        "apply_howi"
+      ],
+      "decision": {
+        "confidence": 0.95,
+        "expected_tradeoff": "Prioritize cash flow and career setup (HiWi) to secure long-term financial stability, accepting short-term academic delay and stress increase.",
+        "risk_awareness": [
+          "stress_increase",
+          "academic_delay"
+        ],
+        "strategic_goal": "Prioritize cash flow and career setup (HiWi) to secure long-term financial stability, accepting short-term academic delay and stress increase."
+      },
+      "delta": {
+        "academic_progress": -6,
+        "career_progress": 12,
+        "energy": -12,
+        "exam_readiness": -3,
+        "loneliness": 4,
+        "money": -23,
+        "social": -2,
+        "stress": 7
+      },
+      "event": {
+        "id": "deposit_worry",
+        "legal_choices": [
+          {
+            "choice_id": "deposit_worry.choice_01_take_photos_for_records",
+            "failure_effects": {
+              "money": -35.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "money": 60.0,
+              "stress": -2.0
+            },
+            "success_rate": 1.0,
+            "text": "Take photos for records",
+            "text_en": "Take photos for records",
+            "text_zh": "拍照留档"
+          },
+          {
+            "choice_id": "deposit_worry.choice_02_don't_worry_yet",
+            "failure_effects": {
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "stress": -3.0
+            },
+            "success_rate": 1.0,
+            "text": "Don't worry yet",
+            "text_en": "Don't worry yet",
+            "text_zh": "先不想"
+          },
+          {
+            "choice_id": "deposit_worry.choice_03_play_it_safe",
+            "failure_effects": {
+              "money": 35.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "money": 105.0,
+              "stress": 1.0
+            },
+            "success_rate": 0.462285714285714,
+            "text": "Play it safe",
+            "text_en": "Play it safe",
+            "text_zh": "稳妥处理"
+          },
+          {
+            "choice_id": "deposit_worry.choice_04_ask_for_help",
+            "failure_effects": {
+              "social": -1.0,
+              "stress": 3.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "money": 70.0,
+              "social": 2.0,
+              "stress": -2.0
+            },
+            "success_rate": 0.484285714285714,
+            "text": "Ask for help",
+            "text_en": "Ask for help",
+            "text_zh": "寻求帮助"
+          }
+        ],
+        "selected_choice_id": "deposit_worry.choice_03_play_it_safe"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "2960bfc10f52d67180343121fd53bd127891b0b2a29649a5166ea9113adff7c1",
+        "event_request_fingerprint": "8d7aeb437acfbbeba5211a2560aa4c9c03440ded84d04218d2a952b698b4c5e5",
+        "source_line": 15,
+        "source_record_sha256": "1acf0a913d2dcb73b5ead882dd57c08346eddd9d75a6aea984c01ebb951b0171"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": -6,
+        "annual_work_half_days": 3,
+        "career_progress": 12,
+        "energy": -12,
+        "exam_readiness": -3,
+        "loneliness": 4,
+        "money": -23,
+        "no_social_streak": 2,
+        "social": -2,
+        "stress": 7,
+        "week": 1
+      },
+      "id": "w15",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 16,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "压力 81。高压会拖累学业和考试，并可能覆盖普通成功结局。",
+            "id": "stress",
+            "score": 81,
+            "suggested_actions": [
+              "take_a_real_break",
+              "therapy",
+              "sleep_recover",
+              "go_running"
+            ],
+            "title": "压力"
+          },
+          {
+            "body": "学业进度 28，备考 34。考试周越近，补掌握度的成本越高。",
+            "id": "academic",
+            "score": 77,
+            "suggested_actions": [
+              "attend_lecture",
+              "problem_set",
+              "office_hour"
+            ],
+            "title": "学业/考试"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "apply_howi",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 28,
+        "annual_work_half_days": 30,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 7936,
+        "career_progress": 51,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 20,
+        "exam_readiness": 34,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 43,
+        "loneliness": 81,
+        "money": 185,
+        "no_social_streak": 26,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 0,
+        "stress": 81,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 67,
+        "week": 16,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 34,
+        "annual_work_half_days": 27,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 7936,
+        "career_progress": 39,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 32,
+        "exam_readiness": 37,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 43,
+        "loneliness": 77,
+        "money": 208,
+        "no_social_streak": 24,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 2,
+        "stress": 74,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 67,
+        "week": 15,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 15
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "write_hausarbeit",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "international_office",
+        "emergency_international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "mini_job_extra",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "take_a_real_break",
+        "therapy",
+        "bilibili_rest",
+        "cv_workshop",
+        "apply_howi"
+      ],
+      "decision": {
+        "confidence": 0.85,
+        "expected_tradeoff": "Maximize cash flow and career setup (HiWi) while using running to mitigate stress; accept academic delay.",
+        "risk_awareness": [
+          "stress_accumulation",
+          "academic_decline"
+        ],
+        "strategic_goal": "Maximize cash flow and career setup (HiWi) while using running to mitigate stress; accept academic delay."
+      },
+      "delta": {
+        "academic_progress": -6,
+        "career_progress": 12,
+        "exam_readiness": -3,
+        "loneliness": 4,
+        "money": -128,
+        "stress": 15
+      },
+      "event": {
+        "id": "klausur_countdown",
+        "legal_choices": [
+          {
+            "choice_id": "klausur_countdown.choice_01_compile_a_list_of_mistakes",
+            "failure_effects": {
+              "exam_readiness": 2.0,
+              "stress": 9.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "exam_readiness": 0.004
+            },
+            "set_flag": "",
+            "success_effects": {
+              "exam_readiness": 12.0,
+              "stress": 5.0
+            },
+            "success_rate": 0.509,
+            "text": "Compile a list of mistakes",
+            "text_en": "Compile a list of mistakes",
+            "text_zh": "整理错题清单"
+          },
+          {
+            "choice_id": "klausur_countdown.choice_02_schedule_office_hours_with_prof/ta",
+            "failure_effects": {
+              "stress": 9.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "academic_progress": 0.003,
+              "language": 0.003
+            },
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": 3.0,
+              "exam_readiness": 8.0,
+              "stress": 3.0
+            },
+            "success_rate": 0.485,
+            "text": "Schedule office hours with prof/TA",
+            "text_en": "Schedule office hours with prof/TA",
+            "text_zh": "约教授/助教答疑"
+          },
+          {
+            "choice_id": "klausur_countdown.choice_03_mock_exam_with_study_group",
+            "failure_effects": {
+              "exam_readiness": 1.0,
+              "stress": 8.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "social": 0.003
+            },
+            "set_flag": "",
+            "success_effects": {
+              "exam_readiness": 9.0,
+              "social": 4.0,
+              "stress": 4.0
+            },
+            "success_rate": 0.459,
+            "text": "Mock exam with study group",
+            "text_en": "Mock exam with study group",
+            "text_zh": "和小组模拟考试"
+          },
+          {
+            "choice_id": "klausur_countdown.choice_04_keep_procrastinating",
+            "failure_effects": {
+              "energy": -4.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "energy": 5.0,
+              "exam_readiness": -12.0,
+              "stress": -4.0
+            },
+            "success_rate": 1.0,
+            "text": "Keep procrastinating",
+            "text_en": "Keep procrastinating",
+            "text_zh": "继续拖延"
+          }
+        ],
+        "selected_choice_id": "klausur_countdown.choice_02_schedule_office_hours_with_prof/ta"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "5b93a2b348fde240b96b8c4cdf51778671e62597f936fe68b1491e331b9b958c",
+        "event_request_fingerprint": "b06dd7e321d7bfebbd9a33c505fa2382bd8f15a6fae58f044f6f8f07a26507f4",
+        "source_line": 16,
+        "source_record_sha256": "e9ca8485813126c7a64df244ef2b4152647b7d073a70666319039c555c245efa"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": -6,
+        "annual_work_half_days": 3,
+        "career_progress": 12,
+        "exam_readiness": -3,
+        "loneliness": 4,
+        "money": -128,
+        "no_social_streak": 2,
+        "stress": 15,
+        "week": 1
+      },
+      "id": "w16",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 17,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "压力 96。高压会拖累学业和考试，并可能覆盖普通成功结局。",
+            "id": "stress",
+            "score": 96,
+            "suggested_actions": [
+              "take_a_real_break",
+              "therapy",
+              "sleep_recover",
+              "go_running"
+            ],
+            "title": "压力"
+          },
+          {
+            "body": "学业进度 22，备考 31。考试周越近，补掌握度的成本越高。",
+            "id": "academic",
+            "score": 83,
+            "suggested_actions": [
+              "attend_lecture",
+              "problem_set",
+              "office_hour"
+            ],
+            "title": "学业/考试"
+          },
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "apply_howi",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 22,
+        "annual_work_half_days": 33,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 7936,
+        "career_progress": 63,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 20,
+        "exam_readiness": 31,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 43,
+        "loneliness": 85,
+        "money": 57,
+        "no_social_streak": 28,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 0,
+        "stress": 96,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 67,
+        "week": 17,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 28,
+        "annual_work_half_days": 30,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 7936,
+        "career_progress": 51,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 20,
+        "exam_readiness": 34,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 43,
+        "loneliness": 81,
+        "money": 185,
+        "no_social_streak": 26,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 0,
+        "stress": 81,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 67,
+        "week": 16,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 16
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "write_hausarbeit",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "international_office",
+        "emergency_international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "mini_job_extra",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "take_a_real_break",
+        "bilibili_rest",
+        "cv_workshop",
+        "apply_howi"
+      ],
+      "decision": {
+        "confidence": 0.95,
+        "expected_tradeoff": "Prioritize immediate stress reduction to prevent burnout and compliance failure, accepting short-term academic delay to preserve long-term viability.",
+        "risk_awareness": [
+          "stress_critical",
+          "academic_decay",
+          "visa_progress_maintenance"
+        ],
+        "strategic_goal": "Prioritize immediate stress reduction to prevent burnout and compliance failure, accepting short-term academic delay to preserve long-term viability."
+      },
+      "delta": {
+        "academic_progress": -3,
+        "career_progress": 4,
+        "energy": 23,
+        "exam_readiness": -2,
+        "language": 4,
+        "loneliness": 4,
+        "money": 105,
+        "stress": -18,
+        "visa_progress": 4
+      },
+      "event": {
+        "id": "illegal_cash_job_offer",
+        "legal_choices": [
+          {
+            "choice_id": "illegal_cash_job_offer.choice_01_refuse_and_find_a_legal_minijob",
+            "failure_effects": {
+              "career_progress": -1.0,
+              "stress": 2.0,
+              "visa_progress": -1.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "career_progress": 4.0,
+              "stress": 3.0,
+              "visa_progress": 2.0
+            },
+            "success_rate": 1.0,
+            "text": "Refuse and find a legal Minijob",
+            "text_en": "Refuse and find a legal Minijob",
+            "text_zh": "拒绝并找合法 Minijob"
+          },
+          {
+            "choice_id": "illegal_cash_job_offer.choice_02_take_the_illegal_job_to_boost_cash_flow",
+            "failure_effects": {
+              "energy": -24.0,
+              "illegal_work_hours": 10.0,
+              "stress": 18.0,
+              "visa_progress": -6.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "illegal_work_taken",
+            "success_effects": {
+              "academic_progress": -6.0,
+              "energy": -30.0,
+              "hunger": -8.0,
+              "illegal_work_hours": 30.0,
+              "stress": 14.0
+            },
+            "success_rate": 0.542628571428571,
+            "text": "Take the illegal job to boost cash flow",
+            "text_en": "Take the illegal job to boost cash flow",
+            "text_zh": "接下黑工补现金流"
+          },
+          {
+            "choice_id": "illegal_cash_job_offer.choice_03_ask_the_university_for_legal_advice_first",
+            "failure_effects": {
+              "stress": 5.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "career_progress": 3.0,
+              "language": 2.0,
+              "stress": -1.0
+            },
+            "success_rate": 0.9,
+            "text": "Ask the university for legal advice first",
+            "text_en": "Ask the university for legal advice first",
+            "text_zh": "先问学校法律建议"
+          },
+          {
+            "choice_id": "illegal_cash_job_offer.choice_04_borrow_money_from_parents_for_this_month",
+            "failure_effects": {
+              "loneliness": 2.0,
+              "money": -35.0,
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "loneliness": -2.0,
+              "money": 240.0,
+              "stress": 7.0
+            },
+            "success_rate": 1.0,
+            "text": "Borrow money from parents for this month",
+            "text_en": "Borrow money from parents for this month",
+            "text_zh": "向父母借过这个月"
+          }
+        ],
+        "selected_choice_id": "illegal_cash_job_offer.choice_01_refuse_and_find_a_legal_minijob"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "a52c84504ba5745f8167795df5ac4f8db68ce294b95e83b6b12b70516bb97182",
+        "event_request_fingerprint": "ca7a85be2dcd9e4643149f4ce04f11ab9812a2eebb48c54266707c5b357c0230",
+        "source_line": 17,
+        "source_record_sha256": "db234ead4c0501fa1e5970990903bca96786760d7b0681331e675887fc192274"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": -3,
+        "blocked_account_balance": -992,
+        "career_progress": 4,
+        "energy": 23,
+        "exam_readiness": -2,
+        "language": 4,
+        "loneliness": 4,
+        "money": 105,
+        "no_social_streak": 2,
+        "stress": -18,
+        "visa_progress": 4,
+        "week": 1
+      },
+      "id": "w17",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 18,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "学业进度 19，备考 29。考试周越近，补掌握度的成本越高。",
+            "id": "academic",
+            "score": 86,
+            "suggested_actions": [
+              "attend_lecture",
+              "problem_set",
+              "office_hour"
+            ],
+            "title": "学业/考试"
+          },
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          },
+          {
+            "body": "压力 78。高压会拖累学业和考试，并可能覆盖普通成功结局。",
+            "id": "stress",
+            "score": 78,
+            "suggested_actions": [
+              "take_a_real_break",
+              "therapy",
+              "sleep_recover",
+              "go_running"
+            ],
+            "title": "压力"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "take_a_real_break",
+        "go_running",
+        "cook_at_home",
+        "write_email_practice"
+      ],
+      "state_after": {
+        "academic_progress": 19,
+        "annual_work_half_days": 33,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 6944,
+        "career_progress": 67,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 43,
+        "exam_readiness": 29,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 47,
+        "loneliness": 89,
+        "money": 162,
+        "no_social_streak": 30,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 0,
+        "stress": 78,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 71,
+        "week": 18,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 22,
+        "annual_work_half_days": 33,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 7936,
+        "career_progress": 63,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 20,
+        "exam_readiness": 31,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 43,
+        "loneliness": 85,
+        "money": 57,
+        "no_social_streak": 28,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 0,
+        "stress": 96,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 67,
+        "week": 17,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 17
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "write_hausarbeit",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "international_office",
+        "emergency_international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "mini_job_extra",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "take_a_real_break",
+        "therapy",
+        "bilibili_rest",
+        "cv_workshop",
+        "apply_howi"
+      ],
+      "decision": {
+        "confidence": 0.9,
+        "expected_tradeoff": "Secure cash and career progress while maintaining legal compliance; manage stress via running.",
+        "risk_awareness": [
+          "stress_increase",
+          "academic_delay"
+        ],
+        "strategic_goal": "Secure cash and career progress while maintaining legal compliance; manage stress via running."
+      },
+      "delta": {
+        "academic_progress": -6,
+        "career_progress": 12,
+        "energy": -23,
+        "exam_readiness": -3,
+        "loneliness": 4,
+        "money": -128,
+        "stress": 13
+      },
+      "event": {
+        "id": "exam_week",
+        "legal_choices": [
+          {
+            "choice_id": "exam_week.choice_01_do_the_questions_you_know_first",
+            "failure_effects": {
+              "exam_readiness": -3.0,
+              "stress": 8.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "exam_readiness": 0.004,
+              "stress": -0.002
+            },
+            "set_flag": "",
+            "success_effects": {
+              "exam_readiness": 5.0,
+              "stress": 4.0
+            },
+            "success_rate": 0.488,
+            "text": "Do the questions you know first",
+            "text_en": "Do the questions you know first",
+            "text_zh": "先做会的题"
+          },
+          {
+            "choice_id": "exam_week.choice_02_translate_the_questions_literally",
+            "failure_effects": {
+              "exam_readiness": -4.0,
+              "stress": 12.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "language": 0.004,
+              "stress": -0.002
+            },
+            "set_flag": "",
+            "success_effects": {
+              "exam_readiness": 2.0,
+              "language": 3.0,
+              "stress": 7.0
+            },
+            "success_rate": 0.489,
+            "text": "Translate the questions literally",
+            "text_en": "Translate the questions literally",
+            "text_zh": "硬翻译题目"
+          },
+          {
+            "choice_id": "exam_week.choice_03_scan_the_whole_paper_to_allocate_time",
+            "failure_effects": {
+              "stress": 7.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "exam_readiness": 0.005
+            },
+            "set_flag": "",
+            "success_effects": {
+              "exam_readiness": 7.0,
+              "stress": 2.0
+            },
+            "success_rate": 0.448,
+            "text": "Scan the whole paper to allocate time",
+            "text_en": "Scan the whole paper to allocate time",
+            "text_zh": "先扫整张卷子分配时间"
+          },
+          {
+            "choice_id": "exam_week.choice_04_stare_at_the_first_question_and_stall",
+            "failure_effects": {
+              "exam_readiness": -8.0,
+              "stress": 14.0
+            },
+            "next_event_id": "",
+            "requirements": {
+              "stress": -0.002
+            },
+            "set_flag": "",
+            "success_effects": {
+              "exam_readiness": -5.0,
+              "stress": 10.0
+            },
+            "success_rate": 0.148,
+            "text": "Stare at the first question and stall",
+            "text_en": "Stare at the first question and stall",
+            "text_zh": "盯着第一题死磕"
+          }
+        ],
+        "selected_choice_id": "exam_week.choice_03_scan_the_whole_paper_to_allocate_time"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "79fbb56de72f6406404cc06291cf0f7287cf3fbad0071f0b7355689db1cc56a7",
+        "event_request_fingerprint": "6173d266446349d638c7bc9809118783db9277b1334fd57f02dfbb98b21dd601",
+        "source_line": 18,
+        "source_record_sha256": "71f054476e74279d9ffb9284831f773ecd8969a6484977f5c6539350eef3606a"
+      },
+      "finished": false,
+      "full_numeric_delta": {
+        "academic_progress": -6,
+        "annual_work_half_days": 3,
+        "career_progress": 12,
+        "energy": -23,
+        "exam_readiness": -3,
+        "loneliness": 4,
+        "money": -128,
+        "no_social_streak": 2,
+        "stress": 13,
+        "week": 1
+      },
+      "id": "w18",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 19,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "学业进度 13，备考 26。考试周越近，补掌握度的成本越高。",
+            "id": "academic",
+            "score": 92,
+            "suggested_actions": [
+              "attend_lecture",
+              "problem_set",
+              "office_hour"
+            ],
+            "title": "学业/考试"
+          },
+          {
+            "body": "压力 91。高压会拖累学业和考试，并可能覆盖普通成功结局。",
+            "id": "stress",
+            "score": 91,
+            "suggested_actions": [
+              "take_a_real_break",
+              "therapy",
+              "sleep_recover",
+              "go_running"
+            ],
+            "title": "压力"
+          },
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "part_time_job",
+        "cook_at_home",
+        "apply_howi",
+        "go_running"
+      ],
+      "state_after": {
+        "academic_progress": 13,
+        "annual_work_half_days": 36,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 6944,
+        "career_progress": 79,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 20,
+        "exam_readiness": 26,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 47,
+        "loneliness": 93,
+        "money": 34,
+        "no_social_streak": 32,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 0,
+        "stress": 91,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 71,
+        "week": 19,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 19,
+        "annual_work_half_days": 33,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 6944,
+        "career_progress": 67,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 43,
+        "exam_readiness": 29,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 47,
+        "loneliness": 89,
+        "money": 162,
+        "no_social_streak": 30,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 0,
+        "stress": 78,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 71,
+        "week": 18,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 18
+    },
+    {
+      "anomalies": [],
+      "attractors": [],
+      "available_action_ids": [
+        "attend_lecture",
+        "problem_set",
+        "group_project",
+        "library_day",
+        "office_hour",
+        "write_hausarbeit",
+        "language_tandem",
+        "write_email_practice",
+        "watch_german_news",
+        "international_office",
+        "emergency_international_office",
+        "write_formal_email_to_abh",
+        "part_time_job",
+        "mini_job_extra",
+        "scholarship",
+        "budget_call",
+        "sell_unused_stuff",
+        "rent_talk_extension",
+        "cook_at_home",
+        "student_club",
+        "date_night",
+        "sleep_recover",
+        "go_running",
+        "take_a_real_break",
+        "bilibili_rest",
+        "cv_workshop",
+        "apply_howi"
+      ],
+      "decision": {
+        "confidence": 0.95,
+        "expected_tradeoff": "Prioritize stress reduction to prevent burnout and compliance failure; accept academic delay to preserve long-term viability.",
+        "risk_awareness": [
+          "stress_critical",
+          "academic_delay_inevitable"
+        ],
+        "strategic_goal": "Prioritize stress reduction to prevent burnout and compliance failure; accept academic delay to preserve long-term viability."
+      },
+      "delta": {
+        "academic_progress": 2,
+        "career_progress": 3,
+        "energy": 19,
+        "exam_readiness": -7,
+        "loneliness": 4,
+        "money": -34,
+        "stress": -9
+      },
+      "event": {
+        "id": "after_exam_void",
+        "legal_choices": [
+          {
+            "choice_id": "after_exam_void.choice_01_rest_for_half_a_day",
+            "failure_effects": {
+              "energy": -4.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "energy": 12.0,
+              "stress": -10.0
+            },
+            "success_rate": 1.0,
+            "text": "Rest for half a day",
+            "text_en": "Rest for half a day",
+            "text_zh": "休息半天"
+          },
+          {
+            "choice_id": "after_exam_void.choice_02_review_immediately",
+            "failure_effects": {
+              "academic_progress": -1.0,
+              "stress": 2.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": 3.0,
+              "stress": 3.0
+            },
+            "success_rate": 1.0,
+            "text": "Review immediately",
+            "text_en": "Review immediately",
+            "text_zh": "立刻复盘"
+          },
+          {
+            "choice_id": "after_exam_void.choice_03_play_it_safe",
+            "failure_effects": {
+              "academic_progress": 1.0,
+              "stress": 4.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": 3.0,
+              "stress": 1.0
+            },
+            "success_rate": 0.483,
+            "text": "Play it safe",
+            "text_en": "Play it safe",
+            "text_zh": "稳妥处理"
+          },
+          {
+            "choice_id": "after_exam_void.choice_04_seek_help",
+            "failure_effects": {
+              "social": -1.0,
+              "stress": 3.0
+            },
+            "next_event_id": "",
+            "requirements": {},
+            "set_flag": "",
+            "success_effects": {
+              "academic_progress": 2.0,
+              "social": 2.0,
+              "stress": -2.0
+            },
+            "success_rate": 0.48,
+            "text": "Seek help",
+            "text_en": "Seek help",
+            "text_zh": "寻求帮助"
+          }
+        ],
+        "selected_choice_id": "after_exam_void.choice_01_rest_for_half_a_day"
+      },
+      "evidence": {
+        "decision_request_fingerprint": "1e8f33c12ef000c5f59df295333a03472b18a9bae36572899fe3a9924a8d7dfc",
+        "event_request_fingerprint": "fbf246b0049e0eb734f3d68cdcf5845cc8fccfb6370f79d340254827aaaa39bf",
+        "source_line": 19,
+        "source_record_sha256": "62574bb2567b518ad58eb0cc3a8ef96f33b83d2434cb142a67cfba3dd61e30ca"
+      },
+      "finished": true,
+      "full_numeric_delta": {
+        "academic_progress": 2,
+        "arrears_amount": 233,
+        "career_progress": 3,
+        "cash_shortfall_count": 1,
+        "energy": 19,
+        "exam_readiness": -7,
+        "failed_courses": 1,
+        "loneliness": 4,
+        "money": -34,
+        "no_social_streak": 2,
+        "stress": -9,
+        "week": 1
+      },
+      "id": "w19",
+      "kind": "actual",
+      "risk_guidance": {
+        "contract_version": "1.0",
+        "evaluator": "RiskEvaluator.get_top_risks",
+        "generated_for_week": 20,
+        "source": "game_risk_evaluator",
+        "top_risks": [
+          {
+            "body": "学业进度 15，备考 19。考试周越近，补掌握度的成本越高。",
+            "id": "academic",
+            "score": 90,
+            "suggested_actions": [
+              "attend_lecture",
+              "problem_set",
+              "office_hour"
+            ],
+            "title": "学业/考试"
+          },
+          {
+            "body": "压力 82。高压会拖累学业和考试，并可能覆盖普通成功结局。",
+            "id": "stress",
+            "score": 82,
+            "suggested_actions": [
+              "take_a_real_break",
+              "therapy",
+              "sleep_recover",
+              "go_running"
+            ],
+            "title": "压力"
+          },
+          {
+            "body": "当前 TestDaF 2/2/2/2。没过 4x4 会卡注册并增加语言班成本。",
+            "id": "testdaf",
+            "score": 82,
+            "suggested_actions": [
+              "language_school_germany",
+              "testdaf_exam_germany"
+            ],
+            "title": "TestDaF 4x4"
+          }
+        ]
+      },
+      "selected_action_ids": [
+        "take_a_real_break",
+        "go_running",
+        "cook_at_home",
+        "office_hour"
+      ],
+      "state_after": {
+        "academic_progress": 15,
+        "annual_work_half_days": 36,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 233,
+        "blocked_account_balance": 6944,
+        "career_progress": 82,
+        "cash_shortfall_count": 1,
+        "current_week_work_hours": 0,
+        "energy": 39,
+        "exam_readiness": 19,
+        "failed_courses": 1,
+        "flags": {
+          "anna_group": true,
+          "arrears": true,
+          "arrived_supplied": true,
+          "cash_shortfall": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "needs_retake": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 47,
+        "loneliness": 97,
+        "money": 0,
+        "no_social_streak": 34,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 0,
+        "stress": 82,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 71,
+        "week": 20,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "state_before": {
+        "academic_progress": 13,
+        "annual_work_half_days": 36,
+        "aps_knowledge": 40,
+        "aps_score": 0,
+        "arrears_amount": 0,
+        "blocked_account_balance": 6944,
+        "career_progress": 79,
+        "cash_shortfall_count": 0,
+        "current_week_work_hours": 0,
+        "energy": 20,
+        "exam_readiness": 26,
+        "failed_courses": 0,
+        "flags": {
+          "anna_group": true,
+          "arrived_supplied": true,
+          "cheap_room_hint": true,
+          "exam_registered": true,
+          "housing_contract_active": true,
+          "school_registered": true,
+          "shallow_friendships": true,
+          "visa_valid": true,
+          "work_law_briefed": true
+        },
+        "gpa_score": 80,
+        "hunger": 12,
+        "language": 47,
+        "loneliness": 93,
+        "money": 34,
+        "no_social_streak": 32,
+        "parent_pressure": 32,
+        "reciprocity_debt": 0,
+        "social": 0,
+        "stress": 91,
+        "testdaf_listening": 2,
+        "testdaf_reading": 2,
+        "testdaf_speaking": 2,
+        "testdaf_writing": 2,
+        "university_tier": "未定位",
+        "unpaid_social_streak": 0,
+        "visa_progress": 71,
+        "week": 19,
+        "weekly_free_social_actions": 0,
+        "weekly_paid_social_actions": 0
+      },
+      "week": 19
+    }
+  ],
+  "persona": "money",
+  "provider": "vllm",
+  "provider_mode": "local",
+  "provider_revision": "model:qwen3.6-27b-nvfp4",
+  "scenario": "default_first_semester",
+  "schema_version": "playthrough-view-v1",
+  "seed": 56,
+  "source_trace": {
+    "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/money-seed-56-b70cd52791ba/playthrough.jsonl",
+    "artifact_sha256": "dc8341a349ec9ad8be8437a0517ebc8a00db5d5bd884a345d64c4f82dbb8bd5d",
+    "record_count": 19
+  },
+  "stop_reason": "game_finished",
+  "truth_label": "local-vllm-real-godot"
+}

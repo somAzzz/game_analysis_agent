@@ -7,6 +7,7 @@ import {
   fetchJudgeExperiments,
   fetchJudgeProviderStatus,
   fetchStaticJudgeExperiment,
+  fetchStaticJudgeExperiments,
   testJudgeProvider,
   submitHumanReview,
 } from "@/lib/api";
@@ -45,24 +46,6 @@ function errorMessage(error: unknown): string {
   return remediation ? `${error.message} ${remediation}` : error.message;
 }
 
-function summaryFromExperiment(value: JudgeExperiment): JudgeExperimentSummary {
-  return {
-    schema_version: "judge-experiment-summary-v1",
-    experiment_id: value.experiment_id,
-    title: value.title,
-    source_kind: value.source_kind,
-    source_label: value.source_label,
-    provider: value.provider,
-    provider_mode: value.provider_mode,
-    model: value.model,
-    lifecycle_status: value.lifecycle_status,
-    campaign_id: value.campaign_id,
-    campaign: value.campaign,
-    campaign_bundle_path: value.campaign_bundle_path,
-    repair_bundle_path: value.repair_bundle_path,
-    completed_at: value.completed_at,
-  };
-}
 
 function ExperimentSelector({ experiments, selected, disabled, onChange }: { experiments: JudgeExperimentSummary[]; selected: JudgeExperiment; disabled: boolean; onChange: (id: string) => void }) {
   return (
@@ -129,12 +112,15 @@ export function JudgePage() {
         return;
       }
       try {
-        const frozen = await fetchStaticJudgeExperiment();
+        const [staticIndex, frozen] = await Promise.all([
+          fetchStaticJudgeExperiments(),
+          fetchStaticJudgeExperiment(),
+        ]);
         if (!active) return;
         applyExperiment(frozen);
-        setExperiments([summaryFromExperiment(frozen)]);
+        setExperiments(staticIndex.experiments);
         setSource("static");
-        setActivity("Static evaluator mode: signed prerecorded evidence is available without a server.");
+        setActivity("Static evaluator mode: signed and local A/B proof evidence is available without a server.");
       } catch (error) {
         if (active) setActivity("Evidence unavailable: " + errorMessage(error));
       }
@@ -154,11 +140,13 @@ export function JudgePage() {
   }
 
   async function handleExperimentChange(experimentId: string): Promise<void> {
-    if (source === "static" || experimentId === experiment?.experiment_id) return;
+    if (experimentId === experiment?.experiment_id) return;
     setExperimentLoading(true);
     setActivity("Verifying " + experimentId + "…");
     try {
-      const next = await fetchJudgeExperiment(experimentId);
+      const next = source === "static"
+        ? await fetchStaticJudgeExperiment(experimentId)
+        : await fetchJudgeExperiment(experimentId);
       applyExperiment(next);
       setActivity(next.source_label + " evidence verified. " + (next.lifecycle_status === "proof_complete" ? "Repair proof is complete." : "Campaign is complete; repair proof has not run."));
     } catch (error) {
@@ -309,7 +297,7 @@ export function JudgePage() {
         </section>
         <JudgeMissionExperience />
         <main className="judge-ledger">
-        <ExperimentSelector experiments={experiments} selected={experiment} disabled={experimentLoading || source === "static"} onChange={(id) => { void handleExperimentChange(id); }} />
+        <ExperimentSelector experiments={experiments} selected={experiment} disabled={experimentLoading} onChange={(id) => { void handleExperimentChange(id); }} />
           <section className="judge-stage" aria-labelledby="campaign-title">
             <div className="judge-stage-marker"><span>01</span><b>CAMPAIGN</b></div>
             <div className="judge-stage-body">
@@ -377,7 +365,7 @@ export function JudgePage() {
       <JudgeMissionExperience />
 
       <main className="judge-ledger">
-        <ExperimentSelector experiments={experiments} selected={experiment} disabled={experimentLoading || source === "static"} onChange={(id) => { void handleExperimentChange(id); }} />
+        <ExperimentSelector experiments={experiments} selected={experiment} disabled={experimentLoading} onChange={(id) => { void handleExperimentChange(id); }} />
         <section className="judge-stage" aria-labelledby="campaign-title">
           <div className="judge-stage-marker"><span>01</span><b>CAMPAIGN</b></div>
           <div className="judge-stage-body">
@@ -468,7 +456,7 @@ export function JudgePage() {
         <section className="judge-stage" aria-labelledby="proof-title">
           <div className="judge-stage-marker"><span>03</span><b>PROOF</b></div>
           <div className="judge-stage-body">
-            <p className="judge-eyebrow">Fixed seeds + unseen holdout</p>
+            <p className="judge-eyebrow">Fixed seeds + unseen holdout · {baselineFixed.decision_policy}</p>
             <h2 id="proof-title">{experiment.decision === "accepted" ? "Fixed and holdout gates accepted the repair." : "The bounded repair did not clear every gate."}</h2>
             <div className="judge-comparison">
               <CohortPair label="Fixed cohort" baseline={baselineFixed} patched={patchedFixed} reduction={experiment.comparison.fixed_relative_reduction} />

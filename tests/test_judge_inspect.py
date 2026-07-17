@@ -134,22 +134,9 @@ def test_committed_judge_manifest_passes_dependency_free_inspect() -> None:
 
     assert result.returncode == 0
     assert payload["status"] == "passed"
-    marker = json.loads(
-        (ROOT / "demo/study-in-germany/.playtest-forge-source.json").read_text(encoding="utf-8")
-    )
-    playthrough_artifacts = 3 + len(
-        list((ROOT / "examples/build_week_2026/playthrough-v1/cells").glob("*.json"))
-    )
-    runtime_overlay_artifacts = 2 + sum(
-        path.is_file() for path in (ROOT / "game-overlays/study-in-germany").rglob("*")
-    )
-    session_orchestration_artifacts = 5
-    assert len(payload["artifacts"]) == (
-        42
-        + marker["file_count"]
-        + 1
-        + playthrough_artifacts
-        + runtime_overlay_artifacts
-        + session_orchestration_artifacts
-    )
+    manifest = json.loads((ROOT / "judge-manifest.json").read_text(encoding="utf-8"))
+    assert len(payload["artifacts"]) == len(manifest["artifacts"])
+    roles = [item["role"] for item in payload["artifacts"]]
+    assert roles.count("local-vllm-experiment-evidence") >= 38
+    assert roles.count("local-vllm-playthrough-evidence") >= 400
     assert payload["checks"][2]["detail"] == ("7 public claims resolved to exact JSON values")

@@ -249,6 +249,7 @@ export interface JudgeCampaignJob {
 
 export interface JudgeCohort {
   cohort: "baseline_fixed" | "patched_fixed" | "baseline_holdout" | "patched_holdout";
+  decision_policy: string;
   game_commit: string;
   seeds: number[];
   cells: number;

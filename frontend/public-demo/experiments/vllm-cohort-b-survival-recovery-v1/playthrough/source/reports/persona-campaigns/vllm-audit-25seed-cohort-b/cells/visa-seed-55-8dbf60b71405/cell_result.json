@@ -1,0 +1,235 @@
+{
+  "artifacts": [
+    {
+      "media_type": "application/x-ndjson",
+      "path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "record_count": 19,
+      "sha256": "3b30b9e5c0d4e4dec2bdffdff0f444043dfd94576ffc524beafb5a0aa4ce9725"
+    }
+  ],
+  "citations": [
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 1,
+      "persona": "visa",
+      "record_sha256": "fdd32158029a209bb4fc774af93fcde301d7d6c184679b4a7f31c67d501bc7bc",
+      "seed": 55,
+      "week": 1
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 2,
+      "persona": "visa",
+      "record_sha256": "a0400ff72e7de37e40762c21541410ceecb237d623621fd545382fdf8a64c384",
+      "seed": 55,
+      "week": 2
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 3,
+      "persona": "visa",
+      "record_sha256": "2c96e5405b6b17f7b0f9863158ef06ab7d9d19e040a82c78687be03eecd1c9f2",
+      "seed": 55,
+      "week": 3
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 4,
+      "persona": "visa",
+      "record_sha256": "9c1db6666db8bfaded5aa4b52160ac9f8bdef7eb0e37a988571698b7cd377f0f",
+      "seed": 55,
+      "week": 4
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 5,
+      "persona": "visa",
+      "record_sha256": "3e1dbfd3e85589d4eea023dd98b1fceb4525f037d021526434208c255887bb8d",
+      "seed": 55,
+      "week": 5
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 6,
+      "persona": "visa",
+      "record_sha256": "9e5e8a4aae69b44fd84cbf931eb076ee023ae5bd84f246c57e2fe32364b3d4e9",
+      "seed": 55,
+      "week": 6
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 7,
+      "persona": "visa",
+      "record_sha256": "43ad5801e3448b43bfbb5c13164b964e714dc9b09dcc8131de0dd48b9ffb7ad8",
+      "seed": 55,
+      "week": 7
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 8,
+      "persona": "visa",
+      "record_sha256": "45304e8ab7ffe50f209a8a04dc415255c51742ced38bec079b871ff2331a356f",
+      "seed": 55,
+      "week": 8
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 9,
+      "persona": "visa",
+      "record_sha256": "963e849b3095da3327554e501cf7cb275fc67ff46f817786c78c98984e9af1c5",
+      "seed": 55,
+      "week": 9
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 10,
+      "persona": "visa",
+      "record_sha256": "837d37f60c145eca9212e0eddd5e0c4b57e367abb53116dca09ba533bb084455",
+      "seed": 55,
+      "week": 10
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 11,
+      "persona": "visa",
+      "record_sha256": "9b6d4f72ec2f7a4b08525b170dd0d28d7f18fa8b6df13f196f08cf1601a9bc07",
+      "seed": 55,
+      "week": 11
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 12,
+      "persona": "visa",
+      "record_sha256": "debfd15b4b3e117c337d9dae5b6d936a30e45ff1b7dd9651a578d84505c227a0",
+      "seed": 55,
+      "week": 12
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 13,
+      "persona": "visa",
+      "record_sha256": "7cc7d9a4998562068c142dc3ce25bdc28d6d04adc1633297c232ab9c42e07764",
+      "seed": 55,
+      "week": 13
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 14,
+      "persona": "visa",
+      "record_sha256": "b69427dce6e511204cff7cc990c0bef74a2df26063ad8a61df819044f96756b9",
+      "seed": 55,
+      "week": 14
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 15,
+      "persona": "visa",
+      "record_sha256": "ecebb086611b475581b5ade0aa927c60dfa09bf6e620c180f1e9b709fade1f86",
+      "seed": 55,
+      "week": 15
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 16,
+      "persona": "visa",
+      "record_sha256": "6328b3c9ffa0d10e92e1a606e4c48dd0fbfdb7a1cc50480922313dde2222be2d",
+      "seed": 55,
+      "week": 16
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 17,
+      "persona": "visa",
+      "record_sha256": "0e9661a156e618268583a3f9adb9661d0fdfe8bd72bf32a58b79238aec5c52cb",
+      "seed": 55,
+      "week": 17
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 18,
+      "persona": "visa",
+      "record_sha256": "17df59d35da4f35b621edfb5ee6aa7360f3d105db564e88067462c404701a717",
+      "seed": 55,
+      "week": 18
+    },
+    {
+      "artifact_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405/playthrough.jsonl",
+      "campaign_id": "vllm-audit-25seed-cohort-b",
+      "cell_id": "visa-seed-55-8dbf60b71405",
+      "line_number": 19,
+      "persona": "visa",
+      "record_sha256": "1265920c78ba7c24af5b09ccec26f9cc80459be272cf6761976dccee71838dab",
+      "seed": 55,
+      "week": 19
+    }
+  ],
+  "completed_at": "2026-07-17T17:36:29.743965Z",
+  "completed_weeks": 19,
+  "error": "",
+  "request": {
+    "campaign_fingerprint": "d999b53c9d6ab15b43eeea7acfe58d3e1150a98327e831b8773cee9a9c3a28fc",
+    "campaign_id": "vllm-audit-25seed-cohort-b",
+    "cell_id": "visa-seed-55-8dbf60b71405",
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "output_dir": "reports/persona-campaigns/vllm-audit-25seed-cohort-b/cells/visa-seed-55-8dbf60b71405",
+    "persona": "visa",
+    "provider": "vllm",
+    "scenario": "default_first_semester",
+    "seed": 55
+  },
+  "request_fingerprint": "216bde7356e2ac62b5ce6bac21fed411495591000707f238d0a13c0cb5e97a9d",
+  "schema_version": "persona-campaign-cell-result-v1",
+  "source": {
+    "agent_commit": "cb142f99b4e24470fe2aa028233aa78212393429",
+    "agent_dirty": false,
+    "agent_tree": "6f86561b59348a60ddf6ce92d79cae91de1e9d87",
+    "campaign_config_sha256": "d999b53c9d6ab15b43eeea7acfe58d3e1150a98327e831b8773cee9a9c3a28fc",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "vllm",
+    "provider_mode": "local",
+    "provider_revision": "model:qwen3.6-27b-nvfp4"
+  },
+  "source_fingerprint": "c4fc40a6582a6bc3dac4771c512b4a80c4371324ef3a019306e5d7e999c9aa06",
+  "started_at": "2026-07-17T17:33:39.947267Z",
+  "state": "completed",
+  "stop_reason": "game_finished"
+}

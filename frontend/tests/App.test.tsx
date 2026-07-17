@@ -20,6 +20,7 @@ const apiMocks = vi.hoisted(() => ({
   fetchJudgeProviderStatus: vi.fn(),
   fetchJudgeExperiments: vi.fn(),
   fetchJudgeExperiment: vi.fn(),
+  fetchStaticJudgeExperiments: vi.fn(),
   fetchStaticJudgeExperiment: vi.fn(),
   testJudgeProvider: vi.fn(),
   createJudgeCampaign: vi.fn(),
@@ -213,6 +214,7 @@ const experiment: JudgeExperiment = {
     ["baseline_fixed", 0], ["patched_fixed", 18], ["baseline_holdout", 0], ["patched_holdout", 61],
   ].map(([name, money]) => ({
     cohort: name as "baseline_fixed", game_commit: "a".repeat(40), seeds: [42, 43, 44], cells: 18,
+    decision_policy: "fixture-authoring-policy-v1",
     weeks: 342, target_members: 18, target_personas: 6, mean_final_money: money as number,
     mean_max_stress: 100, valid_rate: 1, fallback_rate: 0, provider_error_rate: 0,
     persona_alignment_rate: .5, ending_counts: { cashflow_collapse: 18 },
@@ -290,6 +292,7 @@ describe("application routes", () => {
     apiMocks.fetchJudgeProviderStatus.mockResolvedValue(providerStatus);
     apiMocks.fetchJudgeExperiments.mockResolvedValue(experimentIndex);
     apiMocks.fetchJudgeExperiment.mockResolvedValue(experiment);
+    apiMocks.fetchStaticJudgeExperiments.mockResolvedValue(experimentIndex);
     apiMocks.fetchStaticJudgeExperiment.mockResolvedValue(experiment);
   });
 
@@ -335,6 +338,24 @@ describe("application routes", () => {
     expect(await screen.findByRole("heading", { name: "Cohort A local campaign" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "No bounded repair has been published." })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Fixed and unseen holdout proof has not run." })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Record final decision" })).not.toBeInTheDocument();
+  });
+
+  it("switches frozen A/B evidence when the Judge API is unavailable", async () => {
+    const user = userEvent.setup();
+    apiMocks.fetchJudgeExperiments.mockRejectedValue(new Error("offline"));
+    apiMocks.fetchJudgeExperiment.mockRejectedValue(new Error("offline"));
+    apiMocks.fetchStaticJudgeExperiment.mockImplementation((experimentId?: string) =>
+      Promise.resolve(experimentId === campaignOnlyExperiment.experiment_id ? campaignOnlyExperiment : experiment),
+    );
+    renderRoute("/");
+
+    const selector = await screen.findByRole("combobox", { name: /Evidence set/ });
+    expect(selector).toBeEnabled();
+    await user.selectOptions(selector, campaignOnlyExperiment.experiment_id);
+
+    expect(await screen.findByRole("heading", { name: "Cohort A local campaign" })).toBeInTheDocument();
+    expect(apiMocks.fetchStaticJudgeExperiment).toHaveBeenCalledWith(campaignOnlyExperiment.experiment_id);
     expect(screen.queryByRole("button", { name: "Record final decision" })).not.toBeInTheDocument();
   });
 

@@ -1,0 +1,69 @@
+{
+  "schema_version": "build-week-repair-target-v1",
+  "campaign_id": "vllm-audit-25seed-cohort-a",
+  "campaign_request_fingerprint": "9cf036933710be7b0cddc0d3c11b4b3d598c38621ee519a1f04bcc92f08babbb",
+  "campaign_source_fingerprint": "9406c37845e5dbbd61bc620519710dcb0e8aa25f7bb6ec8c80ca9530e663991b",
+  "selected_before_patch": true,
+  "selected_cluster_id": "cashflow-stress-attractor",
+  "label": "Cashflow and stress attractor",
+  "hypothesis": "A single survival-economy pressure mechanism repeatedly pushes distinct player intents into the selected attractor; a constrained change should reduce first entry without erasing designed persona differences.",
+  "member_count": 41,
+  "persona_count": 6,
+  "fixed_seeds": [
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49
+  ],
+  "holdout_seeds": [
+    1042,
+    1043,
+    1044
+  ],
+  "evidence_bundle": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/public",
+  "rubric": {
+    "reproducible": true,
+    "cross_persona": true,
+    "causally_plausible": true,
+    "user_relevant": true,
+    "one_mechanism_repairable": true,
+    "invariant_safe_candidate": true,
+    "visually_explainable": true
+  },
+  "evidence": [
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "money-seed-48-4d815424010f",
+      "persona": "money",
+      "seed": 48,
+      "week": 18,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 436,
+      "record_sha256": "7c0a0bf8d1e5f9806fe5078788d9e1b7da5a4a070fde21e5625fa7d02ade76a9"
+    },
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "newbie-seed-42-58fbd1f01c4a",
+      "persona": "newbie",
+      "seed": 42,
+      "week": 6,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 6,
+      "record_sha256": "a64e787b148505eecff79af1f90b920724c7b9382f9a78bcb6c2c8d9cf1d3fd0"
+    },
+    {
+      "campaign_id": "vllm-audit-25seed-cohort-a",
+      "cell_id": "slacker-seed-42-e2cfa2477f47",
+      "persona": "slacker",
+      "seed": 42,
+      "week": 10,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 770,
+      "record_sha256": "2acc789cec3964c8e23a2fcc62f393127f69c8973764f94eb71b7dcce18f5c8b"
+    }
+  ]
+}
