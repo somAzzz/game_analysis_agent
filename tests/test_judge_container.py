@@ -25,6 +25,7 @@ def test_judge_dockerfile_pins_multiarch_base_and_runs_unprivileged() -> None:
         "COPY .agents/ ./.agents/",
         "COPY demo/ ./demo/",
         "COPY scripts/tools/ ./scripts/tools/",
+        "COPY game-overlays/ ./game-overlays/",
         "fixtures/",
         "examples/build_week_2026/",
     ):

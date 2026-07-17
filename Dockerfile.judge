@@ -26,6 +26,7 @@ COPY .agents/ ./.agents/
 COPY src/ ./src/
 COPY tools/ ./tools/
 COPY scripts/tools/ ./scripts/tools/
+COPY game-overlays/ ./game-overlays/
 COPY config/ ./config/
 COPY demo/ ./demo/
 COPY fixtures/ ./fixtures/
