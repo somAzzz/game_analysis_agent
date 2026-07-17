@@ -46,4 +46,4 @@ def test_codex_skill_is_auto_discoverable_and_has_a_direct_read_fallback() -> No
     skill_artifacts = {
         item["path"] for item in manifest["artifacts"] if item["role"].startswith("codex-skill")
     }
-    assert len(skill_artifacts) == 17
+    assert len(skill_artifacts) == 19

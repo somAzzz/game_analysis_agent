@@ -11,44 +11,133 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 ARTIFACTS = {
-    "config/build_week_2026_expected_demo_findings.json": ("expected-demo-findings", "build-week-expected-demo-findings-v1"),
+    "config/build_week_2026_expected_demo_findings.json": (
+        "expected-demo-findings",
+        "build-week-expected-demo-findings-v1",
+    ),
     "config/build_week_2026_game_pin.json": ("embedded-demo-pin", "build-week-game-pin-v1"),
     "config/build_week_2026_replay.json": ("replay-smoke-manifest", "persona-replay-manifest-v1"),
     "fixtures/persona_replay/smoke_v1.json": ("replay-smoke-fixture", "persona-replay-fixture-v1"),
-    "config/build_week_2026_full_replay.json": ("replay-campaign-manifest", "persona-replay-manifest-v1"),
-    "fixtures/persona_replay/build_week_2026_full_v1.json": ("replay-campaign-fixture", "persona-replay-fixture-v1"),
-    "examples/build_week_2026/campaign-v1/campaign_manifest.json": ("campaign", "persona-campaign-manifest-v1"),
-    "examples/build_week_2026/campaign-v1/campaign_summary.json": ("campaign", "campaign-aggregation-v1"),
+    "config/build_week_2026_full_replay.json": (
+        "replay-campaign-manifest",
+        "persona-replay-manifest-v1",
+    ),
+    "fixtures/persona_replay/build_week_2026_full_v1.json": (
+        "replay-campaign-fixture",
+        "persona-replay-fixture-v1",
+    ),
+    "examples/build_week_2026/campaign-v1/campaign_manifest.json": (
+        "campaign",
+        "persona-campaign-manifest-v1",
+    ),
+    "examples/build_week_2026/campaign-v1/campaign_summary.json": (
+        "campaign",
+        "campaign-aggregation-v1",
+    ),
     "examples/build_week_2026/campaign-v1/persona_runs.jsonl": ("campaign-rows", None),
     "examples/build_week_2026/campaign-v1/agent_eval.jsonl": ("campaign-evaluation", None),
     "examples/build_week_2026/campaign-v1/llm_calls.jsonl": ("replay-calls", None),
-    "examples/build_week_2026/campaign-v1/failure_clusters.json": ("campaign-clusters", "public-failure-clusters-v1"),
-    "examples/build_week_2026/campaign-v1/gate_report.json": ("campaign-gate", "campaign-bundle-gate-v1"),
-    "examples/build_week_2026/experiment-v1/repair_experiment.json": ("repair-record", "repair-experiment-record-v1"),
+    "examples/build_week_2026/campaign-v1/failure_clusters.json": (
+        "campaign-clusters",
+        "public-failure-clusters-v1",
+    ),
+    "examples/build_week_2026/campaign-v1/gate_report.json": (
+        "campaign-gate",
+        "campaign-bundle-gate-v1",
+    ),
+    "examples/build_week_2026/experiment-v1/repair_experiment.json": (
+        "repair-record",
+        "repair-experiment-record-v1",
+    ),
     "examples/build_week_2026/experiment-v1/repair_summary.md": ("repair-summary", None),
     "examples/build_week_2026/experiment-v1/comparison.json": ("repair-comparison", None),
     "examples/build_week_2026/experiment-v1/patch.diff": ("candidate-patch", None),
-    "examples/build_week_2026/experiment-v1/baseline/fixed.json": ("baseline-fixed", "repair-cohort-evidence-v1"),
-    "examples/build_week_2026/experiment-v1/baseline/holdout.json": ("baseline-holdout", "repair-cohort-evidence-v1"),
-    "examples/build_week_2026/experiment-v1/patched/fixed.json": ("patched-fixed", "repair-cohort-evidence-v1"),
-    "examples/build_week_2026/experiment-v1/patched/holdout.json": ("patched-holdout", "repair-cohort-evidence-v1"),
-    "examples/build_week_2026/experiment-v1/gate_report.json": ("repair-gate", "repair-bundle-gate-v1"),
-    "docs/reviews/openai_build_week_2026/G2-campaign.review.json": ("independent-campaign-review", "build-week-g2-review-v1"),
-    "docs/reviews/openai_build_week_2026/G3-repair.review.json": ("independent-repair-review", "build-week-g3-review-v1"),
+    "examples/build_week_2026/experiment-v1/baseline/fixed.json": (
+        "baseline-fixed",
+        "repair-cohort-evidence-v1",
+    ),
+    "examples/build_week_2026/experiment-v1/baseline/holdout.json": (
+        "baseline-holdout",
+        "repair-cohort-evidence-v1",
+    ),
+    "examples/build_week_2026/experiment-v1/patched/fixed.json": (
+        "patched-fixed",
+        "repair-cohort-evidence-v1",
+    ),
+    "examples/build_week_2026/experiment-v1/patched/holdout.json": (
+        "patched-holdout",
+        "repair-cohort-evidence-v1",
+    ),
+    "examples/build_week_2026/experiment-v1/gate_report.json": (
+        "repair-gate",
+        "repair-bundle-gate-v1",
+    ),
+    "docs/reviews/openai_build_week_2026/G2-campaign.review.json": (
+        "independent-campaign-review",
+        "build-week-g2-review-v1",
+    ),
+    "docs/reviews/openai_build_week_2026/G3-repair.review.json": (
+        "independent-repair-review",
+        "build-week-g3-review-v1",
+    ),
     ".agents/skills/playtest-forge/SKILL.md": ("codex-skill", None),
     ".agents/skills/playtest-forge/agents/openai.yaml": ("codex-skill-metadata", None),
-    ".agents/skills/playtest-forge/references/automated-testing.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/automated-testing.md": (
+        "codex-skill-reference",
+        None,
+    ),
     ".agents/skills/playtest-forge/references/design-contract.md": ("codex-skill-reference", None),
-    ".agents/skills/playtest-forge/references/evidence-contract.md": ("codex-skill-reference", None),
-    ".agents/skills/playtest-forge/references/evidence-to-parameters.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/evidence-contract.md": (
+        "codex-skill-reference",
+        None,
+    ),
+    ".agents/skills/playtest-forge/references/evidence-to-parameters.md": (
+        "codex-skill-reference",
+        None,
+    ),
     ".agents/skills/playtest-forge/references/migration-guide.md": ("codex-skill-reference", None),
     ".agents/skills/playtest-forge/references/repair-protocol.md": ("codex-skill-reference", None),
-    ".agents/skills/playtest-forge/references/scenario-balance-economy.md": ("codex-skill-reference", None),
-    ".agents/skills/playtest-forge/references/scenario-boundary-robustness.md": ("codex-skill-reference", None),
-    ".agents/skills/playtest-forge/references/scenario-content-flow.md": ("codex-skill-reference", None),
-    ".agents/skills/playtest-forge/references/session-case-study.md": ("codex-skill-reference", None),
-    ".agents/skills/playtest-forge/references/subagent-playthrough.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/scenario-balance-economy.md": (
+        "codex-skill-reference",
+        None,
+    ),
+    ".agents/skills/playtest-forge/references/scenario-boundary-robustness.md": (
+        "codex-skill-reference",
+        None,
+    ),
+    ".agents/skills/playtest-forge/references/scenario-content-flow.md": (
+        "codex-skill-reference",
+        None,
+    ),
+    ".agents/skills/playtest-forge/references/session-case-study.md": (
+        "codex-skill-reference",
+        None,
+    ),
+    ".agents/skills/playtest-forge/references/subagent-playthrough.md": (
+        "codex-skill-reference",
+        None,
+    ),
     ".agents/skills/playtest-forge/references/test-strategy.md": ("codex-skill-reference", None),
+    ".agents/skills/playtest-forge/references/codex-session-orchestration.md": (
+        "codex-skill-reference",
+        None,
+    ),
+    ".agents/skills/playtest-forge/scripts/session-options": (
+        "codex-skill-script",
+        None,
+    ),
+    "config/playtest_session_profiles.json": (
+        "codex-playtest-profiles",
+        "playtest-session-profiles-v1",
+    ),
+    "src/game_analysis_agent/playtest_session.py": (
+        "codex-playtest-planner",
+        None,
+    ),
+    "tools/describe_playtest_session.py": (
+        "codex-playtest-planner-cli",
+        None,
+    ),
     ".agents/skills/playtest-forge/scripts/preflight": ("codex-skill-script", None),
     ".agents/skills/playtest-forge/scripts/run-campaign": ("codex-skill-script", None),
     ".agents/skills/playtest-forge/scripts/verify-repair": ("codex-skill-script", None),
@@ -58,6 +147,21 @@ ARTIFACTS = {
 for demo_file in sorted((ROOT / "demo/study-in-germany").rglob("*")):
     if demo_file.is_file():
         ARTIFACTS[demo_file.relative_to(ROOT).as_posix()] = ("embedded-demo-source", None)
+
+ARTIFACTS["scripts/tools/RunInteractiveProbe.gd"] = (
+    "embedded-demo-runtime-overlay",
+    None,
+)
+ARTIFACTS["src/game_analysis_agent/build_week_game_pin.py"] = (
+    "embedded-demo-overlay-service",
+    None,
+)
+for overlay_file in sorted((ROOT / "game-overlays/study-in-germany").rglob("*")):
+    if overlay_file.is_file():
+        ARTIFACTS[overlay_file.relative_to(ROOT).as_posix()] = (
+            "embedded-demo-runtime-overlay",
+            None,
+        )
 
 PLAYTHROUGH_ROOT = ROOT / "examples/build_week_2026/playthrough-v1"
 ARTIFACTS["examples/build_week_2026/playthrough-v1/README.md"] = ("playthrough-guide", None)

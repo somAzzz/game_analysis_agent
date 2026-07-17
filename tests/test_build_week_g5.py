@@ -31,7 +31,7 @@ def test_current_submission_fails_closed_on_external_release_blockers() -> None:
     review = review_g5(project_root=ROOT)
 
     assert review["status"] == "failed"
-    assert review["failure_count"] == 7
+    assert review["failure_count"] == 6
     assert set(review["failures"]) == {
         "prior_gates",
         "claim_ledger",
@@ -39,7 +39,6 @@ def test_current_submission_fails_closed_on_external_release_blockers() -> None:
         "manual_comparison",
         "clean_room_review",
         "video_review",
-        "license_privacy_secrets",
     }
 
 
@@ -79,9 +78,7 @@ def test_complete_synthetic_submission_can_pass_all_g5_checks(tmp_path: Path) ->
     image_ref = "ghcr.io/example/playtest-forge-judge"
     digest = "sha256:" + "b" * 64
     current_image = _read(ROOT / "judge-image-metadata.json")
-    current_image_digest = (
-        f"{current_image['reference']}@{current_image['index_digest']}"
-    )
+    current_image_digest = f"{current_image['reference']}@{current_image['index_digest']}"
     devpost_path = tmp_path / "submission/build-week-2026/DEVPOST_DRAFT.md"
     devpost = devpost_path.read_text(encoding="utf-8")
     replacements = {
@@ -146,7 +143,16 @@ def test_complete_synthetic_submission_can_pass_all_g5_checks(tmp_path: Path) ->
             "status": "completed",
             "reviewer_role": "non_builder",
             "elapsed_seconds": 600,
-            "tasks": {name: True for name in ("product", "roles", "first_command", "headline_evidence", "repair_decision")},
+            "tasks": {
+                name: True
+                for name in (
+                    "product",
+                    "roles",
+                    "first_command",
+                    "headline_evidence",
+                    "repair_decision",
+                )
+            },
             "stop_ship_findings": [],
         },
     )

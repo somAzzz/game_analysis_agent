@@ -163,16 +163,16 @@
       "sha256": "0e0f57f8bf7b0b9188f7eac32f4cfaf5b4dc8aefe5ab8dfd1d368cd1816164cf"
     },
     {
-      "bytes": 5702,
+      "bytes": 7819,
       "path": ".agents/skills/playtest-forge/SKILL.md",
       "role": "codex-skill",
-      "sha256": "4eaaf728c05a860150e7930c548c503320e4e92dc35c95eb5af746bb7eb0af6f"
+      "sha256": "1e490e909eea96ee3d94f03022906df4c9fec6afc467fd7d0622689c8090cba8"
     },
     {
-      "bytes": 282,
+      "bytes": 344,
       "path": ".agents/skills/playtest-forge/agents/openai.yaml",
       "role": "codex-skill-metadata",
-      "sha256": "345d487be72fd7d842e0a6321f9410fcfb0872c9986428af8dc9a2f35cc1a7ba"
+      "sha256": "40ac08afcc3b39b7065b2f612d390dd0841e983775983ce6e9a75c67c0cfd307"
     },
     {
       "bytes": 1681,
@@ -187,10 +187,10 @@
       "sha256": "6fab3b7b86b2f9be412e4b6b5e3afaa9c9e14a04a7292b6cffa6f5b431b01d41"
     },
     {
-      "bytes": 1981,
+      "bytes": 3160,
       "path": ".agents/skills/playtest-forge/references/evidence-contract.md",
       "role": "codex-skill-reference",
-      "sha256": "3a712d02b20ecead813d0b7402a6038fd8ebe229f9596aa39c5addcf472c277d"
+      "sha256": "8e077f2456dcf0af38527664ca3edb002e6bd2a538a41abb6a32209b1473253d"
     },
     {
       "bytes": 2072,
@@ -235,10 +235,10 @@
       "sha256": "c068eaf9f60402d266b11b56c5f35b431d98ff0956a8625679260ffa9c73aaab"
     },
     {
-      "bytes": 1915,
+      "bytes": 2838,
       "path": ".agents/skills/playtest-forge/references/subagent-playthrough.md",
       "role": "codex-skill-reference",
-      "sha256": "e6ab47812a54f560ecf40e07f020ba38986aa3ae0dec275f362ff95ee9d5d975"
+      "sha256": "732d9a1fdbf60dfe41fca859b63a5a0c409c4d761ca265ea39a1c7fc215cdc8b"
     },
     {
       "bytes": 1606,
@@ -247,16 +247,47 @@
       "sha256": "c8cb5309d0658beefdbd3864b0931329420259f223aae6395a758f25c1c9c847"
     },
     {
+      "bytes": 5241,
+      "path": ".agents/skills/playtest-forge/references/codex-session-orchestration.md",
+      "role": "codex-skill-reference",
+      "sha256": "3d24712ee27901d390df6440042a24d48bd89daf95ad2a36fe3f81099c30c72e"
+    },
+    {
+      "bytes": 150,
+      "path": ".agents/skills/playtest-forge/scripts/session-options",
+      "role": "codex-skill-script",
+      "sha256": "dcecda4966ca4cbda9df40248adbd69222f598af22b50778c3d717f264c74233"
+    },
+    {
+      "bytes": 1575,
+      "path": "config/playtest_session_profiles.json",
+      "role": "codex-playtest-profiles",
+      "schema_version": "playtest-session-profiles-v1",
+      "sha256": "7f509bd88b195a97d94e6e752248bbd47bcab20984b3d06eacd26ea1381f824d"
+    },
+    {
+      "bytes": 5444,
+      "path": "src/game_analysis_agent/playtest_session.py",
+      "role": "codex-playtest-planner",
+      "sha256": "2700d627e3e20deedbe8e3fcdaea0508abec50f1ae15c61e90a5d26c15c8e06d"
+    },
+    {
+      "bytes": 2299,
+      "path": "tools/describe_playtest_session.py",
+      "role": "codex-playtest-planner-cli",
+      "sha256": "66104801de35aaf96bcbd73736790b28230f91369e732b2aff39dacc07e43de1"
+    },
+    {
       "bytes": 209,
       "path": ".agents/skills/playtest-forge/scripts/preflight",
       "role": "codex-skill-script",
       "sha256": "d1b658c0c7aa97206cdeeb0a9480623daf78fd8b370f74c207943bda12505f33"
     },
     {
-      "bytes": 148,
+      "bytes": 404,
       "path": ".agents/skills/playtest-forge/scripts/run-campaign",
       "role": "codex-skill-script",
-      "sha256": "fcda14a75edab4b4524e780e013c8aef3861fa9a45c8640aae6f28e0dac87c62"
+      "sha256": "51ee5a80b08ce89547d3b47e45b85953f198dcbbfa463c36e40c0494288a10b2"
     },
     {
       "bytes": 257,
@@ -755,6 +786,54 @@
       "path": "demo/study-in-germany/scripts/tools/ValidateRouteBoundaries.gd",
       "role": "embedded-demo-source",
       "sha256": "dc8a8f5e8a8654a0f0408f421dae5d6702d5c99c26b04427900120501440bd5a"
+    },
+    {
+      "bytes": 12129,
+      "path": "scripts/tools/RunInteractiveProbe.gd",
+      "role": "embedded-demo-runtime-overlay",
+      "sha256": "5dc96425dc59d52bc8d9c5b981e4aedbc791386e131cc5c397bd1c17b4e074c0"
+    },
+    {
+      "bytes": 29084,
+      "path": "src/game_analysis_agent/build_week_game_pin.py",
+      "role": "embedded-demo-overlay-service",
+      "sha256": "959dfc5a1dd8fc5b0f5a612cd260482fef7c0437ca1893ce831c188ca65edef1"
+    },
+    {
+      "bytes": 91899,
+      "path": "game-overlays/study-in-germany/autoload/DataRegistry.gd",
+      "role": "embedded-demo-runtime-overlay",
+      "sha256": "9d471f54e2b3c2337464e15c5e88bcf0d1fe256da7d8806c83ced27b530e4216"
+    },
+    {
+      "bytes": 98996,
+      "path": "game-overlays/study-in-germany/data/localization/events.json",
+      "role": "embedded-demo-runtime-overlay",
+      "sha256": "52ff86b78571ca44469ef6afb90246ecf1d9a2907281e09671b8460473d56348"
+    },
+    {
+      "bytes": 29555,
+      "path": "game-overlays/study-in-germany/scenes/main/Main.gd",
+      "role": "embedded-demo-runtime-overlay",
+      "sha256": "d8eca972196410fbe48931313080baa0d89ffcee1d729b8024e687e01d89d9ea"
+    },
+    {
+      "bytes": 8527,
+      "path": "game-overlays/study-in-germany/scripts/data/DataLoader.gd",
+      "role": "embedded-demo-runtime-overlay",
+      "sha256": "e33122d7179f4c85efec2d7058e638b55ad7856b08fb7c1ef01883f096058fc9"
+    },
+    {
+      "bytes": 1001,
+      "path": "game-overlays/study-in-germany/scripts/data/EventChoiceDef.gd",
+      "role": "embedded-demo-runtime-overlay",
+      "sha256": "f8626c3a36db12755bcbf22b030981e7761ee74a714a15efeb90e3a8e0d46535"
+    },
+    {
+      "bytes": 3930,
+      "path": "game-overlays/study-in-germany/scripts/data/EventDef.gd",
+      "role": "embedded-demo-runtime-overlay",
+      "sha256": "9d2e10cd5e979e69f736e3eeef438232b8086e6782c5cecb856afe16ed6e8d11"
     },
     {
       "bytes": 1896,
