@@ -1,0 +1,235 @@
+{
+  "artifacts": [
+    {
+      "media_type": "application/x-ndjson",
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "record_count": 19,
+      "sha256": "23aed31cd175df52b17e361b7bb56614e54dde3c4e638fd1078b175b3951a3c7"
+    }
+  ],
+  "citations": [
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 1,
+      "persona": "money",
+      "record_sha256": "1cae1fd1304ced11d2e3ff8bc08b8cbace21eab0e34fd45462ba332b70a1b00f",
+      "seed": 43,
+      "week": 1
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 2,
+      "persona": "money",
+      "record_sha256": "f2047ae4cfa9ace92613371c859c6284074b8736c19c11c55de31a61be53b969",
+      "seed": 43,
+      "week": 2
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 3,
+      "persona": "money",
+      "record_sha256": "7b925e71036d454f8f8ca8f0bc046e275dc569288862b3e4a52dd83357900bd9",
+      "seed": 43,
+      "week": 3
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 4,
+      "persona": "money",
+      "record_sha256": "a339f43b4cdcf2985c0ba829a684b6c2e0937e943ce5e1d0ce953f80eb67e9f4",
+      "seed": 43,
+      "week": 4
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 5,
+      "persona": "money",
+      "record_sha256": "3ca42b083b25f34d935e75450cebccea36e5cb131a2625083f08f46f2be86947",
+      "seed": 43,
+      "week": 5
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 6,
+      "persona": "money",
+      "record_sha256": "d88cb11f9f1a785d668c250c98dce3ebf1c7a42daa1ea5bf592dbb7759ea7c41",
+      "seed": 43,
+      "week": 6
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 7,
+      "persona": "money",
+      "record_sha256": "b6cd3646e04553785ee5289cb710f7b61d93f5f7583d20c041c9f31393acdcd1",
+      "seed": 43,
+      "week": 7
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 8,
+      "persona": "money",
+      "record_sha256": "7da81930d097070f32bd70402c759cdb337fc69313b940b3499f7ca33820d69d",
+      "seed": 43,
+      "week": 8
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 9,
+      "persona": "money",
+      "record_sha256": "9e25a3222a00e10393357f77f124958e7358d4587e0a393dd475aa3b42163bf3",
+      "seed": 43,
+      "week": 9
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 10,
+      "persona": "money",
+      "record_sha256": "99a668492bb083c3c001f7843d5bb1af1bbe36cf17e72d8c3260f0c2e80333b0",
+      "seed": 43,
+      "week": 10
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 11,
+      "persona": "money",
+      "record_sha256": "d900542e883aa266701ffe00f4d6aae1a0a765a2f34aced6be520147a9e82e8d",
+      "seed": 43,
+      "week": 11
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 12,
+      "persona": "money",
+      "record_sha256": "78163b88542696c635008a6236dc35d9f7e2aa9f144198e5c9c12b07bba6f3ad",
+      "seed": 43,
+      "week": 12
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 13,
+      "persona": "money",
+      "record_sha256": "38946a9b3aa0af33377b85265e6fa4a53ef5147af046a1176e871400d3a3f118",
+      "seed": 43,
+      "week": 13
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 14,
+      "persona": "money",
+      "record_sha256": "de63f8b0b3d171a8f442ba669aa0f69a3afdf6cf61a4510954b95c0568b3612c",
+      "seed": 43,
+      "week": 14
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 15,
+      "persona": "money",
+      "record_sha256": "6ad0f2bb925b61ef21ad2cbe780dd05ee56e9ddd2555eda72bc9167cb98ed678",
+      "seed": 43,
+      "week": 15
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 16,
+      "persona": "money",
+      "record_sha256": "e426ae65b622f1dea60dce781d473d12da7bacbbd90b5f4fc51813e0ade8d736",
+      "seed": 43,
+      "week": 16
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 17,
+      "persona": "money",
+      "record_sha256": "c1dcdfd8b0214fabe88221b97ca973e9dd4bce994b2f8960bcce8331d88249ac",
+      "seed": 43,
+      "week": 17
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 18,
+      "persona": "money",
+      "record_sha256": "bbeaa64d39de61118a74fa6abb216723c4882d034382517618718dc40d7a9ad6",
+      "seed": 43,
+      "week": 18
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "money-seed-43-19fc7eb327d9",
+      "line_number": 19,
+      "persona": "money",
+      "record_sha256": "6e3cc337ee2b82b11d475b0e7f314fd7372faafd882b716194a29a5b5a277fed",
+      "seed": 43,
+      "week": 19
+    }
+  ],
+  "completed_at": "2026-07-16T21:50:40.295842Z",
+  "completed_weeks": 19,
+  "error": "",
+  "request": {
+    "campaign_fingerprint": "41680ccc097fd9c9088b8526b9254cdf1a9c2b363481a66439d9825a70dfd110",
+    "campaign_id": "playthrough-evidence-full-v1",
+    "cell_id": "money-seed-43-19fc7eb327d9",
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "output_dir": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9",
+    "persona": "money",
+    "provider": "replay",
+    "scenario": "default_first_semester",
+    "seed": 43
+  },
+  "request_fingerprint": "8b5e4f3c4ebecd636e5eb8a79bc363f3b6b654762329cb5b4cf598d613fdec48",
+  "schema_version": "persona-campaign-cell-result-v1",
+  "source": {
+    "agent_commit": "c96f2ed3595162a174e680b563337f6215f6eace",
+    "agent_dirty": false,
+    "agent_tree": "a3a90bf687512ac8f3a4a63ab3ebe052347b8c84",
+    "campaign_config_sha256": "b4201753f6788b54580979eb762b9f0c25deacb732f36ed330cf198e0d132c22",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "replay",
+    "provider_mode": "replay",
+    "provider_revision": "fixture:865f4fb83028f7ada18b581462adef3cbb15f2b06ed4c59cb0601f97b0d5f590"
+  },
+  "source_fingerprint": "63d7625a6e17c3517941589369f318673664a2cfb48fb843d8d304a0af47f10b",
+  "started_at": "2026-07-16T21:49:58.861061Z",
+  "state": "completed",
+  "stop_reason": "game_finished"
+}

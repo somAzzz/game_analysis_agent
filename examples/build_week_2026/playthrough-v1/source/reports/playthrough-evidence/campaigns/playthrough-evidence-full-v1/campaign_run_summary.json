@@ -1,0 +1,32 @@
+{
+  "campaign_id": "playthrough-evidence-full-v1",
+  "resumed_cell_ids": [
+    "newbie-seed-42-800280af3dc4",
+    "newbie-seed-43-b99ca186823f",
+    "newbie-seed-44-74c10ddf911c",
+    "study-seed-42-f9980b3d5bc8",
+    "study-seed-43-a0be562b0f29",
+    "study-seed-44-559809e534ec",
+    "money-seed-42-0814df41bd32",
+    "money-seed-43-19fc7eb327d9",
+    "money-seed-44-ef5f7a6f072c",
+    "social-seed-42-3e0651d2a124",
+    "social-seed-43-68645c459b97",
+    "social-seed-44-70c95eebf532",
+    "visa-seed-42-88dd8348830c",
+    "visa-seed-43-da3b18bf94b1",
+    "visa-seed-44-7e68c349c083",
+    "slacker-seed-42-40927837a583",
+    "slacker-seed-43-f26905951cff",
+    "slacker-seed-44-16886c02c0a3"
+  ],
+  "status_counts": {
+    "cancelled": 0,
+    "completed": 18,
+    "failed": 0,
+    "partial": 0,
+    "queued": 0,
+    "running": 0
+  },
+  "submittable": true
+}

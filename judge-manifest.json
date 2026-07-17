@@ -755,9 +755,176 @@
       "path": "demo/study-in-germany/scripts/tools/ValidateRouteBoundaries.gd",
       "role": "embedded-demo-source",
       "sha256": "dc8a8f5e8a8654a0f0408f421dae5d6702d5c99c26b04427900120501440bd5a"
+    },
+    {
+      "bytes": 1896,
+      "path": "examples/build_week_2026/playthrough-v1/README.md",
+      "role": "playthrough-guide",
+      "sha256": "b78da2fb634ac6fe523c432d494e2e74fe96bc579d24d42dd856a725b927e2df"
+    },
+    {
+      "bytes": 23023,
+      "path": "examples/build_week_2026/playthrough-v1/manifest.json",
+      "role": "playthrough-evidence",
+      "schema_version": "playthrough-evidence-manifest-v1",
+      "sha256": "67da1280510f5c1aa9963d02458c66630fd9a3d24346784dbb451d4573d6a43c"
+    },
+    {
+      "bytes": 7066,
+      "path": "examples/build_week_2026/playthrough-v1/personas.json",
+      "role": "playthrough-personas",
+      "schema_version": "playthrough-personas-v1",
+      "sha256": "608785a34af26a8845dc998dd6cc41a76d8b6f54fe8d5001066c3ce923201ad8"
+    },
+    {
+      "bytes": 213303,
+      "path": "examples/build_week_2026/playthrough-v1/cells/money-seed-42.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "ce4ba2d2da93c24040071c252f82e9bcd3fc15d00deacf33a1c53df970b5aef1"
+    },
+    {
+      "bytes": 171082,
+      "path": "examples/build_week_2026/playthrough-v1/cells/money-seed-43.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "0ae6b8850378eeee1c38c171bc6b7a90409fefb33ea8833e7cbf303366545b23"
+    },
+    {
+      "bytes": 203521,
+      "path": "examples/build_week_2026/playthrough-v1/cells/money-seed-44.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "be701167245fd465b876bf2bcc5e10e4c6a9eb0685c16bf7dd62d8374898589f"
+    },
+    {
+      "bytes": 191766,
+      "path": "examples/build_week_2026/playthrough-v1/cells/newbie-seed-42.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "9907f94a5bcedf4bb983b63f94880c8f00cdeba78990f27cec62b7d85e1753b2"
+    },
+    {
+      "bytes": 206753,
+      "path": "examples/build_week_2026/playthrough-v1/cells/newbie-seed-43.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "6e00b1a2b69467c8bb0981e68402c911a5253afdb8bca58b5837814906cdb015"
+    },
+    {
+      "bytes": 190786,
+      "path": "examples/build_week_2026/playthrough-v1/cells/newbie-seed-44.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "ca94d75f9b36ac028188dfac017d24287056285168ee5ec354511be4fb80ec78"
+    },
+    {
+      "bytes": 218872,
+      "path": "examples/build_week_2026/playthrough-v1/cells/slacker-seed-42.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "9036787b52f0425466fc70a73369fd1997809ae1afd9e23f2f4e94c56d27fada"
+    },
+    {
+      "bytes": 173939,
+      "path": "examples/build_week_2026/playthrough-v1/cells/slacker-seed-43.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "c628729328f2bb52fb80afe1323ec2ef23585362869bc5ed5996dfb6728a44a8"
+    },
+    {
+      "bytes": 187524,
+      "path": "examples/build_week_2026/playthrough-v1/cells/slacker-seed-44.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "c36995460de51c854d6b1cb86b90c3a81cf6593b4f06cdec781976425b4855c4"
+    },
+    {
+      "bytes": 184370,
+      "path": "examples/build_week_2026/playthrough-v1/cells/social-seed-42.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "d0a9697163f934401e975a2d581d14166e256bee833a9b5bdb4cfb0c9573c60c"
+    },
+    {
+      "bytes": 193992,
+      "path": "examples/build_week_2026/playthrough-v1/cells/social-seed-43.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "15652100624efffd16a5f190220cc19bf71e23fd26f352f2b3d98f0cc78b8078"
+    },
+    {
+      "bytes": 189544,
+      "path": "examples/build_week_2026/playthrough-v1/cells/social-seed-44.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "c126d904d868cb8062ec43eeb82b8e93655687e6a564b88865e1027212e5aeb6"
+    },
+    {
+      "bytes": 215679,
+      "path": "examples/build_week_2026/playthrough-v1/cells/study-seed-42.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "da02c144a9c75358b4bf8d78a100b1284aefddcc20f03ee96ea9ab623e7ffe54"
+    },
+    {
+      "bytes": 174995,
+      "path": "examples/build_week_2026/playthrough-v1/cells/study-seed-43.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "1feb2c7e57ed7562fc9c7ffb7edb555342b4670ba102098a9f4e0e72223b6892"
+    },
+    {
+      "bytes": 189719,
+      "path": "examples/build_week_2026/playthrough-v1/cells/study-seed-44.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "0641e9a4dc0ec994edde3d2179906a64672bca2f228508e3734a8157520b961f"
+    },
+    {
+      "bytes": 192979,
+      "path": "examples/build_week_2026/playthrough-v1/cells/visa-seed-42.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "38649649decdcbf3d728714c9ad70db5a1a5b9c25ba6714548858083a339adcd"
+    },
+    {
+      "bytes": 201500,
+      "path": "examples/build_week_2026/playthrough-v1/cells/visa-seed-43.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "c1500229e6ed91590aa124e237cc04a0f4471cd55959e10b2cd13c3bf710966c"
+    },
+    {
+      "bytes": 191499,
+      "path": "examples/build_week_2026/playthrough-v1/cells/visa-seed-44.json",
+      "role": "playthrough-view",
+      "schema_version": "playthrough-view-v1",
+      "sha256": "173e4bcc38c9716c422ab34c9090b1d5da1218c9f64ea28442b94858e52ab8fd"
     }
   ],
   "claims": [
+    {
+      "evidence": [
+        {
+          "equals": 18,
+          "json_pointer": "/cell_count",
+          "path": "examples/build_week_2026/playthrough-v1/manifest.json"
+        },
+        {
+          "equals": 342,
+          "json_pointer": "/node_count",
+          "path": "examples/build_week_2026/playthrough-v1/manifest.json"
+        },
+        {
+          "equals": 324,
+          "json_pointer": "/actual_edge_count",
+          "path": "examples/build_week_2026/playthrough-v1/manifest.json"
+        }
+      ],
+      "id": "playthrough_inspector_evidence",
+      "statement": "The Playthrough Inspector is backed by 18 verified real-Godot Replay cells, 342 weekly nodes, and 324 observed state transitions."
+    },
     {
       "evidence": [
         {

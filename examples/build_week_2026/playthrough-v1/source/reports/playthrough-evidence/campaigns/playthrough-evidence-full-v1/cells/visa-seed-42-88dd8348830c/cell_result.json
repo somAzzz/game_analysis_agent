@@ -1,0 +1,235 @@
+{
+  "artifacts": [
+    {
+      "media_type": "application/x-ndjson",
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "record_count": 19,
+      "sha256": "20b561d0322f3fb78272a4ec49ef294db19e87e5560ec559f171040ade5eecda"
+    }
+  ],
+  "citations": [
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 1,
+      "persona": "visa",
+      "record_sha256": "5be1c0e8c87a1a3bb6dd72d6a41283fd8e9dc635add5c2bb20c019f62dbe15e3",
+      "seed": 42,
+      "week": 1
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 2,
+      "persona": "visa",
+      "record_sha256": "8ce899c10f7e5f1743f556fcfdb90ce828beee47d2e59c90160089978d503d20",
+      "seed": 42,
+      "week": 2
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 3,
+      "persona": "visa",
+      "record_sha256": "27e85e9e7cf937fcd3c0e118e95c43906a937a25c6431f3be9dc26d631ac0643",
+      "seed": 42,
+      "week": 3
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 4,
+      "persona": "visa",
+      "record_sha256": "00de110cdfd29ea8aef97e90893cad6e00879457c647de6818889012cd561a20",
+      "seed": 42,
+      "week": 4
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 5,
+      "persona": "visa",
+      "record_sha256": "65703bb2598567c63cbe0cfc5f820cdb257ee19dcbb99636a45226d77473de22",
+      "seed": 42,
+      "week": 5
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 6,
+      "persona": "visa",
+      "record_sha256": "0011a5a918e9f58b1412a6e93388e442511527dbb7840a4ee79e408907c1e433",
+      "seed": 42,
+      "week": 6
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 7,
+      "persona": "visa",
+      "record_sha256": "eded46077d00c63a149d418f21b51b2c57b528be27aa810e76d1d859ac2e50cd",
+      "seed": 42,
+      "week": 7
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 8,
+      "persona": "visa",
+      "record_sha256": "6a08d1d57522c5fca9cdc9c484067c304701c1329758e0360d1ecb91846e685d",
+      "seed": 42,
+      "week": 8
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 9,
+      "persona": "visa",
+      "record_sha256": "19c377200730221ddee2770f372b030481df9c688e5e483ef4b3e9284c017130",
+      "seed": 42,
+      "week": 9
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 10,
+      "persona": "visa",
+      "record_sha256": "f9776ef226a32a09659811068b560dac6c3eb2ba7348da53efce31a6032cb064",
+      "seed": 42,
+      "week": 10
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 11,
+      "persona": "visa",
+      "record_sha256": "7b89b2abb9eabbdec7a311891f6c0e187f3760d0310cb8bfac0017fbbd3aa5e4",
+      "seed": 42,
+      "week": 11
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 12,
+      "persona": "visa",
+      "record_sha256": "c2d2446ad8abf006375ef7e545db8bd62c496b7c239d1563bf63a76f14e44d1f",
+      "seed": 42,
+      "week": 12
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 13,
+      "persona": "visa",
+      "record_sha256": "31ed35c65dc21209e2097137acde8b0a2b686a14284e52b55e028899e5cf8402",
+      "seed": 42,
+      "week": 13
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 14,
+      "persona": "visa",
+      "record_sha256": "75ee4130a97e082095f036fb938cfb8d31a8e74b81893e340046b75b0d701a87",
+      "seed": 42,
+      "week": 14
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 15,
+      "persona": "visa",
+      "record_sha256": "1b38c2e392f9f4518e1919a828650448b0c84997ef53bc0908eb8f8b036797d2",
+      "seed": 42,
+      "week": 15
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 16,
+      "persona": "visa",
+      "record_sha256": "27ce9609e6d21d46fa5ad84e9c6a81455a35f0c9910a6620448498bb9cdbeb87",
+      "seed": 42,
+      "week": 16
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 17,
+      "persona": "visa",
+      "record_sha256": "b2468176b761fbbe1b6c8959fd16e01e284f3364d8b52f72da53816b058710fd",
+      "seed": 42,
+      "week": 17
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 18,
+      "persona": "visa",
+      "record_sha256": "a7f5bbc9c2104a37141761a3be2021df238ddce7518f2069071c81fd9706eab9",
+      "seed": 42,
+      "week": 18
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "visa-seed-42-88dd8348830c",
+      "line_number": 19,
+      "persona": "visa",
+      "record_sha256": "49d9633bbfcb5b01b6b63f27efc3bcda6023d50cbd5e8333251333aa39e03162",
+      "seed": 42,
+      "week": 19
+    }
+  ],
+  "completed_at": "2026-07-16T21:52:06.216021Z",
+  "completed_weeks": 19,
+  "error": "",
+  "request": {
+    "campaign_fingerprint": "41680ccc097fd9c9088b8526b9254cdf1a9c2b363481a66439d9825a70dfd110",
+    "campaign_id": "playthrough-evidence-full-v1",
+    "cell_id": "visa-seed-42-88dd8348830c",
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "output_dir": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c",
+    "persona": "visa",
+    "provider": "replay",
+    "scenario": "default_first_semester",
+    "seed": 42
+  },
+  "request_fingerprint": "02395df7555d87cf7da8c5669d4be57cb9effb71bee44868c5cc34d6eb113f6b",
+  "schema_version": "persona-campaign-cell-result-v1",
+  "source": {
+    "agent_commit": "c96f2ed3595162a174e680b563337f6215f6eace",
+    "agent_dirty": false,
+    "agent_tree": "a3a90bf687512ac8f3a4a63ab3ebe052347b8c84",
+    "campaign_config_sha256": "b4201753f6788b54580979eb762b9f0c25deacb732f36ed330cf198e0d132c22",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "replay",
+    "provider_mode": "replay",
+    "provider_revision": "fixture:865f4fb83028f7ada18b581462adef3cbb15f2b06ed4c59cb0601f97b0d5f590"
+  },
+  "source_fingerprint": "63d7625a6e17c3517941589369f318673664a2cfb48fb843d8d304a0af47f10b",
+  "started_at": "2026-07-16T21:51:17.293402Z",
+  "state": "completed",
+  "stop_reason": "game_finished"
+}

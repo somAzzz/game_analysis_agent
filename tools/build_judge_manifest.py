@@ -59,7 +59,44 @@ for demo_file in sorted((ROOT / "demo/study-in-germany").rglob("*")):
     if demo_file.is_file():
         ARTIFACTS[demo_file.relative_to(ROOT).as_posix()] = ("embedded-demo-source", None)
 
+PLAYTHROUGH_ROOT = ROOT / "examples/build_week_2026/playthrough-v1"
+ARTIFACTS["examples/build_week_2026/playthrough-v1/README.md"] = ("playthrough-guide", None)
+ARTIFACTS["examples/build_week_2026/playthrough-v1/manifest.json"] = (
+    "playthrough-evidence",
+    "playthrough-evidence-manifest-v1",
+)
+ARTIFACTS["examples/build_week_2026/playthrough-v1/personas.json"] = (
+    "playthrough-personas",
+    "playthrough-personas-v1",
+)
+for playthrough_cell in sorted((PLAYTHROUGH_ROOT / "cells").glob("*.json")):
+    ARTIFACTS[playthrough_cell.relative_to(ROOT).as_posix()] = (
+        "playthrough-view",
+        "playthrough-view-v1",
+    )
+
 CLAIMS = [
+    {
+        "id": "playthrough_inspector_evidence",
+        "statement": "The Playthrough Inspector is backed by 18 verified real-Godot Replay cells, 342 weekly nodes, and 324 observed state transitions.",
+        "evidence": [
+            {
+                "path": "examples/build_week_2026/playthrough-v1/manifest.json",
+                "json_pointer": "/cell_count",
+                "equals": 18,
+            },
+            {
+                "path": "examples/build_week_2026/playthrough-v1/manifest.json",
+                "json_pointer": "/node_count",
+                "equals": 342,
+            },
+            {
+                "path": "examples/build_week_2026/playthrough-v1/manifest.json",
+                "json_pointer": "/actual_edge_count",
+                "equals": 324,
+            },
+        ],
+    },
     {
         "id": "campaign_scale",
         "statement": "The committed Replay campaign contains 18 real-Godot cells and 342 gameplay weeks.",

@@ -1,0 +1,14 @@
+{
+  "agent": "interactive_player",
+  "started_at": "2026-07-16T21:50:40.305861Z",
+  "completed_at": "2026-07-16T21:51:24.747070Z",
+  "output_files": [
+    "playthrough.jsonl",
+    "playthrough_summary.md",
+    "playthrough_agent_report.json"
+  ],
+  "llm_calls": [],
+  "tool_events": [],
+  "budget_usage": null,
+  "error": null
+}

@@ -1,0 +1,77 @@
+{
+  "artifacts": [
+    {
+      "bytes": 10521,
+      "path": "campaign_manifest.json",
+      "records": null,
+      "sha256": "87db2b45d1ba5a7608c3a826ee69df1e69e2668eb8eb3f1472ecabdb67d9c85c"
+    },
+    {
+      "bytes": 49008,
+      "path": "campaign_summary.json",
+      "records": null,
+      "sha256": "a8a605b9f82df0e44c11c12490efd2562376789cf1ce974dfc11012d9faa295d"
+    },
+    {
+      "bytes": 129213,
+      "path": "persona_runs.jsonl",
+      "records": 342,
+      "sha256": "163f5d4649914eb115a5e4096e5e60f0d19122ec70f30c18e2b1e39a616dd2fa"
+    },
+    {
+      "bytes": 7421,
+      "path": "agent_eval.jsonl",
+      "records": 18,
+      "sha256": "0e34b369b8f13abefe4fe1fe66ad27304145a1d0687adfc491d5b024b1b371fb"
+    },
+    {
+      "bytes": 352980,
+      "path": "llm_calls.jsonl",
+      "records": 684,
+      "sha256": "a2af285c6a03d8d1b6d495574967fe6a7573c92d2ca20c93c12fe9ff888862cd"
+    },
+    {
+      "bytes": 17644,
+      "path": "failure_clusters.json",
+      "records": null,
+      "sha256": "a407cad45306b86ad34948e9f1d5b9d5933acf1b0c581406a02b650919b62988"
+    }
+  ],
+  "campaign_id": "playthrough-evidence-full-v1",
+  "checks": [
+    {
+      "detail": "18/18 ordered cells",
+      "id": "expected_cells",
+      "status": "passed"
+    },
+    {
+      "detail": "18/18 completed",
+      "id": "completed_cells",
+      "status": "passed"
+    },
+    {
+      "detail": "manifest and aggregation fingerprints",
+      "id": "identity",
+      "status": "passed"
+    },
+    {
+      "detail": "all artifacts reparsed",
+      "id": "schemas",
+      "status": "passed"
+    },
+    {
+      "detail": "6 artifacts hashed",
+      "id": "hashes",
+      "status": "passed"
+    },
+    {
+      "detail": "no forbidden fields or secrets",
+      "id": "public_safety",
+      "status": "passed"
+    }
+  ],
+  "request_fingerprint": "41680ccc097fd9c9088b8526b9254cdf1a9c2b363481a66439d9825a70dfd110",
+  "schema_version": "campaign-bundle-gate-v1",
+  "source_fingerprint": "63d7625a6e17c3517941589369f318673664a2cfb48fb843d8d304a0af47f10b",
+  "status": "passed"
+}

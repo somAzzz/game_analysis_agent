@@ -1,0 +1,235 @@
+{
+  "artifacts": [
+    {
+      "media_type": "application/x-ndjson",
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "record_count": 19,
+      "sha256": "5ab605c7292b0515cdef58bee19ef26f315de7442c162f0932fe4680b3c0eb22"
+    }
+  ],
+  "citations": [
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 1,
+      "persona": "social",
+      "record_sha256": "c570c2e8e7fc12f179cff81aa0e951d1d78879c6677f4e6a089b5da618162b41",
+      "seed": 43,
+      "week": 1
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 2,
+      "persona": "social",
+      "record_sha256": "a3e35d2351fec2831ec97a2170e2fbe5c06dbddf6703d5684780cdf0dfd739d0",
+      "seed": 43,
+      "week": 2
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 3,
+      "persona": "social",
+      "record_sha256": "fd946d2b223a7437c43373e01e93ec59b402b9031eea2db88e931d350c17d4ca",
+      "seed": 43,
+      "week": 3
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 4,
+      "persona": "social",
+      "record_sha256": "be088eb839d58c61139083f0d9ff1a35d82c055936ca75eeb7ec755a72f6e6fb",
+      "seed": 43,
+      "week": 4
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 5,
+      "persona": "social",
+      "record_sha256": "c4667fcf44fa217d1cd96bc7a156a3c3d17dfe0a6cb8e5452226833ab55dd444",
+      "seed": 43,
+      "week": 5
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 6,
+      "persona": "social",
+      "record_sha256": "5e5c5624954a669accf16059f89cdbc78f3f7efff3c407d0abbc0d7007122446",
+      "seed": 43,
+      "week": 6
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 7,
+      "persona": "social",
+      "record_sha256": "3ba73adaeec3072c7d96447b77eaefae6eeaccf1cd80ed474929eeee7ff1fa5c",
+      "seed": 43,
+      "week": 7
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 8,
+      "persona": "social",
+      "record_sha256": "bc2ba3caaa7f9c2bd5ae13e4f2c562cd5cc4097781931eeeba50dd4f72724fd0",
+      "seed": 43,
+      "week": 8
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 9,
+      "persona": "social",
+      "record_sha256": "1404105211ddb608d71b58eceb3d44ca59e661c0d027ca1d27d8d27eb1f98f31",
+      "seed": 43,
+      "week": 9
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 10,
+      "persona": "social",
+      "record_sha256": "e8f3811a33cf1a14c2b06aa6f65a0b26e9ad8f83d577f1d85952da8a07914d72",
+      "seed": 43,
+      "week": 10
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 11,
+      "persona": "social",
+      "record_sha256": "a5c51cdeec1d847ebcc8077013046bee0f07569b4feae8e5ff3692b53cc8ea10",
+      "seed": 43,
+      "week": 11
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 12,
+      "persona": "social",
+      "record_sha256": "13055a0c12af7feab8f26e673bb9ffd342d45e54f94f046d98cb3b3f2d7a7f5c",
+      "seed": 43,
+      "week": 12
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 13,
+      "persona": "social",
+      "record_sha256": "1e86c1f6b1e2862bea5db21872f2ceb992d8032e9fd28e335644c7be45c4e250",
+      "seed": 43,
+      "week": 13
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 14,
+      "persona": "social",
+      "record_sha256": "37dd03ba9838ad3f72c37d1b99d3550b2fbb64d02cadbb6bbfd91bc695e4a178",
+      "seed": 43,
+      "week": 14
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 15,
+      "persona": "social",
+      "record_sha256": "88e0e45a366b3ca38b8b669a5067f1d85210aade9c781a83465329cf65879116",
+      "seed": 43,
+      "week": 15
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 16,
+      "persona": "social",
+      "record_sha256": "223d0b550dd7afee1106a623c9f63202a0e2274e2499bfe3f157da3933183317",
+      "seed": 43,
+      "week": 16
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 17,
+      "persona": "social",
+      "record_sha256": "b73dca17a1b1598721099f112e94bb17869e2e93516301f2c82b3797ba3c090f",
+      "seed": 43,
+      "week": 17
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 18,
+      "persona": "social",
+      "record_sha256": "16697eac024477a2ba922d6b9213ec4a4cac16967dc836bd914297e4b54c7b34",
+      "seed": 43,
+      "week": 18
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "social-seed-43-68645c459b97",
+      "line_number": 19,
+      "persona": "social",
+      "record_sha256": "8158da317e6c29fcfd1c62e7e1cc29ac076607616c4093038af94bfb5f56424e",
+      "seed": 43,
+      "week": 19
+    }
+  ],
+  "completed_at": "2026-07-16T21:51:24.765510Z",
+  "completed_weeks": 19,
+  "error": "",
+  "request": {
+    "campaign_fingerprint": "41680ccc097fd9c9088b8526b9254cdf1a9c2b363481a66439d9825a70dfd110",
+    "campaign_id": "playthrough-evidence-full-v1",
+    "cell_id": "social-seed-43-68645c459b97",
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "output_dir": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97",
+    "persona": "social",
+    "provider": "replay",
+    "scenario": "default_first_semester",
+    "seed": 43
+  },
+  "request_fingerprint": "cdb9df9b3e191252c86d712eec1e2b8a8f8c0e78c2b7fa59d85f3190821aae03",
+  "schema_version": "persona-campaign-cell-result-v1",
+  "source": {
+    "agent_commit": "c96f2ed3595162a174e680b563337f6215f6eace",
+    "agent_dirty": false,
+    "agent_tree": "a3a90bf687512ac8f3a4a63ab3ebe052347b8c84",
+    "campaign_config_sha256": "b4201753f6788b54580979eb762b9f0c25deacb732f36ed330cf198e0d132c22",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "replay",
+    "provider_mode": "replay",
+    "provider_revision": "fixture:865f4fb83028f7ada18b581462adef3cbb15f2b06ed4c59cb0601f97b0d5f590"
+  },
+  "source_fingerprint": "63d7625a6e17c3517941589369f318673664a2cfb48fb843d8d304a0af47f10b",
+  "started_at": "2026-07-16T21:50:40.297274Z",
+  "state": "completed",
+  "stop_reason": "game_finished"
+}

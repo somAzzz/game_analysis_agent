@@ -1,0 +1,235 @@
+{
+  "artifacts": [
+    {
+      "media_type": "application/x-ndjson",
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "record_count": 19,
+      "sha256": "c3fd828c65f669f0c23f9f9187665709ba909a6077778800810a0ff51359b3f4"
+    }
+  ],
+  "citations": [
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 1,
+      "persona": "slacker",
+      "record_sha256": "e0089e983f52194f1c467784520b0dccfe91b31b397cb4ccc3d7779c44bee6ee",
+      "seed": 43,
+      "week": 1
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 2,
+      "persona": "slacker",
+      "record_sha256": "a67b6ca91e4a6af2fe6c3e943128a1867a868492e0dc09c2259b4ad5e733ad47",
+      "seed": 43,
+      "week": 2
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 3,
+      "persona": "slacker",
+      "record_sha256": "fa429782c717592ca9fbfe271925453a4b314e9746282f8fc0798acf6fb541be",
+      "seed": 43,
+      "week": 3
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 4,
+      "persona": "slacker",
+      "record_sha256": "fadc6d1f5402172b49c4cd2ece798d40032f83ced0d31b051467c189aa472581",
+      "seed": 43,
+      "week": 4
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 5,
+      "persona": "slacker",
+      "record_sha256": "c4d045d8c91b48399aea5c8129c25adcacc32671bcad1187b70000be10d676f0",
+      "seed": 43,
+      "week": 5
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 6,
+      "persona": "slacker",
+      "record_sha256": "788b0573997ce403ae036dbf23e8d8637bc61be02c6b7697eb6ce5b05b39817a",
+      "seed": 43,
+      "week": 6
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 7,
+      "persona": "slacker",
+      "record_sha256": "297a1222e2c8f25102a9e53bc0b6be9a0040a5dfadaed6e6a7bac2cb97df8229",
+      "seed": 43,
+      "week": 7
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 8,
+      "persona": "slacker",
+      "record_sha256": "e932cf16748406e2be2814c5b7e17f70ceb2c773354793438fb40e98c63ebec8",
+      "seed": 43,
+      "week": 8
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 9,
+      "persona": "slacker",
+      "record_sha256": "72ddb4a978587cb0fbb28f77b772880649775ae5a78b33e616ad87973d10005c",
+      "seed": 43,
+      "week": 9
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 10,
+      "persona": "slacker",
+      "record_sha256": "bb81c5dc1b2a89f75201c24093e073a5fdec480cd5479a077440cf28ccea5e16",
+      "seed": 43,
+      "week": 10
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 11,
+      "persona": "slacker",
+      "record_sha256": "3b757a634e50c4fb8f4f5c0e6129f553d4c7c1280aa2079a398b6ca2ec2fefaf",
+      "seed": 43,
+      "week": 11
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 12,
+      "persona": "slacker",
+      "record_sha256": "12cdf0fddc94735b9a4713b10d6ab5be6397eeee58824a3d2856b54eac9245f3",
+      "seed": 43,
+      "week": 12
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 13,
+      "persona": "slacker",
+      "record_sha256": "9daaa0ef2b7b3f484a088a853de61d42b2f6f943a9262450ea40c7e943539b10",
+      "seed": 43,
+      "week": 13
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 14,
+      "persona": "slacker",
+      "record_sha256": "e04511eb2ae2c2c942b8266eb24fb664f274ea431862ed26f79002ade76efb83",
+      "seed": 43,
+      "week": 14
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 15,
+      "persona": "slacker",
+      "record_sha256": "54b9aef6828409abecd99446382ad4b224bc91dede9a930e54947402b4a032a1",
+      "seed": 43,
+      "week": 15
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 16,
+      "persona": "slacker",
+      "record_sha256": "a9ff51e64e7420a7f262c1f45e48b828fbc755870b385ba6e636eaeac8449af6",
+      "seed": 43,
+      "week": 16
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 17,
+      "persona": "slacker",
+      "record_sha256": "94286ada7299f86bc05419844724369743d5aa236d5e8cb7ab07b021a689c73a",
+      "seed": 43,
+      "week": 17
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 18,
+      "persona": "slacker",
+      "record_sha256": "4514819e5faf9174970a4d1c4bbc68e5d2fd0dd9c0041297a65ac1959a0ea1a0",
+      "seed": 43,
+      "week": 18
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "slacker-seed-43-f26905951cff",
+      "line_number": 19,
+      "persona": "slacker",
+      "record_sha256": "82ad59fbac69ab5c7bec6d5acb2e001c21d4c14e81f91f59b6462ce991f238cb",
+      "seed": 43,
+      "week": 19
+    }
+  ],
+  "completed_at": "2026-07-16T21:52:37.908435Z",
+  "completed_weeks": 19,
+  "error": "",
+  "request": {
+    "campaign_fingerprint": "41680ccc097fd9c9088b8526b9254cdf1a9c2b363481a66439d9825a70dfd110",
+    "campaign_id": "playthrough-evidence-full-v1",
+    "cell_id": "slacker-seed-43-f26905951cff",
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "output_dir": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff",
+    "persona": "slacker",
+    "provider": "replay",
+    "scenario": "default_first_semester",
+    "seed": 43
+  },
+  "request_fingerprint": "9448c1d27d9defcdac55bb2674a32bb334d9bb811b4b0771e13a7d5e6625a4bc",
+  "schema_version": "persona-campaign-cell-result-v1",
+  "source": {
+    "agent_commit": "c96f2ed3595162a174e680b563337f6215f6eace",
+    "agent_dirty": false,
+    "agent_tree": "a3a90bf687512ac8f3a4a63ab3ebe052347b8c84",
+    "campaign_config_sha256": "b4201753f6788b54580979eb762b9f0c25deacb732f36ed330cf198e0d132c22",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "replay",
+    "provider_mode": "replay",
+    "provider_revision": "fixture:865f4fb83028f7ada18b581462adef3cbb15f2b06ed4c59cb0601f97b0d5f590"
+  },
+  "source_fingerprint": "63d7625a6e17c3517941589369f318673664a2cfb48fb843d8d304a0af47f10b",
+  "started_at": "2026-07-16T21:52:06.216850Z",
+  "state": "completed",
+  "stop_reason": "game_finished"
+}

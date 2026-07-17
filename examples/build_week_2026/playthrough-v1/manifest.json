@@ -1,0 +1,562 @@
+{
+  "actual_edge_count": 324,
+  "campaign_id": "playthrough-evidence-full-v1",
+  "cell_count": 18,
+  "checks": [
+    {
+      "detail": "18/18",
+      "id": "completed_cells",
+      "status": "passed"
+    },
+    {
+      "detail": "18 traces",
+      "id": "raw_hashes",
+      "status": "passed"
+    },
+    {
+      "detail": "342 rows",
+      "id": "row_citations",
+      "status": "passed"
+    },
+    {
+      "detail": "all adjacent nodes",
+      "id": "state_continuity",
+      "status": "passed"
+    },
+    {
+      "detail": "all selected actions",
+      "id": "action_legality",
+      "status": "passed"
+    },
+    {
+      "detail": "all selected choices",
+      "id": "event_choice_legality",
+      "status": "passed"
+    },
+    {
+      "detail": "all numeric deltas",
+      "id": "delta_consistency",
+      "status": "passed"
+    },
+    {
+      "detail": "0 fallback / 0 provider error",
+      "id": "provider_health",
+      "status": "passed"
+    }
+  ],
+  "derived_artifacts": [
+    {
+      "bytes": 213303,
+      "path": "cells/money-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "ce4ba2d2da93c24040071c252f82e9bcd3fc15d00deacf33a1c53df970b5aef1"
+    },
+    {
+      "bytes": 171082,
+      "path": "cells/money-seed-43.json",
+      "role": "playthrough-view",
+      "sha256": "0ae6b8850378eeee1c38c171bc6b7a90409fefb33ea8833e7cbf303366545b23"
+    },
+    {
+      "bytes": 203521,
+      "path": "cells/money-seed-44.json",
+      "role": "playthrough-view",
+      "sha256": "be701167245fd465b876bf2bcc5e10e4c6a9eb0685c16bf7dd62d8374898589f"
+    },
+    {
+      "bytes": 191766,
+      "path": "cells/newbie-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "9907f94a5bcedf4bb983b63f94880c8f00cdeba78990f27cec62b7d85e1753b2"
+    },
+    {
+      "bytes": 206753,
+      "path": "cells/newbie-seed-43.json",
+      "role": "playthrough-view",
+      "sha256": "6e00b1a2b69467c8bb0981e68402c911a5253afdb8bca58b5837814906cdb015"
+    },
+    {
+      "bytes": 190786,
+      "path": "cells/newbie-seed-44.json",
+      "role": "playthrough-view",
+      "sha256": "ca94d75f9b36ac028188dfac017d24287056285168ee5ec354511be4fb80ec78"
+    },
+    {
+      "bytes": 218872,
+      "path": "cells/slacker-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "9036787b52f0425466fc70a73369fd1997809ae1afd9e23f2f4e94c56d27fada"
+    },
+    {
+      "bytes": 173939,
+      "path": "cells/slacker-seed-43.json",
+      "role": "playthrough-view",
+      "sha256": "c628729328f2bb52fb80afe1323ec2ef23585362869bc5ed5996dfb6728a44a8"
+    },
+    {
+      "bytes": 187524,
+      "path": "cells/slacker-seed-44.json",
+      "role": "playthrough-view",
+      "sha256": "c36995460de51c854d6b1cb86b90c3a81cf6593b4f06cdec781976425b4855c4"
+    },
+    {
+      "bytes": 184370,
+      "path": "cells/social-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "d0a9697163f934401e975a2d581d14166e256bee833a9b5bdb4cfb0c9573c60c"
+    },
+    {
+      "bytes": 193992,
+      "path": "cells/social-seed-43.json",
+      "role": "playthrough-view",
+      "sha256": "15652100624efffd16a5f190220cc19bf71e23fd26f352f2b3d98f0cc78b8078"
+    },
+    {
+      "bytes": 189544,
+      "path": "cells/social-seed-44.json",
+      "role": "playthrough-view",
+      "sha256": "c126d904d868cb8062ec43eeb82b8e93655687e6a564b88865e1027212e5aeb6"
+    },
+    {
+      "bytes": 215679,
+      "path": "cells/study-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "da02c144a9c75358b4bf8d78a100b1284aefddcc20f03ee96ea9ab623e7ffe54"
+    },
+    {
+      "bytes": 174995,
+      "path": "cells/study-seed-43.json",
+      "role": "playthrough-view",
+      "sha256": "1feb2c7e57ed7562fc9c7ffb7edb555342b4670ba102098a9f4e0e72223b6892"
+    },
+    {
+      "bytes": 189719,
+      "path": "cells/study-seed-44.json",
+      "role": "playthrough-view",
+      "sha256": "0641e9a4dc0ec994edde3d2179906a64672bca2f228508e3734a8157520b961f"
+    },
+    {
+      "bytes": 192979,
+      "path": "cells/visa-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "38649649decdcbf3d728714c9ad70db5a1a5b9c25ba6714548858083a339adcd"
+    },
+    {
+      "bytes": 201500,
+      "path": "cells/visa-seed-43.json",
+      "role": "playthrough-view",
+      "sha256": "c1500229e6ed91590aa124e237cc04a0f4471cd55959e10b2cd13c3bf710966c"
+    },
+    {
+      "bytes": 191499,
+      "path": "cells/visa-seed-44.json",
+      "role": "playthrough-view",
+      "sha256": "173e4bcc38c9716c422ab34c9090b1d5da1218c9f64ea28442b94858e52ab8fd"
+    },
+    {
+      "bytes": 7066,
+      "path": "personas.json",
+      "role": "persona-view",
+      "sha256": "608785a34af26a8845dc998dd6cc41a76d8b6f54fe8d5001066c3ce923201ad8"
+    }
+  ],
+  "frontend_implementation_requires_design_approval": true,
+  "legal_event_choice_count": 1336,
+  "node_count": 342,
+  "playthrough_data_ready": true,
+  "request": {
+    "campaign_id": "playthrough-evidence-full-v1",
+    "concurrency": 4,
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "personas": [
+      "newbie",
+      "study",
+      "money",
+      "social",
+      "visa",
+      "slacker"
+    ],
+    "provider": "replay",
+    "report_root": "reports/playthrough-evidence/campaigns",
+    "scenario": "default_first_semester",
+    "schema_version": "persona-campaign-request-v1",
+    "seeds": [
+      42,
+      43,
+      44
+    ]
+  },
+  "request_fingerprint": "41680ccc097fd9c9088b8526b9254cdf1a9c2b363481a66439d9825a70dfd110",
+  "schema_version": "playthrough-evidence-manifest-v1",
+  "source": {
+    "agent_commit": "c96f2ed3595162a174e680b563337f6215f6eace",
+    "agent_dirty": false,
+    "agent_tree": "a3a90bf687512ac8f3a4a63ab3ebe052347b8c84",
+    "campaign_config_sha256": "b4201753f6788b54580979eb762b9f0c25deacb732f36ed330cf198e0d132c22",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "replay",
+    "provider_mode": "replay",
+    "provider_revision": "fixture:865f4fb83028f7ada18b581462adef3cbb15f2b06ed4c59cb0601f97b0d5f590"
+  },
+  "source_action_catalog": {
+    "bytes": 28831,
+    "path": "demo/study-in-germany/data/actions/generated_actions.json",
+    "role": "game-action-catalog",
+    "sha256": "99fdfef2f370babe69e13c22ea5cbd17299e08c62c6b0f1a84d7247653ed2f3d"
+  },
+  "source_artifacts": [
+    {
+      "bytes": 10163,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-42-0814df41bd32/cell_result.json",
+      "role": "cell-result",
+      "sha256": "5e2a4bd748c0270f89c4625405d4eb956cde31afd443cb6b1880846c68d168d3"
+    },
+    {
+      "bytes": 428534,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-42-0814df41bd32/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "af5935af439f04e7251fc1bbd29692c9910b30d7711e7601c842857ab8459425"
+    },
+    {
+      "bytes": 8898,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-42-0814df41bd32/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "129ba3d99190e90e7b5d05108562f4a9d14a541770db1df051d1d80d7228aa30"
+    },
+    {
+      "bytes": 10163,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/cell_result.json",
+      "role": "cell-result",
+      "sha256": "8a03fbe112752c4490f4c6dd56d73453fff5c271926b0ed72435a0cf830da2d2"
+    },
+    {
+      "bytes": 424663,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "23aed31cd175df52b17e361b7bb56614e54dde3c4e638fd1078b175b3951a3c7"
+    },
+    {
+      "bytes": 6260,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-43-19fc7eb327d9/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "2ad6f9a1e89bb70f058a694e2e3a7b2fa3180e22f50ae9481f8dc50991ec37a5"
+    },
+    {
+      "bytes": 10163,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-44-ef5f7a6f072c/cell_result.json",
+      "role": "cell-result",
+      "sha256": "122ada98ba479989edef2281e0313a2f9368529334d6c85acd701c759580733f"
+    },
+    {
+      "bytes": 416384,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-44-ef5f7a6f072c/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "9c1dbc1c74633a7ee14170c849426f01b00723b72e3f1338258afaed19f448c2"
+    },
+    {
+      "bytes": 8775,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/money-seed-44-ef5f7a6f072c/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "d46fac252fd2ca857bb0f5a8c0ad1d6f8610f5bc567593913a1c8b96c00e4d9d"
+    },
+    {
+      "bytes": 10224,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-42-800280af3dc4/cell_result.json",
+      "role": "cell-result",
+      "sha256": "b2d2bbcf457e068c24a82266fcbf15e5897a2c1c308e0871f607b5304b1c561f"
+    },
+    {
+      "bytes": 417920,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-42-800280af3dc4/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "5563b484e1178f8d4705c109e3d81a249c573fbcf4ebcead3571e98882dc8d78"
+    },
+    {
+      "bytes": 8591,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-42-800280af3dc4/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "ae1d19d86d789afc48adf51d4841fda0f71cc3f623b9cfe7735051b9679f45ed"
+    },
+    {
+      "bytes": 10224,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-43-b99ca186823f/cell_result.json",
+      "role": "cell-result",
+      "sha256": "ca5bc37473f93b96039d3608b40433fcfb5fb170db544c44e4d784c5990b5b94"
+    },
+    {
+      "bytes": 426533,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-43-b99ca186823f/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "4ee3ecd6145efdbde7cc34955f2808cb7de26ebe54829f411d6190af6ea8a076"
+    },
+    {
+      "bytes": 8787,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-43-b99ca186823f/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "129e222d9cbd94b2ef013cc6dd7205749f28e8eff12364cbc0051ebacf8d49a4"
+    },
+    {
+      "bytes": 10224,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/cell_result.json",
+      "role": "cell-result",
+      "sha256": "28708c663b83c05523927f04325efb7d41cf0d25b832884d16ab803527e25463"
+    },
+    {
+      "bytes": 438495,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "69e9f752ea9d67e1ef1dfe17b228d4c282f4581d8130763cdb9e3b24a2b26082"
+    },
+    {
+      "bytes": 8494,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "f4f5c1c775890b40a1111de1b22b7fd4277e69eb2eee42114a29c254ccf3b460"
+    },
+    {
+      "bytes": 10285,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-42-40927837a583/cell_result.json",
+      "role": "cell-result",
+      "sha256": "b0538bb0d20ffc4f331ac3ded67991a1b34c029ec41a537d3096bfcbb65989f3"
+    },
+    {
+      "bytes": 435137,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-42-40927837a583/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "259b392def04014af601714772980148590fb25e8f94abde1f36b4c307516823"
+    },
+    {
+      "bytes": 8912,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-42-40927837a583/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "08ba18971112cc360745e19f140dcc18e349aaad4a36cad15d832f4f7853587c"
+    },
+    {
+      "bytes": 10285,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/cell_result.json",
+      "role": "cell-result",
+      "sha256": "4c83f9f49af455d172b1f0ab26cb93e93ea3ad238a5a71404115f82627ae07d3"
+    },
+    {
+      "bytes": 407164,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "c3fd828c65f669f0c23f9f9187665709ba909a6077778800810a0ff51359b3f4"
+    },
+    {
+      "bytes": 6843,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-43-f26905951cff/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "89461cfaf92c17349d2d6d73ec4ce7bcce3d95d70bf2967feddddca80caa6a0e"
+    },
+    {
+      "bytes": 10285,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-44-16886c02c0a3/cell_result.json",
+      "role": "cell-result",
+      "sha256": "0901376a8b403517b0b3da55335fc9a8a868e44276630277196d7397e3022c16"
+    },
+    {
+      "bytes": 433972,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-44-16886c02c0a3/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "67633139c967a13f0d4eea6f08b5b75a4ff07beddce7fe17c1ef06be27eaaaa6"
+    },
+    {
+      "bytes": 8042,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/slacker-seed-44-16886c02c0a3/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "9804f5bc019eff336ad26af8f4bdefd3626df57749b3e68974747dd707f52c77"
+    },
+    {
+      "bytes": 10224,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-42-3e0651d2a124/cell_result.json",
+      "role": "cell-result",
+      "sha256": "93bbfbd6e045b0a124f057bdfee17fd95f00ff9570504f96df471e9012f6d043"
+    },
+    {
+      "bytes": 417249,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-42-3e0651d2a124/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "8842c38517a875edf42b6ed811241cabf642c9eecdea41b129b3cfd628769b5a"
+    },
+    {
+      "bytes": 7822,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-42-3e0651d2a124/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "0e57b364e2cf02821c4158a705d125470533962944206a7aa396c145cc654cc2"
+    },
+    {
+      "bytes": 10224,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/cell_result.json",
+      "role": "cell-result",
+      "sha256": "9eeab1c2605752ed0448dd910ff2c598594d921db277f9eb975582128a4c7a53"
+    },
+    {
+      "bytes": 424124,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "5ab605c7292b0515cdef58bee19ef26f315de7442c162f0932fe4680b3c0eb22"
+    },
+    {
+      "bytes": 8728,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-43-68645c459b97/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "c9d8ccaca0844f71632febf89c2aa851ea0a53af025b763d4defb809a1840845"
+    },
+    {
+      "bytes": 10224,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-44-70c95eebf532/cell_result.json",
+      "role": "cell-result",
+      "sha256": "22eb625817e2b866b9d102a5f4c02c758ed9187f2d3183b46a77f2df7acc4b30"
+    },
+    {
+      "bytes": 416180,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-44-70c95eebf532/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "70f7d2bc659e0f3de452c90ba7b139c32c1b4264596a2e1c45914ad1a96f9f40"
+    },
+    {
+      "bytes": 8503,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/social-seed-44-70c95eebf532/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "230517f7902ffab3f8a79515f1eb3685f10ed63a88ca4c96b33985ac6ff3d618"
+    },
+    {
+      "bytes": 10163,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/study-seed-42-f9980b3d5bc8/cell_result.json",
+      "role": "cell-result",
+      "sha256": "f11a4ebae7ec0af20b20602a51ef8cf38a6479460d692afa515bd7bc8dee93ae"
+    },
+    {
+      "bytes": 432787,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/study-seed-42-f9980b3d5bc8/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "568b11027a1400d5c1683a2c4c31a96b49aaf93df744129b26c4c95e8638f6cd"
+    },
+    {
+      "bytes": 8827,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/study-seed-42-f9980b3d5bc8/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "9c18f8d733b779bf69283d8e0c75b5da0c627599ffee8db7c5bb00c74ea042b5"
+    },
+    {
+      "bytes": 10163,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/study-seed-43-a0be562b0f29/cell_result.json",
+      "role": "cell-result",
+      "sha256": "3958abd2f66a4d4867e529655314d768dc9e8c85806f90947152ce01c8d0ae4a"
+    },
+    {
+      "bytes": 412332,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/study-seed-43-a0be562b0f29/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "6eb110a68cb38a9aaff2d52a64cce9320110415b7fa6ced3b182955508b686dd"
+    },
+    {
+      "bytes": 6832,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/study-seed-43-a0be562b0f29/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "66dd895e088ba379d51c4948d7ff1c2c8285038d94ac03c470139ec3542bc7ac"
+    },
+    {
+      "bytes": 10163,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/study-seed-44-559809e534ec/cell_result.json",
+      "role": "cell-result",
+      "sha256": "451364c1d4e4997ff4f8662d512b6d5584c05a568e7dadb95a07ca1ea1c8575b"
+    },
+    {
+      "bytes": 416964,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/study-seed-44-559809e534ec/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "02bec2523afb637991cacd8ebe15fdfde868690d62a90f8df6cfb9ff2b0b5b85"
+    },
+    {
+      "bytes": 8458,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/study-seed-44-559809e534ec/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "081849bdf6ec5a238ee73cdd9c329a570679805733a8f087944f2a3d3c2f7984"
+    },
+    {
+      "bytes": 10102,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/cell_result.json",
+      "role": "cell-result",
+      "sha256": "fd004ef50b23874ba6f430685f438e5c76ca8f162eb4d061dae759ab199f924a"
+    },
+    {
+      "bytes": 419574,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "20b561d0322f3fb78272a4ec49ef294db19e87e5560ec559f171040ade5eecda"
+    },
+    {
+      "bytes": 8705,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-42-88dd8348830c/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "53bd6e5cb8b9aee35418e4aaa4ab3d5073c897d91c15bb5f45847cb79b7216a6"
+    },
+    {
+      "bytes": 10102,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-43-da3b18bf94b1/cell_result.json",
+      "role": "cell-result",
+      "sha256": "9e752088098e4b51b6d062304f1ebaa52b788fbbc0f177d4872ce457f9a2ee9e"
+    },
+    {
+      "bytes": 428895,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-43-da3b18bf94b1/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "8633b07cdc9606bd67d1a0efadff6acc3ff3250b2a19fdcbb4140f45731e959b"
+    },
+    {
+      "bytes": 8781,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-43-da3b18bf94b1/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "69fdc9f847db1893ae0145bfadbf0e85db6e7b701414fa719bf1c131f857e654"
+    },
+    {
+      "bytes": 10102,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-44-7e68c349c083/cell_result.json",
+      "role": "cell-result",
+      "sha256": "c0f82fa6f5e337c357d3c8e0449b263b5485b9f6847d3306507124f919adb81c"
+    },
+    {
+      "bytes": 442692,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-44-7e68c349c083/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "a83122d94483669f3e2810be0572ec42d625ec6efcb7a06db1e1d42b123c6fa2"
+    },
+    {
+      "bytes": 8440,
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/visa-seed-44-7e68c349c083/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "fda8d7ea9c259f000a3604088cf230bfdd8a25bec3e8487b97bf924f2f4fbf26"
+    }
+  ],
+  "source_campaign_manifest": {
+    "bytes": 10521,
+    "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/campaign_manifest.json",
+    "role": "campaign-manifest",
+    "sha256": "87db2b45d1ba5a7608c3a826ee69df1e69e2668eb8eb3f1472ecabdb67d9c85c"
+  },
+  "source_failure_clusters": {
+    "bytes": 17644,
+    "path": "public/failure_clusters.json",
+    "role": "failure-clusters",
+    "sha256": "a407cad45306b86ad34948e9f1d5b9d5933acf1b0c581406a02b650919b62988"
+  },
+  "source_fingerprint": "63d7625a6e17c3517941589369f318673664a2cfb48fb843d8d304a0af47f10b",
+  "source_personas": {
+    "bytes": 2473,
+    "path": "config/player_personas.yaml",
+    "role": "persona-contract",
+    "sha256": "b3734201edc44bbd523bfc0c60d9ed3f472f5d973100a9ca0baa76092bace692"
+  },
+  "source_public_gate": {
+    "bytes": 2057,
+    "path": "public/gate_report.json",
+    "role": "campaign-gate",
+    "sha256": "4ec6255888e72dab3404b644c52880f868ac33e4ebeb312a0bb623850b0bff81"
+  },
+  "truth_label": "prerecorded-real-godot-replay"
+}
