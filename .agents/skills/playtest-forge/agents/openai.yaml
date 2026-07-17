@@ -1,4 +1,4 @@
 interface:
   display_name: "Playtest Forge"
-  short_description: "Turn playtest evidence into proven game changes"
-  default_prompt: "Use $playtest-forge to combine automated and persona playtests, make one evidence-bounded game change, and accept or reject it with holdout proof."
+  short_description: "Run governed playtests and prove bounded repairs"
+  default_prompt: "Use $playtest-forge to choose a frozen test profile and provider, start the evidence UI, stream each weekly result through the shared local/API campaign service, and repair only with fixed and holdout proof."

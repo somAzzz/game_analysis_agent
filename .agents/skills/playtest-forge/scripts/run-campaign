@@ -2,4 +2,17 @@
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../../../.." && pwd)
 cd "$ROOT"
-exec uv run python tools/run_build_week_campaign.py "$@"
+provider=${1:-replay}
+case "$provider" in
+  vllm|sglang|openai|deepseek)
+    exec scripts/run-persona-campaign "$@"
+    ;;
+  replay)
+    shift
+    exec uv run python tools/run_build_week_campaign.py "$@"
+    ;;
+  *)
+    echo "provider must be replay, vllm, sglang, openai, or deepseek" >&2
+    exit 2
+    ;;
+esac

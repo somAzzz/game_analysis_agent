@@ -17,6 +17,14 @@ fail the step visibly.
 
 ## Run discipline
 
+Select the provider before execution and never change it inside a cohort:
+
+- `replay`: committed deterministic fixture, labelled `prerecorded`;
+- `vllm` / `sglang`: fresh local model calls, labelled `local`;
+- `openai` / `deepseek`: fresh remote calls, labelled `live`.
+
+For this repository, use `scripts/run-persona-campaign <provider>` for non-Replay full-semester campaigns. It routes through the typed persona campaign service, real Godot probe, sanitized public bundle, and `frontend/public/live-playthrough` view. Use `.agents/skills/playtest-forge/scripts/run-campaign replay` only for the canonical committed Replay campaign.
+
 - Keep steps sequential inside a playthrough; parallelize independent cells.
 - Bound personas, seeds, weeks, concurrency, retries, tokens, and wall time.
 - Persist actual provider/model, response ID, latency, refusal, retry, usage,
@@ -25,6 +33,8 @@ fail the step visibly.
   label.
 - Save a decision fixture only after schema and privacy review; hash it for
   later Replay.
+- A 20-week request may finish after 19 decisions when the resulting game state is week 20; retain both values explicitly.
+- One clean persona validates transport, gameplay, retention, and UI only. It cannot authorize a repair target; require cross-persona evidence for repair selection.
 
 ## Interpret behavior
 

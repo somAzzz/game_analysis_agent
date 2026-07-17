@@ -24,6 +24,19 @@ Do not publish prompts, raw model responses, secrets, private game text, host
 paths, or private traces. Create a sanitized bundle with the same aggregate and
 citation identities.
 
+## Dynamic local/live persona campaigns
+
+A non-Replay campaign must use `persona_campaign_service.run(...)` through `scripts/run-persona-campaign`; do not duplicate CLI logic in a skill. Retain raw cell evidence under `reports/persona-campaigns/<campaign>/cells`, publish only the sanitized bundle, and generate the frontend view under `frontend/public/live-playthrough`.
+
+The public truth label must match the frozen provider and mode, including `local-vllm-real-godot`, `local-sglang-real-godot`, `live-openai-real-godot`, or `live-deepseek-real-godot`. Never relabel local evidence as live. Reject partial cells and any fallback week. A single-persona campaign must publish `repair_target_eligible=false`.
+
+`frontend/public/live-playthrough/session.json` is a sanitized, ephemeral
+progress contract shared by local and API providers. `running` and `finalizing`
+are UI telemetry, not citable completed evidence. Only after the service writes
+`completed` and the public bundle/view verifiers pass may Codex cite the final
+manifest, gate, and hashed rows. A `failed` session must remain failed; it must
+never fall back to Replay or a different provider under the same identity.
+
 ## Current repository adapter
 
 For the retained Build Week campaign, verify these committed artifacts before

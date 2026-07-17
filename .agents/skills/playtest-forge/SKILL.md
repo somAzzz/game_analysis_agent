@@ -13,10 +13,11 @@ gates decide whether a change survives. Never optimize toward acceptance.
 
 Read only the references required for the request:
 
+- Start an interactive Codex-guided campaign session: `references/codex-session-orchestration.md`.
 - Choose test layers or distinguish Replay/live evidence: `references/test-strategy.md`.
 - Run deterministic matrices, simulations, sweeps, or regression tests:
   `references/automated-testing.md`.
-- Run live LLM/Codex persona playthroughs: `references/subagent-playthrough.md`.
+- Run local vLLM/SGLang or live OpenAI/DeepSeek persona playthroughs: `references/subagent-playthrough.md`.
 - Convert observed metrics into a parameter or mechanism change:
   `references/evidence-to-parameters.md`.
 - Review economy, resource pressure, difficulty, or progression:
@@ -32,6 +33,36 @@ Read only the references required for the request:
 - Work on this repository's Build Week case: `references/design-contract.md`.
 - Explain the retained cashflow repair example: `references/session-case-study.md`.
 
+## Codex-guided session entrypoint
+
+When the user asks to start testing, use the frozen orchestration in
+`references/codex-session-orchestration.md`. This is mandatory for this
+repository's interactive path:
+
+1. Run `scripts/preflight` and `scripts/session-options --json` without making
+   a model call. Inspect existing generated session/evidence and provider
+   readiness without printing secrets.
+2. Offer the three frozen profiles in recommended order: one strategy, all six
+   strategies on seed 42, or the 6 x 3 repair-evidence matrix. Explain calls,
+   cells, duration, eligibility, and cost exposure. Let the user choose the
+   profile, provider, and the persona for a one-strategy run.
+3. Do not make a provider call until those choices are confirmed. Recommend a
+   one-strategy local vLLM run first, then six-strategy local divergence, then
+   repair evidence; use OpenAI only when the user selects it.
+4. Start the frontend in a persistent terminal before the campaign and provide
+   `http://127.0.0.1:5173/#/playthrough-inspector`.
+5. Execute the exact command emitted by `scripts/session-options`. Local and
+   API providers must use the same typed campaign service, real-Godot probe,
+   limits, progress publisher, UI view, and evidence gates. Never create a
+   provider-specific shortcut.
+6. Monitor the command and `frontend/public/live-playthrough/session.json`.
+   Report meaningful progress at least once per minute while work continues.
+   Treat this file as in-progress UI state, not completed evidence.
+7. On completion, verify the sanitized bundle and frontend view, state the
+   exact truth label, and say whether the cohort can select a repair target.
+   A one-strategy or one-seed result can validate the agent but cannot prove a
+   repair. Never spend API credit, edit the game, or begin repair automatically.
+
 ## Core workflow
 
 1. Discover the game adapter, runtime, contracts, source revision, tests,
@@ -43,7 +74,7 @@ Read only the references required for the request:
    coverage, reproducibility, sensitivity, and regression truth.
 4. Add persona/subagent playthroughs when semantic choice quality, exploration,
    or distinct player intent matters. Keep the action schema and game runtime
-   shared with automation. Label live, Replay, partial, and failed runs.
+   shared with automation. Label local, live, Replay, partial, and failed runs.
 5. Reject incomplete, stale, schema-invalid, fallback-obscured, or
    provider-error evidence before diagnosis.
 6. Separate observed facts, interpretation, and hypothesis. Cite the exact
@@ -82,6 +113,7 @@ Read only the references required for the request:
 
 - Persona workers may choose actions and explain intent; only the main Codex
   agent may inspect private source, plan edits, change code, and judge release.
+- Local vLLM/SGLang proves a fresh local-model call, not a live OpenAI call. Preserve the exact provider and mode label.
 - Replay proves reproducibility, not a fresh model call. Never relabel it live.
 - Never accept a partial cohort, silently fall back after a provider failure,
   or merge a patch automatically.
@@ -95,4 +127,4 @@ Read only the references required for the request:
 End with: test contract → cited facts → interpretation → one hypothesis →
 bounded diff → focused test → fixed proof → holdout proof → protected gates →
 accepted/rejected decision → next experiment. State which results came from
-automation, live persona workers, or Replay.
+automation, local persona workers, live persona workers, or Replay.

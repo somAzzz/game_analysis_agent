@@ -1,0 +1,47 @@
+{
+  "schema_version": "playtest-session-profiles-v1",
+  "profiles": [
+    {
+      "id": "one-strategy",
+      "label": "One-strategy pipeline check",
+      "stage": "pipeline",
+      "description": "Prove provider, real Godot, 20-week retention, and frontend updates with one chosen strategy.",
+      "personas": ["newbie"],
+      "allow_persona_override": true,
+      "seeds": [42],
+      "max_weeks": 20,
+      "concurrency": 1,
+      "max_calls": 50,
+      "repair_target_eligible": false,
+      "repair_decision_ready": false
+    },
+    {
+      "id": "six-strategy",
+      "label": "Six-strategy divergence check",
+      "stage": "divergence",
+      "description": "Run every strategy on the same seed to expose convergence and persona divergence.",
+      "personas": ["newbie", "study", "money", "social", "visa", "slacker"],
+      "allow_persona_override": false,
+      "seeds": [42],
+      "max_weeks": 20,
+      "concurrency": 4,
+      "max_calls": 260,
+      "repair_target_eligible": true,
+      "repair_decision_ready": false
+    },
+    {
+      "id": "repair-evidence",
+      "label": "Repair-evidence matrix",
+      "stage": "repair_evidence",
+      "description": "Run all six strategies across the three frozen fixed seeds before selecting a repair target.",
+      "personas": ["newbie", "study", "money", "social", "visa", "slacker"],
+      "allow_persona_override": false,
+      "seeds": [42, 43, 44],
+      "max_weeks": 20,
+      "concurrency": 4,
+      "max_calls": 760,
+      "repair_target_eligible": true,
+      "repair_decision_ready": true
+    }
+  ]
+}
