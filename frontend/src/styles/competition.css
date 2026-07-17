@@ -526,7 +526,10 @@ main.playthrough-page {
   min-height: 42px;
   padding: 10px 15px;
   border: 1px solid var(--judge-rule);
+  background: transparent;
   color: var(--judge-ink);
+  cursor: pointer;
+  font-family: inherit;
   font-size: 10px;
   text-transform: uppercase;
 }
@@ -878,4 +881,340 @@ main.playthrough-page {
 @media (prefers-reduced-motion: reduce) {
   .playthrough-runner-anchor { transition-duration: .01ms !important; }
   .playthrough-runner-tooltip { transition-duration: .01ms !important; }
+}
+
+/* Full-campaign evidence review */
+.competition-evidence-source {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.competition-evidence-source button {
+  border: 1px solid color-mix(in srgb, var(--judge-ink) 22%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.38rem 0.72rem;
+}
+
+.competition-evidence-source button[aria-pressed="true"] {
+  background: var(--judge-ink);
+  color: var(--judge-panel);
+}
+
+.competition-evidence-source button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.playthrough-path-selector {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) minmax(10rem, 14rem) minmax(12rem, 1fr);
+  gap: 1rem;
+  align-items: end;
+  border: 1px solid color-mix(in srgb, var(--judge-ink) 18%, transparent);
+  background: color-mix(in srgb, var(--judge-panel) 92%, white);
+  padding: 1rem 1.15rem;
+}
+
+.playthrough-path-selector > div,
+.playthrough-path-selector label,
+.playthrough-path-selector p {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+}
+
+.playthrough-path-selector > div > span,
+.playthrough-path-selector label > span {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.playthrough-path-selector select {
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--judge-ink) 30%, transparent);
+  border-radius: 0;
+  background: #061116;
+  color: var(--judge-ink);
+  font: inherit;
+  padding: 0.65rem 0.75rem;
+}
+
+.playthrough-path-selector p {
+  justify-self: end;
+  text-align: right;
+}
+
+.playthrough-path-selector p b {
+  overflow-wrap: anywhere;
+}
+
+.judge-human-stage .judge-stage-marker span,
+.judge-human-stage .judge-eyebrow {
+  color: var(--judge-amber);
+}
+
+.judge-verdict {
+  --judge-decision-color: var(--judge-red);
+  border-color: var(--judge-decision-color);
+}
+
+.judge-verdict[data-decision="approve"],
+.judge-verdict[data-decision="accepted"] {
+  --judge-decision-color: var(--judge-cyan);
+}
+
+.judge-verdict[data-decision="needs_more_evidence"] {
+  --judge-decision-color: var(--judge-amber);
+}
+
+.judge-verdict strong { color: var(--judge-decision-color); }
+
+.judge-review-handoff {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 34px;
+  border-top: 1px solid var(--judge-rule);
+  border-bottom: 1px solid var(--judge-rule);
+}
+
+.judge-review-handoff > div {
+  min-width: 0;
+  padding: 22px 20px;
+  border-right: 1px solid var(--judge-rule);
+}
+
+.judge-review-handoff > div:first-child { padding-left: 0; }
+.judge-review-handoff > div:last-child { border-right: 0; }
+.judge-review-handoff span,
+.judge-review-record dt {
+  display: block;
+  color: var(--judge-muted);
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.judge-review-handoff strong,
+.judge-review-handoff code {
+  display: block;
+  margin-top: 9px;
+  overflow-wrap: anywhere;
+  color: var(--judge-cyan);
+  font-size: 14px;
+}
+
+.judge-review-handoff > div:first-child strong {
+  color: var(--judge-red);
+  font-size: 22px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.judge-review-handoff > div:last-child strong { color: var(--judge-amber); }
+
+.judge-review-evidence-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.judge-review-evidence-links a,
+.judge-review-evidence-links button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--judge-rule);
+  background: transparent;
+  color: var(--judge-ink);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.judge-review-evidence-links a:first-child {
+  border-color: var(--judge-cyan);
+  color: var(--judge-cyan);
+}
+
+.judge-human-review {
+  margin-top: 16px;
+  border: 1px solid var(--judge-rule);
+  background: rgba(12, 29, 35, .86);
+}
+
+.judge-review-form-grid {
+  display: grid;
+  grid-template-columns: minmax(250px, .72fr) minmax(0, 1.28fr);
+}
+
+.judge-human-review fieldset {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  margin: 0;
+  padding: 25px;
+  border: 0;
+  border-right: 1px solid var(--judge-rule);
+}
+
+.judge-human-review legend,
+.judge-review-note > span {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--judge-muted);
+  font: 700 11px/1.4 var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.judge-human-review legend {
+  float: left;
+  width: 100%;
+  padding: 0;
+}
+
+.judge-human-review legend + label { clear: both; }
+
+.judge-human-review fieldset label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 10px 13px;
+  border: 1px solid var(--judge-rule);
+  color: var(--judge-muted);
+  cursor: pointer;
+}
+
+.judge-human-review fieldset label:hover {
+  border-color: var(--judge-cyan);
+  color: var(--judge-ink);
+}
+
+.judge-human-review fieldset label.is-selected {
+  border-color: var(--judge-amber);
+  background: rgba(242, 198, 109, .07);
+  color: var(--judge-ink);
+  box-shadow: inset 4px 0 var(--judge-amber);
+}
+
+.judge-human-review input { accent-color: var(--judge-amber); }
+
+.judge-review-note {
+  display: grid;
+  align-content: start;
+  padding: 25px;
+}
+
+.judge-review-note textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 150px;
+  resize: vertical;
+  padding: 15px;
+  border: 1px solid var(--judge-rule);
+  border-radius: 0;
+  background: #061116;
+  color: var(--judge-ink);
+  font: 13px/1.55 var(--mono);
+}
+
+.judge-review-note textarea::placeholder { color: #73898a; }
+.judge-review-note textarea:focus-visible {
+  outline: 3px solid var(--judge-amber);
+  outline-offset: 3px;
+}
+.judge-review-note small {
+  margin-top: 9px;
+  color: var(--judge-muted);
+  font-size: 9px;
+}
+
+.judge-review-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 25px;
+  border-top: 1px solid var(--judge-rule);
+}
+
+.judge-review-actions > p {
+  margin: 0;
+  color: var(--judge-amber);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.judge-review-actions > div {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
+}
+
+.judge-review-actions button {
+  min-height: 44px;
+  padding: 10px 15px;
+  border: 1px solid var(--judge-rule);
+  font: 700 10px var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.judge-review-actions button:disabled { cursor: not-allowed; opacity: .38; }
+
+.judge-review-record {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--judge-rule);
+}
+
+.judge-review-record div {
+  min-width: 0;
+  padding: 17px 20px;
+  border-right: 1px solid var(--judge-rule);
+}
+
+.judge-review-record div:last-child { border-right: 0; }
+.judge-review-record dd {
+  margin: 7px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--judge-ink);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 860px) {
+  .judge-review-handoff,
+  .judge-review-record { grid-template-columns: 1fr; }
+  .judge-review-handoff > div,
+  .judge-review-record div {
+    padding-left: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--judge-rule);
+  }
+  .judge-review-form-grid { grid-template-columns: 1fr; }
+  .judge-human-review fieldset { border-right: 0; border-bottom: 1px solid var(--judge-rule); }
+}
+
+@media (max-width: 760px) {
+  .playthrough-path-selector { grid-template-columns: 1fr; }
+  .playthrough-path-selector p { justify-self: start; text-align: left; }
+  .judge-review-actions { align-items: stretch; flex-direction: column; }
+  .judge-review-actions > div { flex-direction: column; }
+  .judge-review-actions button { width: 100%; }
 }

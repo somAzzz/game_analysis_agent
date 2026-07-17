@@ -197,7 +197,7 @@ export interface GraphPayload {
   };
 }
 
-export type JudgeProvider = "replay" | "openai";
+export type JudgeProvider = "replay" | "vllm" | "openai";
 export type JudgeJobStatus = "queued" | "running" | "completed" | "failed" | "cancelled";
 
 export interface JudgeProviderStatus {
@@ -208,6 +208,16 @@ export interface JudgeProviderStatus {
       mode: "prerecorded";
       requires_api_key: false;
       requires_game_runtime: false;
+    };
+    vllm: {
+      status: "available" | "unavailable";
+      mode: "local";
+      model: string;
+      requires_api_key: false;
+      endpoint_configured: boolean;
+      game_runtime_configured: boolean;
+      live_runner_enabled: boolean;
+      live_campaign_ready: boolean;
     };
     openai: {
       status: "available" | "unavailable";
@@ -224,7 +234,7 @@ export interface JudgeProviderStatus {
 export interface JudgeCampaignJob {
   campaign_id: string;
   status: JudgeJobStatus;
-  mode: "prerecorded" | "live";
+  mode: "prerecorded" | "local" | "live";
   request: {
     provider: JudgeProvider;
     personas: string[];
@@ -253,11 +263,27 @@ export interface JudgeCohort {
   persona_alignment_rate: number | null;
   ending_counts: Record<string, number>;
 }
+export type HumanReviewDecision = "approve" | "reject" | "needs_more_evidence";
+
+export interface HumanReviewRecord {
+  schema_version: "judge-human-review-v1";
+  experiment_id: string;
+  evidence_fingerprint: string;
+  machine_recommendation: "accepted" | "rejected";
+  human_decision: HumanReviewDecision;
+  reviewer_note: string;
+  overrides_machine_recommendation: boolean;
+  reviewed_at: string;
+  merge_performed: false;
+}
+
 
 export interface JudgeExperiment {
   schema_version: string;
   experiment_id: string;
   status: string;
+  evidence_fingerprint: string;
+  human_review: HumanReviewRecord | null;
   decision: "accepted" | "rejected";
   decision_reason: string;
   hypothesis: string;
@@ -340,6 +366,7 @@ export interface PlaytestSession {
     running_cells: number;
     failed_cells: number;
     completed_weeks: number;
+    retained_cells?: number;
     total_cells: number;
     total_requested_weeks: number;
   };
@@ -407,6 +434,12 @@ export interface PlaythroughManifest {
   node_count: number;
   actual_edge_count: number;
   legal_event_choice_count: number;
+  cell_index?: {
+    path: string;
+    sha256: string;
+    bytes: number;
+    role: "cell-index";
+  };
   playthrough_data_ready: boolean;
   source: {
     agent_commit: string;
@@ -481,10 +514,30 @@ export interface PlaythroughCell {
   }>;
   nodes: PlaythroughNode[];
 }
+export interface PlaythroughCellReference {
+  cell_id: string;
+  persona: PlaythroughPersonaSlug;
+  seed: number;
+  path: string;
+  completed_weeks: number;
+  final_ending: string;
+  stop_reason: string;
+  attractor_count: number;
+}
+
+export interface PlaythroughCellIndex {
+  schema_version: "playthrough-cell-index-v1";
+  campaign_id: string;
+  truth_label: PlaythroughTruthLabel;
+  cell_count: number;
+  cells: PlaythroughCellReference[];
+}
+
 
 export interface PlaythroughBundle {
   manifest: PlaythroughManifest;
   personas: PlaythroughPersona[];
   cell: PlaythroughCell;
   cells: Partial<Record<PlaythroughPersonaSlug, PlaythroughCell>>;
+  cellReferences: PlaythroughCellReference[];
 }

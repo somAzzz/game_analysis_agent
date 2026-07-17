@@ -11,7 +11,8 @@ import personaRoster from "@/assets/competition/persona-roster-v2.webp";
 import moneyRunner from "@/assets/competition/money-runner-v1.png";
 import missionMap from "@/assets/competition/judge-mission-map-v1.png";
 import { competitionPlaythrough } from "@/lib/playthrough";
-import type { PlaythroughPersona, PlaythroughPersonaSlug } from "@/types";
+import type { PlaythroughBundle, PlaythroughPersona, PlaythroughPersonaSlug } from "@/types";
+import { loadLivePlaythrough } from "@/lib/livePlaythrough";
 
 const PERSONA_ORDER: PlaythroughPersonaSlug[] = [
   "newbie",
@@ -53,7 +54,13 @@ function firstEnding(persona: PlaythroughPersona): [string, number] {
 }
 
 export function JudgeMissionExperience() {
-  const { manifest, personas, cell } = competitionPlaythrough;
+  const [latestPlaythrough, setLatestPlaythrough] = useState<PlaythroughBundle | null>(null);
+  const [evidenceSource, setEvidenceSource] = useState<"latest" | "replay">("latest");
+  const bundle = evidenceSource === "latest" && latestPlaythrough
+    ? latestPlaythrough
+    : competitionPlaythrough;
+  const { manifest, personas, cell } = bundle;
+  const isLatest = bundle === latestPlaythrough;
   const [selectedSlug, setSelectedSlug] = useState<PlaythroughPersonaSlug>("money");
   const [hoveredSlug, setHoveredSlug] = useState<PlaythroughPersonaSlug | null>(null);
   const [drawerSlug, setDrawerSlug] = useState<PlaythroughPersonaSlug | null>(null);
@@ -65,6 +72,15 @@ export function JudgeMissionExperience() {
     (persona) => persona.slug === (hoveredSlug ?? selectedSlug),
   ) ?? selectedPersona;
   const drawerPersona = personas.find((persona) => persona.slug === drawerSlug) ?? null;
+  const drawerCell = bundle.cellReferences.find((item) => item.persona === drawerSlug);
+  useEffect(() => {
+    const controller = new AbortController();
+    loadLivePlaythrough(controller.signal, { persona: "money" })
+      .then((value) => setLatestPlaythrough(value))
+      .catch(() => setLatestPlaythrough(null));
+    return () => controller.abort();
+  }, []);
+
 
   useEffect(() => {
     if (!drawerSlug) return undefined;
@@ -113,6 +129,10 @@ export function JudgeMissionExperience() {
         <div><strong>{manifest.actual_edge_count}</strong><span>actual edges</span></div>
         <div><strong>{manifest.legal_event_choice_count.toLocaleString("en-US")}</strong><span>legal choices</span></div>
         <p><ShieldCheck weight="fill" /> {manifest.truth_label}</p>
+        <div className="competition-evidence-source" aria-label="Judge Mission evidence source">
+          <button type="button" disabled={!latestPlaythrough} aria-pressed={isLatest} onClick={() => setEvidenceSource("latest")}>Latest campaign</button>
+          <button type="button" aria-pressed={!isLatest} onClick={() => setEvidenceSource("replay")}>Signed Replay</button>
+        </div>
       </div>
 
       <div className="competition-squad-layout">
@@ -172,12 +192,15 @@ export function JudgeMissionExperience() {
         </div>
         <div className="competition-route-action">
           <div>
-            <span>DEMO ROUTE · ACTUAL GODOT REPLAY</span>
-            <strong>Money · seed 42 · 19 nodes · 18 recorded transitions</strong>
+            <span>DEMO ROUTE · {isLatest ? "LATEST VERIFIED CAMPAIGN" : "SIGNED GODOT REPLAY"}</span>
+            <strong>{PERSONA_LABELS[cell.persona]} · seed {cell.seed} · {cell.nodes.length} nodes · {cell.actual_edges.length} recorded transitions</strong>
             <small>Solid path is committed evidence. Unselected legal choices are never presented as future state.</small>
           </div>
-          <Link to="/playthrough-inspector" aria-label="Open Money seed 42 in Playthrough Inspector">
-            <Play weight="fill" /> Inspect signed replay <ArrowRight />
+          <Link
+            to={`/playthrough-inspector?source=${isLatest ? "latest" : "replay"}&persona=${cell.persona}&seed=${cell.seed}`}
+            aria-label={`Open ${PERSONA_LABELS[cell.persona]} seed ${cell.seed} in Playthrough Inspector`}
+          >
+            <Play weight="fill" /> Inspect {isLatest ? "latest path" : "signed replay"} <ArrowRight />
           </Link>
         </div>
       </div>
@@ -198,8 +221,11 @@ export function JudgeMissionExperience() {
               <div><span>STRATEGY RECORD</span><h2 id="competition-drawer-title">{PERSONA_LABELS[drawerPersona.slug]}</h2></div>
               <button ref={closeButtonRef} type="button" onClick={closeDrawer} aria-label="Close Persona details"><X /></button>
             </header>
-            <Link className="competition-drawer-cta" to={`/playthrough-inspector?persona=${drawerPersona.slug}`}>
-              <Play weight="fill" /> Inspect {PERSONA_LABELS[drawerPersona.slug]} seed 42 replay <ArrowRight />
+            <Link
+              className="competition-drawer-cta"
+              to={`/playthrough-inspector?source=${isLatest ? "latest" : "replay"}&persona=${drawerPersona.slug}&seed=${drawerCell?.seed ?? 42}`}
+            >
+              <Play weight="fill" /> Inspect {PERSONA_LABELS[drawerPersona.slug]} seed {drawerCell?.seed ?? 42} {isLatest ? "latest path" : "replay"} <ArrowRight />
             </Link>
             <section>
               <h3>Strategy contract</h3>
@@ -224,7 +250,7 @@ export function JudgeMissionExperience() {
               <Record label="Completed cells" value={`${drawerPersona.observed.completed_cells}/${drawerPersona.observed.cell_count}`} />
               {drawerPersona.slug === "money" && <Record label="Selected trace" value={`${cell.cell_id} · ${cell.nodes.length} cited rows`} mono />}
             </section>
-            <p className="competition-drawer-limit"><Info weight="fill" /> Replay proves reproducibility, not a fresh OpenAI call.</p>
+            <p className="competition-drawer-limit"><Info weight="fill" /> {isLatest ? "Latest campaign preserves its exact provider truth label." : "Replay proves reproducibility, not a fresh model call."}</p>
           </aside>
         </div>
       )}

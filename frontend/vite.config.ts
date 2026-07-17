@@ -23,6 +23,12 @@ export default defineConfig({
     // convenience for hacking, we just enable CORS so the SPA can fetch
     // directly from a sibling dev server.
     cors: true,
+    proxy: {
+      "/api": {
+        target: process.env.VITE_JUDGE_API_URL || "http://127.0.0.1:8080",
+        changeOrigin: false,
+      },
+    },
   },
   build: {
     target: "es2022",

@@ -8,6 +8,8 @@
 import type {
   DecisionGraphManifest,
   FrontManifest,
+  HumanReviewDecision,
+  HumanReviewRecord,
   IssueManifest,
   JudgeCampaignJob,
   JudgeExperiment,
@@ -150,6 +152,26 @@ export function fetchJudgeCampaign(campaignId: string): Promise<JudgeCampaignJob
 
 export function fetchJudgeExperiment(): Promise<JudgeExperiment> {
   return judgeJSON<JudgeExperiment>("experiments/cashflow-drift-repair-v1");
+}
+
+export function submitHumanReview(
+  experimentId: string,
+  evidenceFingerprint: string,
+  decision: HumanReviewDecision,
+  reviewerNote: string,
+): Promise<HumanReviewRecord> {
+  return judgeJSON<HumanReviewRecord>(
+    `experiments/${encodeURIComponent(experimentId)}/human-review`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        evidence_fingerprint: evidenceFingerprint,
+        decision,
+        reviewer_note: reviewerNote,
+      }),
+    },
+  );
 }
 
 export async function fetchStaticJudgeExperiment(): Promise<JudgeExperiment> {

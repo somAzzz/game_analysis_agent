@@ -9,6 +9,7 @@ import {
   fetchJudgeExperiment,
   fetchJudgeProviderStatus,
   fetchStaticJudgeExperiment,
+  submitHumanReview,
   testJudgeProvider,
 } from "@/lib/api";
 import type {
@@ -218,4 +219,34 @@ describe("manifest API", () => {
       headers: { Accept: "application/json" },
     });
   });
+});
+
+
+it("submits a bounded human review without any merge instruction", async () => {
+  const fetchMock = vi.fn().mockResolvedValue(responseWith({
+    schema_version: "judge-human-review-v1",
+    human_decision: "approve",
+    merge_performed: false,
+  }));
+  vi.stubGlobal("fetch", fetchMock);
+
+  await submitHumanReview(
+    "cashflow-drift-repair-v1",
+    "a".repeat(64),
+    "approve",
+    "Evidence supports a human approval.",
+  );
+
+  expect(fetchMock).toHaveBeenCalledWith(
+    "/api/experiments/cashflow-drift-repair-v1/human-review",
+    expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({
+        evidence_fingerprint: "a".repeat(64),
+        decision: "approve",
+        reviewer_note: "Evidence supports a human approval.",
+      }),
+    }),
+  );
+  expect(String(fetchMock.mock.calls[0]?.[1]?.body)).not.toContain("merge");
 });

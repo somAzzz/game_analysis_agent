@@ -180,6 +180,7 @@
   },
   "decision": "rejected",
   "decision_reason": "Repair rejected because required proof failed: fixed_target, holdout_target",
+  "evidence_fingerprint": "9bd9c67e94c2318e38edeb86b3c06066b719d2f11d4631bc124cfef9908b855f",
   "experiment_id": "cashflow-drift-repair-v1",
   "gates": [
     {
@@ -231,6 +232,7 @@
       "status": "passed"
     }
   ],
+  "human_review": null,
   "hypothesis": "Recurring survival-economy drift depletes spendable cash faster than distinct persona strategies can recover, after which the cash-shortfall stress feedback pushes every intent into the same cashflow/stress attractor.",
   "mechanism_class": "recurring_living_cost_drift",
   "mode": "prerecorded",

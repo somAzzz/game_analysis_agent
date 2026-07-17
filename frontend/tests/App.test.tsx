@@ -22,6 +22,7 @@ const apiMocks = vi.hoisted(() => ({
   testJudgeProvider: vi.fn(),
   createJudgeCampaign: vi.fn(),
   fetchJudgeCampaign: vi.fn(),
+  submitHumanReview: vi.fn(),
 }));
 
 vi.mock("@/lib/api", () => apiMocks);
@@ -165,6 +166,10 @@ const providerStatus: JudgeProviderStatus = {
   schema_version: "judge-provider-status-v1",
   providers: {
     replay: { status: "available", mode: "prerecorded", requires_api_key: false, requires_game_runtime: false },
+    vllm: {
+      status: "available", mode: "local", model: "local-test-model", requires_api_key: false,
+      endpoint_configured: true, game_runtime_configured: true, live_campaign_ready: true,
+    },
     openai: {
       status: "unavailable", mode: "live", model: "gpt-5.6-luna", requires_api_key: true,
       api_key_configured: false, game_runtime_configured: false, live_campaign_ready: false,
@@ -175,6 +180,8 @@ const providerStatus: JudgeProviderStatus = {
 const experiment: JudgeExperiment = {
   schema_version: "judge-public-experiment-v1",
   experiment_id: "cashflow-drift-repair-v1",
+  evidence_fingerprint: "d".repeat(64),
+  human_review: null,
   status: "passed",
   decision: "rejected",
   decision_reason: "Repair rejected because required proof failed: fixed_target, holdout_target",
@@ -234,6 +241,7 @@ describe("application routes", () => {
   });
 
   it("tells the complete Campaign Repair Proof story on the evaluator route", async () => {
+    const user = userEvent.setup();
     renderRoute("/");
 
     expect(await screen.findByRole("heading", { name: /A patch passed its unit test/i })).toBeInTheDocument();
@@ -245,11 +253,18 @@ describe("application routes", () => {
     expect(screen.getByText("REPAIR")).toBeInTheDocument();
     expect(screen.getByText("PROOF")).toBeInTheDocument();
     expect(screen.getAllByText("REJECTED").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Machine recommendation").length).toBeGreaterThanOrEqual(3);
+    expect(screen.getByText("Awaiting human review")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "The machine recommends. A human decides." })).toBeInTheDocument();
     expect(screen.getAllByText("18/18").length).toBeGreaterThanOrEqual(3);
     expect(screen.getByText(/OpenAI live subagent/i)).toBeInTheDocument();
     expect(screen.getByText(/View exact candidate diff/i)).toBeInTheDocument();
     expect(screen.getByText(/demo\/study-in-germany/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Exact candidate source diff/i)).toHaveTextContent("WEEKLY_ALLOWANCE");
+    const patchDetails = screen.getByLabelText(/Exact candidate source diff/i).closest("details");
+    expect(patchDetails).not.toHaveAttribute("open");
+    await user.click(screen.getByRole("button", { name: "Review exact patch diff" }));
+    expect(patchDetails).toHaveAttribute("open");
   });
 
   it("runs the bounded Replay action from Judge Mode", async () => {
@@ -270,6 +285,44 @@ describe("application routes", () => {
     expect(screen.getByText(/judge-demo123/i)).toBeInTheDocument();
   });
 
+  it("records and exports a human decision on the same experiment", async () => {
+    const user = userEvent.setup();
+    const review = {
+      schema_version: "judge-human-review-v1" as const,
+      experiment_id: experiment.experiment_id,
+      evidence_fingerprint: experiment.evidence_fingerprint,
+      machine_recommendation: "rejected" as const,
+      human_decision: "needs_more_evidence" as const,
+      reviewer_note: "Need a pressure-sensitive unseen cohort.",
+      overrides_machine_recommendation: true,
+      reviewed_at: "2026-07-17T20:00:00Z",
+      merge_performed: false as const,
+    };
+    apiMocks.submitHumanReview.mockResolvedValue(review);
+    const createObjectURL = vi.fn(() => "blob:human-review");
+    const revokeObjectURL = vi.fn();
+    vi.stubGlobal("URL", { ...URL, createObjectURL, revokeObjectURL });
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+    renderRoute("/");
+
+    await user.click(await screen.findByRole("radio", { name: "Needs more evidence" }));
+    await user.type(screen.getByLabelText(/Reviewer note/), review.reviewer_note);
+    await user.click(screen.getByRole("button", { name: "Record final decision" }));
+
+    await waitFor(() => expect(apiMocks.submitHumanReview).toHaveBeenCalledWith(
+      experiment.experiment_id,
+      experiment.evidence_fingerprint,
+      "needs_more_evidence",
+      review.reviewer_note,
+    ));
+    expect(await screen.findByText(/No merge was performed/i)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Export human_review.json" }));
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
+    expect(click).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURL).toHaveBeenCalledWith("blob:human-review");
+    click.mockRestore();
+  });
+
   it("opens the actual Money strategy record and restores focus on Escape", async () => {
     const user = userEvent.setup();
     renderRoute("/");
@@ -282,7 +335,7 @@ describe("application routes", () => {
     expect(screen.getByText("career tag")).toBeInTheDocument();
     expect(screen.getByText(/money-seed-42/i)).toBeInTheDocument();
     const replayLink = screen.getByRole("link", { name: /Inspect Money seed 42 replay/i });
-    expect(replayLink).toHaveAttribute("href", "/playthrough-inspector?persona=money");
+    expect(replayLink).toHaveAttribute("href", "/playthrough-inspector?source=replay&persona=money&seed=42");
     await user.tab();
     expect(replayLink).toHaveFocus();
     await user.tab();
@@ -305,10 +358,8 @@ describe("application routes", () => {
     expect(screen.getByLabelText("Money current state at recorded week 1")).toHaveAttribute("data-runner-frame", "1");
     expect(screen.getByRole("heading", { name: "Arrival in Germany" })).toBeInTheDocument();
     expect(screen.getByText("Go to the dorm to drop off luggage")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "中文" }));
-    expect(screen.getByRole("heading", { name: "抵达德国" })).toBeInTheDocument();
-    expect(screen.getByText("先去宿舍放行李")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "EN" }));
+    expect(screen.queryByRole("button", { name: "中文" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "EN" })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByRole("heading", { name: "Continuing Language Studies in Germany" })).toBeInTheDocument();
@@ -327,7 +378,7 @@ describe("application routes", () => {
 
     await user.click(screen.getByRole("button", { name: /W19 Post-Exam Void/i }));
     expect(screen.getByRole("heading", { name: "Post-Exam Void" })).toBeInTheDocument();
-    expect(screen.getByText("cashflow_collapse")).toBeInTheDocument();
+    expect(screen.getAllByText("cashflow_collapse").length).toBeGreaterThan(0);
     expect(within(screen.getByRole("article")).getByText("€3,862")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Go to recorded week 19" })).toHaveAttribute("aria-current", "step");
   });

@@ -28,10 +28,9 @@ import {
   DEFAULT_EVENT_LOCALE,
   localizedChoice,
   localizedEvent,
-  type EventLocale,
 } from "@/lib/eventLocalization";
 import { competitionPlaythrough } from "@/lib/playthrough";
-import { loadLivePlaythrough, loadPlaytestSession } from "@/lib/livePlaythrough";
+import { loadLivePlaythrough, loadLivePlaythroughCell, loadPlaytestSession } from "@/lib/livePlaythrough";
 import type {
   PlaytestSession,
   PlaythroughBundle,
@@ -103,22 +102,39 @@ export function PlaythroughInspectorPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const useLatest = Boolean(latestPlaythrough && searchParams.get("source") !== "replay");
   const bundle = useLatest ? latestPlaythrough! : competitionPlaythrough;
-  const { manifest, cells } = bundle;
-  const availablePersonas = PERSONA_ORDER.filter((slug) => Boolean(cells[slug]));
+  const { manifest, cells, cellReferences } = bundle;
+  const availablePersonas = PERSONA_ORDER.filter((slug) => (
+    cellReferences.some((reference) => reference.persona === slug)
+  ));
   const requestedPersona = searchParams.get("persona");
-  const defaultPersona = useLatest ? (availablePersonas[0] ?? "newbie") : "money";
-  const personaSlug = isPersonaSlug(requestedPersona) && cells[requestedPersona]
-    ? requestedPersona : defaultPersona;
+  const desiredPersona = isPersonaSlug(requestedPersona)
+    && availablePersonas.includes(requestedPersona)
+    ? requestedPersona
+    : useLatest ? (availablePersonas[0] ?? "newbie") : "money";
+  const requestedSeed = Number(searchParams.get("seed"));
+  const availableSeeds = cellReferences
+    .filter((reference) => reference.persona === desiredPersona)
+    .map((reference) => reference.seed)
+    .sort((left, right) => left - right);
+  const desiredSeed = availableSeeds.includes(requestedSeed)
+    ? requestedSeed
+    : (availableSeeds[0] ?? 42);
+  const cell = useLatest
+    ? bundle.cell
+    : (cells[desiredPersona] ?? bundle.cell);
+  const personaSlug = cell.persona;
   const personaLabel = PERSONA_LABELS[personaSlug];
-  const cell = cells[personaSlug] ?? bundle.cell;
+  const selectedPathPosition = cellReferences.findIndex((reference) => (
+    reference.persona === cell.persona && reference.seed === cell.seed
+  )) + 1;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [eventLocale, setEventLocale] = useState<EventLocale>(DEFAULT_EVENT_LOCALE);
-  const currentNode = cell.nodes[currentIndex];
+  const safeCurrentIndex = Math.min(currentIndex, Math.max(0, cell.nodes.length - 1));
+  const currentNode = cell.nodes[safeCurrentIndex];
   const runnerFrameIndex = (currentNode.week - 1) % 2;
   const runnerAsset = PERSONA_RUNNERS[personaSlug][runnerFrameIndex];
   const choice = selectedChoice(currentNode);
-  const eventCopy = localizedEvent(currentNode.event.id, eventLocale);
+  const eventCopy = localizedEvent(currentNode.event.id, DEFAULT_EVENT_LOCALE);
   const progress = currentIndex / Math.max(1, cell.nodes.length - 1);
   const runnerPosition = 5 + progress * 90;
   const metricRows = useMemo(
@@ -132,13 +148,14 @@ export function PlaythroughInspectorPage() {
   const stressMetric = metricRows.find((metric) => metric.key === "stress");
   const arrearsMetric = metricRows.find((metric) => metric.key === "arrears_amount");
   const sessionPercent = liveSession
-    ? Math.min(100, Math.round(
-        liveSession.progress.completed_weeks
-        / Math.max(1, liveSession.progress.total_requested_weeks)
-        * 100,
-      ))
+    ? liveSession.status === "completed"
+      ? 100
+      : Math.min(99, Math.round(
+          liveSession.progress.completed_weeks
+          / Math.max(1, liveSession.progress.total_requested_weeks)
+          * 100,
+        ))
     : 0;
-
   useEffect(() => {
     const controller = new AbortController();
     loadLivePlaythrough(controller.signal)
@@ -149,6 +166,28 @@ export function PlaythroughInspectorPage() {
       });
     return () => controller.abort();
   }, []);
+
+  useEffect(() => {
+    if (!useLatest || !latestPlaythrough) return undefined;
+    if (latestPlaythrough.cell.persona === desiredPersona && latestPlaythrough.cell.seed === desiredSeed) {
+      return undefined;
+    }
+    const reference = latestPlaythrough.cellReferences.find((item) => (
+      item.persona === desiredPersona && item.seed === desiredSeed
+    ));
+    if (!reference) return undefined;
+    const controller = new AbortController();
+    loadLivePlaythroughCell(latestPlaythrough.manifest, reference, controller.signal)
+      .then((nextCell) => setLatestPlaythrough((current) => current
+        && current.manifest.campaign_id === latestPlaythrough.manifest.campaign_id
+        ? { ...current, cell: nextCell, cells: { ...current.cells, [nextCell.persona]: nextCell } }
+        : current))
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setLatestError(error instanceof Error ? error.message : "Selected path unavailable");
+      });
+    return () => controller.abort();
+  }, [desiredPersona, desiredSeed, latestPlaythrough, useLatest]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -184,7 +223,7 @@ export function PlaythroughInspectorPage() {
   useEffect(() => {
     setPlaying(false);
     setCurrentIndex(0);
-  }, [personaSlug, manifest.campaign_id]);
+  }, [cell.seed, personaSlug, manifest.campaign_id]);
 
   useEffect(() => {
     if (!playing) return undefined;
@@ -233,9 +272,19 @@ export function PlaythroughInspectorPage() {
   }
   function selectPersona(slug: PlaythroughPersonaSlug): void {
     const next = new URLSearchParams(searchParams);
+    const seeds = cellReferences
+      .filter((reference) => reference.persona === slug)
+      .map((reference) => reference.seed);
     next.set("persona", slug);
+    next.set("seed", String(seeds.includes(desiredSeed) ? desiredSeed : (seeds[0] ?? 42)));
     setSearchParams(next, { replace: true });
   }
+  function selectSeed(seed: number): void {
+    const next = new URLSearchParams(searchParams);
+    next.set("seed", String(seed));
+    setSearchParams(next, { replace: true });
+  }
+
 
   function selectSource(source: "replay" | "latest"): void {
     const next = new URLSearchParams(searchParams);
@@ -261,14 +310,6 @@ export function PlaythroughInspectorPage() {
             <div><dt>Seed</dt><dd>{cell.seed}</dd></div>
             <div><dt>Nodes</dt><dd>{cell.nodes.length}</dd></div>
             <div><dt>Edges</dt><dd>{cell.actual_edges.length}</dd></div>
-            <div className="playthrough-language-control">
-              <dt>Event language</dt>
-              <dd>
-                <button type="button" className={eventLocale === "en" ? "is-active" : ""} aria-pressed={eventLocale === "en"} onClick={() => setEventLocale("en")}>EN</button>
-                <button type="button" className={eventLocale === "zh" ? "is-active" : ""} aria-pressed={eventLocale === "zh"} onClick={() => setEventLocale("zh")}>中文</button>
-              </dd>
-            </div>
-            <div><dt>Default copy</dt><dd>English</dd></div>
           </dl>
         </section>
 
@@ -333,10 +374,24 @@ export function PlaythroughInspectorPage() {
               >
                 <img src={PERSONA_RUNNERS[slug][0]} alt="" />
                 <span>{PERSONA_LABELS[slug]}</span>
-                <small>seed {cells[slug]?.seed ?? cell.seed}</small>
+                <small>seed {slug === personaSlug ? cell.seed : (cellReferences.find((item) => item.persona === slug)?.seed ?? "—")}</small>
               </button>
             ))}
           </div>
+        </section>
+
+        <section className="playthrough-path-selector" aria-labelledby="playthrough-seed-title">
+          <div>
+            <span id="playthrough-seed-title">SEED PATH</span>
+            <small>Path {Math.max(1, selectedPathPosition)} of {cellReferences.length} in this evidence source</small>
+          </div>
+          <label>
+            <span>Seed</span>
+            <select value={desiredSeed} onChange={(event) => selectSeed(Number(event.target.value))}>
+              {availableSeeds.map((seed) => <option key={seed} value={seed}>seed {seed}</option>)}
+            </select>
+          </label>
+          <p><b>{cell.final_ending}</b><span>{cell.completed_weeks} decisions · {cell.stop_reason.replaceAll("_", " ")}</span></p>
         </section>
 
         <section className="playthrough-route" aria-labelledby="playthrough-route-title">
@@ -457,7 +512,7 @@ export function PlaythroughInspectorPage() {
                     return (
                       <li key={item.choice_id} className={isSelected ? "is-selected" : ""}>
                         <span>{isSelected ? <Check weight="bold" /> : null}</span>
-                        <div><b>{localizedChoice(currentNode.event.id, item, eventLocale)}</b><small>{isSelected ? "observed result" : "legal here · future not executed"}</small></div>
+                        <div><b>{localizedChoice(currentNode.event.id, item, DEFAULT_EVENT_LOCALE)}</b><small>{isSelected ? "observed result" : "legal here · future not executed"}</small></div>
                       </li>
                     );
                   })}
@@ -473,7 +528,7 @@ export function PlaythroughInspectorPage() {
                     </div>
                   ))}
                 </dl>
-                <div className="playthrough-selected-choice"><small>SELECTED CHOICE</small><strong>{localizedChoice(currentNode.event.id, choice, eventLocale)}</strong></div>
+                <div className="playthrough-selected-choice"><small>SELECTED CHOICE</small><strong>{localizedChoice(currentNode.event.id, choice, DEFAULT_EVENT_LOCALE)}</strong></div>
               </section>
             </div>
           </article>
@@ -485,7 +540,7 @@ export function PlaythroughInspectorPage() {
               {cell.nodes.map((node, index) => (
                 <button key={node.id} type="button" className={index === currentIndex ? "is-active" : ""} onClick={() => selectIndex(index)}>
                   <span>W{node.week}</span>
-                  <span><b>{localizedEvent(node.event.id, eventLocale).title}</b><small>{localizedChoice(node.event.id, selectedChoice(node), eventLocale)}</small></span>
+                  <span><b>{localizedEvent(node.event.id, DEFAULT_EVENT_LOCALE).title}</b><small>{localizedChoice(node.event.id, selectedChoice(node), DEFAULT_EVENT_LOCALE)}</small></span>
                   <code>{node.evidence.source_record_sha256.slice(0, 8)}</code>
                 </button>
               ))}

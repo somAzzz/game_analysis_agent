@@ -64,4 +64,14 @@ export const competitionPlaythrough: PlaythroughBundle = Object.freeze({
   personas: personasDocument.personas,
   cell,
   cells,
+  cellReferences: Object.values(cells).map((item) => ({
+    cell_id: item.cell_id,
+    persona: item.persona,
+    seed: item.seed,
+    path: `cells/${item.persona}-seed-${item.seed}.json`,
+    completed_weeks: item.completed_weeks,
+    final_ending: item.final_ending,
+    stop_reason: item.stop_reason,
+    attractor_count: item.nodes.filter((node) => node.attractors.length > 0).length,
+  })),
 });

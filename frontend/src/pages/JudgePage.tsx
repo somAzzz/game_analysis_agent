@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   createJudgeCampaign,
   fetchJudgeCampaign,
@@ -6,11 +7,14 @@ import {
   fetchJudgeProviderStatus,
   fetchStaticJudgeExperiment,
   testJudgeProvider,
+  submitHumanReview,
 } from "@/lib/api";
 import type {
   JudgeCampaignJob,
   JudgeCohort,
   JudgeExperiment,
+  HumanReviewDecision,
+  HumanReviewRecord,
   JudgeProvider,
   JudgeProviderStatus,
 } from "@/types";
@@ -19,6 +23,7 @@ import { ForgeTopNav } from "@/components/competition/ForgeWorkspace";
 
 const PROVIDER_LABEL: Record<JudgeProvider, string> = {
   replay: "Deterministic policy Replay",
+  vllm: "Local vLLM persona agent",
   openai: "OpenAI live subagent",
 };
 
@@ -46,6 +51,10 @@ export function JudgePage() {
   const [campaign, setCampaign] = useState<JudgeCampaignJob | null>(null);
   const [activity, setActivity] = useState("Loading the signed public evidence…");
   const [busy, setBusy] = useState(false);
+  const [reviewDecision, setReviewDecision] = useState<HumanReviewDecision | "">("");
+  const [reviewerNote, setReviewerNote] = useState("");
+  const [reviewBusy, setReviewBusy] = useState(false);
+  const [reviewActivity, setReviewActivity] = useState("No human final decision recorded.");
   const pollRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -55,6 +64,9 @@ export function JudgePage() {
       if (status.status === "fulfilled") setProviderStatus(status.value);
       if (proof.status === "fulfilled") {
         setExperiment(proof.value);
+        setReviewDecision(proof.value.human_review?.human_decision ?? "");
+        setReviewerNote(proof.value.human_review?.reviewer_note ?? "");
+        if (proof.value.human_review) setReviewActivity("Human review recorded. No merge was performed.");
         setActivity("Judge API connected. Replay is ready; live mode is configuration-gated.");
         return;
       }
@@ -62,6 +74,8 @@ export function JudgePage() {
         const frozen = await fetchStaticJudgeExperiment();
         if (!active) return;
         setExperiment(frozen);
+        setReviewDecision(frozen.human_review?.human_decision ?? "");
+        setReviewerNote(frozen.human_review?.reviewer_note ?? "");
         setSource("static");
         setActivity("Static evaluator mode: signed prerecorded evidence is available without a server.");
       } catch (error) {
@@ -74,8 +88,11 @@ export function JudgePage() {
     };
   }, []);
 
-  const openAIReady = providerStatus?.providers.openai.live_campaign_ready === true;
-  const providerDisabled = source === "static" || (provider === "openai" && !openAIReady);
+  const providerReady = provider === "replay"
+    || (provider === "vllm"
+      ? providerStatus?.providers.vllm?.live_campaign_ready === true
+      : providerStatus?.providers.openai.live_campaign_ready === true);
+  const providerDisabled = source === "static" || !providerReady;
 
   async function handleProviderTest() {
     setBusy(true);
@@ -121,6 +138,46 @@ export function JudgePage() {
       setActivity(errorMessage(error));
     }
   }
+  async function handleHumanReview() {
+    if (!experiment || !reviewDecision || !reviewerNote.trim()) return;
+    setReviewBusy(true);
+    setReviewActivity("Recording human final decision against the current evidence…");
+    try {
+      const saved = await submitHumanReview(
+        experiment.experiment_id,
+        experiment.evidence_fingerprint,
+        reviewDecision,
+        reviewerNote,
+      );
+      setExperiment((current) => current ? { ...current, human_review: saved } : current);
+      setReviewActivity("Human review recorded. No merge was performed.");
+    } catch (error) {
+      setReviewActivity(errorMessage(error));
+    } finally {
+      setReviewBusy(false);
+    }
+  }
+
+  function exportHumanReview(record: HumanReviewRecord | null): void {
+    if (!record) return;
+    const blob = new Blob([`${JSON.stringify(record, null, 2)}\n`], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "human_review.json";
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function focusPatchDiff(): void {
+    const diff = document.getElementById("candidate-patch-diff") as HTMLDetailsElement | null;
+    if (!diff) return;
+    diff.open = true;
+    diff.scrollIntoView?.({ behavior: "smooth", block: "start" });
+    diff.querySelector("summary")?.focus();
+  }
 
   const campaignResult = useMemo(() => {
     if (!campaign?.result) return null;
@@ -147,6 +204,10 @@ export function JudgePage() {
   const patchedFixed = cohort(experiment, "patched_fixed");
   const baselineHoldout = cohort(experiment, "baseline_holdout");
   const patchedHoldout = cohort(experiment, "patched_holdout");
+  const displayedDecision = experiment.human_review
+    ? experiment.human_review.human_decision.replaceAll("_", " ")
+    : experiment.decision;
+  const verdictLabel = experiment.human_review ? "Human decision" : "Machine recommendation";
 
   return (
     <div className="judge-shell">
@@ -158,12 +219,16 @@ export function JudgePage() {
       <section className="judge-hero" aria-labelledby="judge-title">
         <div>
           <p className="judge-kicker">OpenAI Build Week 2026 · Judge Mode</p>
-          <h1 id="judge-title">A patch passed its unit test.<br /><em>We still rejected it.</em></h1>
+          <h1 id="judge-title">A patch passed its unit test.<br /><em>The holdout still rejected it.</em></h1>
         </div>
-        <aside className="judge-verdict" aria-label="Experiment verdict">
-          <span>Final decision</span>
-          <strong>{experiment.decision}</strong>
-          <small>{experiment.experiment_id}</small>
+        <aside
+          className="judge-verdict"
+          data-decision={experiment.human_review?.human_decision ?? experiment.decision}
+          aria-label="Experiment decision status"
+        >
+          <span>{verdictLabel}</span>
+          <strong>{displayedDecision}</strong>
+          <small>{experiment.human_review ? `Machine recommendation: ${experiment.decision}` : "Awaiting human review"}</small>
         </aside>
         <p className="judge-thesis">
           Codex plans the campaign, coordinates persona playthroughs against a real Godot game,
@@ -191,7 +256,7 @@ export function JudgePage() {
             <div className="judge-console">
               <fieldset>
                 <legend>Action provider</legend>
-                {(["replay", "openai"] as JudgeProvider[]).map((item) => (
+                {(["replay", "vllm", "openai"] as JudgeProvider[]).map((item) => (
                   <label key={item} className={provider === item ? "is-selected" : ""}>
                     <input
                       type="radio"
@@ -201,7 +266,11 @@ export function JudgePage() {
                       onChange={() => setProvider(item)}
                     />
                     <span>{PROVIDER_LABEL[item]}</span>
-                    <small>{item === "replay" ? "fixture policy · no key" : openAIReady ? "live · server key ready" : "live · configuration required"}</small>
+                    <small>{item === "replay"
+                        ? "fixture policy · no key"
+                        : item === "vllm"
+                          ? providerStatus?.providers.vllm?.live_campaign_ready ? "local · runner configured" : "local · configuration required"
+                          : providerStatus?.providers.openai.live_campaign_ready ? "live · server key ready" : "live · configuration required"}</small>
                   </label>
                 ))}
               </fieldset>
@@ -232,7 +301,7 @@ export function JudgePage() {
               </ul>
               <div className="judge-stamp" aria-label="Candidate repair rejected">REJECTED</div>
             </div>
-            <details className="judge-diff">
+            <details id="candidate-patch-diff" className="judge-diff">
               <summary>
                 <span>View exact candidate diff</span>
                 <code>sha256 {experiment.patch.patch_sha256.slice(0, 12)}</code>
@@ -279,7 +348,100 @@ export function JudgePage() {
                 ))}
               </ol>
             </div>
-            <p className="judge-decision"><span>Decision</span><strong>{experiment.decision}</strong>{experiment.decision_reason}</p>
+            <p className="judge-decision"><span>Machine recommendation</span><strong>{experiment.decision}</strong>{experiment.decision_reason}</p>
+          </div>
+        </section>
+
+        <section className="judge-stage judge-human-stage" aria-labelledby="human-review-title">
+          <div className="judge-stage-marker"><span>04</span><b>HUMAN</b></div>
+          <div className="judge-stage-body">
+            <p className="judge-eyebrow">Human review · same evidence fingerprint</p>
+            <h2 id="human-review-title">The machine recommends. A human decides.</h2>
+            <p className="judge-copy">
+              Review the retained campaign, fixed and holdout gates, and the exact candidate patch.
+              Your decision is recorded beside the machine recommendation; it never rewrites evidence
+              and never merges the patch.
+            </p>
+
+            <div className="judge-review-handoff" aria-label="Review handoff">
+              <div><span>Machine recommendation</span><strong>{experiment.decision}</strong></div>
+              <div><span>Evidence fingerprint</span><code>{experiment.evidence_fingerprint.slice(0, 16)}</code></div>
+              <div><span>Automation boundary</span><strong>NO AUTO-MERGE</strong></div>
+            </div>
+
+            <nav className="judge-review-evidence-links" aria-label="Human review evidence">
+              <Link to="/playthrough-inspector?source=replay&persona=money&seed=42">
+                View full campaign evidence
+              </Link>
+              <button type="button" onClick={focusPatchDiff}>Review exact patch diff</button>
+            </nav>
+
+            <div className="judge-human-review">
+              <div className="judge-review-form-grid">
+                <fieldset>
+                  <legend>Final human decision</legend>
+                  {([
+                    ["approve", "Approve"],
+                    ["reject", "Reject"],
+                    ["needs_more_evidence", "Needs more evidence"],
+                  ] as Array<[HumanReviewDecision, string]>).map(([value, label]) => (
+                    <label key={value} className={reviewDecision === value ? "is-selected" : ""}>
+                      <input
+                        type="radio"
+                        name="human-review-decision"
+                        value={value}
+                        checked={reviewDecision === value}
+                        onChange={() => setReviewDecision(value)}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </fieldset>
+                <label className="judge-review-note">
+                  <span>Reviewer note</span>
+                  <textarea
+                    value={reviewerNote}
+                    maxLength={2000}
+                    rows={6}
+                    required
+                    placeholder="Cite the visible gates or evidence that support this human decision."
+                    onChange={(event) => setReviewerNote(event.target.value)}
+                  />
+                  <small>{reviewerNote.length} / 2000 · stored with the evidence fingerprint</small>
+                </label>
+              </div>
+              <div className="judge-review-actions">
+                <p role="status" aria-live="polite">
+                  {source === "static" ? "Start the Judge API to record a durable review." : reviewActivity}
+                </p>
+                <div>
+                  <button
+                    type="button"
+                    className="judge-button-primary"
+                    disabled={source === "static" || reviewBusy || !reviewDecision || !reviewerNote.trim()}
+                    onClick={handleHumanReview}
+                  >
+                    {reviewBusy ? "Recording…" : "Record final decision"}
+                  </button>
+                  <button
+                    type="button"
+                    className="judge-button-secondary"
+                    disabled={!experiment.human_review}
+                    onClick={() => exportHumanReview(experiment.human_review)}
+                  >
+                    Export human_review.json
+                  </button>
+                </div>
+              </div>
+              {experiment.human_review && (
+                <dl className="judge-review-record">
+                  <div><dt>Human decision</dt><dd>{experiment.human_review.human_decision.replaceAll("_", " ")}</dd></div>
+                  <div><dt>Machine recommendation</dt><dd>{experiment.human_review.machine_recommendation}</dd></div>
+                  <div><dt>Recommendation overridden</dt><dd>{experiment.human_review.overrides_machine_recommendation ? "yes" : "no"}</dd></div>
+                  <div><dt>Merge performed</dt><dd>no</dd></div>
+                </dl>
+              )}
+            </div>
           </div>
         </section>
       </main>
