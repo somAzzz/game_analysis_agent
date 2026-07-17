@@ -10,6 +10,8 @@ Read in date order, not position order. Newest first.
 
 ## 2026-07-17
 
+- [openai_build_week_2026/LOCAL_VLLM_AB_REPAIR_PROOF_2026-07-17.md](openai_build_week_2026/LOCAL_VLLM_AB_REPAIR_PROOF_2026-07-17.md) — *completed* — A/B frozen plans, sensitivity, fixed plus unseen holdout proof, rejection, and persistent Persona/seed evidence
+- [openai_build_week_2026/SUBMISSION_COMPLIANCE_AUDIT_2026-07-17.md](openai_build_week_2026/SUBMISSION_COMPLIANCE_AUDIT_2026-07-17.md) — *active* — official rule audit, final hybrid delivery decision, README coverage, and remaining release blockers
 - [openai_build_week_2026/FULL_CAMPAIGN_REVIEW_REMEDIATION_REVIEW.md](openai_build_week_2026/FULL_CAMPAIGN_REVIEW_REMEDIATION_REVIEW.md) — *implemented* — shared provider execution, exact-path replay, large-batch evidence indexing, Judge updates, and remaining follow-ups
 - [openai_build_week_2026/HUMAN_DECISION_FRONTEND_INTEGRATION_REVIEW.md](openai_build_week_2026/HUMAN_DECISION_FRONTEND_INTEGRATION_REVIEW.md) — *implemented* — Human Decision information architecture, design-language audit, interaction boundaries, and before/after visual evidence
 - [openai_build_week_2026/local-vllm-25-seed-audit-2026-07-17/README.md](openai_build_week_2026/local-vllm-25-seed-audit-2026-07-17/README.md) — *completed* — 150-cell real-Godot local-vLLM audit, agent/game reports, and pressure-burnout cross-check

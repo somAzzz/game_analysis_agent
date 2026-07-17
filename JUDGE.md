@@ -76,8 +76,8 @@ Inspect is a Python-standard-library program. It reads
 then checks:
 
 1. manifest and declared artifact schemas;
-2. byte size and SHA-256 for 123 public evidence, Skill, expected-failure gate, and embedded-demo artifacts;
-3. six public claims against exact RFC 6901 JSON pointers;
+2. byte size and SHA-256 for 599 public evidence, Skill, expected-failure gate, embedded-demo, and local-vLLM A/B artifacts;
+3. seven public claims against exact RFC 6901 JSON pointers;
 4. committed campaign, repair, and independent G2/G3 review evidence.
 
 It requires Python 3.9+ only. It does not import the project package and does

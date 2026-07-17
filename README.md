@@ -9,7 +9,7 @@ The primary review path is repository-only and offline:
 ./judge --mode replay --offline --json --output-dir -
 ```
 
-Inspect needs only Python 3.9+ and validates 144 committed artifact hashes,
+Inspect needs only Python 3.9+ and validates 599 committed artifact hashes,
 schemas, provenance gates, and seven exact public claim references. Replay adds
 the locked `uv` environment and consumes hash-pinned persona fixtures; it does
 not need Godot, Docker, a GPU, network, an API key, a browser, or an external
@@ -60,6 +60,26 @@ tracked by Git and hash-verified by `judge-manifest.json`; it is not excluded
 because `.agents` is a hidden directory. See the official
 [Codex Skills guide](https://learn.chatgpt.com/docs/build-skills) for repository
 discovery and explicit/implicit invocation behavior.
+
+## How Codex, GPT-5.6, and humans are used
+
+Codex is the primary build and repair director. From the repository root it
+loads `playtest-forge`, freezes persona/seed/holdout and acceptance gates before
+source edits, launches the shared campaign services, proposes an allowlisted
+candidate in an isolated game worktree, and publishes the exact patch plus a
+machine accept/reject recommendation. The Judge UI exposes the same evidence
+fingerprint to automated evaluators and human reviewers.
+
+GPT-5.6 is implemented as the optional live Persona action provider through the
+same contract used by local vLLM. Keys remain server-side; the browser can only
+select a provider and start a bounded campaign. The final release checklist
+still requires one retained, redacted GPT-5.6 campaign, so prerecorded Replay
+and local-vLLM records are not represented as OpenAI calls.
+
+Humans choose the experiment scope and frozen policy, may inspect every retained
+cohort and exact diff, and record Approve / Reject / Needs more evidence with a
+reviewer note. Human review never rewrites evidence and never auto-merges a game
+patch. See the [submission compliance audit](docs/reviews/openai_build_week_2026/SUBMISSION_COMPLIANCE_AUDIT_2026-07-17.md).
 
 Development-side AI agent pipeline for simulation games. The current reference
 integration is the Godot `study-in-germany` demo, but the project is structured
@@ -165,6 +185,18 @@ The evaluator paths have progressively larger requirements:
   development adapters, not Judge requirements.
 
 The pure Python analyzers and tests can run without Godot or a live LLM.
+
+### Supported delivery paths
+
+| Path | Supported environment | Rebuild/model/key required |
+|---|---|---|
+| GitHub Pages | Current desktop/mobile browsers | None |
+| `./judge --mode inspect` | Python 3.9+ on Linux or macOS | None |
+| `./judge --mode replay` | Linux or macOS with locked `uv` environment | No model, Godot, Docker, or key |
+| Judge container/dashboard | Docker Engine 24+ on linux/amd64 or linux/arm64 | Image build/pull only; no model or key |
+| Real game authoring | Host Codex + Godot 4.4 or Docker Godot wrapper | Writable demo runtime |
+| Local persona campaign | Host Codex + Docker Godot/vLLM sidecars | NVIDIA-compatible local model stack |
+| OpenAI persona campaign | Host Codex + Godot runtime | Server-side OpenAI API key |
 
 ## Quick Start A: No Godot, No LLM
 
@@ -764,10 +796,14 @@ The deterministic Python/frontend suites do not need Godot or an LLM. Real
 simulation, validators, and live interactive play still require a compatible
 Godot 4 binary; live persona evaluation additionally requires an LLM endpoint.
 The reference demo is embedded, so CI and evaluators need no private-repository
-token or sibling checkout. Docker is unavailable on this macOS host, so the
-updated container bundle still needs a fresh Linux/Docker acceptance run. The
-owner approved public bundling, but an explicit repository license remains a
-G5 release decision.
+token or sibling checkout. The final local A/B Judge image has passed no-network, read-only Inspect
+and Replay plus a read-only, dropped-capability Dashboard/API check after packaging
+the embedded game overlays and signed static experiment fixtures. Full local/OpenAI
+campaign authoring intentionally remains a host-Codex plus Docker-sidecar path rather than an all-container path.
+After any committed evidence or frontend change, the final image must still be
+rebuilt and the same restricted acceptance rows rerun. The project is MIT
+licensed; the remaining G5 blockers are submission evidence and owner actions,
+not licensing.
 
 ## Notes
 

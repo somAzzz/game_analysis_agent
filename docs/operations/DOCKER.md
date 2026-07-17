@@ -112,7 +112,30 @@ python3 tools/run_gameplay_agent.py all --runs 100 --policy balanced
 The Docker setup keeps both external runtimes available while the Python CLI
 remains easy to run and debug on the host.
 
-## 7. Configurable knobs
+## 7. Final evaluator and Codex communication model
+
+The supported competition delivery is deliberately hybrid:
+
+- GitHub Pages and the Judge image are evaluator surfaces; they need no model,
+  game checkout, API key, or Docker socket.
+- Codex runs on the host, discovers `.agents/skills/playtest-forge`, and calls
+  the repository services/scripts through its shell tool. MCP is not required.
+- The Godot wrapper communicates with the `godot` sidecar through
+  `docker compose exec`; if the sidecar is absent it uses a bounded one-shot
+  container with identical absolute mounts.
+- Local vLLM is reached through its published OpenAI-compatible host endpoint.
+  The OpenAI provider uses the same campaign request, progress, aggregation, and
+  experiment-registry contracts, with the key retained server-side.
+
+The final local A/B Judge image contains `game-overlays/`, the signed static
+experiment index, and full A/B evidence. It passed no-network, read-only Inspect
+and Replay plus a read-only, dropped-capability Dashboard/API check. The first
+rebuild exposed a missing `frontend/public-demo/` copy; `Dockerfile.judge` now
+packages those signed fixtures. Publish a new immutable multi-architecture digest
+only from this final source state. The `agent` container is
+not claimed as a controller for sibling containers.
+
+## 8. Configurable knobs
 
 All knobs live in `.env`:
 
@@ -128,13 +151,13 @@ All knobs live in `.env`:
 | `GAME_PROJECT_PATH` | Writable prepared demo runtime mounted at the identical container path | `reports/docker-game-runtime` after preparation |
 | `GODOT_DOCKER_MOUNT_ROOT` | Parent of this repository, mounted at the same absolute path | wrapper-detected repository parent |
 
-## 8. Version pinning
+## 9. Version pinning
 
 `vllm/vllm-openai:v0.25.0` is the latest stable tag (as of 2026-07-13)
 with NVFP4 + MTP validated against Qwen3.6 27B NVFP4. Bump quarterly;
 see fintext_llm for the same pinning rationale.
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
 **`error: failed to inspect docker image`** — your `vllm/vllm-openai`
 image isn't pulled yet. Run `docker compose pull vllm` first.
