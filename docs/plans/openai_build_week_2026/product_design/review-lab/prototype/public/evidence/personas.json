@@ -1,0 +1,307 @@
+{
+  "personas": [
+    {
+      "contract": {
+        "alignment_risk_guided": true,
+        "description": "第一次玩，不知道最优解，倾向跟随 UI 提示。",
+        "exploration": 0.45,
+        "failure_intent": false,
+        "hard_avoid": [
+          "hunger_above_85",
+          "money_below_minus_1000"
+        ],
+        "priorities": [
+          "avoid_immediate_crisis",
+          "follow_top_risks",
+          "try_visible_actions"
+        ],
+        "risk_tolerance": 0.35
+      },
+      "observed": {
+        "action_tag_rates": {
+          "admin": 0.25,
+          "exam": 0.25,
+          "language": 0.429825,
+          "social": 0.236842,
+          "study": 0.570175
+        },
+        "cell_count": 3,
+        "completed_cells": 3,
+        "final_endings": {
+          "cashflow_collapse": 3
+        },
+        "first_cashflow_stress_attractor_weeks": [
+          6,
+          6,
+          14
+        ],
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "selected_action_count": 228,
+        "weeks": 57
+      },
+      "slug": "newbie"
+    },
+    {
+      "contract": {
+        "acceptable_costs": [
+          "moderate_stress",
+          "low_social"
+        ],
+        "alignment_action_tags": [
+          "study",
+          "language",
+          "application",
+          "exam"
+        ],
+        "description": "学霸路线，优先 APS/TestDaF/考试。",
+        "exploration": 0.25,
+        "failure_intent": false,
+        "hard_avoid": [
+          "hunger_above_85",
+          "money_below_minus_500"
+        ],
+        "priorities": [
+          "academic_progress",
+          "exam_readiness",
+          "language",
+          "aps_knowledge"
+        ],
+        "risk_tolerance": 0.4
+      },
+      "observed": {
+        "action_tag_rates": {
+          "admin": 0.25,
+          "exam": 0.25,
+          "language": 0.5,
+          "social": 0.25,
+          "study": 0.5
+        },
+        "cell_count": 3,
+        "completed_cells": 3,
+        "final_endings": {
+          "cashflow_collapse": 3
+        },
+        "first_cashflow_stress_attractor_weeks": [
+          3,
+          6,
+          6
+        ],
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "selected_action_count": 228,
+        "weeks": 57
+      },
+      "slug": "study"
+    },
+    {
+      "contract": {
+        "acceptable_costs": [
+          "academic_delay",
+          "stress_increase"
+        ],
+        "alignment_action_tags": [
+          "work",
+          "career",
+          "income"
+        ],
+        "description": "打工路线，优先现金流和工作经验。",
+        "exploration": 0.35,
+        "failure_intent": false,
+        "hard_avoid": [
+          "stress_above_95",
+          "compliance_risk_above_90"
+        ],
+        "priorities": [
+          "money",
+          "career_progress",
+          "survival"
+        ],
+        "risk_tolerance": 0.65
+      },
+      "observed": {
+        "action_tag_rates": {
+          "admin": 0.175439,
+          "career": 0.004386,
+          "exam": 0.25,
+          "language": 0.368421,
+          "social": 0.245614,
+          "study": 0.631579
+        },
+        "cell_count": 3,
+        "completed_cells": 3,
+        "final_endings": {
+          "cashflow_collapse": 3
+        },
+        "first_cashflow_stress_attractor_weeks": [
+          3,
+          3,
+          6
+        ],
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "selected_action_count": 228,
+        "weeks": 57
+      },
+      "slug": "money"
+    },
+    {
+      "contract": {
+        "alignment_action_tags": [
+          "social",
+          "language"
+        ],
+        "description": "社交路线，优先关系、人脉、信息。",
+        "exploration": 0.55,
+        "failure_intent": false,
+        "hard_avoid": [
+          "hunger_above_80",
+          "money_below_minus_800"
+        ],
+        "priorities": [
+          "social",
+          "loneliness_reduction",
+          "language"
+        ],
+        "risk_tolerance": 0.45
+      },
+      "observed": {
+        "action_tag_rates": {
+          "admin": 0.25,
+          "exam": 0.25,
+          "language": 0.5,
+          "social": 0.25,
+          "study": 0.5
+        },
+        "cell_count": 3,
+        "completed_cells": 3,
+        "final_endings": {
+          "cashflow_collapse": 3
+        },
+        "first_cashflow_stress_attractor_weeks": [
+          3,
+          6,
+          6
+        ],
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "selected_action_count": 228,
+        "weeks": 57
+      },
+      "slug": "social"
+    },
+    {
+      "contract": {
+        "alignment_action_tags": [
+          "admin",
+          "application",
+          "visa"
+        ],
+        "description": "行政稳健路线，优先注册、保险、银行、居留。",
+        "exploration": 0.2,
+        "failure_intent": false,
+        "hard_avoid": [
+          "visa_progress_below_30_after_week_10",
+          "money_below_minus_500"
+        ],
+        "priorities": [
+          "visa_progress",
+          "registration",
+          "deadline_safety",
+          "document_ready"
+        ],
+        "risk_tolerance": 0.25
+      },
+      "observed": {
+        "action_tag_rates": {
+          "admin": 0.25,
+          "exam": 0.25,
+          "language": 0.429825,
+          "social": 0.236842,
+          "study": 0.570175
+        },
+        "cell_count": 3,
+        "completed_cells": 3,
+        "final_endings": {
+          "cashflow_collapse": 3
+        },
+        "first_cashflow_stress_attractor_weeks": [
+          6,
+          6,
+          10
+        ],
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "selected_action_count": 228,
+        "weeks": 57
+      },
+      "slug": "visa"
+    },
+    {
+      "contract": {
+        "alignment_action_tags": [
+          "mental",
+          "life",
+          "recovery",
+          "avoidance"
+        ],
+        "description": "摆烂路线，短期降低压力，故意忽略部分长期风险。",
+        "exploration": 0.65,
+        "failure_intent": true,
+        "hard_avoid": [
+          "hunger_above_95"
+        ],
+        "priorities": [
+          "stress_reduction",
+          "energy_recovery",
+          "short_term_comfort"
+        ],
+        "risk_tolerance": 0.8
+      },
+      "observed": {
+        "action_tag_rates": {
+          "admin": 0.179825,
+          "exam": 0.25,
+          "language": 0.372807,
+          "social": 0.25,
+          "study": 0.627193
+        },
+        "cell_count": 3,
+        "completed_cells": 3,
+        "final_endings": {
+          "cashflow_collapse": 3
+        },
+        "first_cashflow_stress_attractor_weeks": [
+          3,
+          6,
+          6
+        ],
+        "seeds": [
+          42,
+          43,
+          44
+        ],
+        "selected_action_count": 228,
+        "weeks": 57
+      },
+      "slug": "slacker"
+    }
+  ],
+  "schema_version": "playthrough-personas-v1",
+  "truth_label": "prerecorded-real-godot-replay"
+}

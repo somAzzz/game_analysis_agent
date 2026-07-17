@@ -1,0 +1,20 @@
+{
+  "schema_version": "review-lab-provenance-v1",
+  "truth_label": "prerecorded-real-godot-replay",
+  "source_root": "examples/build_week_2026/playthrough-v1",
+  "selected_cell": "money-seed-42-0814df41bd32",
+  "files": {
+    "manifest.json": {
+      "sha256": "67da1280510f5c1aa9963d02458c66630fd9a3d24346784dbb451d4573d6a43c",
+      "bytes": 23023
+    },
+    "personas.json": {
+      "sha256": "608785a34af26a8845dc998dd6cc41a76d8b6f54fe8d5001066c3ce923201ad8",
+      "bytes": 7066
+    },
+    "cells/money-seed-42.json": {
+      "sha256": "ce4ba2d2da93c24040071c252f82e9bcd3fc15d00deacf33a1c53df970b5aef1",
+      "bytes": 213303
+    }
+  }
+}
