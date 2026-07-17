@@ -278,22 +278,64 @@ export interface HumanReviewRecord {
 }
 
 
-export interface JudgeExperiment {
-  schema_version: string;
+export type JudgeExperimentSourceKind = "signed" | "local_vllm" | "openai_api";
+export type JudgeExperimentLifecycle = "campaign_complete" | "proof_complete";
+
+export interface JudgeCampaignEvidence {
+  gate_status: "passed";
+  personas: string[];
+  seeds: number[];
+  max_weeks: number;
+  cells: number;
+  weeks: number;
+  target_members: number;
+  target_personas: number;
+  valid_rate: number;
+  fallback_rate: number;
+  provider_error_rate: number;
+  mean_final_money: number | null;
+  mean_max_stress: number | null;
+  request_fingerprint: string;
+  source_fingerprint: string;
+}
+
+export interface JudgeExperimentSummary {
+  schema_version: "judge-experiment-summary-v1";
   experiment_id: string;
+  title: string;
+  source_kind: JudgeExperimentSourceKind;
+  source_label: string;
+  provider: JudgeProvider;
+  provider_mode: string;
+  model: string;
+  lifecycle_status: JudgeExperimentLifecycle;
+  campaign_id: string;
+  campaign: JudgeCampaignEvidence;
+  campaign_bundle_path: string;
+  repair_bundle_path: string | null;
+  completed_at: string | null;
+}
+
+export interface JudgeExperimentIndex {
+  schema_version: "judge-experiment-index-v1";
+  experiments: JudgeExperimentSummary[];
+}
+
+export interface JudgeExperiment extends Omit<JudgeExperimentSummary, "schema_version"> {
+  schema_version: string;
   status: string;
   evidence_fingerprint: string;
   human_review: HumanReviewRecord | null;
-  decision: "accepted" | "rejected";
-  decision_reason: string;
-  hypothesis: string;
-  mechanism_class: string;
+  decision: "accepted" | "rejected" | null;
+  decision_reason: string | null;
+  hypothesis: string | null;
+  mechanism_class: string | null;
   comparison: {
     fixed_member_delta: number;
     fixed_relative_reduction: number;
     holdout_member_delta: number;
     holdout_relative_reduction: number;
-  };
+  } | null;
   cohorts: JudgeCohort[];
   gates: {
     gate_id: string;
@@ -314,7 +356,7 @@ export interface JudgeExperiment {
     canonical_source_path: string;
     disposition: "candidate_not_merged";
     diff: string;
-  };
+  } | null;
   codex: {
     task_reference: string;
     feedback_session_id: string;
@@ -323,8 +365,8 @@ export interface JudgeExperiment {
     hypothesis_owned_by_codex: true;
     patch_owned_by_codex: true;
     decision_owned_by_codex: true;
-  };
-  mode: "prerecorded";
+  } | null;
+  mode: string;
 }
 
 

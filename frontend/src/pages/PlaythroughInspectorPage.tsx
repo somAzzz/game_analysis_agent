@@ -30,7 +30,13 @@ import {
   localizedEvent,
 } from "@/lib/eventLocalization";
 import { competitionPlaythrough } from "@/lib/playthrough";
-import { loadLivePlaythrough, loadLivePlaythroughCell, loadPlaytestSession } from "@/lib/livePlaythrough";
+import {
+  loadExperimentPlaythrough,
+  loadExperimentPlaythroughCell,
+  loadLivePlaythrough,
+  loadLivePlaythroughCell,
+  loadPlaytestSession,
+} from "@/lib/livePlaythrough";
 import type {
   PlaytestSession,
   PlaythroughBundle,
@@ -100,6 +106,7 @@ export function PlaythroughInspectorPage() {
   const [latestError, setLatestError] = useState("");
   const [liveSession, setLiveSession] = useState<PlaytestSession | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const selectedExperiment = searchParams.get("experiment");
   const useLatest = Boolean(latestPlaythrough && searchParams.get("source") !== "replay");
   const bundle = useLatest ? latestPlaythrough! : competitionPlaythrough;
   const { manifest, cells, cellReferences } = bundle;
@@ -158,14 +165,17 @@ export function PlaythroughInspectorPage() {
     : 0;
   useEffect(() => {
     const controller = new AbortController();
-    loadLivePlaythrough(controller.signal)
+    const request = selectedExperiment
+      ? loadExperimentPlaythrough(selectedExperiment, controller.signal)
+      : loadLivePlaythrough(controller.signal);
+    request
       .then((value) => setLatestPlaythrough(value))
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
         setLatestError(error instanceof Error ? error.message : "Latest campaign unavailable");
       });
     return () => controller.abort();
-  }, []);
+  }, [selectedExperiment]);
 
   useEffect(() => {
     if (!useLatest || !latestPlaythrough) return undefined;
@@ -177,7 +187,10 @@ export function PlaythroughInspectorPage() {
     ));
     if (!reference) return undefined;
     const controller = new AbortController();
-    loadLivePlaythroughCell(latestPlaythrough.manifest, reference, controller.signal)
+    const request = selectedExperiment
+      ? loadExperimentPlaythroughCell(selectedExperiment, latestPlaythrough.manifest, reference, controller.signal)
+      : loadLivePlaythroughCell(latestPlaythrough.manifest, reference, controller.signal);
+    request
       .then((nextCell) => setLatestPlaythrough((current) => current
         && current.manifest.campaign_id === latestPlaythrough.manifest.campaign_id
         ? { ...current, cell: nextCell, cells: { ...current.cells, [nextCell.persona]: nextCell } }
@@ -187,9 +200,10 @@ export function PlaythroughInspectorPage() {
         setLatestError(error instanceof Error ? error.message : "Selected path unavailable");
       });
     return () => controller.abort();
-  }, [desiredPersona, desiredSeed, latestPlaythrough, useLatest]);
+  }, [desiredPersona, desiredSeed, latestPlaythrough, selectedExperiment, useLatest]);
 
   useEffect(() => {
+    if (selectedExperiment) return undefined;
     const controller = new AbortController();
     let refreshing = false;
     const refresh = async () => {
@@ -218,7 +232,7 @@ export function PlaythroughInspectorPage() {
       controller.abort();
       window.clearInterval(timer);
     };
-  }, [latestPlaythrough?.manifest.campaign_id]);
+  }, [latestPlaythrough?.manifest.campaign_id, selectedExperiment]);
 
   useEffect(() => {
     setPlaying(false);
@@ -288,7 +302,10 @@ export function PlaythroughInspectorPage() {
 
   function selectSource(source: "replay" | "latest"): void {
     const next = new URLSearchParams(searchParams);
-    if (source === "replay") next.set("source", "replay");
+    if (source === "replay") {
+      next.set("source", "replay");
+      next.delete("experiment");
+    }
     else next.delete("source");
     setSearchParams(next, { replace: true });
   }
@@ -302,7 +319,7 @@ export function PlaythroughInspectorPage() {
         <section className="playthrough-heading">
           <Link to="/"><ArrowLeft /> Judge Mission</Link>
           <div>
-            <p className="playthrough-eyebrow">PLAYTHROUGH INSPECTOR · SIGNED ACTUAL PATH</p>
+            <p className="playthrough-eyebrow">PLAYTHROUGH INSPECTOR · {useLatest ? manifest.source.provider.toUpperCase() : "SIGNED"} ACTUAL PATH</p>
             <h1>{personaLabel} runs the evidence, one week at a time.</h1>
           </div>
           <dl>
@@ -352,7 +369,7 @@ export function PlaythroughInspectorPage() {
               <span>Signed Replay</span><small>prerecorded · real Godot</small>
             </button>
             <button type="button" disabled={!latestPlaythrough} className={useLatest ? "is-active" : ""} aria-pressed={useLatest} onClick={() => selectSource("latest")}>
-              <span>Latest campaign</span><small>{latestPlaythrough?.manifest.truth_label ?? "not generated"}</small>
+              <span>{selectedExperiment ? "Selected experiment" : "Latest campaign"}</span><small>{latestPlaythrough?.manifest.truth_label ?? "not generated"}</small>
             </button>
           </div>
         </section>

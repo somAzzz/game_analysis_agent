@@ -7,6 +7,7 @@ import {
   createJudgeCampaign,
   fetchJudgeCampaign,
   fetchJudgeExperiment,
+  fetchJudgeExperiments,
   fetchJudgeProviderStatus,
   fetchStaticJudgeExperiment,
   submitHumanReview,
@@ -188,22 +189,25 @@ describe("manifest API", () => {
     const status = { schema_version: "judge-provider-status-v1", providers: {} };
     const job = { campaign_id: "judge-abc", status: "completed" };
     const experiment = { schema_version: "judge-public-experiment-v1", decision: "rejected" };
+    const experimentIndex = { schema_version: "judge-experiment-index-v1", experiments: [] };
     fetchMock
       .mockResolvedValueOnce(responseWith(status))
       .mockResolvedValueOnce(responseWith({ status: "passed" }))
       .mockResolvedValueOnce(responseWith(job))
       .mockResolvedValueOnce(responseWith(job))
+      .mockResolvedValueOnce(responseWith(experimentIndex))
       .mockResolvedValueOnce(responseWith(experiment));
 
     await fetchJudgeProviderStatus();
     await testJudgeProvider("replay");
     await createJudgeCampaign("openai");
     await fetchJudgeCampaign("judge-abc");
+    await fetchJudgeExperiments();
     await fetchJudgeExperiment();
 
     expect(fetchMock.mock.calls.map((call) => call[0])).toEqual([
       "/api/provider-status", "/api/provider-test", "/api/campaigns",
-      "/api/campaigns/judge-abc", "/api/experiments/cashflow-drift-repair-v1",
+      "/api/campaigns/judge-abc", "/api/experiments", "/api/experiments/cashflow-drift-repair-v1",
     ]);
     const createBody = String(fetchMock.mock.calls[2]?.[1]?.body);
     expect(createBody).toBe('{"provider":"openai"}');

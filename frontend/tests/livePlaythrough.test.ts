@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { loadLivePlaythrough } from "@/lib/livePlaythrough";
+import { loadExperimentPlaythrough, loadLivePlaythrough } from "@/lib/livePlaythrough";
 import type {
   PlaythroughCell,
   PlaythroughCellIndex,
@@ -102,5 +102,27 @@ describe("live playthrough index", () => {
       "/live-playthrough/cells/money-seed-42.json",
     );
     expect(fetchMock).toHaveBeenCalledTimes(4);
+  });
+
+  it("loads a persistent experiment path and rejects unsafe ids", async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith("/manifest.json")) return Promise.resolve(jsonResponse(manifest));
+      if (url.endsWith("/personas.json")) {
+        return Promise.resolve(jsonResponse({ truth_label: manifest.truth_label, personas: [] }));
+      }
+      if (url.endsWith("/index.json")) return Promise.resolve(jsonResponse(index));
+      if (url.endsWith("/cells/money-seed-42.json")) return Promise.resolve(jsonResponse(cell(42)));
+      throw new Error(`unexpected fetch: `);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const bundle = await loadExperimentPlaythrough("vllm-cohort-a-pressure-feedback-v1", undefined, { persona: "money", seed: 42 });
+
+    expect(bundle?.cell.seed).toBe(42);
+    expect(fetchMock.mock.calls.map(([input]) => String(input))).toContain(
+      "/experiments/vllm-cohort-a-pressure-feedback-v1/playthrough/cells/money-seed-42.json",
+    );
+    await expect(loadExperimentPlaythrough("../private")).rejects.toThrow("Experiment id is unsafe");
   });
 });

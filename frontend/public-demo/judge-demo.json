@@ -1,4 +1,34 @@
 {
+  "campaign": {
+    "cells": 18,
+    "fallback_rate": 0.0,
+    "gate_status": "passed",
+    "max_weeks": 20,
+    "mean_final_money": 0.0,
+    "mean_max_stress": 100.0,
+    "personas": [
+      "newbie",
+      "study",
+      "money",
+      "social",
+      "visa",
+      "slacker"
+    ],
+    "provider_error_rate": 0.0,
+    "request_fingerprint": "8fa65234cb151a16534cfdbad7a2a26b330a9efc0610c701f7e20e87a41b7538",
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "source_fingerprint": "01dbba63744eec8f0c055fe6cc75bc0dd9ddf02a9ea6192238193dd009eee49b",
+    "target_members": 18,
+    "target_personas": 6,
+    "valid_rate": 1.0,
+    "weeks": 342
+  },
+  "campaign_bundle_path": "examples/build_week_2026/campaign-v1",
+  "campaign_id": "build-week-2026-evidence-v1",
   "codex": {
     "decision_owned_by_codex": true,
     "feedback_session_id": "019f6816-fe0d-78a2-9001-1890b32ef820",
@@ -178,6 +208,7 @@
     "holdout_persona_alignment_delta": 0.0,
     "holdout_relative_reduction": 0.0
   },
+  "completed_at": "2026-07-16T16:11:12.705580+00:00",
   "decision": "rejected",
   "decision_reason": "Repair rejected because required proof failed: fixed_target, holdout_target",
   "evidence_fingerprint": "9bd9c67e94c2318e38edeb86b3c06066b719d2f11d4631bc124cfef9908b855f",
@@ -234,8 +265,10 @@
   ],
   "human_review": null,
   "hypothesis": "Recurring survival-economy drift depletes spendable cash faster than distinct persona strategies can recover, after which the cash-shortfall stress feedback pushes every intent into the same cashflow/stress attractor.",
+  "lifecycle_status": "proof_complete",
   "mechanism_class": "recurring_living_cost_drift",
   "mode": "prerecorded",
+  "model": "deterministic-persona-policy-fixture",
   "patch": {
     "added_lines": 35,
     "baseline_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
@@ -254,6 +287,12 @@
     "patched_commit": "c42b1c84630497427d895bf963103f8b40f5976d",
     "patched_tree": "ce5264c46b900493237acd4a42a65a0f8f884f62"
   },
-  "schema_version": "judge-public-experiment-v1",
-  "status": "passed"
+  "provider": "replay",
+  "provider_mode": "prerecorded",
+  "repair_bundle_path": "examples/build_week_2026/experiment-v1",
+  "schema_version": "judge-public-experiment-v2",
+  "source_kind": "signed",
+  "source_label": "SIGNED REPLAY",
+  "status": "passed",
+  "title": "Signed cashflow repair replay"
 }

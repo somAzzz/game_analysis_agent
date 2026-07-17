@@ -12,6 +12,7 @@ import type {
   HumanReviewRecord,
   IssueManifest,
   JudgeCampaignJob,
+  JudgeExperimentIndex,
   JudgeExperiment,
   JudgeProvider,
   JudgeProviderStatus,
@@ -150,8 +151,12 @@ export function fetchJudgeCampaign(campaignId: string): Promise<JudgeCampaignJob
   return judgeJSON<JudgeCampaignJob>(`campaigns/${encodeURIComponent(campaignId)}`);
 }
 
-export function fetchJudgeExperiment(): Promise<JudgeExperiment> {
-  return judgeJSON<JudgeExperiment>("experiments/cashflow-drift-repair-v1");
+export function fetchJudgeExperiments(): Promise<JudgeExperimentIndex> {
+  return judgeJSON<JudgeExperimentIndex>("experiments");
+}
+
+export function fetchJudgeExperiment(experimentId = "cashflow-drift-repair-v1"): Promise<JudgeExperiment> {
+  return judgeJSON<JudgeExperiment>("experiments/" + encodeURIComponent(experimentId));
 }
 
 export function submitHumanReview(

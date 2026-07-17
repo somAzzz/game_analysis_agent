@@ -9,6 +9,7 @@ import type {
   FrontManifest,
   IssueManifest,
   JudgeExperiment,
+  JudgeExperimentIndex,
   JudgeProviderStatus,
 } from "@/types";
 
@@ -17,6 +18,7 @@ const apiMocks = vi.hoisted(() => ({
   fetchIssueManifest: vi.fn(),
   fetchDecisionGraphManifest: vi.fn(),
   fetchJudgeProviderStatus: vi.fn(),
+  fetchJudgeExperiments: vi.fn(),
   fetchJudgeExperiment: vi.fn(),
   fetchStaticJudgeExperiment: vi.fn(),
   testJudgeProvider: vi.fn(),
@@ -178,8 +180,27 @@ const providerStatus: JudgeProviderStatus = {
 };
 
 const experiment: JudgeExperiment = {
-  schema_version: "judge-public-experiment-v1",
+  schema_version: "judge-public-experiment-v2",
   experiment_id: "cashflow-drift-repair-v1",
+  title: "Signed cashflow drift repair",
+  source_kind: "signed",
+  source_label: "SIGNED REPLAY",
+  provider: "replay",
+  provider_mode: "prerecorded",
+  model: "fixture-authoring-policy-v1",
+  lifecycle_status: "proof_complete",
+  campaign_id: "signed-replay-campaign",
+  campaign: {
+    gate_status: "passed",
+    personas: ["newbie", "study", "money", "social", "visa", "slacker"],
+    seeds: [42, 43, 44],
+    max_weeks: 20, cells: 18, weeks: 342, target_members: 18, target_personas: 6,
+    valid_rate: 1, fallback_rate: 0, provider_error_rate: 0, mean_final_money: 0, mean_max_stress: 100,
+    request_fingerprint: "e".repeat(64), source_fingerprint: "f".repeat(64),
+  },
+  campaign_bundle_path: "examples/build_week_2026/vllm-25seed-audit/public",
+  repair_bundle_path: "examples/build_week_2026/repair-proof/public",
+  completed_at: "2026-07-16T12:00:00Z",
   evidence_fingerprint: "d".repeat(64),
   human_review: null,
   status: "passed",
@@ -214,6 +235,37 @@ const experiment: JudgeExperiment = {
   mode: "prerecorded",
 };
 
+const experimentIndex: JudgeExperimentIndex = {
+  schema_version: "judge-experiment-index-v1",
+  experiments: [{
+    schema_version: "judge-experiment-summary-v1",
+    experiment_id: experiment.experiment_id, title: experiment.title,
+    source_kind: experiment.source_kind, source_label: experiment.source_label,
+    provider: experiment.provider, provider_mode: experiment.provider_mode, model: experiment.model,
+    lifecycle_status: experiment.lifecycle_status, campaign_id: experiment.campaign_id, campaign: experiment.campaign,
+    campaign_bundle_path: experiment.campaign_bundle_path, repair_bundle_path: experiment.repair_bundle_path,
+    completed_at: experiment.completed_at,
+  }],
+};
+
+const campaignOnlyExperiment: JudgeExperiment = {
+  ...experiment,
+  experiment_id: "vllm-audit-25seed-cohort-a", title: "Cohort A local campaign",
+  source_kind: "local_vllm", source_label: "LOCAL vLLM", provider: "vllm", provider_mode: "local",
+  model: "qwen3.6-27b-nvfp4", lifecycle_status: "campaign_complete", campaign_id: "vllm-audit-25seed-cohort-a",
+  campaign: { ...experiment.campaign, cells: 48, weeks: 912, target_members: 41 },
+  campaign_bundle_path: "reports/persona-campaigns/vllm-audit-25seed-cohort-a/public", repair_bundle_path: null,
+  evidence_fingerprint: "1".repeat(64), decision: null, decision_reason: null, hypothesis: null, mechanism_class: null,
+  comparison: null, cohorts: [], gates: [], patch: null, codex: null, mode: "local",
+};
+experimentIndex.experiments.push({
+  schema_version: "judge-experiment-summary-v1", experiment_id: campaignOnlyExperiment.experiment_id,
+  title: campaignOnlyExperiment.title, source_kind: campaignOnlyExperiment.source_kind, source_label: campaignOnlyExperiment.source_label,
+  provider: campaignOnlyExperiment.provider, provider_mode: campaignOnlyExperiment.provider_mode, model: campaignOnlyExperiment.model,
+  lifecycle_status: campaignOnlyExperiment.lifecycle_status, campaign_id: campaignOnlyExperiment.campaign_id, campaign: campaignOnlyExperiment.campaign,
+  campaign_bundle_path: campaignOnlyExperiment.campaign_bundle_path, repair_bundle_path: null, completed_at: null,
+});
+
 function renderRoute(path: string) {
   return render(
     <MemoryRouter
@@ -236,6 +288,7 @@ describe("application routes", () => {
     apiMocks.fetchIssueManifest.mockResolvedValue(issueManifest);
     apiMocks.fetchDecisionGraphManifest.mockResolvedValue(graphManifest);
     apiMocks.fetchJudgeProviderStatus.mockResolvedValue(providerStatus);
+    apiMocks.fetchJudgeExperiments.mockResolvedValue(experimentIndex);
     apiMocks.fetchJudgeExperiment.mockResolvedValue(experiment);
     apiMocks.fetchStaticJudgeExperiment.mockResolvedValue(experiment);
   });
@@ -244,7 +297,7 @@ describe("application routes", () => {
     const user = userEvent.setup();
     renderRoute("/");
 
-    expect(await screen.findByRole("heading", { name: /A patch passed its unit test/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /A bounded patch faced its proof/i })).toBeInTheDocument();
     const missionNav = screen.getByRole("navigation", { name: "Competition pages" });
     expect(missionNav.closest("header")).toHaveClass("competition-top-nav");
     expect(within(missionNav).getByRole("link", { name: "Judge Mission" })).toHaveAttribute("aria-current", "page");
@@ -265,6 +318,24 @@ describe("application routes", () => {
     expect(patchDetails).not.toHaveAttribute("open");
     await user.click(screen.getByRole("button", { name: "Review exact patch diff" }));
     expect(patchDetails).toHaveAttribute("open");
+  });
+
+  it("switches to a discovered local campaign without fabricating repair proof", async () => {
+    const user = userEvent.setup();
+    apiMocks.fetchJudgeExperiment.mockImplementation((experimentId?: string) =>
+      Promise.resolve(experimentId === campaignOnlyExperiment.experiment_id ? campaignOnlyExperiment : experiment),
+    );
+    renderRoute("/");
+
+    const selector = await screen.findByRole("combobox", { name: /Evidence set/ });
+    expect(within(selector).getByRole("option", { name: /SIGNED REPLAY.*FULL PROOF/i })).toBeInTheDocument();
+    expect(within(selector).getByRole("option", { name: /LOCAL vLLM.*CAMPAIGN ONLY/i })).toBeInTheDocument();
+    await user.selectOptions(selector, campaignOnlyExperiment.experiment_id);
+
+    expect(await screen.findByRole("heading", { name: "Cohort A local campaign" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "No bounded repair has been published." })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Fixed and unseen holdout proof has not run." })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Record final decision" })).not.toBeInTheDocument();
   });
 
   it("runs the bounded Replay action from Judge Mode", async () => {
@@ -550,7 +621,7 @@ describe("application routes", () => {
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("link", { name: /Open Judge Mission/i }));
-    expect(await screen.findByRole("heading", { name: /A patch passed its unit test/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /A bounded patch faced its proof/i })).toBeInTheDocument();
   });
 
   it("shows a useful front-page loading failure", async () => {

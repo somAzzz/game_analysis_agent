@@ -22,7 +22,7 @@ const PERSONA_SLUGS = new Set<PlaythroughPersonaSlug>([
 export async function loadPlaytestSession(
   signal?: AbortSignal,
 ): Promise<PlaytestSession | null> {
-  const root = `${import.meta.env.BASE_URL}live-playthrough`;
+  const root = import.meta.env.BASE_URL + "live-playthrough";
   const response = await fetch(`${root}/session.json?time=${Date.now()}`, {
     signal,
     cache: "no-store",
@@ -46,7 +46,23 @@ export async function loadLivePlaythrough(
   signal?: AbortSignal,
   selection?: { persona?: PlaythroughPersonaSlug; seed?: number },
 ): Promise<PlaythroughBundle | null> {
-  const root = `${import.meta.env.BASE_URL}live-playthrough`;
+  return loadPlaythrough(import.meta.env.BASE_URL + "live-playthrough", signal, selection);
+}
+
+export async function loadExperimentPlaythrough(
+  experimentId: string,
+  signal?: AbortSignal,
+  selection?: { persona?: PlaythroughPersonaSlug; seed?: number },
+): Promise<PlaythroughBundle | null> {
+  if (!experimentId || experimentId.length > 64 || /[^a-z0-9-]/.test(experimentId)) throw new Error("Experiment id is unsafe");
+  return loadPlaythrough(import.meta.env.BASE_URL + "experiments/" + experimentId + "/playthrough", signal, selection);
+}
+
+async function loadPlaythrough(
+  root: string,
+  signal?: AbortSignal,
+  selection?: { persona?: PlaythroughPersonaSlug; seed?: number },
+): Promise<PlaythroughBundle | null> {
   const [manifestResponse, personasResponse, indexResponse] = await Promise.all([
     fetch(`${root}/manifest.json`, { signal, cache: "no-store" }),
     fetch(`${root}/personas.json`, { signal, cache: "no-store" }),
@@ -69,7 +85,7 @@ export async function loadLivePlaythrough(
     && (selection?.seed === undefined || item.seed === selection.seed)
   )) ?? references.find((item) => item.persona === selection?.persona) ?? references[0];
   if (!selected) throw new Error("Latest playthrough has no indexed cell");
-  const cell = await loadLivePlaythroughCell(manifest, selected, signal);
+  const cell = await loadPlaythroughCell(root, manifest, selected, signal);
   return {
     manifest,
     personas: personaDocument.personas,
@@ -84,10 +100,28 @@ export async function loadLivePlaythroughCell(
   reference: PlaythroughCellReference,
   signal?: AbortSignal,
 ): Promise<PlaythroughCell> {
+  return loadPlaythroughCell(import.meta.env.BASE_URL + "live-playthrough", manifest, reference, signal);
+}
+
+export async function loadExperimentPlaythroughCell(
+  experimentId: string,
+  manifest: PlaythroughManifest,
+  reference: PlaythroughCellReference,
+  signal?: AbortSignal,
+): Promise<PlaythroughCell> {
+  if (!experimentId || experimentId.length > 64 || /[^a-z0-9-]/.test(experimentId)) throw new Error("Experiment id is unsafe");
+  return loadPlaythroughCell(import.meta.env.BASE_URL + "experiments/" + experimentId + "/playthrough", manifest, reference, signal);
+}
+
+async function loadPlaythroughCell(
+  root: string,
+  manifest: PlaythroughManifest,
+  reference: PlaythroughCellReference,
+  signal?: AbortSignal,
+): Promise<PlaythroughCell> {
   if (!/^cells\/[a-z]+-seed--?\d+\.json$/.test(reference.path)) {
     throw new Error("Latest playthrough cell path is unsafe");
   }
-  const root = `${import.meta.env.BASE_URL}live-playthrough`;
   const response = await fetch(`${root}/${reference.path}`, {
     signal,
     cache: "no-store",

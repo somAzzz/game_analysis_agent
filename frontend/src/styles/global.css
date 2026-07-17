@@ -1367,6 +1367,14 @@ main {
 .judge-mode span { color: var(--judge-amber); }
 
 main.judge-ledger { max-width: none; margin: 0; padding: 0 clamp(24px, 7vw, 108px) 110px; }
+.judge-experiment-switcher { display: grid; grid-template-columns: 130px minmax(0, 1fr); min-height: 92px; border-top: 1px solid var(--judge-rule); border-bottom: 1px solid var(--judge-rule); }
+.judge-experiment-rail { display: flex; align-items: center; border-right: 1px solid var(--judge-rule); color: var(--judge-muted); font-size: 9px; letter-spacing: .18em; }
+.judge-experiment-switcher > label { display: grid; grid-template-columns: auto minmax(260px, 640px); align-content: center; align-items: center; gap: 7px 18px; padding: 18px 0 18px clamp(30px, 5vw, 78px); }
+.judge-experiment-switcher label > span { color: var(--judge-cyan); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+.judge-experiment-switcher select { min-width: 0; padding: 9px 34px 9px 12px; border: 1px solid var(--judge-rule); border-radius: 0; color: var(--judge-ink); background: #0a191e; font: 600 11px var(--mono); }
+.judge-experiment-switcher select:disabled { opacity: .62; }
+.judge-experiment-switcher small { grid-column: 2; color: var(--judge-muted); font-size: 9px; overflow-wrap: anywhere; }
+.judge-stage-pending .judge-stage-marker span { color: var(--judge-muted); }
 .judge-stage { display: grid; grid-template-columns: 130px minmax(0, 1fr); border-bottom: 1px solid var(--judge-rule); }
 .judge-stage-marker { padding: 70px 25px 0 0; border-right: 1px solid var(--judge-rule); }
 .judge-stage-marker span { display: block; color: var(--judge-cyan); font-family: var(--serif); font-size: 52px; line-height: 1; }
@@ -1453,11 +1461,15 @@ main.judge-ledger { max-width: none; margin: 0; padding: 0 clamp(24px, 7vw, 108p
 
 .judge-shell button:focus-visible,
 .judge-shell a:focus-visible,
-.judge-shell input:focus-visible { outline: 3px solid var(--judge-amber); outline-offset: 3px; }
+.judge-shell input:focus-visible,
+.judge-shell select:focus-visible { outline: 3px solid var(--judge-amber); outline-offset: 3px; }
 
 @media (max-width: 860px) {
   .judge-hero { grid-template-columns: 1fr; }
   .judge-verdict { max-width: 300px; }
+  .judge-experiment-switcher { grid-template-columns: 70px minmax(0, 1fr); }
+  .judge-experiment-switcher > label { grid-template-columns: 1fr; }
+  .judge-experiment-switcher small { grid-column: 1; }
   .judge-stage { grid-template-columns: 70px minmax(0, 1fr); }
   .judge-stage-marker { padding-right: 12px; }
   .judge-stage-marker span { font-size: 37px; }
@@ -1471,6 +1483,9 @@ main.judge-ledger { max-width: none; margin: 0; padding: 0 clamp(24px, 7vw, 108p
 
 @media (max-width: 560px) {
   main.judge-ledger { padding-left: 18px; padding-right: 18px; }
+  .judge-experiment-switcher { grid-template-columns: 1fr; }
+  .judge-experiment-rail { display: none; }
+  .judge-experiment-switcher > label { padding: 18px 0; }
   .judge-stage { grid-template-columns: 1fr; }
   .judge-stage-marker { padding: 45px 0 0; border-right: 0; }
   .judge-stage-marker span, .judge-stage-marker b { display: inline-block; margin-right: 12px; writing-mode: initial; }

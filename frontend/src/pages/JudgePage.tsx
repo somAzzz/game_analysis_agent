@@ -4,6 +4,7 @@ import {
   createJudgeCampaign,
   fetchJudgeCampaign,
   fetchJudgeExperiment,
+  fetchJudgeExperiments,
   fetchJudgeProviderStatus,
   fetchStaticJudgeExperiment,
   testJudgeProvider,
@@ -13,6 +14,7 @@ import type {
   JudgeCampaignJob,
   JudgeCohort,
   JudgeExperiment,
+  JudgeExperimentSummary,
   HumanReviewDecision,
   HumanReviewRecord,
   JudgeProvider,
@@ -43,8 +45,61 @@ function errorMessage(error: unknown): string {
   return remediation ? `${error.message} ${remediation}` : error.message;
 }
 
+function summaryFromExperiment(value: JudgeExperiment): JudgeExperimentSummary {
+  return {
+    schema_version: "judge-experiment-summary-v1",
+    experiment_id: value.experiment_id,
+    title: value.title,
+    source_kind: value.source_kind,
+    source_label: value.source_label,
+    provider: value.provider,
+    provider_mode: value.provider_mode,
+    model: value.model,
+    lifecycle_status: value.lifecycle_status,
+    campaign_id: value.campaign_id,
+    campaign: value.campaign,
+    campaign_bundle_path: value.campaign_bundle_path,
+    repair_bundle_path: value.repair_bundle_path,
+    completed_at: value.completed_at,
+  };
+}
+
+function ExperimentSelector({ experiments, selected, disabled, onChange }: { experiments: JudgeExperimentSummary[]; selected: JudgeExperiment; disabled: boolean; onChange: (id: string) => void }) {
+  return (
+    <section className="judge-experiment-switcher" aria-label="Experiment evidence selector">
+      <div className="judge-experiment-rail" aria-hidden="true"><span>EXPERIMENT</span></div>
+      <label htmlFor="judge-experiment-select">
+        <span>Evidence set</span>
+        <select id="judge-experiment-select" aria-label="Evidence set" value={selected.experiment_id} disabled={disabled} onChange={(event) => onChange(event.target.value)}>
+          {experiments.map((item) => (
+            <option key={item.experiment_id} value={item.experiment_id}>
+              {item.source_label} · {item.title} · {item.lifecycle_status === "proof_complete" ? "FULL PROOF" : "CAMPAIGN ONLY"}
+            </option>
+          ))}
+        </select>
+        <small>{selected.source_label} · {selected.model} · {selected.campaign.cells} cells / {selected.campaign.weeks} weeks</small>
+      </label>
+    </section>
+  );
+}
+
+function PendingStage({ number, label, title }: { number: string; label: string; title: string }) {
+  return (
+    <section className="judge-stage judge-stage-pending">
+      <div className="judge-stage-marker"><span>{number}</span><b>{label}</b></div>
+      <div className="judge-stage-body">
+        <p className="judge-eyebrow">Not fabricated · not inferred</p>
+        <h2>{title}</h2>
+        <p className="judge-copy">This campaign is verified and selectable, but no bounded patch and fixed/holdout proof have been published for it yet.</p>
+      </div>
+    </section>
+  );
+}
+
 export function JudgePage() {
   const [experiment, setExperiment] = useState<JudgeExperiment | null>(null);
+  const [experiments, setExperiments] = useState<JudgeExperimentSummary[]>([]);
+  const [experimentLoading, setExperimentLoading] = useState(false);
   const [providerStatus, setProviderStatus] = useState<JudgeProviderStatus | null>(null);
   const [provider, setProvider] = useState<JudgeProvider>("replay");
   const [source, setSource] = useState<"api" | "static">("api");
@@ -59,34 +114,68 @@ export function JudgePage() {
 
   useEffect(() => {
     let active = true;
-    Promise.allSettled([fetchJudgeProviderStatus(), fetchJudgeExperiment()]).then(async ([status, proof]) => {
+    const load = async () => {
+      const [status, index, proof] = await Promise.allSettled([
+        fetchJudgeProviderStatus(),
+        fetchJudgeExperiments(),
+        fetchJudgeExperiment(),
+      ]);
       if (!active) return;
       if (status.status === "fulfilled") setProviderStatus(status.value);
+      if (index.status === "fulfilled") setExperiments(index.value.experiments);
       if (proof.status === "fulfilled") {
-        setExperiment(proof.value);
-        setReviewDecision(proof.value.human_review?.human_decision ?? "");
-        setReviewerNote(proof.value.human_review?.reviewer_note ?? "");
-        if (proof.value.human_review) setReviewActivity("Human review recorded. No merge was performed.");
-        setActivity("Judge API connected. Replay is ready; live mode is configuration-gated.");
+        applyExperiment(proof.value);
+        setActivity("Judge API connected. Select any verified experiment; new local and OpenAI campaigns register automatically.");
         return;
       }
       try {
         const frozen = await fetchStaticJudgeExperiment();
         if (!active) return;
-        setExperiment(frozen);
-        setReviewDecision(frozen.human_review?.human_decision ?? "");
-        setReviewerNote(frozen.human_review?.reviewer_note ?? "");
+        applyExperiment(frozen);
+        setExperiments([summaryFromExperiment(frozen)]);
         setSource("static");
         setActivity("Static evaluator mode: signed prerecorded evidence is available without a server.");
       } catch (error) {
-        if (active) setActivity(`Evidence unavailable: ${errorMessage(error)}`);
+        if (active) setActivity("Evidence unavailable: " + errorMessage(error));
       }
-    });
+    };
+    void load();
     return () => {
       active = false;
       if (pollRef.current !== null) window.clearTimeout(pollRef.current);
     };
   }, []);
+
+  function applyExperiment(next: JudgeExperiment): void {
+    setExperiment(next);
+    setReviewDecision(next.human_review?.human_decision ?? "");
+    setReviewerNote(next.human_review?.reviewer_note ?? "");
+    setReviewActivity(next.human_review ? "Human review recorded. No merge was performed." : "No human final decision recorded.");
+  }
+
+  async function handleExperimentChange(experimentId: string): Promise<void> {
+    if (source === "static" || experimentId === experiment?.experiment_id) return;
+    setExperimentLoading(true);
+    setActivity("Verifying " + experimentId + "…");
+    try {
+      const next = await fetchJudgeExperiment(experimentId);
+      applyExperiment(next);
+      setActivity(next.source_label + " evidence verified. " + (next.lifecycle_status === "proof_complete" ? "Repair proof is complete." : "Campaign is complete; repair proof has not run."));
+    } catch (error) {
+      setActivity(errorMessage(error));
+    } finally {
+      setExperimentLoading(false);
+    }
+  }
+
+  async function refreshExperimentIndex(preferredCampaignId?: string): Promise<void> {
+    const index = await fetchJudgeExperiments();
+    setExperiments(index.experiments);
+    if (!preferredCampaignId) return;
+    const nextSummary = index.experiments.find((item) => item.campaign_id === preferredCampaignId);
+    if (!nextSummary) return;
+    applyExperiment(await fetchJudgeExperiment(nextSummary.experiment_id));
+  }
 
   const providerReady = provider === "replay"
     || (provider === "vllm"
@@ -121,6 +210,9 @@ export function JudgePage() {
             pollRef.current = window.setTimeout(poll, 350);
           } else {
             setBusy(false);
+            if (current.status === "completed") {
+              await refreshExperimentIndex(current.campaign_id);
+            }
             setActivity(
               current.status === "completed"
                 ? `${PROVIDER_LABEL[provider]} campaign completed with evidence attached.`
@@ -200,6 +292,46 @@ export function JudgePage() {
     );
   }
 
+  if (experiment.lifecycle_status !== "proof_complete" || experiment.patch === null || experiment.comparison === null || experiment.codex === null || experiment.decision === null || experiment.decision_reason === null || experiment.hypothesis === null || experiment.mechanism_class === null) {
+    return (
+      <div className="judge-shell">
+        <ForgeTopNav active="mission" truthLabel={experiment.source_label + " campaign"} />
+        <section className="judge-hero" aria-labelledby="judge-title">
+          <div>
+            <p className="judge-kicker">OpenAI Build Week 2026 · Judge Mode</p>
+            <h1 id="judge-title">The campaign is complete.<br /><em>The repair is not.</em></h1>
+          </div>
+          <aside className="judge-verdict" data-decision="pending" aria-label="Experiment lifecycle status">
+            <span>Evidence lifecycle</span><strong>CAMPAIGN ONLY</strong><small>No machine repair recommendation yet</small>
+          </aside>
+          <p className="judge-thesis">Completed campaigns register immediately. Repair, proof, and human review remain visibly pending until their own evidence passes.</p>
+          <p className="judge-mode"><span aria-hidden="true">●</span> {experiment.source_label} · {experiment.provider_mode} · hashes verified</p>
+        </section>
+        <JudgeMissionExperience />
+        <main className="judge-ledger">
+        <ExperimentSelector experiments={experiments} selected={experiment} disabled={experimentLoading || source === "static"} onChange={(id) => { void handleExperimentChange(id); }} />
+          <section className="judge-stage" aria-labelledby="campaign-title">
+            <div className="judge-stage-marker"><span>01</span><b>CAMPAIGN</b></div>
+            <div className="judge-stage-body">
+              <p className="judge-eyebrow">Verified campaign evidence</p>
+              <h2 id="campaign-title">{experiment.title}</h2>
+              <div className="judge-metrics" aria-label="Campaign facts">
+                <Metric value={String(experiment.campaign.cells)} label="persona × seed cells" />
+                <Metric value={String(experiment.campaign.weeks)} label="Godot weeks" />
+                <Metric value={percent(experiment.campaign.valid_rate)} label="valid actions" />
+                <Metric value={experiment.campaign.target_members + "/" + experiment.campaign.cells} label="target members" intent="danger" />
+              </div>
+              <p className="judge-copy">{experiment.source_label} · {experiment.model}. This completed result is retained without borrowing a patch or proof from another experiment.</p>
+            </div>
+          </section>
+          <PendingStage number="02" label="REPAIR" title="No bounded repair has been published." />
+          <PendingStage number="03" label="PROOF" title="Fixed and unseen holdout proof has not run." />
+          <PendingStage number="04" label="HUMAN" title="Human review opens after machine evidence exists." />
+        </main>
+      </div>
+    );
+  }
+
   const baselineFixed = cohort(experiment, "baseline_fixed");
   const patchedFixed = cohort(experiment, "patched_fixed");
   const baselineHoldout = cohort(experiment, "baseline_holdout");
@@ -208,6 +340,11 @@ export function JudgePage() {
     ? experiment.human_review.human_decision.replaceAll("_", " ")
     : experiment.decision;
   const verdictLabel = experiment.human_review ? "Human decision" : "Machine recommendation";
+  const evidenceLink = experiment.source_kind === "signed"
+    ? "/playthrough-inspector?source=replay&persona=money&seed=42"
+    : "/playthrough-inspector?experiment=" + experiment.experiment_id
+      + "&persona=" + experiment.campaign.personas[0]
+      + "&seed=" + experiment.campaign.seeds[0];
 
   return (
     <div className="judge-shell">
@@ -219,7 +356,7 @@ export function JudgePage() {
       <section className="judge-hero" aria-labelledby="judge-title">
         <div>
           <p className="judge-kicker">OpenAI Build Week 2026 · Judge Mode</p>
-          <h1 id="judge-title">A patch passed its unit test.<br /><em>The holdout still rejected it.</em></h1>
+          <h1 id="judge-title">A bounded patch faced its proof.<br /><em>{experiment.decision === "accepted" ? "The gates accepted it." : "The gates rejected it."}</em></h1>
         </div>
         <aside
           className="judge-verdict"
@@ -234,22 +371,23 @@ export function JudgePage() {
           Codex plans the campaign, coordinates persona playthroughs against a real Godot game,
           proposes one bounded repair, and lets fixed plus unseen holdout evidence—not optimism—decide.
         </p>
-        <p className="judge-mode"><span aria-hidden="true">●</span> {source === "static" ? "Static evaluator copy" : "Judge API connected"} · prerecorded evidence · hashes verified before publication</p>
+        <p className="judge-mode"><span aria-hidden="true">●</span> {source === "static" ? "Static evaluator copy" : experiment.source_label} · {experiment.provider_mode} evidence · hashes verified before publication</p>
       </section>
 
       <JudgeMissionExperience />
 
       <main className="judge-ledger">
+        <ExperimentSelector experiments={experiments} selected={experiment} disabled={experimentLoading || source === "static"} onChange={(id) => { void handleExperimentChange(id); }} />
         <section className="judge-stage" aria-labelledby="campaign-title">
           <div className="judge-stage-marker"><span>01</span><b>CAMPAIGN</b></div>
           <div className="judge-stage-body">
             <p className="judge-eyebrow">Observe before editing</p>
-            <h2 id="campaign-title">Six personas converged on one failure.</h2>
+            <h2 id="campaign-title">{experiment.title}</h2>
             <div className="judge-metrics" aria-label="Campaign facts">
-              <Metric value="18" label="persona × seed cells" />
-              <Metric value="342" label="Godot weeks" />
-              <Metric value="100%" label="valid actions" />
-              <Metric value="18/18" label="cashflow collapse" intent="danger" />
+              <Metric value={String(experiment.campaign.cells)} label="persona × seed cells" />
+              <Metric value={String(experiment.campaign.weeks)} label="Godot weeks" />
+              <Metric value={percent(experiment.campaign.valid_rate)} label="valid actions" />
+              <Metric value={experiment.campaign.target_members + "/" + experiment.campaign.cells} label="target members" intent="danger" />
             </div>
             <p className="judge-copy">The game runtime is automated; the action provider is swappable. Replay is a deterministically authored persona-policy fixture—not a recorded LLM run. OpenAI runs the same bounded interface as a live persona subagent when server configuration is ready.</p>
 
@@ -288,7 +426,7 @@ export function JudgePage() {
           <div className="judge-stage-marker"><span>02</span><b>REPAIR</b></div>
           <div className="judge-stage-body">
             <p className="judge-eyebrow">One hypothesis · one bounded mechanism</p>
-            <h2 id="repair-title">Codex changed the recurring cost drift.</h2>
+            <h2 id="repair-title">Codex tested {experiment.mechanism_class.replaceAll("_", " ")}.</h2>
             <blockquote>{experiment.hypothesis}</blockquote>
             <div className="judge-patch">
               <div>
@@ -299,7 +437,7 @@ export function JudgePage() {
               <ul>
                 {experiment.patch.modified_paths.map((path) => <li key={path}>{path}</li>)}
               </ul>
-              <div className="judge-stamp" aria-label="Candidate repair rejected">REJECTED</div>
+              <div className="judge-stamp" aria-label={`Candidate repair `}>{experiment.decision.toUpperCase()}</div>
             </div>
             <details id="candidate-patch-diff" className="judge-diff">
               <summary>
@@ -331,7 +469,7 @@ export function JudgePage() {
           <div className="judge-stage-marker"><span>03</span><b>PROOF</b></div>
           <div className="judge-stage-body">
             <p className="judge-eyebrow">Fixed seeds + unseen holdout</p>
-            <h2 id="proof-title">Cash improved. The failure did not.</h2>
+            <h2 id="proof-title">{experiment.decision === "accepted" ? "Fixed and holdout gates accepted the repair." : "The bounded repair did not clear every gate."}</h2>
             <div className="judge-comparison">
               <CohortPair label="Fixed cohort" baseline={baselineFixed} patched={patchedFixed} reduction={experiment.comparison.fixed_relative_reduction} />
               <CohortPair label="Unseen holdout" baseline={baselineHoldout} patched={patchedHoldout} reduction={experiment.comparison.holdout_relative_reduction} />
@@ -370,7 +508,7 @@ export function JudgePage() {
             </div>
 
             <nav className="judge-review-evidence-links" aria-label="Human review evidence">
-              <Link to="/playthrough-inspector?source=replay&persona=money&seed=42">
+              <Link to={evidenceLink}>
                 View full campaign evidence
               </Link>
               <button type="button" onClick={focusPatchDiff}>Review exact patch diff</button>
