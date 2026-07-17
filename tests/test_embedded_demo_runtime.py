@@ -26,8 +26,22 @@ def test_prepares_verified_writable_runtime_with_audited_overlay(tmp_path: Path)
     overlay = marker["overlays"][0]
     assert overlay["path"] == "scripts/tools/RunInteractiveProbe.gd"
     assert overlay["canonical_sha256"] != overlay["runtime_sha256"]
-    assert (output / overlay["path"]).read_bytes() == (
-        ROOT / overlay["source"]
+    assert (output / overlay["path"]).read_bytes() == (ROOT / overlay["source"]).read_bytes()
+    assert {item["path"] for item in marker["overlays"]} == {
+        "scripts/tools/RunInteractiveProbe.gd",
+        "autoload/DataRegistry.gd",
+        "scenes/main/Main.gd",
+        "scripts/data/DataLoader.gd",
+        "scripts/data/EventChoiceDef.gd",
+        "scripts/data/EventDef.gd",
+        "data/localization/events.json",
+    }
+    localization = next(
+        item for item in marker["overlays"] if item["path"] == "data/localization/events.json"
+    )
+    assert localization["canonical_sha256"] is None
+    assert (output / localization["path"]).read_bytes() == (
+        ROOT / localization["source"]
     ).read_bytes()
     assert _game_provenance(output)["source_type"] == "embedded_runtime_overlay"
     verify_materialized_game_tree(
@@ -52,10 +66,12 @@ def test_refuses_minimal_forged_runtime_marker(tmp_path: Path) -> None:
     output.mkdir()
     pin = load_game_pin(ROOT / "config/build_week_2026_game_pin.json")
     (output / RUNTIME_OVERLAY_FILE).write_text(
-        json.dumps({
-            "schema_version": "build-week-game-runtime-overlay-v1",
-            "base_commit": pin["pin"]["commit"],
-        }),
+        json.dumps(
+            {
+                "schema_version": "build-week-game-runtime-overlay-v1",
+                "base_commit": pin["pin"]["commit"],
+            }
+        ),
         encoding="utf-8",
     )
     (output / "keep.txt").write_text("owner data", encoding="utf-8")

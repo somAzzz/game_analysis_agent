@@ -1,0 +1,3599 @@
+{
+  "default_locale": "en",
+  "events": {
+    "academic_gap": {
+      "body": {
+        "en": "You realize the real hurdle isn't the content, but the professor's assumption that you already know it.",
+        "zh": "你发现真正的难点不是知识点，而是老师默认你早就知道。"
+      },
+      "choices": [
+        {
+          "en": "Catch up on basics",
+          "zh": "补基础"
+        },
+        {
+          "en": "Ask Li for notes",
+          "zh": "问李同学资料"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Lost in the Lecture",
+        "zh": "课程听不懂"
+      }
+    },
+    "accent_misunderstood": {
+      "body": {
+        "en": "You repeated yourself three times, but they still heard a different word.",
+        "zh": "你说了三遍，对方还是听成了另一个词。"
+      },
+      "choices": [
+        {
+          "en": "Rephrase it",
+          "zh": "换个说法"
+        },
+        {
+          "en": "Type it on your phone",
+          "zh": "拿手机打字"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Accent Misunderstanding",
+        "zh": "口音误会"
+      }
+    },
+    "after_exam_void": {
+      "body": {
+        "en": "The exams are over, but you don't feel as relieved as expected.",
+        "zh": "考试结束了，但你没有想象中那么轻松。"
+      },
+      "choices": [
+        {
+          "en": "Rest for half a day",
+          "zh": "休息半天"
+        },
+        {
+          "en": "Review immediately",
+          "zh": "立刻复盘"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Post-Exam Void",
+        "zh": "考后空虚"
+      }
+    },
+    "anmeldung_deadline": {
+      "body": {
+        "en": "Without registration, opening a bank account, getting insurance, and extending your visa become complicated.",
+        "zh": "没有住址登记，后面的银行、保险、延签都会变得微妙。"
+      },
+      "choices": [
+        {
+          "en": "Submit documents immediately",
+          "zh": "立刻补材料"
+        },
+        {
+          "en": "Ask the International Office first",
+          "zh": "先问 International Office"
+        },
+        {
+          "en": "Ask your roommate to confirm the Wohnungsgeberbestätigung",
+          "zh": "请室友确认 Wohnungsgeberbestätigung"
+        },
+        {
+          "en": "Shove the envelope in a drawer",
+          "zh": "把信封塞进抽屉"
+        }
+      ],
+      "title": {
+        "en": "Anmeldung Reminder",
+        "zh": "Anmeldung 提醒"
+      }
+    },
+    "anna_coffee": {
+      "body": {
+        "en": "Anna says we can chat about the presentation over coffee.",
+        "zh": "Anna 说 presentation 可以顺便聊一下。"
+      },
+      "choices": [
+        {
+          "en": "Go",
+          "zh": "去"
+        },
+        {
+          "en": "Say you're busy",
+          "zh": "说太忙了"
+        },
+        {
+          "en": "Handle safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Coffee with Anna",
+        "zh": "Anna 约咖啡"
+      }
+    },
+    "annual_work_limit_warning": {
+      "body": {
+        "en": "You have reached or exceeded the annual limit of half-day work. While short-term cash flow looks good, long-term compliance and visa renewal explanations will become burdensome.",
+        "zh": "你已经接近或超过全年半天额度。短期现金流很好看，但长期合规性和续签解释都会变得沉重。"
+      },
+      "choices": [
+        {
+          "en": "Stop working and organize records",
+          "zh": "停止接班并整理记录"
+        },
+        {
+          "en": "Consult professional legal help",
+          "zh": "咨询专业法律帮助"
+        },
+        {
+          "en": "Bet you won't get caught",
+          "zh": "赌不会被发现"
+        },
+        {
+          "en": "Switch to scholarships and on-campus jobs",
+          "zh": "转向奖学金和校内岗位"
+        }
+      ],
+      "title": {
+        "en": "Annual Work Limit Reached",
+        "zh": "年度打工额度用尽"
+      }
+    },
+    "aps_elite_university_options": {
+      "body": {
+        "en": "Your APS results and academic background are strong enough to aim for top research universities or TU9 programs, but your application materials must be more refined.",
+        "zh": "你的 APS 结果和成绩背景足以冲刺更强的研究型大学或 TU9 项目，但申请材料也要更精细。"
+      },
+      "choices": [
+        {
+          "en": "Aim for TU9/Elite programs",
+          "zh": "冲刺 TU9/精英项目"
+        },
+        {
+          "en": "Focus on research universities",
+          "zh": "研究型大学为主"
+        },
+        {
+          "en": "Keep Universities of Applied Sciences as backup",
+          "zh": "保留应用科学大学兜底"
+        },
+        {
+          "en": "Wait for perfect materials",
+          "zh": "先等更完美材料"
+        }
+      ],
+      "title": {
+        "en": "APS High Score Positioning",
+        "zh": "APS 高分定位"
+      }
+    },
+    "aps_low_university_options": {
+      "body": {
+        "en": "You passed APS, but your score and background are tight. You can still apply, but you need more safety schools, preparatory courses, or restricted admission strategies.",
+        "zh": "APS 通过了，但分数和背景比较紧。你仍能申请，但需要更多保底、预科或受限专业策略。"
+      },
+      "choices": [
+        {
+          "en": "Focus on safety programs",
+          "zh": "主打保底项目"
+        },
+        {
+          "en": "Consider preparatory or bridge courses",
+          "zh": "考虑预科或桥梁课程"
+        },
+        {
+          "en": "Improve background before applying",
+          "zh": "继续补背景再申请"
+        },
+        {
+          "en": "Forcefully aim for top rankings",
+          "zh": "硬冲高排名"
+        }
+      ],
+      "title": {
+        "en": "APS Barely Passed",
+        "zh": "APS 低空通过"
+      }
+    },
+    "aps_mid_university_options": {
+      "body": {
+        "en": "Your APS score allows you to apply to many comprehensive and applied science universities. A strategic selection is more important than blindly chasing top names.",
+        "zh": "你的 APS 分数可以申请不少综合大学和应用科学大学。选校策略比盲目冲名校更重要。"
+      },
+      "choices": [
+        {
+          "en": "Mix comprehensive and applied science unis",
+          "zh": "综合大学 + 应用科学混申"
+        },
+        {
+          "en": "Prioritize course matching",
+          "zh": "优先看课程匹配"
+        },
+        {
+          "en": "Only aim for rankings",
+          "zh": "只冲排名"
+        },
+        {
+          "en": "Improve language before applying",
+          "zh": "先补语言再申请"
+        }
+      ],
+      "title": {
+        "en": "APS Safe Positioning",
+        "zh": "APS 稳妥定位"
+      }
+    },
+    "aps_not_ready": {
+      "body": {
+        "en": "The application deadline is approaching. To pass APS, you need complete documents, sufficient funds, language skills to explain your courses, and solid review of major subjects.",
+        "zh": "距离申请季结束越来越近。要参加 APS，至少需要材料齐、钱够、语言能说明课程、专业课复习到位。"
+      },
+      "choices": [
+        {
+          "en": "Continue reviewing major subjects",
+          "zh": "继续复习专业课"
+        },
+        {
+          "en": "Improve language expression",
+          "zh": "补语言表达"
+        },
+        {
+          "en": "Work temporarily to cover costs",
+          "zh": "临时打工补费用"
+        },
+        {
+          "en": "Reorganize documents",
+          "zh": "重新整理材料"
+        }
+      ],
+      "title": {
+        "en": "APS Not Yet Ready",
+        "zh": "APS 还没达标"
+      }
+    },
+    "aps_start": {
+      "body": {
+        "en": "You haven't truly departed yet. APS verifies the authenticity of your academic documents and eligibility, and uses interviews or TestAS to confirm you actually studied the courses on your transcript.",
+        "zh": "你还没有真正出发。APS 会核查学历材料真实性和入学资格，并通过面谈或 TestAS 检查你是否真的学过成绩单上的课程。"
+      },
+      "choices": [
+        {
+          "en": "Review APS requirements first",
+          "zh": "先看清 APS 要求"
+        },
+        {
+          "en": "Make a document checklist",
+          "zh": "列材料清单"
+        },
+        {
+          "en": "Estimate application budget",
+          "zh": "估算申请预算"
+        },
+        {
+          "en": "Review interview templates first",
+          "zh": "先背面谈模板"
+        }
+      ],
+      "title": {
+        "en": "Application Season Begins: APS",
+        "zh": "申请季开始：APS"
+      }
+    },
+    "arrival": {
+      "body": {
+        "en": "You drag two suitcases out of the station. APS, admission, visa, insurance, and blocked account proofs are all done. Now it's time to handle local German procedures.",
+        "zh": "你拖着两个箱子出站。APS、录取、签证、保险证明和冻结账户证明都已经在出发前完成，现在要把德国本地手续接上。"
+      },
+      "choices": [
+        {
+          "en": "Go to the dorm to drop off luggage",
+          "zh": "先去宿舍放行李"
+        },
+        {
+          "en": "Head straight to the supermarket and dm for essentials",
+          "zh": "立刻去超市和 dm 补生活用品"
+        },
+        {
+          "en": "Activate SIM card and banking app first",
+          "zh": "先激活 SIM 卡和银行 App"
+        },
+        {
+          "en": "Sit at the station to catch your breath",
+          "zh": "坐在车站缓一缓"
+        }
+      ],
+      "title": {
+        "en": "Arrival in Germany",
+        "zh": "抵达德国"
+      }
+    },
+    "bank_card_delay": {
+      "body": {
+        "en": "Your frozen account is active, but the Girocard/debit card is still on its way. Every payment feels like an exam.",
+        "zh": "冻结账户已激活，但 Girocard/借记卡还在路上；每个付款场景都像考试。"
+      },
+      "choices": [
+        {
+          "en": "Contact the bank",
+          "zh": "联系银行"
+        },
+        {
+          "en": "Borrow cash from a friend",
+          "zh": "先借朋友现金"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Bank Card Delayed",
+        "zh": "银行卡还没到"
+      }
+    },
+    "bike_flat_tire": {
+      "body": {
+        "en": "You've finally experienced a classic side quest of life in Germany.",
+        "zh": "你终于拥有了德国生活的一项经典支线。"
+      },
+      "choices": [
+        {
+          "en": "Fix it yourself",
+          "zh": "自己修"
+        },
+        {
+          "en": "Go to a bike shop",
+          "zh": "去车店"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Flat Tire",
+        "zh": "自行车爆胎"
+      }
+    },
+    "bike_offer": {
+      "body": {
+        "en": "Someone is selling a bike cheap. The brakes squeak loudly.",
+        "zh": "有人低价出一辆自行车，刹车声很有存在感。"
+      },
+      "choices": [
+        {
+          "en": "Buy it",
+          "zh": "买下"
+        },
+        {
+          "en": "Skip it",
+          "zh": "算了"
+        },
+        {
+          "en": "Handle safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Used Bike",
+        "zh": "二手自行车"
+      }
+    },
+    "blocked_account_notice": {
+      "body": {
+        "en": "The standard proof of funds for a 2026 student visa is 11,904 EUR/year. Funds are not available all at once; typically, a maximum of 992 EUR is released monthly after activation.",
+        "zh": "2026 年学生签证常见资金证明是 11,904 EUR/年。钱不是一次性可用，激活后通常每月最多释放 992 EUR。"
+      },
+      "choices": [
+        {
+          "en": "Redo budget at 992 EUR/month",
+          "zh": "按 992 EUR/月重做预算"
+        },
+        {
+          "en": "Assume full withdrawal is possible",
+          "zh": "误以为能一次取出"
+        },
+        {
+          "en": "Ask bank support for release dates",
+          "zh": "问银行客服确认释放日"
+        },
+        {
+          "en": "Work part-time to cover cash flow",
+          "zh": "先打工补现金流"
+        }
+      ],
+      "title": {
+        "en": "Blocked Account Notice",
+        "zh": "冻结账户提醒"
+      }
+    },
+    "boss_extra_shift": {
+      "body": {
+        "en": "The boss says they're short-handed this week and asks if you can pick up an extra shift.",
+        "zh": "老板说这周人手不够，希望你多来一次。"
+      },
+      "choices": [
+        {
+          "en": "Agree",
+          "zh": "答应"
+        },
+        {
+          "en": "Refuse",
+          "zh": "拒绝"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Boss's Overtime Request",
+        "zh": "老板加班请求"
+      }
+    },
+    "burnout_warning": {
+      "body": {
+        "en": "You're not exactly sleepy, but you have zero motivation to move.",
+        "zh": "你不是很困，但也完全不想动。"
+      },
+      "choices": [
+        {
+          "en": "Force yourself to rest",
+          "zh": "强制休息"
+        },
+        {
+          "en": "Keep pushing through",
+          "zh": "继续硬撑"
+        },
+        {
+          "en": "Handle things steadily",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Body Sending Warnings",
+        "zh": "身体发出警告"
+      }
+    },
+    "career_doubt": {
+      "body": {
+        "en": "You suddenly doubt whether you want to stay in Germany, return home, pursue a PhD, or change careers.",
+        "zh": "你突然不确定自己到底想留德、回国、读博还是转行。"
+      },
+      "choices": [
+        {
+          "en": "List pros and cons of each path",
+          "zh": "列路线利弊"
+        },
+        {
+          "en": "Don't think about the future yet",
+          "zh": "先不想未来"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Career Direction Doubts",
+        "zh": "职业方向怀疑"
+      }
+    },
+    "career_fair": {
+      "body": {
+        "en": "You grab a stack of flyers and a dose of reality.",
+        "zh": "你拿到一堆传单，也拿到一点现实感。"
+      },
+      "choices": [
+        {
+          "en": "Apply seriously",
+          "zh": "认真投递"
+        },
+        {
+          "en": "Just browse around",
+          "zh": "只逛一圈"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Campus Career Fair",
+        "zh": "校园招聘会"
+      }
+    },
+    "cash_only_place": {
+      "body": {
+        "en": "You thought you could swipe your card, but the clerk pointed to the ATM at the entrance.",
+        "zh": "你以为可以刷卡，店员指了指门口的 ATM。"
+      },
+      "choices": [
+        {
+          "en": "Withdraw cash",
+          "zh": "去取现金"
+        },
+        {
+          "en": "Try another shop",
+          "zh": "换一家店"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Cash Only",
+        "zh": "只收现金"
+      }
+    },
+    "cheap_ticket": {
+      "body": {
+        "en": "A ticket to a neighboring city is so cheap it feels like a temptation to escape your homework.",
+        "zh": "一张去邻城的票很便宜，便宜到像是在诱惑你逃离作业。"
+      },
+      "choices": [
+        {
+          "en": "Weekend day trip",
+          "zh": "周末短途旅行"
+        },
+        {
+          "en": "Resist the urge",
+          "zh": "忍住不去"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Cheap Train Ticket",
+        "zh": "廉价火车票"
+      }
+    },
+    "city_registration_letter": {
+      "body": {
+        "en": "The letter is short, but you read it three times to be sure it wasn't bad news.",
+        "zh": "信不长，但你读了三遍才确定它不是坏消息。"
+      },
+      "choices": [
+        {
+          "en": "File it",
+          "zh": "归档"
+        },
+        {
+          "en": "Ask roommate to confirm",
+          "zh": "问室友确认"
+        },
+        {
+          "en": "Handle prudently",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Letter from City Hall",
+        "zh": "市政厅来信"
+      }
+    },
+    "classmate_home_dinner": {
+      "body": {
+        "en": "Li says they cooked extra tonight and asks if you want to join. You're hungry but feel a bit awkward.",
+        "zh": "李同学说今晚多做了菜，问你要不要过去。你很饿，也有点不好意思。"
+      },
+      "choices": [
+        {
+          "en": "Bring some fruit",
+          "zh": "带点水果过去"
+        },
+        {
+          "en": "Go empty-handed but offer to wash dishes",
+          "zh": "空手去但主动洗碗"
+        },
+        {
+          "en": "Decline, return to dorm for instant noodles",
+          "zh": "拒绝，回宿舍泡面"
+        },
+        {
+          "en": "Pack leftovers for tomorrow's lunch",
+          "zh": "顺便打包明天午饭"
+        }
+      ],
+      "title": {
+        "en": "Dinner at a Classmate's Place",
+        "zh": "去同学家吃饭"
+      }
+    },
+    "club_poster": {
+      "body": {
+        "en": "There's an event on the bulletin board that doesn't look too awkward.",
+        "zh": "公告栏上有一个看起来不太尴尬的活动。"
+      },
+      "choices": [
+        {
+          "en": "Sign up",
+          "zh": "报名参加"
+        },
+        {
+          "en": "Walk past",
+          "zh": "路过"
+        },
+        {
+          "en": "Handle safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Club Poster",
+        "zh": "社团海报"
+      }
+    },
+    "coding_hackathon": {
+      "body": {
+        "en": "A hackathon this weekend. Free pizza, sleep at your own risk.",
+        "zh": "周末有场 Hackathon，披萨免费，睡眠自费。"
+      },
+      "choices": [
+        {
+          "en": "Attend",
+          "zh": "参加"
+        },
+        {
+          "en": "Study first",
+          "zh": "备考优先"
+        },
+        {
+          "en": "Handle safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Hackathon Invite",
+        "zh": "Hackathon 邀请"
+      }
+    },
+    "course_forum": {
+      "body": {
+        "en": "Someone on Moodle asked the question you were about to ask.",
+        "zh": "有人在 Moodle 里问了你也想问的问题。"
+      },
+      "choices": [
+        {
+          "en": "Read the discussion carefully",
+          "zh": "认真看讨论"
+        },
+        {
+          "en": "Reply casually",
+          "zh": "顺手回复"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Course Forum Lifesaver",
+        "zh": "课程论坛救命帖"
+      }
+    },
+    "cv_language_choice": {
+      "body": {
+        "en": "You're unsure whether to submit your CV in English or German.",
+        "zh": "你不知道该投英文简历还是德文简历。"
+      },
+      "choices": [
+        {
+          "en": "Prepare a bilingual version",
+          "zh": "做双语版本"
+        },
+        {
+          "en": "Start with English",
+          "zh": "先用英文"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "CV Language Choice",
+        "zh": "简历语言选择"
+      }
+    },
+    "deadline_extension": {
+      "body": {
+        "en": "The professor said you can apply for one extension, but you need a valid reason.",
+        "zh": "老师说可以申请一次延期，但需要合理理由。"
+      },
+      "choices": [
+        {
+          "en": "Apply seriously",
+          "zh": "认真申请"
+        },
+        {
+          "en": "Don't apply",
+          "zh": "不申请"
+        },
+        {
+          "en": "Handle it cautiously",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Extension Opportunity",
+        "zh": "延期机会"
+      }
+    },
+    "deep_l_trap": {
+      "body": {
+        "en": "The translation looks formal—so formal it sounds unnatural.",
+        "zh": "翻译结果看起来很正式，正式到不像人话。"
+      },
+      "choices": [
+        {
+          "en": "Edit it yourself",
+          "zh": "自己改一遍"
+        },
+        {
+          "en": "Send as is",
+          "zh": "直接发送"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Translator Trap",
+        "zh": "翻译器陷阱"
+      }
+    },
+    "deportation_risk_notice": {
+      "body": {
+        "en": "The Foreigners' Office has written to demand an explanation of your status. Previous delays or illegal work have turned the risk from background noise into a countdown.",
+        "zh": "外管局来信要求你尽快说明身份状态。之前的拖延或不合规打工已经让风险从背景音变成了倒计时。"
+      },
+      "choices": [
+        {
+          "en": "Bring all documents and fix it in person",
+          "zh": "带齐材料当面补救"
+        },
+        {
+          "en": "Ask the International Office to intervene",
+          "zh": "请学校 International Office 介入"
+        },
+        {
+          "en": "Consult a lawyer",
+          "zh": "找律师咨询"
+        },
+        {
+          "en": "Keep pushing through",
+          "zh": "继续硬扛"
+        }
+      ],
+      "title": {
+        "en": "Residence Risk Escalating",
+        "zh": "居留风险升级"
+      }
+    },
+    "deposit_worry": {
+      "body": {
+        "en": "You start worrying if your deposit will be fully refunded upon moving out.",
+        "zh": "你开始担心退房时押金会不会完整回来。"
+      },
+      "choices": [
+        {
+          "en": "Take photos for records",
+          "zh": "拍照留档"
+        },
+        {
+          "en": "Don't worry yet",
+          "zh": "先不想"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Deposit Anxiety",
+        "zh": "押金焦虑"
+      }
+    },
+    "desperate_illegal_work_offer": {
+      "body": {
+        "en": "Your account is empty; hunger and stress are rising. Someone offers cash-in-hand work: daily pay, no ID checks, no contract. It could save this month, or jeopardize your residency.",
+        "zh": "账户已经见底，饥饿和压力一起上升。有人说有现金工，当天结账、不问身份、不签合同。它能救这个月，也可能把你推向居留风险。"
+      },
+      "choices": [
+        {
+          "en": "Seek Student Union aid",
+          "zh": "找学生会紧急援助"
+        },
+        {
+          "en": "Borrow from friends/parents",
+          "zh": "向同学或父母借钱"
+        },
+        {
+          "en": "Take the cash job",
+          "zh": "接下现金黑工"
+        },
+        {
+          "en": "Use food banks/cheap canteens",
+          "zh": "去食物救助/低价食堂"
+        }
+      ],
+      "title": {
+        "en": "Temptation of Illegal Work",
+        "zh": "没钱后的黑工诱惑"
+      }
+    },
+    "deutsch_phrase_win": {
+      "body": {
+        "en": "You delivered a full sentence at the counter, and the clerk understood it completely.",
+        "zh": "你在柜台前完整说完一句话，对方也完整听懂了。"
+      },
+      "choices": [
+        {
+          "en": "Strike while the iron is hot",
+          "zh": "乘胜追击多说两句"
+        },
+        {
+          "en": "Know when to stop",
+          "zh": "见好就收"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Nailed a German Phrase",
+        "zh": "一句德语说顺了"
+      }
+    },
+    "doctor_appointment": {
+      "body": {
+        "en": "You're starting to understand why everyone says to call first.",
+        "zh": "你开始理解为什么大家说先打电话。"
+      },
+      "choices": [
+        {
+          "en": "Call to book",
+          "zh": "打电话预约"
+        },
+        {
+          "en": "Book online",
+          "zh": "找线上预约"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Doctor's Appointment",
+        "zh": "预约医生"
+      }
+    },
+    "drinks_with_classmates": {
+      "body": {
+        "en": "Group members suggest hitting a bar tonight. Going or not isn't just a social choice: it affects your wallet, energy for tomorrow, and relationships.",
+        "zh": "小组同学说今晚去酒吧。去不去都不是纯社交选择：钱、第二天精力和关系都会变。"
+      },
+      "choices": [
+        {
+          "en": "Go for a light drink",
+          "zh": "去小酌一杯"
+        },
+        {
+          "en": "Stick to non-alcoholic drinks",
+          "zh": "喝无酒精饮料"
+        },
+        {
+          "en": "Decline to study",
+          "zh": "拒绝去学习"
+        },
+        {
+          "en": "Overindulge",
+          "zh": "喝过头"
+        }
+      ],
+      "title": {
+        "en": "Drinks with Classmates",
+        "zh": "同学约你喝酒"
+      }
+    },
+    "exam_old_paper": {
+      "body": {
+        "en": "The legendary Altklausur has appeared in your cloud drive.",
+        "zh": "网盘里出现了传说中的 Altklausur。"
+      },
+      "choices": [
+        {
+          "en": "Start practicing immediately",
+          "zh": "立刻刷"
+        },
+        {
+          "en": "Share with the study group",
+          "zh": "分享给小组"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Found Past Papers",
+        "zh": "找到往年题"
+      }
+    },
+    "exam_registration": {
+      "body": {
+        "en": "Attending class doesn't auto-register you for exams; the system quietly waits for you to slip up.",
+        "zh": "考试不是上课就自动报名，系统静静等你犯错。"
+      },
+      "choices": [
+        {
+          "en": "Register now",
+          "zh": "马上报名"
+        },
+        {
+          "en": "Register and check the syllabus",
+          "zh": "报名后顺手查考纲"
+        },
+        {
+          "en": "Ask classmates about the process",
+          "zh": "先问同学报名流程"
+        },
+        {
+          "en": "Wait a bit",
+          "zh": "晚点再说"
+        }
+      ],
+      "title": {
+        "en": "Exam Registration",
+        "zh": "考试报名"
+      }
+    },
+    "exam_week": {
+      "body": {
+        "en": "You recognize every word, but suddenly don't understand the sentences.",
+        "zh": "题目每个词都认识，连起来突然不认识。"
+      },
+      "choices": [
+        {
+          "en": "Do the questions you know first",
+          "zh": "先做会的题"
+        },
+        {
+          "en": "Translate the questions literally",
+          "zh": "硬翻译题目"
+        },
+        {
+          "en": "Scan the whole paper to allocate time",
+          "zh": "先扫整张卷子分配时间"
+        },
+        {
+          "en": "Stare at the first question and stall",
+          "zh": "盯着第一题死磕"
+        }
+      ],
+      "title": {
+        "en": "First Klausur",
+        "zh": "第一次 Klausur"
+      }
+    },
+    "exercise_sheet_warning": {
+      "body": {
+        "en": "Your exercise scores on Moodle remind you: understanding the lecture doesn't mean you can solve the problems.",
+        "zh": "Moodle 上的练习分数提醒你：听懂课不等于会做题。"
+      },
+      "choices": [
+        {
+          "en": "Do three practice sets",
+          "zh": "补三套练习题"
+        },
+        {
+          "en": "Clarify in Tutorium",
+          "zh": "去 Tutorium 问清楚"
+        },
+        {
+          "en": "Compare answers with classmates",
+          "zh": "和同学对答案"
+        },
+        {
+          "en": "Focus on other things first",
+          "zh": "先忙别的"
+        }
+      ],
+      "title": {
+        "en": "Übung Score Warning",
+        "zh": "Übung 分数预警"
+      }
+    },
+    "expensive_partner_weekend": {
+      "body": {
+        "en": "Your partner sends links to restaurants, shows, and trips to neighboring cities. Everything sounds tempting, but everything burns cash.",
+        "zh": "对方发来餐厅、演出和邻城旅行链接，每一项都很心动，每一项都在烧钱。"
+      },
+      "choices": [
+        {
+          "en": "Split costs but set a budget cap",
+          "zh": "AA 但设预算上限"
+        },
+        {
+          "en": "Grin and bear it, follow all plans",
+          "zh": "硬着头皮全跟"
+        },
+        {
+          "en": "Honestly admit your budget is tight",
+          "zh": "坦白说自己预算有限"
+        },
+        {
+          "en": "Reject this weekend's plans",
+          "zh": "拒绝这个周末"
+        }
+      ],
+      "title": {
+        "en": "Weekend Plans with an Expensive Partner",
+        "zh": "高消费对象的周末计划"
+      }
+    },
+    "family_compare": {
+      "body": {
+        "en": "Your family forwards news that a peer your age is already working.",
+        "zh": "家里人转来一个同龄人已经工作的消息。"
+      },
+      "choices": [
+        {
+          "en": "Check messages less",
+          "zh": "少看消息"
+        },
+        {
+          "en": "Explain your pace seriously",
+          "zh": "认真解释自己的节奏"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Relative Comparison",
+        "zh": "亲戚比较"
+      }
+    },
+    "first_lecture": {
+      "body": {
+        "en": "The professor speaks fast. The PPT looks familiar yet strange.",
+        "zh": "教授讲得很快，PPT 看起来很熟悉但又陌生。"
+      },
+      "choices": [
+        {
+          "en": "Force yourself to take notes",
+          "zh": "硬着头皮记笔记"
+        },
+        {
+          "en": "Ask classmates for materials after class",
+          "zh": "课后问同学资料"
+        },
+        {
+          "en": "Review Moodle materials that night",
+          "zh": "当晚重看 Moodle 资料"
+        },
+        {
+          "en": "Pretend you understood everything",
+          "zh": "假装都听懂了"
+        }
+      ],
+      "title": {
+        "en": "First Lecture",
+        "zh": "第一次上课"
+      }
+    },
+    "flat_kitchen": {
+      "body": {
+        "en": "A pot no one claims has appeared on the kitchen counter.",
+        "zh": "厨房台面上出现了没人承认的锅。"
+      },
+      "choices": [
+        {
+          "en": "Take the initiative to clean",
+          "zh": "主动打扫"
+        },
+        {
+          "en": "Politely remind the group chat",
+          "zh": "在群里礼貌提醒"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "WG Kitchen Meeting",
+        "zh": "WG 厨房会议"
+      }
+    },
+    "friend_back_home": {
+      "body": {
+        "en": "A friend shares their promotion news. You offer sincere congratulations, though a wave of nostalgia hits you.",
+        "zh": "朋友说升职了，你真心祝贺，也有一点恍惚。"
+      },
+      "choices": [
+        {
+          "en": "Congratulate and catch up",
+          "zh": "祝贺并聊聊近况"
+        },
+        {
+          "en": "End the chat",
+          "zh": "关掉聊天"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Friend's Promotion Back Home",
+        "zh": "国内朋友升职"
+      }
+    },
+    "germany_language_track_start": {
+      "body": {
+        "en": "You're in Germany, but your TestDaF isn't 4x4 yet. Language courses, housing, and living expenses are burning cash. Formal registration and classes are delayed.",
+        "zh": "你已经到德国，但 TestDaF 还没 4x4。语言班、住宿和生活费同时烧钱，正式注册和上课都会被推迟。"
+      },
+      "choices": [
+        {
+          "en": "Enroll in an intensive language course",
+          "zh": "报名密集语言班"
+        },
+        {
+          "en": "Self-study for a week to save money",
+          "zh": "先自学一周省钱"
+        },
+        {
+          "en": "Ask the university about conditional registration",
+          "zh": "问学校能否条件注册"
+        },
+        {
+          "en": "Find a cheaper language school",
+          "zh": "找便宜语言学校"
+        }
+      ],
+      "title": {
+        "en": "Continuing Language Studies in Germany",
+        "zh": "德国继续读语言"
+      }
+    },
+    "grocery_inflation": {
+      "body": {
+        "en": "You notice that cheese, eggs, and fruit have all gone up in price.",
+        "zh": "你发现奶酪、鸡蛋和水果一起涨价了。"
+      },
+      "choices": [
+        {
+          "en": "Adjust your budget",
+          "zh": "改做预算"
+        },
+        {
+          "en": "Pretend not to notice",
+          "zh": "假装没看见"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Sticker Shock at the Supermarket",
+        "zh": "超市价格刺眼"
+      }
+    },
+    "group_invite": {
+      "body": {
+        "en": "Anna asks if you want to do the presentation together.",
+        "zh": "Anna 问你要不要一起做 presentation。"
+      },
+      "choices": [
+        {
+          "en": "Agree and take the lead on dividing tasks",
+          "zh": "答应并主动分工"
+        },
+        {
+          "en": "Only take the research part",
+          "zh": "只接资料整理的部分"
+        },
+        {
+          "en": "Ask her to explain the grading criteria first",
+          "zh": "请她先解释评分标准"
+        },
+        {
+          "en": "Politely decline",
+          "zh": "委婉拒绝"
+        }
+      ],
+      "title": {
+        "en": "German Classmate Invites You to a Group",
+        "zh": "德国同学邀你组队"
+      }
+    },
+    "health_insurance_letter": {
+      "body": {
+        "en": "Every word in the letter matters, but you're only sure that the Beitragsnummer is important.",
+        "zh": "信里每个词都重要，但你只确定 Beitragsnummer 很重要。"
+      },
+      "choices": [
+        {
+          "en": "Translate it carefully",
+          "zh": "认真翻译"
+        },
+        {
+          "en": "Photo it and send to the group chat",
+          "zh": "拍给群友"
+        },
+        {
+          "en": "Handle it cautiously",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Letter from Insurance",
+        "zh": "保险来信"
+      }
+    },
+    "heating_argument": {
+      "body": {
+        "en": "Your roommate thinks 19°C is reasonable; you, as a Southerner, demand dignity.",
+        "zh": "室友觉得 19 度很合理，你觉得南方人需要尊严。"
+      },
+      "choices": [
+        {
+          "en": "Hold a meeting to negotiate",
+          "zh": "开会协商"
+        },
+        {
+          "en": "Wear an extra layer",
+          "zh": "多穿一件"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Heating Dispute",
+        "zh": "暖气温度争论"
+      }
+    },
+    "hiwi_hint": {
+      "body": {
+        "en": "A teaching assistant hints that there will be student assistant (HiWi) positions at the institute next semester.",
+        "zh": "助教说下学期研究所有学生助理位置。"
+      },
+      "choices": [
+        {
+          "en": "Inquire proactively",
+          "zh": "主动询问"
+        },
+        {
+          "en": "Prepare your CV first",
+          "zh": "先准备简历"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "HiWi Hint",
+        "zh": "HiWi 暗示"
+      }
+    },
+    "homesick_food": {
+      "body": {
+        "en": "You suddenly crave the taste of home.",
+        "zh": "你突然很想吃家里的味道。"
+      },
+      "choices": [
+        {
+          "en": "Recreate it yourself",
+          "zh": "自己复刻"
+        },
+        {
+          "en": "Go to a Chinese restaurant",
+          "zh": "去中餐馆"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Homesick Meal",
+        "zh": "想家的一顿饭"
+      }
+    },
+    "illegal_cash_job_offer": {
+      "body": {
+        "en": "Someone offered you a cash-only job with no contract and no recorded hours. The money comes fast, but it may violate visa, residence, and working hour regulations.",
+        "zh": "有人介绍一份现金结算的活，不签合同、不报工时。钱来得快，但可能违反签证/居留和工作时长规则。"
+      },
+      "choices": [
+        {
+          "en": "Refuse and find a legal Minijob",
+          "zh": "拒绝并找合法 Minijob"
+        },
+        {
+          "en": "Take the illegal job to boost cash flow",
+          "zh": "接下黑工补现金流"
+        },
+        {
+          "en": "Ask the university for legal advice first",
+          "zh": "先问学校法律建议"
+        },
+        {
+          "en": "Borrow money from parents for this month",
+          "zh": "向父母借过这个月"
+        }
+      ],
+      "title": {
+        "en": "Cash-in-Hand Job Offer",
+        "zh": "现金黑工邀请"
+      }
+    },
+    "illegal_work_followup": {
+      "body": {
+        "en": "Cash jobs lack payslips and clear hour records. You start worrying about how this might affect your residence permit and studies.",
+        "zh": "现金工没有工资单，也没有清晰工时。你开始担心这件事会不会影响居留和学业。"
+      },
+      "choices": [
+        {
+          "en": "Stop immediately and keep records",
+          "zh": "立刻停止并保留记录"
+        },
+        {
+          "en": "Seek advice from ASTA or a lawyer",
+          "zh": "找 ASTA 或法律咨询"
+        },
+        {
+          "en": "Continue working to earn the money first",
+          "zh": "继续做，先把钱赚到"
+        },
+        {
+          "en": "Pretend nothing is wrong",
+          "zh": "假装无事发生"
+        }
+      ],
+      "title": {
+        "en": "Risks of Illegal Work",
+        "zh": "黑工后续风险"
+      }
+    },
+    "insurance_payment": {
+      "body": {
+        "en": "Student public health and long-term care insurance are deducted monthly. In 2026, common rates for providers like TK are approx. 141-146 EUR/month.",
+        "zh": "学生公保和护理保险按月扣费。2026 年 TK 等公保学生费率常见约 141-146 EUR/月。"
+      },
+      "choices": [
+        {
+          "en": "Include in monthly budget",
+          "zh": "记入月度预算"
+        },
+        {
+          "en": "Pretend not to see it",
+          "zh": "假装没看见"
+        },
+        {
+          "en": "Verify age and care insurance rates",
+          "zh": "核对年龄和护理保险费率"
+        },
+        {
+          "en": "Contact insurer to change deduction account",
+          "zh": "联系保险公司改扣款账户"
+        }
+      ],
+      "title": {
+        "en": "Insurance Deduction",
+        "zh": "保险扣费"
+      }
+    },
+    "international_potluck": {
+      "body": {
+        "en": "Everyone brings a dish and a slice of their story.",
+        "zh": "每个人都带了一道菜，也带来一点各自的故事。"
+      },
+      "choices": [
+        {
+          "en": "Bring a hometown dish",
+          "zh": "带一道家乡菜"
+        },
+        {
+          "en": "Just chat",
+          "zh": "只去聊天"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "International Potluck",
+        "zh": "国际学生聚餐"
+      }
+    },
+    "job_study_conflict": {
+      "body": {
+        "en": "Your boss asks if you can work an extra shift this weekend. Your homework is asking the same question.",
+        "zh": "老板问你周末能不能多来一班，作业也在问同一个问题。"
+      },
+      "choices": [
+        {
+          "en": "Choose work",
+          "zh": "选择上班"
+        },
+        {
+          "en": "Choose homework",
+          "zh": "选择写作业"
+        },
+        {
+          "en": "Swap for shorter shifts",
+          "zh": "和老板换短班"
+        },
+        {
+          "en": "Commit to both",
+          "zh": "两边都答应"
+        }
+      ],
+      "title": {
+        "en": "Work vs. Study Clash",
+        "zh": "打工和学习撞车"
+      }
+    },
+    "klausur_countdown": {
+      "body": {
+        "en": "The exam date on the calendar suddenly feels imminent; all unfinished problems seem to glow.",
+        "zh": "日历上的考试日期突然变得很近，所有未完成的题都开始发光。"
+      },
+      "choices": [
+        {
+          "en": "Compile a list of mistakes",
+          "zh": "整理错题清单"
+        },
+        {
+          "en": "Schedule office hours with prof/TA",
+          "zh": "约教授/助教答疑"
+        },
+        {
+          "en": "Mock exam with study group",
+          "zh": "和小组模拟考试"
+        },
+        {
+          "en": "Keep procrastinating",
+          "zh": "继续拖延"
+        }
+      ],
+      "title": {
+        "en": "Klausur Countdown: 2 Weeks",
+        "zh": "Klausur 倒计时两周"
+      }
+    },
+    "lab_partner_absent": {
+      "body": {
+        "en": "The group lab is about to start, but your partner's avatar is as silent as a default setting.",
+        "zh": "小组实验快开始了，搭档头像安静得像默认设置。"
+      },
+      "choices": [
+        {
+          "en": "Proceed alone",
+          "zh": "自己先推进"
+        },
+        {
+          "en": "Contact the TA",
+          "zh": "联系助教"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Lab Partner MIA",
+        "zh": "实验搭档失联"
+      }
+    },
+    "language_wall": {
+      "body": {
+        "en": "A long sentence at the counter hits you, and your soul briefly disconnects.",
+        "zh": "你在柜台前听到了一个长句，灵魂短暂离线。"
+      },
+      "choices": [
+        {
+          "en": "Ask them to slow down",
+          "zh": "请对方说慢一点"
+        },
+        {
+          "en": "Switch to English",
+          "zh": "改用英语"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "The German Wall",
+        "zh": "德语墙"
+      }
+    },
+    "laundry_fail": {
+      "body": {
+        "en": "You discover the dryer and your clothes failed to reach an agreement.",
+        "zh": "你发现烘干机和你的衣服并没有达成共识。"
+      },
+      "choices": [
+        {
+          "en": "Handle calmly",
+          "zh": "冷静处理"
+        },
+        {
+          "en": "Send to friends to vent",
+          "zh": "发给朋友吐槽"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Laundry Mishap",
+        "zh": "洗衣事故"
+      }
+    },
+    "legal_work_limit_notice": {
+      "body": {
+        "en": "The university reminds non-EU students: part-time work is usually limited to 140 full days or 280 half days per year. Working more than 20 hours a week during the semester jeopardizes your residence permit and academic status.",
+        "zh": "学校提醒非欧盟学生：打工通常不能超过每年 140 个全天或 280 个半天，学期内每周超过 20 小时会让居留和学业状态变得危险。"
+      },
+      "choices": [
+        {
+          "en": "Log hours in your calendar",
+          "zh": "把工时记进日历"
+        },
+        {
+          "en": "Only take jobs with clear contracts",
+          "zh": "只接合同清楚的班"
+        },
+        {
+          "en": "Ask the AStA/International Office",
+          "zh": "问 AStA/International Office"
+        },
+        {
+          "en": "Assume you won't exceed the limit",
+          "zh": "觉得自己不会超"
+        }
+      ],
+      "title": {
+        "en": "Student Work Hour Limits",
+        "zh": "学生打工时长说明"
+      }
+    },
+    "li_anxiety": {
+      "body": {
+        "en": "Someone in the group chat said half the class failed this course last year.",
+        "zh": "群里有人说这门课去年挂了一半。"
+      },
+      "choices": [
+        {
+          "en": "Verify info",
+          "zh": "核实信息"
+        },
+        {
+          "en": "Stop checking chat",
+          "zh": "停止看群"
+        },
+        {
+          "en": "Handle safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Li Forwards Group Message",
+        "zh": "李同学转发群消息"
+      }
+    },
+    "library_friend": {
+      "body": {
+        "en": "You spot the same classmate in the library again and exchange a nod.",
+        "zh": "你又在图书馆看到同一个同学，互相点了点头。"
+      },
+      "choices": [
+        {
+          "en": "Strike up a conversation",
+          "zh": "主动聊天"
+        },
+        {
+          "en": "Keep studying",
+          "zh": "继续学习"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Familiar Face in the Library",
+        "zh": "图书馆熟脸"
+      }
+    },
+    "library_workshop": {
+      "body": {
+        "en": "You learn to use several databases and discover what 'search anxiety' really means.",
+        "zh": "你学会了几个数据库，也学会了什么叫检索焦虑。"
+      },
+      "choices": [
+        {
+          "en": "Attend",
+          "zh": "参加"
+        },
+        {
+          "en": "Skip",
+          "zh": "跳过"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Library Research Workshop",
+        "zh": "图书馆文献课"
+      }
+    },
+    "linkedin_message": {
+      "body": {
+        "en": "Someone viewed your profile, but you haven't finished updating your project experience yet.",
+        "zh": "有人看了你的主页，但你还没写完项目经历。"
+      },
+      "choices": [
+        {
+          "en": "Polish your profile",
+          "zh": "完善主页"
+        },
+        {
+          "en": "Ignore for now",
+          "zh": "暂时忽略"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "LinkedIn Message",
+        "zh": "LinkedIn 私信"
+      }
+    },
+    "lonely_christmas": {
+      "body": {
+        "en": "The streets are quiet, and so is the dorm kitchen.",
+        "zh": "街上很安静，宿舍厨房也很安静。"
+      },
+      "choices": [
+        {
+          "en": "Video call home",
+          "zh": "给家里打视频"
+        },
+        {
+          "en": "Dinner with classmates",
+          "zh": "约同学吃饭"
+        },
+        {
+          "en": "Church/Student Union event",
+          "zh": "去教堂/学生会活动"
+        },
+        {
+          "en": "Tough it out alone",
+          "zh": "自己扛过去"
+        }
+      ],
+      "title": {
+        "en": "A Lonely Holiday",
+        "zh": "一个人的节日"
+      }
+    },
+    "lost_in_campus": {
+      "body": {
+        "en": "Building numbers, entrances, and floors seem like three different systems.",
+        "zh": "楼号、入口和楼层像是三套不同系统。"
+      },
+      "choices": [
+        {
+          "en": "Ask for directions",
+          "zh": "问路"
+        },
+        {
+          "en": "Find it yourself",
+          "zh": "自己找"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Lost on Campus",
+        "zh": "校园迷路"
+      }
+    },
+    "mailbox_shock": {
+      "body": {
+        "en": "A letter that looks very formal is sitting in your mailbox.",
+        "zh": "信箱里躺着一封看起来很正式的信。"
+      },
+      "choices": [
+        {
+          "en": "Open it immediately",
+          "zh": "马上拆开"
+        },
+        {
+          "en": "Wait until evening",
+          "zh": "晚上再说"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Mailbox Shock",
+        "zh": "信箱惊吓"
+      }
+    },
+    "mensa_surprise": {
+      "body": {
+        "en": "The Mensa food is surprisingly good today.",
+        "zh": "今天 Mensa 居然挺好吃。"
+      },
+      "choices": [
+        {
+          "en": "Enjoy it fully",
+          "zh": "认真享受"
+        },
+        {
+          "en": "Photo and post in group chat",
+          "zh": "拍照发群"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Mensa Surprise",
+        "zh": "食堂惊喜"
+      }
+    },
+    "mental_health_webinar": {
+      "body": {
+        "en": "The university sent a webinar link that feels like it was written just for you.",
+        "zh": "学校发来讲座链接，主题像是专门写给你的。"
+      },
+      "choices": [
+        {
+          "en": "Attend",
+          "zh": "参加"
+        },
+        {
+          "en": "Save for later",
+          "zh": "收藏不看"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Mental Health Webinar",
+        "zh": "心理健康讲座"
+      }
+    },
+    "midterm_pressure": {
+      "body": {
+        "en": "Assignments, reading, and daily chores start piling up all at once.",
+        "zh": "作业、阅读和生活琐事开始一起上门。"
+      },
+      "choices": [
+        {
+          "en": "Organize a study plan",
+          "zh": "整理学习计划"
+        },
+        {
+          "en": "Take a nap first",
+          "zh": "先睡一觉"
+        },
+        {
+          "en": "Skip a work shift to finish homework",
+          "zh": "砍掉一班打工补作业"
+        },
+        {
+          "en": "Power through with coffee",
+          "zh": "靠咖啡硬顶"
+        }
+      ],
+      "title": {
+        "en": "Midterm Pressure",
+        "zh": "期中压力"
+      }
+    },
+    "missed_exam_registration": {
+      "body": {
+        "en": "You suddenly remember that exam registration closes today.",
+        "zh": "你突然想起考试报名截止就在今天。"
+      },
+      "choices": [
+        {
+          "en": "Fix it immediately",
+          "zh": "立刻补救"
+        },
+        {
+          "en": "Email for help",
+          "zh": "写邮件求助"
+        },
+        {
+          "en": "Ask a classmate to guide you",
+          "zh": "请同学现场带路"
+        },
+        {
+          "en": "Accept it, try next semester",
+          "zh": "认了，下学期再说"
+        }
+      ],
+      "title": {
+        "en": "Almost Missed Registration",
+        "zh": "差点错过考试报名"
+      }
+    },
+    "missing_school_registration": {
+      "body": {
+        "en": "At the classroom door, you realize your account, course selection, and materials are stuck due to incomplete registration. Semester fees are spent, but your studies are idling.",
+        "zh": "你到了教室门口才发现账号、选课和课程材料都卡在注册状态。学期费花了时间和精力，学业却开始空转。"
+      },
+      "choices": [
+        {
+          "en": "Complete registration today",
+          "zh": "当天补注册"
+        },
+        {
+          "en": "Visit the International Office first",
+          "zh": "先找 International Office"
+        },
+        {
+          "en": "Rely on self-study for a week",
+          "zh": "只靠自学顶一周"
+        },
+        {
+          "en": "Keep procrastinating",
+          "zh": "继续拖延"
+        }
+      ],
+      "title": {
+        "en": "Unregistered, Can't Attend Class",
+        "zh": "注册没完成，上不了课"
+      }
+    },
+    "moodle_down": {
+      "body": {
+        "en": "The day before the deadline, the system starts acting up.",
+        "zh": "截止前一天，系统开始装死。"
+      },
+      "choices": [
+        {
+          "en": "Screenshot and email",
+          "zh": "截图发邮件"
+        },
+        {
+          "en": "Wait for it to recover",
+          "zh": "等它恢复"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Moodle is Down",
+        "zh": "Moodle 崩了"
+      }
+    },
+    "moodle_quiz": {
+      "body": {
+        "en": "An unassuming quiz suddenly counts toward your continuous assessment grade.",
+        "zh": "一个不起眼的小测突然算进平时分。"
+      },
+      "choices": [
+        {
+          "en": "Complete it now",
+          "zh": "立刻补做"
+        },
+        {
+          "en": "Accept the loss",
+          "zh": "接受损失"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Moodle Quiz",
+        "zh": "Moodle 小测"
+      }
+    },
+    "neighbor_greeting": {
+      "body": {
+        "en": "You had a 12-second German conversation with a neighbor in the stairwell.",
+        "zh": "你在楼梯间和邻居进行了一场 12 秒的德语对话。"
+      },
+      "choices": [
+        {
+          "en": "Chat a bit more",
+          "zh": "多聊一句"
+        },
+        {
+          "en": "End politely",
+          "zh": "礼貌结束"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Neighbor's Greeting",
+        "zh": "邻居打招呼"
+      }
+    },
+    "neighbor_noise": {
+      "body": {
+        "en": "The bass from upstairs continues until dawn.",
+        "zh": "楼上低音持续到凌晨。"
+      },
+      "choices": [
+        {
+          "en": "Go upstairs to talk",
+          "zh": "上楼沟通"
+        },
+        {
+          "en": "Wear earplugs",
+          "zh": "戴耳塞"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Neighbor's Party",
+        "zh": "邻居派对"
+      }
+    },
+    "office_hour_full": {
+      "body": {
+        "en": "Booking the professor's office hours is harder than getting a table at a hot restaurant.",
+        "zh": "教授的 office hour 比热门餐厅还难约。"
+      },
+      "choices": [
+        {
+          "en": "Email with clear questions",
+          "zh": "写清楚问题发邮件"
+        },
+        {
+          "en": "Discuss with classmates",
+          "zh": "找同学讨论"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Office Hours Full",
+        "zh": "答疑预约满了"
+      }
+    },
+    "parents_future": {
+      "body": {
+        "en": "During a video call, your parents ask whether you plan to stay in Germany or return home after graduation.",
+        "zh": "视频电话里，父母问你毕业以后留德国还是回国。"
+      },
+      "choices": [
+        {
+          "en": "Say you haven't decided yet",
+          "zh": "说还没想好"
+        },
+        {
+          "en": "Say you want to stay in Germany",
+          "zh": "说想留德国"
+        },
+        {
+          "en": "Say returning home is also an option",
+          "zh": "说回国也不错"
+        },
+        {
+          "en": "Handle it cautiously",
+          "zh": "稳妥处理"
+        }
+      ],
+      "title": {
+        "en": "Parents Ask About the Future",
+        "zh": "父母问未来"
+      }
+    },
+    "parents_money_hint": {
+      "body": {
+        "en": "Your parents mention the exchange rate changed again; you sense the unspoken pressure.",
+        "zh": "父母说最近汇率又变了，你听懂了没说出口的压力。"
+      },
+      "choices": [
+        {
+          "en": "Show them a budget",
+          "zh": "做预算表给他们看"
+        },
+        {
+          "en": "Reassure them first",
+          "zh": "先安慰他们"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Parents' Money Hint",
+        "zh": "父母暗示开销"
+      }
+    },
+    "parents_package": {
+      "body": {
+        "en": "It contains spices, medicine, and a note full of reminders.",
+        "zh": "里面有调料、药和一张写满叮嘱的纸。"
+      },
+      "choices": [
+        {
+          "en": "Video call to thank them",
+          "zh": "好好视频感谢"
+        },
+        {
+          "en": "Just acknowledge receipt",
+          "zh": "收到就行"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Package from Home",
+        "zh": "家里寄来的包裹"
+      }
+    },
+    "payslip_question": {
+      "body": {
+        "en": "Every deduction on your payslip looks like a foreign vocabulary test.",
+        "zh": "工资单上每个扣款项目都像陌生词汇测试。"
+      },
+      "choices": [
+        {
+          "en": "Research taxes and insurance",
+          "zh": "研究税和保险"
+        },
+        {
+          "en": "Ask a colleague",
+          "zh": "问同事"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Payslip Confusion",
+        "zh": "工资单疑惑"
+      }
+    },
+    "pfand_machine": {
+      "body": {
+        "en": "The machine spat back two bottles. You start wondering if bottles need visas too.",
+        "zh": "机器吐回了两个瓶子，你开始怀疑瓶子也需要签证。"
+      },
+      "choices": [
+        {
+          "en": "Study the rules",
+          "zh": "研究规则"
+        },
+        {
+          "en": "Deal with it later",
+          "zh": "下次再说"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Pfand Machine",
+        "zh": "押金瓶机器"
+      }
+    },
+    "pharmacy_advice": {
+      "body": {
+        "en": "The pharmacist speaks slowly; for the first time, slowness feels like kindness.",
+        "zh": "药剂师说得很慢，你第一次觉得慢是一种善意。"
+      },
+      "choices": [
+        {
+          "en": "Listen carefully",
+          "zh": "认真听"
+        },
+        {
+          "en": "Buy what they suggest",
+          "zh": "照着买"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Pharmacy Advice",
+        "zh": "药房建议"
+      }
+    },
+    "plagiarism_warning": {
+      "body": {
+        "en": "Your professor warns that incorrect citation formats can cause major issues.",
+        "zh": "老师提醒引用格式不规范也可能出大问题。"
+      },
+      "choices": [
+        {
+          "en": "Reorganize references",
+          "zh": "重整参考文献"
+        },
+        {
+          "en": "Ask about library workshops",
+          "zh": "问图书馆课程"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Citation Format Warning",
+        "zh": "引用格式警告"
+      }
+    },
+    "presentation_applause": {
+      "body": {
+        "en": "After your presentation, some people nod, and a few even clap twice.",
+        "zh": "讲完后有人点头，还有人真的鼓掌了两下。"
+      },
+      "choices": [
+        {
+          "en": "Accept this small victory",
+          "zh": "接受这个小胜利"
+        },
+        {
+          "en": "Review shortcomings",
+          "zh": "复盘不足"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Presentation Applause",
+        "zh": "Presentation 掌声"
+      }
+    },
+    "presentation_freeze": {
+      "body": {
+        "en": "You forget the next word halfway through your presentation.",
+        "zh": "你讲到一半忘了下一个词。"
+      },
+      "choices": [
+        {
+          "en": "Check notes and continue",
+          "zh": "看提示继续"
+        },
+        {
+          "en": "Let a teammate take over",
+          "zh": "让队友接一下"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Presentation Freeze",
+        "zh": "Presentation 卡壳"
+      }
+    },
+    "prof_email": {
+      "body": {
+        "en": "You spent 40 minutes agonizing over the salutation and tone.",
+        "zh": "你花了 40 分钟纠结称呼和语气。"
+      },
+      "choices": [
+        {
+          "en": "Polish with DeepL",
+          "zh": "用 DeepL 润色"
+        },
+        {
+          "en": "Send it directly",
+          "zh": "直接发"
+        },
+        {
+          "en": "Ask a Chinese classmate",
+          "zh": "问中国同学"
+        },
+        {
+          "en": "Handle it cautiously",
+          "zh": "稳妥处理"
+        }
+      ],
+      "title": {
+        "en": "First Email to a Professor",
+        "zh": "第一次给教授写邮件"
+      }
+    },
+    "prof_reply": {
+      "body": {
+        "en": "The professor actually replied, and it wasn't an auto-reply.",
+        "zh": "教授竟然回复了，而且不是自动回复。"
+      },
+      "choices": [
+        {
+          "en": "Follow up",
+          "zh": "认真跟进"
+        },
+        {
+          "en": "Save for later",
+          "zh": "先收藏"
+        },
+        {
+          "en": "Handle safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Professor's Reply",
+        "zh": "教授回信"
+      }
+    },
+    "project_presentation": {
+      "body": {
+        "en": "The group document is finally open, but everyone's understanding differs slightly.",
+        "zh": "小组文档终于打开了，但大家的理解不完全一样。"
+      },
+      "choices": [
+        {
+          "en": "Proactively integrate slides",
+          "zh": "主动整合 slides"
+        },
+        {
+          "en": "Stick to your own section",
+          "zh": "只负责自己的部分"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Presentation Approaching",
+        "zh": "Presentation 临近"
+      }
+    },
+    "quiet_success": {
+      "body": {
+        "en": "The bus was on time, an email got a reply, and you finished a page of homework.",
+        "zh": "今天公交准点、邮件有人回、作业也写完了一页。"
+      },
+      "choices": [
+        {
+          "en": "Remember this feeling",
+          "zh": "记住这种感觉"
+        },
+        {
+          "en": "Handle it cautiously",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        },
+        {
+          "en": "Push forward boldly",
+          "zh": "冒险推进"
+        }
+      ],
+      "title": {
+        "en": "A Small Smoothness",
+        "zh": "一个小小的顺利"
+      }
+    },
+    "rainy_week": {
+      "body": {
+        "en": "It gets dark early, and your mood follows suit.",
+        "zh": "天黑得很早，心情也跟着早退。"
+      },
+      "choices": [
+        {
+          "en": "Go out for exercise",
+          "zh": "出门运动"
+        },
+        {
+          "en": "Stay in the dorm",
+          "zh": "宅在宿舍"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Week of Rain",
+        "zh": "连续阴雨"
+      }
+    },
+    "refund": {
+      "body": {
+        "en": "A previously overcharged fee has been refunded.",
+        "zh": "之前多扣的一笔费用退回来了。"
+      },
+      "choices": [
+        {
+          "en": "Save it",
+          "zh": "存起来"
+        },
+        {
+          "en": "Treat yourself to better food",
+          "zh": "改善伙食"
+        },
+        {
+          "en": "Handle it cautiously",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Unexpected Refund",
+        "zh": "意外退款"
+      }
+    },
+    "refund_from_landlord": {
+      "body": {
+        "en": "Your landlord says they overcharged for utilities last month and has refunded the difference.",
+        "zh": "房东说上月杂费多收了一点，给你退回来了。"
+      },
+      "choices": [
+        {
+          "en": "Save it",
+          "zh": "存起来"
+        },
+        {
+          "en": "Buy some treats",
+          "zh": "买点好吃的"
+        },
+        {
+          "en": "Handle prudently",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Landlord Refund",
+        "zh": "房东退小额费用"
+      }
+    },
+    "registration_queue": {
+      "body": {
+        "en": "The line moves slowly, but everyone holds a stack of fate in their hands.",
+        "zh": "队伍移动得很慢，但每个人手里都拿着一叠命运。"
+      },
+      "choices": [
+        {
+          "en": "Wait patiently",
+          "zh": "耐心排完"
+        },
+        {
+          "en": "Go back to prepare documents first",
+          "zh": "先回去补材料"
+        },
+        {
+          "en": "Handle it cautiously",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Registration Office Queue",
+        "zh": "注册办公室排队"
+      }
+    },
+    "registration_window_missed": {
+      "body": {
+        "en": "The Einschreibung deadline has passed. Even if you pass the TestDaF later, you can't join this semester's regular studies. You must handle deferrals, language courses, or exception requests. Living costs keep burning, and mental stress becomes the main quest.",
+        "zh": "Einschreibung 截止日过去了。就算之后 TestDaF 过了，也不能立刻进入本学期正常学习，只能处理延期、语言班或例外申请。生活费还在烧，精神压力开始变成主线。"
+      },
+      "choices": [
+        {
+          "en": "Accept registration next semester",
+          "zh": "接受下学期再注册"
+        },
+        {
+          "en": "Request an exception with TestDaF and documents",
+          "zh": "带 TestDaF 和材料求例外"
+        },
+        {
+          "en": "Transfer to a language course and wait for next semester",
+          "zh": "转入语言班等待下学期"
+        },
+        {
+          "en": "Ignore emails and deadlines",
+          "zh": "逃避邮件和截止日"
+        }
+      ],
+      "title": {
+        "en": "Missed Registration Window",
+        "zh": "错过学校注册窗口"
+      }
+    },
+    "relationship_support_exam": {
+      "body": {
+        "en": "The night before the exam, your partner doesn't drag you out to party. Instead, they leave you quiet time and a meal.",
+        "zh": "考试前一晚，对方没有拉你出去玩，而是给你留了安静时间和一盒饭。"
+      },
+      "choices": [
+        {
+          "en": "Accept support and keep studying",
+          "zh": "接受支持后继续复习"
+        },
+        {
+          "en": "Take a 10-minute walk together",
+          "zh": "一起散步十分钟"
+        },
+        {
+          "en": "Express sincere gratitude",
+          "zh": "认真表达感谢"
+        },
+        {
+          "en": "Feel a bit cold due to anxiety",
+          "zh": "焦虑中有点冷淡"
+        }
+      ],
+      "title": {
+        "en": "Exam Support from a Stable Partner",
+        "zh": "稳定关系的考前支持"
+      }
+    },
+    "rent_pressure": {
+      "body": {
+        "en": "Rent and the deposit make your account balance look unfriendly.",
+        "zh": "房租和押金让账户余额看起来很不友好。"
+      },
+      "choices": [
+        {
+          "en": "Pick up more shifts",
+          "zh": "接更多班"
+        },
+        {
+          "en": "Explain to parents",
+          "zh": "和父母解释"
+        },
+        {
+          "en": "Find short-term Nachhilfe/tutoring",
+          "zh": "找短期 Nachhilfe/家教"
+        },
+        {
+          "en": "Skip rent and hope next month's funds clear",
+          "zh": "先欠着房租赌下月释放"
+        }
+      ],
+      "title": {
+        "en": "Rent Pressure",
+        "zh": "房租压力"
+      }
+    },
+    "romance_bankruptcy_warning": {
+      "body": {
+        "en": "You check your bills and realize this relationship is no longer just a romantic issue, but a cash flow crisis. Rent and insurance are waiting for you next month.",
+        "zh": "你翻开账单，发现这段关系已经不只是浪漫问题，而是现金流问题。下个月房租和保险都在等你。"
+      },
+      "choices": [
+        {
+          "en": "Stop expensive dates",
+          "zh": "停止高消费约会"
+        },
+        {
+          "en": "Discuss budgets clearly with your partner",
+          "zh": "和对方谈清预算"
+        },
+        {
+          "en": "Pick up more shifts to cover the gap",
+          "zh": "接更多班补窟窿"
+        },
+        {
+          "en": "Keep swiping your card to maintain appearances",
+          "zh": "继续刷卡维持体面"
+        }
+      ],
+      "title": {
+        "en": "Romance Expenses Out of Control",
+        "zh": "感情开销失控"
+      }
+    },
+    "romance_crossroads": {
+      "body": {
+        "en": "You've met a few people through events and dating apps. Student life in Germany is tough; a relationship could be your support system or a new risk.",
+        "zh": "你在活动和约会 App 之间认识了几个人。留学生活已经很难，亲密关系可能是支撑，也可能是新的风险。"
+      },
+      "choices": [
+        {
+          "en": "Choose a partner who cooks together",
+          "zh": "选择会一起做饭的对象"
+        },
+        {
+          "en": "Choose a fun but expensive partner",
+          "zh": "选择很会玩但花钱多的对象"
+        },
+        {
+          "en": "Be moved by intense pursuit",
+          "zh": "被热烈追求打动"
+        },
+        {
+          "en": "Take it slow, don't rush commitment",
+          "zh": "慢慢观察，不急着确定"
+        }
+      ],
+      "title": {
+        "en": "Romance Branch Begins",
+        "zh": "感情支线开端"
+      }
+    },
+    "romance_scam_risk": {
+      "body": {
+        "en": "Your partner starts frequently borrowing money, disappearing temporarily, then suddenly becoming sweet when you try to exit. You realize this isn't a normal conflict.",
+        "zh": "对方开始频繁借钱、临时消失，又在你想退出时突然变得温柔。你意识到这可能不是普通矛盾。"
+      },
+      "choices": [
+        {
+          "en": "Stop transfers immediately and distance yourself",
+          "zh": "立刻停止转账并拉开距离"
+        },
+        {
+          "en": "Review chat logs with friends",
+          "zh": "找朋友复盘聊天记录"
+        },
+        {
+          "en": "Continue trusting them",
+          "zh": "继续相信对方"
+        },
+        {
+          "en": "Confront them face-to-face",
+          "zh": "当面摊牌"
+        }
+      ],
+      "title": {
+        "en": "Risk of Emotional Scam",
+        "zh": "被欺骗感情的风险"
+      }
+    },
+    "room_contract_clause": {
+      "body": {
+        "en": "There's a section on Nebenkosten in the contract; reading it only made you more confused.",
+        "zh": "合同里有一段 Nebenkosten，你读完更不确定了。"
+      },
+      "choices": [
+        {
+          "en": "Ask your roommate to explain",
+          "zh": "请室友解释"
+        },
+        {
+          "en": "Research it yourself",
+          "zh": "自己查"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Lease Clause",
+        "zh": "租房合同条款"
+      }
+    },
+    "roommate_help": {
+      "body": {
+        "en": "Cem reminds you that a procedure can be done online.",
+        "zh": "Cem 提醒你一个手续可以线上办。"
+      },
+      "choices": [
+        {
+          "en": "Ask him to look with you",
+          "zh": "请他一起看"
+        },
+        {
+          "en": "Figure it out yourself",
+          "zh": "自己研究"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Roommate Helps Out",
+        "zh": "室友帮忙"
+      }
+    },
+    "semester_fee_due": {
+      "body": {
+        "en": "Your university sent a Semesterbeitrag email. While most German public universities don't charge high tuition, semester fees, student union dues, and transit tickets must still be paid on time.",
+        "zh": "学校发来 Semesterbeitrag 邮件。德国多数公立大学不是传统高学费，但学期费、学生会费和交通票仍要按时缴。"
+      },
+      "choices": [
+        {
+          "en": "Pay on time",
+          "zh": "按时缴费"
+        },
+        {
+          "en": "Confirm deadline first",
+          "zh": "先确认截止日期"
+        },
+        {
+          "en": "Handle prudently",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Semester Fee Reminder",
+        "zh": "学期费提醒"
+      }
+    },
+    "semester_ticket": {
+      "body": {
+        "en": "The semester ticket doesn't just appear on your phone. Another lesson learned.",
+        "zh": "学期票不是自动出现在手机里的，你又学到一件事。"
+      },
+      "choices": [
+        {
+          "en": "Activate now",
+          "zh": "立刻激活"
+        },
+        {
+          "en": "Screenshot and ask classmates",
+          "zh": "先截图问同学"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Semester Ticket Activation",
+        "zh": "学期票激活"
+      }
+    },
+    "semester_wrap": {
+      "body": {
+        "en": "You're starting to grasp the rhythm of German universities and why everyone says the first semester is an adjustment period.",
+        "zh": "你开始理解德国大学的节奏，也理解了为什么大家都说第一学期是适应期。"
+      },
+      "choices": [
+        {
+          "en": "Reflect on this semester",
+          "zh": "复盘这一学期"
+        },
+        {
+          "en": "Make an admin checklist for next semester",
+          "zh": "给下学期列行政清单"
+        },
+        {
+          "en": "Grab dinner with friends to celebrate",
+          "zh": "约朋友吃饭庆祝"
+        },
+        {
+          "en": "Just lie flat and scroll on your phone",
+          "zh": "直接躺平刷手机"
+        }
+      ],
+      "title": {
+        "en": "Semester Ending Soon",
+        "zh": "学期快结束了"
+      }
+    },
+    "sick_day": {
+      "body": {
+        "en": "Your body reminds you that German winters aren't just background textures.",
+        "zh": "身体提醒你德国冬天不是背景贴图。"
+      },
+      "choices": [
+        {
+          "en": "Rest",
+          "zh": "休息"
+        },
+        {
+          "en": "Push through to class",
+          "zh": "硬去上课"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Caught a Cold",
+        "zh": "感冒"
+      }
+    },
+    "sim_card_confusion": {
+      "body": {
+        "en": "You discover that even plans called 'unlimited' have many restrictions.",
+        "zh": "你发现同样叫 unlimited 的套餐也有很多限制。"
+      },
+      "choices": [
+        {
+          "en": "Compare prices carefully",
+          "zh": "认真比价"
+        },
+        {
+          "en": "Just buy one randomly",
+          "zh": "随便买一个"
+        },
+        {
+          "en": "Handle it cautiously",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "SIM Card Plans",
+        "zh": "电话卡套餐"
+      }
+    },
+    "snow_day": {
+      "body": {
+        "en": "The snow makes the city quiet and the roads slippery.",
+        "zh": "雪把城市变得安静，也把路变得很滑。"
+      },
+      "choices": [
+        {
+          "en": "Go for a walk",
+          "zh": "出去走走"
+        },
+        {
+          "en": "Watch from the dorm",
+          "zh": "在宿舍看雪"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "First Snow",
+        "zh": "第一场雪"
+      }
+    },
+    "spati_talk": {
+      "body": {
+        "en": "The clerk asks where you're from, and you find yourself talking more than usual.",
+        "zh": "店员问你从哪里来，你突然多说了几句。"
+      },
+      "choices": [
+        {
+          "en": "Keep chatting",
+          "zh": "继续聊"
+        },
+        {
+          "en": "Buy and leave",
+          "zh": "买完就走"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Late-Night Convenience Store Chat",
+        "zh": "深夜便利店闲聊"
+      }
+    },
+    "stable_partner_cooking": {
+      "body": {
+        "en": "Your partner brought ingredients to your dorm to cook together. You chat about classes, rent, and the future. Dinner wasn't expensive, but it felt grounding.",
+        "zh": "对方带了食材来宿舍一起做饭。你们聊课程、房租和未来，晚饭没有很贵，但很踏实。"
+      },
+      "choices": [
+        {
+          "en": "Prep food and chat",
+          "zh": "一起备菜聊天"
+        },
+        {
+          "en": "Make lunchboxes for tomorrow",
+          "zh": "顺便做明天便当"
+        },
+        {
+          "en": "Clarify boundaries",
+          "zh": "聊清楚彼此边界"
+        },
+        {
+          "en": "Enjoy tonight, don't talk about the future",
+          "zh": "只享受今晚，不谈以后"
+        }
+      ],
+      "title": {
+        "en": "A Meal in a Stable Relationship",
+        "zh": "稳定关系的一顿饭"
+      }
+    },
+    "student_discount": {
+      "body": {
+        "en": "You discover an app that can save you money on transport or groceries.",
+        "zh": "你发现一个 App 能省下一些交通或超市钱。"
+      },
+      "choices": [
+        {
+          "en": "Research it immediately",
+          "zh": "立刻研究"
+        },
+        {
+          "en": "Save for later, ignore for now",
+          "zh": "收藏但不看"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Student Discount",
+        "zh": "学生优惠"
+      }
+    },
+    "student_job_offer": {
+      "body": {
+        "en": "A classmate mentions their shop is short-staffed and you could trial shift tonight.",
+        "zh": "一个同学说店里缺人，今晚就能试工。"
+      },
+      "choices": [
+        {
+          "en": "Go for the trial",
+          "zh": "去试工"
+        },
+        {
+          "en": "Politely decline",
+          "zh": "婉拒"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Temp Job Opportunity",
+        "zh": "临时工机会"
+      }
+    },
+    "sunday_closed": {
+      "body": {
+        "en": "You stand at the supermarket door, staring at your reflection in the glass.",
+        "zh": "你站在超市门口，和玻璃里的自己对视。"
+      },
+      "choices": [
+        {
+          "en": "Cook from the fridge",
+          "zh": "翻冰箱做饭"
+        },
+        {
+          "en": "Order delivery",
+          "zh": "点外卖"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Supermarket Closed on Sunday",
+        "zh": "周日超市关门"
+      }
+    },
+    "tax_id_letter": {
+      "body": {
+        "en": "A rare piece of good news: Your Steuer-ID has arrived.",
+        "zh": "一封少见的好消息：Steuer-ID 到了。"
+      },
+      "choices": [
+        {
+          "en": "File it away",
+          "zh": "归档收好"
+        },
+        {
+          "en": "Toss it aside",
+          "zh": "随手一放"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Tax ID Arrived",
+        "zh": "税号到了"
+      }
+    },
+    "termin_missing": {
+      "body": {
+        "en": "No appointments available for the next three months.",
+        "zh": "未来三个月都没有可预约时间。"
+      },
+      "choices": [
+        {
+          "en": "Refresh every morning",
+          "zh": "每天早上刷新"
+        },
+        {
+          "en": "Email to explain the situation",
+          "zh": "写邮件解释情况"
+        },
+        {
+          "en": "Ask the university for help",
+          "zh": "找学校帮忙"
+        },
+        {
+          "en": "Just wait for the system to release slots",
+          "zh": "只等系统放号"
+        }
+      ],
+      "title": {
+        "en": "No Termin at Ausländerbehörde",
+        "zh": "Ausländerbehörde 没有 Termin"
+      }
+    },
+    "testdaf_blocks_enrollment": {
+      "body": {
+        "en": "The university reminds you: without a passing language certificate, you cannot formally register for German-taught programs. Every week delayed costs living expenses and missed classes.",
+        "zh": "学校提醒：没有合格语言证明，德语授课项目不能正式注册。每拖一周，都在花生活费和错过课程。"
+      },
+      "choices": [
+        {
+          "en": "Crash course and retake the exam",
+          "zh": "集中冲刺重考"
+        },
+        {
+          "en": "Apply for a language course extension",
+          "zh": "申请语言班延期"
+        },
+        {
+          "en": "Switch to English-taught/other programs",
+          "zh": "转英语授课/其他项目"
+        },
+        {
+          "en": "Keep procrastinating",
+          "zh": "继续拖延"
+        }
+      ],
+      "title": {
+        "en": "TestDaF Blocks Enrollment",
+        "zh": "TestDaF 卡住注册"
+      }
+    },
+    "testdaf_requirement_notice": {
+      "body": {
+        "en": "German-taught programs typically require TestDaF scores in all four modules. Your goal isn't the average, but achieving TDN 4 in Reading, Listening, Writing, and Speaking.",
+        "zh": "德语授课项目通常要看 TestDaF 四项小分。你的目标不是平均分，而是阅读、听力、写作、口语都达到 TDN 4。"
+      },
+      "choices": [
+        {
+          "en": "Create a 4-module study plan",
+          "zh": "制定四项备考计划"
+        },
+        {
+          "en": "Focus on Speaking and Writing",
+          "zh": "重点补口语和写作"
+        },
+        {
+          "en": "Register for the exam to secure a slot",
+          "zh": "先报名考试占考位"
+        },
+        {
+          "en": "Think you can take it in Germany",
+          "zh": "觉得可以到德国再考"
+        }
+      ],
+      "title": {
+        "en": "TestDaF 4x4 Requirement",
+        "zh": "TestDaF 4x4 要求"
+      }
+    },
+    "train_strike": {
+      "body": {
+        "en": "Your planned route suddenly becomes a puzzle.",
+        "zh": "你计划好的路线突然变成谜题。"
+      },
+      "choices": [
+        {
+          "en": "Change route early",
+          "zh": "提前改路线"
+        },
+        {
+          "en": "Switch to online learning",
+          "zh": "改线上学习"
+        },
+        {
+          "en": "Handle prudently",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Train Strike",
+        "zh": "火车罢工"
+      }
+    },
+    "trash_sorting_test": {
+      "body": {
+        "en": "You hold a package in front of four recycling bins.",
+        "zh": "你拿着包装盒，面对四个垃圾桶。"
+      },
+      "choices": [
+        {
+          "en": "Research before tossing",
+          "zh": "查清楚再扔"
+        },
+        {
+          "en": "Go with gut feeling",
+          "zh": "凭直觉"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Waste Sorting Test",
+        "zh": "垃圾分类考试"
+      }
+    },
+    "tutorium_help": {
+      "body": {
+        "en": "The TA explained a problem that stumped you for three days in just three minutes.",
+        "zh": "助教把一个你卡了三天的问题讲成了三分钟。"
+      },
+      "choices": [
+        {
+          "en": "Take careful notes",
+          "zh": "认真整理笔记"
+        },
+        {
+          "en": "Ask questions after class",
+          "zh": "课后提问"
+        },
+        {
+          "en": "Handle it safely",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Tutorium Rescue",
+        "zh": "Tutorium 救场"
+      }
+    },
+    "visa_status_hidden_check": {
+      "body": {
+        "en": "Your calendar reminds you that your visa or residence permit is nearing expiration. There's no green progress bar in the system, only Termins, documents, and endless emails.",
+        "zh": "日历提醒你签证或居留许可快到期。系统里没有绿色进度条，只有 Termin、材料和一封封邮件。"
+      },
+      "choices": [
+        {
+          "en": "Contact the Foreigners' Office and university immediately",
+          "zh": "立刻联系外管局和学校"
+        },
+        {
+          "en": "Submit documents and apply for a Fiktionsbescheinigung",
+          "zh": "补材料并申请 Fiktionsbescheinigung"
+        },
+        {
+          "en": "Keep refreshing for a Termin online",
+          "zh": "只在网页上继续刷 Termin"
+        },
+        {
+          "en": "Hope they don't check on me",
+          "zh": "相信不会查到自己"
+        }
+      ],
+      "title": {
+        "en": "Residence Permit Expiring Soon",
+        "zh": "居留期限临近"
+      }
+    },
+    "wechat_silence": {
+      "body": {
+        "en": "You post less on Moments, unsure how to summarize the week.",
+        "zh": "你发现自己越来越少发动态，因为不知道该怎么概括这一周。"
+      },
+      "choices": [
+        {
+          "en": "Write a genuine update",
+          "zh": "写一段真实记录"
+        },
+        {
+          "en": "Keep lurking",
+          "zh": "继续潜水"
+        },
+        {
+          "en": "Play it safe",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Ask for help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "WeChat Silence",
+        "zh": "朋友圈沉默"
+      }
+    },
+    "wg_interview": {
+      "body": {
+        "en": "Your potential roommates ask if you're usually noisy and if you're willing to help clean the kitchen.",
+        "zh": "室友问你平时会不会很吵，以及是不是愿意一起打扫厨房。"
+      },
+      "choices": [
+        {
+          "en": "Act very German",
+          "zh": "表现得非常德式"
+        },
+        {
+          "en": "Offer to cook Chinese food",
+          "zh": "说自己会做中餐"
+        },
+        {
+          "en": "Admit your budget is tight",
+          "zh": "坦白预算很紧"
+        },
+        {
+          "en": "Over-accommodate every rule",
+          "zh": "过度迎合每条规则"
+        }
+      ],
+      "title": {
+        "en": "WG Interview",
+        "zh": "WG 面试"
+      }
+    },
+    "winter_dark": {
+      "body": {
+        "en": "4 PM feels like 8 PM.",
+        "zh": "下午四点像晚上八点。"
+      },
+      "choices": [
+        {
+          "en": "Buy a desk lamp",
+          "zh": "买盏台灯"
+        },
+        {
+          "en": "Get used to it",
+          "zh": "适应一下"
+        },
+        {
+          "en": "Handle it cautiously",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Early Darkness",
+        "zh": "天黑太早"
+      }
+    },
+    "work_limit_exceeded_warning": {
+      "body": {
+        "en": "Your legal work hours this week have exceeded 20. The money is coming in, but continuing this pace risks your employment record, payslips, and residency status.",
+        "zh": "这一周的合法工作时长已经超过 20 小时。钱确实进账了，但如果继续这样安排，雇主记录、工资单和居留身份都会变成风险点。"
+      },
+      "choices": [
+        {
+          "en": "Reduce shifts immediately",
+          "zh": "马上减少排班"
+        },
+        {
+          "en": "Consult Ausländerbehörde/University",
+          "zh": "向外管局/学校咨询许可"
+        },
+        {
+          "en": "Switch to on-campus HiWi",
+          "zh": "换成校内 HiWi 路线"
+        },
+        {
+          "en": "Keep overworking for cash",
+          "zh": "继续超时先赚钱"
+        }
+      ],
+      "title": {
+        "en": "Work Hour Limit Exceeded",
+        "zh": "打工时长越线"
+      }
+    },
+    "wrong_platform": {
+      "body": {
+        "en": "You stood on the wrong platform at the right station.",
+        "zh": "你站在了正确车站的错误站台。"
+      },
+      "choices": [
+        {
+          "en": "Treat it as city exploration",
+          "zh": "当作城市探索"
+        },
+        {
+          "en": "Take a taxi to fix it",
+          "zh": "打车补救"
+        },
+        {
+          "en": "Handle carefully",
+          "zh": "稳妥处理"
+        },
+        {
+          "en": "Seek help",
+          "zh": "寻求帮助"
+        }
+      ],
+      "title": {
+        "en": "Wrong Platform",
+        "zh": "坐错站台"
+      }
+    }
+  },
+  "generated_by": {
+    "model": "qwen3.6-27b-nvfp4",
+    "provider": "vllm"
+  },
+  "schema_version": "event-localization-v1",
+  "source": {
+    "event_count": 128,
+    "path": "data/events/generated_events.json",
+    "sha256": "8be881925c7fb52fea16160b6b2dbee6ecda1e31178f801cfed931ea361971b6"
+  }
+}

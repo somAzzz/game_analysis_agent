@@ -128,16 +128,13 @@ def verify_game_pin(source_repo: str | Path, manifest: Mapping[str, Any]) -> dic
                 f"game content mismatch for {file_path}: "
                 f"expected {item['sha256']}, got {actual_sha256}"
             )
-        verified_files.append(
-            {"path": file_path, "git_blob": actual_blob, "sha256": actual_sha256}
-        )
+        verified_files.append({"path": file_path, "git_blob": actual_blob, "sha256": actual_sha256})
 
     archive = _git_bytes(source, "archive", "--format=tar", commit)
     archive_sha256 = hashlib.sha256(archive).hexdigest()
     if archive_sha256 != pin["archive_sha256"]:
         raise GamePinError(
-            "game archive mismatch: "
-            f"expected {pin['archive_sha256']}, got {archive_sha256}"
+            f"game archive mismatch: expected {pin['archive_sha256']}, got {archive_sha256}"
         )
 
     checkout_revision = _git_text(source, "rev-parse", "HEAD")
@@ -238,9 +235,7 @@ def materialize_game_tree(
             "content_tree_sha256": content_tree_sha256,
             "file_count": verification["file_count"],
             "files": content_inventory,
-            "public_distribution": verification["packaging"].get(
-                "public_distribution", False
-            ),
+            "public_distribution": verification["packaging"].get("public_distribution", False),
         }
         (temporary / MATERIALIZED_PROVENANCE_FILE).write_text(
             json.dumps(provenance, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
@@ -348,6 +343,19 @@ def verify_materialized_game_tree(
     }
 
 
+def _runtime_overlay_specs() -> tuple[tuple[str, str], ...]:
+    game_overlay = "game-overlays/study-in-germany"
+    return (
+        ("scripts/tools/RunInteractiveProbe.gd", "scripts/tools/RunInteractiveProbe.gd"),
+        ("autoload/DataRegistry.gd", f"{game_overlay}/autoload/DataRegistry.gd"),
+        ("scenes/main/Main.gd", f"{game_overlay}/scenes/main/Main.gd"),
+        ("scripts/data/DataLoader.gd", f"{game_overlay}/scripts/data/DataLoader.gd"),
+        ("scripts/data/EventChoiceDef.gd", f"{game_overlay}/scripts/data/EventChoiceDef.gd"),
+        ("scripts/data/EventDef.gd", f"{game_overlay}/scripts/data/EventDef.gd"),
+        ("data/localization/events.json", f"{game_overlay}/data/localization/events.json"),
+    )
+
+
 def prepare_embedded_game_runtime(
     project_root: str | Path,
     destination: str | Path,
@@ -377,31 +385,39 @@ def prepare_embedded_game_runtime(
             output, project=project, source=source, verification=verification
         )
 
-    overlay_source = project / "scripts/tools/RunInteractiveProbe.gd"
-    if not overlay_source.is_file():
-        raise GamePinError("runtime interactive probe is unavailable")
-    overlay_relative = "scripts/tools/RunInteractiveProbe.gd"
+    overlay_specs = _runtime_overlay_specs()
+    for _target, source_relative in overlay_specs:
+        if not (project / source_relative).is_file():
+            raise GamePinError(f"runtime overlay source is unavailable: {source_relative}")
     temporary = Path(tempfile.mkdtemp(prefix=f".{output.name}.", dir=output.parent))
     backup: Path | None = None
     try:
         shutil.copytree(source, temporary, dirs_exist_ok=True)
-        overlay_target = temporary / overlay_relative
-        canonical_sha256 = hashlib.sha256(overlay_target.read_bytes()).hexdigest()
-        shutil.copy2(overlay_source, overlay_target)
-        runtime_sha256 = hashlib.sha256(overlay_target.read_bytes()).hexdigest()
+        overlay_records: list[dict[str, Any]] = []
+        for target_relative, source_relative in overlay_specs:
+            overlay_source = project / source_relative
+            overlay_target = temporary / target_relative
+            canonical_sha256 = (
+                hashlib.sha256(overlay_target.read_bytes()).hexdigest()
+                if overlay_target.is_file()
+                else None
+            )
+            overlay_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(overlay_source, overlay_target)
+            overlay_records.append(
+                {
+                    "path": target_relative,
+                    "source": source_relative,
+                    "canonical_sha256": canonical_sha256,
+                    "runtime_sha256": hashlib.sha256(overlay_target.read_bytes()).hexdigest(),
+                }
+            )
         overlay = {
             "schema_version": RUNTIME_OVERLAY_SCHEMA_VERSION,
             "base_commit": verification["commit"],
             "base_tree": verification["tree"],
             "base_content_tree_sha256": verification["content_tree_sha256"],
-            "overlays": [
-                {
-                    "path": overlay_relative,
-                    "source": "scripts/tools/RunInteractiveProbe.gd",
-                    "canonical_sha256": canonical_sha256,
-                    "runtime_sha256": runtime_sha256,
-                }
-            ],
+            "overlays": overlay_records,
         }
         (temporary / RUNTIME_OVERLAY_FILE).write_text(
             json.dumps(overlay, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
@@ -494,9 +510,7 @@ def _content_tree_sha256(inventory: list[dict[str, Any]]) -> str:
     return digest.hexdigest()
 
 
-def _verify_materialized_required_files(
-    root: Path, required_files: list[dict[str, str]]
-) -> None:
+def _verify_materialized_required_files(root: Path, required_files: list[dict[str, str]]) -> None:
     for item in required_files:
         path = root / item["path"]
         if not path.is_file():
@@ -533,30 +547,46 @@ def _require_managed_runtime_destination(
         payload = json.loads(marker.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError, OSError) as exc:
         raise GamePinError("refusing to replace an unmanaged runtime game destination") from exc
-    overlay_path = "scripts/tools/RunInteractiveProbe.gd"
-    overlay_source = project / overlay_path
-    expected_overlay = {
-        "path": overlay_path,
-        "source": overlay_path,
-        "canonical_sha256": hashlib.sha256((source / overlay_path).read_bytes()).hexdigest(),
-        "runtime_sha256": hashlib.sha256(overlay_source.read_bytes()).hexdigest(),
-    }
-    if payload != {
-        "schema_version": RUNTIME_OVERLAY_SCHEMA_VERSION,
-        "base_commit": verification["commit"],
-        "base_tree": verification["tree"],
-        "base_content_tree_sha256": verification["content_tree_sha256"],
-        "overlays": [expected_overlay],
-    }:
+    if (
+        payload.get("schema_version") != RUNTIME_OVERLAY_SCHEMA_VERSION
+        or payload.get("base_commit") != verification["commit"]
+        or payload.get("base_tree") != verification["tree"]
+        or payload.get("base_content_tree_sha256") != verification["content_tree_sha256"]
+    ):
         raise GamePinError("refusing to replace a runtime game with different provenance")
+    allowed_overlays = dict(_runtime_overlay_specs())
+    recorded_overlays = payload.get("overlays")
+    if not isinstance(recorded_overlays, list) or not recorded_overlays:
+        raise GamePinError("refusing to replace a runtime game with different provenance")
+    seen_overlays: set[str] = set()
+    for index, item in enumerate(recorded_overlays):
+        if not isinstance(item, dict):
+            raise GamePinError("refusing to replace a runtime game with different provenance")
+        overlay_path = _safe_git_path(item.get("path"), index=index)
+        canonical_path = source / overlay_path
+        canonical_sha256 = (
+            hashlib.sha256(canonical_path.read_bytes()).hexdigest()
+            if canonical_path.is_file()
+            else None
+        )
+        if (
+            overlay_path in seen_overlays
+            or item.get("source") != allowed_overlays.get(overlay_path)
+            or item.get("canonical_sha256") != canonical_sha256
+            or not _SHA256.fullmatch(str(item.get("runtime_sha256", "")))
+        ):
+            raise GamePinError("refusing to replace a runtime game with different provenance")
+        seen_overlays.add(overlay_path)
     source_marker = source / MATERIALIZED_PROVENANCE_FILE
     runtime_marker = path / MATERIALIZED_PROVENANCE_FILE
     if runtime_marker.read_bytes() != source_marker.read_bytes():
         raise GamePinError("refusing to replace a runtime with a modified base marker")
     source_inventory = json.loads(source_marker.read_text(encoding="utf-8"))["files"]
-    expected_paths = {
-        item["path"] for item in source_inventory
-    } | {MATERIALIZED_PROVENANCE_FILE, RUNTIME_OVERLAY_FILE}
+    expected_paths = (
+        {item["path"] for item in source_inventory}
+        | {item["path"] for item in recorded_overlays}
+        | {MATERIALIZED_PROVENANCE_FILE, RUNTIME_OVERLAY_FILE}
+    )
     actual_paths: set[str] = set()
     for candidate in path.rglob("*"):
         if candidate.is_symlink():
@@ -575,19 +605,23 @@ def _require_managed_runtime_destination(
             raise GamePinError("refusing to replace a runtime containing unmanaged files")
     if not expected_paths.issubset(actual_paths):
         raise GamePinError("refusing to replace an incomplete runtime game")
+    overlay_digests = {item["path"]: item["runtime_sha256"] for item in recorded_overlays}
     for item in source_inventory:
         relative = item["path"]
         candidate = path / relative
-        expected_digest = (
-            expected_overlay["runtime_sha256"]
-            if relative == overlay_path
-            else item["sha256"]
-        )
+        expected_digest = overlay_digests.get(relative, item["sha256"])
         if (
             _portable_mode(candidate) != item["mode"]
             or hashlib.sha256(candidate.read_bytes()).hexdigest() != expected_digest
         ):
             raise GamePinError("refusing to replace a modified runtime game")
+    for relative, expected_digest in overlay_digests.items():
+        candidate = path / relative
+        if (
+            not candidate.is_file()
+            or hashlib.sha256(candidate.read_bytes()).hexdigest() != expected_digest
+        ):
+            raise GamePinError("refusing to replace a modified runtime overlay")
 
 
 def _safe_git_path(value: Any, *, index: int) -> str:

@@ -54,7 +54,12 @@ def test_linux_amd64_evidence_requires_native_clean_and_container_results(tmp_pa
     }
     for name in ("doctor-inspect.json", "doctor-replay.json", "doctor-dashboard-native.json"):
         _write(tmp_path / name, doctor)
-    for name in ("judge-inspect.json", "judge-replay.json", "container-inspect.json", "container-replay.json"):
+    for name in (
+        "judge-inspect.json",
+        "judge-replay.json",
+        "container-inspect.json",
+        "container-replay.json",
+    ):
         _write(tmp_path / name, {"status": "passed"})
     _write(tmp_path / "provider-status.json", {"providers": {"replay": {"status": "available"}}})
     _write(tmp_path / "docker-image.json", {"Id": "sha256:image"})
@@ -98,9 +103,7 @@ def test_linux_godot_selects_simulation_manifest_when_interactive_report_is_pres
     interactive.mkdir(parents=True)
     runtime = tmp_path / "game-runtime"
     prepare_embedded_game_runtime(ROOT, runtime)
-    manifest = {
-        "provenance": _embedded_provenance(runtime, system="Linux-6.8-x86_64")
-    }
+    manifest = {"provenance": _embedded_provenance(runtime, system="Linux-6.8-x86_64")}
     _write(simulation / "report_manifest.json", manifest)
     (simulation / "raw_runs.jsonl").write_text('{"week": 1}\n', encoding="utf-8")
     _write(interactive / "report_manifest.json", {"kind": "interactive"})
@@ -109,9 +112,9 @@ def test_linux_godot_selects_simulation_manifest_when_interactive_report_is_pres
         {
             "schema_version": "build-week-expected-demo-findings-result-v1",
             "status": "passed",
-            "game_commit": _embedded_provenance(runtime, system="Linux")[
-                "game_repository"
-            ]["commit"],
+            "game_commit": _embedded_provenance(runtime, system="Linux")["game_repository"][
+                "commit"
+            ],
         },
     )
 
@@ -130,7 +133,7 @@ def test_linux_godot_rejects_forged_game_pin(tmp_path: Path) -> None:
     provenance = _embedded_provenance(runtime, system="Linux-6.8-x86_64")
     provenance["game_repository"]["commit"] = "a" * 40
     _write(simulation / "report_manifest.json", {"provenance": provenance})
-    (simulation / "raw_runs.jsonl").write_text('{}\n', encoding="utf-8")
+    (simulation / "raw_runs.jsonl").write_text("{}\n", encoding="utf-8")
     _write(
         tmp_path / "expected-demo-findings.json",
         {
@@ -186,7 +189,8 @@ def test_live_openai_requires_completed_calls_and_rejects_secret(tmp_path: Path)
     evidence = build_evidence("live-openai", tmp_path)
     assert evidence["provider"] == "openai"
 
-    result["debug"] = "sk-should-not-be-retained"
+    secret = "sk-" + "should-not-be-retained"
+    result["debug"] = secret
     _write(tmp_path / "live-openai-campaign.json", result)
     with pytest.raises(PlatformEvidenceError, match="secret"):
         build_evidence("live-openai", tmp_path)
