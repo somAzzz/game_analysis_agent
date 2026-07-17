@@ -16,7 +16,7 @@ def test_current_g4_fails_only_unproven_release_evidence() -> None:
     review = review_g4(project_root=ROOT, execute_commands=False)
 
     assert review["status"] == "failed"
-    assert review["failures"] == ["platform_delivery"]
+    assert review["failures"] == ["platform_delivery", "published_multiarch_image"]
     platform = next(item for item in review["checks"] if item["id"] == "platform_delivery")
     assert "platform evidence" in platform["error"]
     assert review["checks"][0]["status"] == "passed"
@@ -24,10 +24,9 @@ def test_current_g4_fails_only_unproven_release_evidence() -> None:
     image = next(
         item for item in review["checks"] if item["id"] == "published_multiarch_image"
     )
-    assert image["status"] == "passed"
-    assert image["evidence"]["source_contract_sha256"] == (
-        platform_contract_fingerprint(ROOT)
-    )
+    assert image["status"] == "failed"
+    assert "current delivery contract" in image["error"]
+    assert image["evidence"] == {}
 
 
 def test_g4_rejects_stale_published_image_contract(tmp_path: Path) -> None:

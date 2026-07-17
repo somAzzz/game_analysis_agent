@@ -139,7 +139,10 @@ def test_committed_judge_manifest_passes_dependency_free_inspect() -> None:
             encoding="utf-8"
         )
     )
-    assert len(payload["artifacts"]) == 42 + marker["file_count"] + 1
+    playthrough_artifacts = 3 + len(
+        list((ROOT / "examples/build_week_2026/playthrough-v1/cells").glob("*.json"))
+    )
+    assert len(payload["artifacts"]) == 42 + marker["file_count"] + 1 + playthrough_artifacts
     assert payload["checks"][2]["detail"] == (
-        "6 public claims resolved to exact JSON values"
+        "7 public claims resolved to exact JSON values"
     )
