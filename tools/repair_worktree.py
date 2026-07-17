@@ -32,6 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
     validate.add_argument("--worktree", type=Path, required=True)
     validate.add_argument("--plan", type=Path, required=True)
     validate.add_argument("--patch", type=Path, required=True)
+    validate.add_argument("--evidence", type=Path, required=True)
     return parser
 
 
@@ -55,6 +56,10 @@ def main(argv: list[str] | None = None) -> int:
                 plan=plan,
                 patch_path=args.patch,
                 project_root=ROOT,
+            )
+            args.evidence.parent.mkdir(parents=True, exist_ok=True)
+            args.evidence.write_text(
+                evidence.model_dump_json(indent=2) + "\n", encoding="utf-8"
             )
             payload = {"status": "passed", "patch": evidence.model_dump(mode="json")}
     except (OSError, ValueError, RepairWorktreeError) as exc:
