@@ -43,6 +43,10 @@ needs network, Docker, Godot, a model key, or a sibling game checkout.
 
 ## Documents in review order
 
+Start with [Codex-first playtest session](CODEX_PLAYTEST_SESSION.md) for the
+implemented Skill conversation, frozen profiles, local/API parity, live weekly
+UI updates, and repair boundary.
+
 1. [Implementation plan](IMPLEMENTATION_PLAN.md) — product thesis, scope, architecture, and competition mapping.
 2. [Stepwise execution plan](EXECUTION_PLAN.md) — P0–P5 tasks and gate order. Older status tables are plan-time snapshots unless explicitly dated current.
 3. [Competition product-design review](product_design/COMPETITION_PRODUCT_DESIGN_REVIEW.md) — frontend audit, four-role critique, game-native interaction direction, and prioritized acceptance criteria.
@@ -60,7 +64,7 @@ needs network, Docker, Godot, a model key, or a sibling game checkout.
   active-job concurrency, but not hosted multi-tenant authentication, quotas,
   job TTL, or billing governance. Do not expose it directly to the public web.
 - The canonical embedded demo is read-only by policy. All Godot runs use a
-  verified writable runtime copy with one audited interactive-probe overlay.
+  verified writable runtime copy with an audited bilingual runtime overlay set.
 - The demo intentionally retains three declared balance findings. Linux CI
   accepts only that exact pin-bound finding set while requiring the other five
   Godot validators to pass; changed findings fail closed.
