@@ -12,7 +12,7 @@ The submission is not authorized while G4 is failed. Complete in order:
 - [ ] Update and pass `tools/review_build_week_g4.py` without weakening required checks.
 - [ ] Replace the remaining YouTube placeholder in the Devpost draft.
 - [ ] Record video, verify duration below 3:00, captions/audio, and signed-out YouTube access.
-- [ ] Confirm repository access/licensing for all judges.
+- [x] Confirm repository access and add MIT licensing plus attribution for judges.
 - [ ] Run final G5 secret, privacy, link, hash, test, clean-clone, image, and video review.
 
 Machine-readable records to complete without estimates:

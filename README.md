@@ -9,8 +9,8 @@ The primary review path is repository-only and offline:
 ./judge --mode replay --offline --json --output-dir -
 ```
 
-Inspect needs only Python 3.9+ and validates 123 committed artifact hashes,
-schemas, provenance gates, and six exact public claim references. Replay adds
+Inspect needs only Python 3.9+ and validates 144 committed artifact hashes,
+schemas, provenance gates, and seven exact public claim references. Replay adds
 the locked `uv` environment and consumes hash-pinned persona fixtures; it does
 not need Godot, Docker, a GPU, network, an API key, a browser, or an external
 game checkout. The complete demo source is embedded and hash-inventoried under
@@ -129,6 +129,13 @@ decoding. You can also point the client at SGLang or DeepSeek-compatible
 endpoints.
 
 中文说明保留在 [README.zh-CN.md](README.zh-CN.md).
+
+## License, attribution, and competition scope
+
+The project is available under the [MIT License](LICENSE). See
+[ATTRIBUTION.md](ATTRIBUTION.md) for third-party and artwork provenance, and
+[the prior-versus-Build-Week disclosure](submission/build-week-2026/PRIOR_VS_BUILD_WEEK.md)
+for the exact competition scope.
 
 ## Current Status
 
