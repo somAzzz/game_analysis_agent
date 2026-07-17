@@ -1,22 +1,15 @@
 import { Link } from "react-router-dom";
+import { ForgeStatePanel, ForgeWorkspace } from "@/components/competition/ForgeWorkspace";
 
 export function NotFoundPage() {
   return (
-    <div style={{ padding: 60 }}>
-      <h1
-        style={{
-          fontFamily: "var(--serif)",
-          fontSize: 64,
-          fontVariationSettings: '"opsz" 144, "wght" 420, "WONK" 1',
-          margin: 0,
-        }}
-      >
-        404 · <em>lost the plot</em>
-      </h1>
-      <p style={{ fontStyle: "italic", color: "var(--ink-soft)", fontSize: 18 }}>
-        That route doesn&apos;t exist (or the manifest doesn&apos;t know about it).
-      </p>
-      <Link to="/">← Back to the front page</Link>
-    </div>
+    <ForgeWorkspace active="mission" truthLabel="Route not found">
+      <ForgeStatePanel
+        eyebrow="404 / outside the evidence map"
+        title="This route left the playable area."
+        description="The address does not exist, or no generated manifest currently exposes it. Return to the judging story or browse the evidence archive."
+        actions={<><Link to="/">Open Judge Mission</Link><Link to="/reports">Browse Mission Archive</Link></>}
+      />
+    </ForgeWorkspace>
   );
 }

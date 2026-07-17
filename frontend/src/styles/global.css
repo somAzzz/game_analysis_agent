@@ -1296,7 +1296,7 @@ main {
   }
 }
 
-/* Judge Mode — a dark evidence ledger, intentionally separate from the archive. */
+/* Judge Mode — the dark evidence-ledger foundation shared across competition routes. */
 .judge-shell {
   --judge-bg: #071318;
   --judge-panel: #0c1d23;
@@ -1319,23 +1319,6 @@ main {
 
 .judge-shell a { border-color: var(--judge-rule); }
 .judge-shell a:hover { border-color: var(--judge-cyan); }
-
-.judge-nav {
-  min-height: 72px;
-  padding: 0 clamp(24px, 5vw, 76px);
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 24px;
-  align-items: center;
-  border-bottom: 1px solid var(--judge-rule);
-  color: var(--judge-muted);
-  font-size: 10px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.judge-nav > :last-child { justify-self: end; }
-.judge-wordmark { color: var(--judge-cyan); font-weight: 600; letter-spacing: 0.2em; }
 
 .judge-hero {
   display: grid;
@@ -1473,8 +1456,6 @@ main.judge-ledger { max-width: none; margin: 0; padding: 0 clamp(24px, 7vw, 108p
 .judge-shell input:focus-visible { outline: 3px solid var(--judge-amber); outline-offset: 3px; }
 
 @media (max-width: 860px) {
-  .judge-nav { grid-template-columns: 1fr auto; }
-  .judge-nav > span { display: none; }
   .judge-hero { grid-template-columns: 1fr; }
   .judge-verdict { max-width: 300px; }
   .judge-stage { grid-template-columns: 70px minmax(0, 1fr); }

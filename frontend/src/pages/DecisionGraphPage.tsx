@@ -1,5 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Dispatch,
+  type MutableRefObject,
+  type SetStateAction,
+} from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+  ArrowCounterClockwise,
+  CaretLeft,
+  CaretRight,
+  Pause,
+  Play,
+} from "@phosphor-icons/react";
 import {
   Background,
   Controls,
@@ -15,6 +30,12 @@ import {
   type NodeProps,
 } from "@xyflow/react";
 import dagre from "dagre";
+import {
+  ForgeMetricStrip,
+  ForgePageHeader,
+  ForgeStatePanel,
+  ForgeWorkspace,
+} from "@/components/competition/ForgeWorkspace";
 import { fetchDecisionGraphManifest } from "@/lib/api";
 import {
   computeGraph,
@@ -175,27 +196,24 @@ export function DecisionGraphPage() {
 
   if (error) {
     return (
-      <div style={{ padding: 60 }}>
-        <h1>Decision graph not found</h1>
-        <pre
-          style={{
-            background: "var(--paper-deep)",
-            padding: 18,
-            fontFamily: "var(--mono)",
-            fontSize: 12,
-            color: "var(--ink-soft)",
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {error}
-        </pre>
-        <Link to="/">← Back to front page</Link>
-      </div>
+      <ForgeWorkspace active="archive" truthLabel="Graph unavailable">
+        <ForgeStatePanel
+          eyebrow="Decision graph / load failure"
+          title="This route map could not be opened."
+          tone="error"
+          description={<pre>{error}</pre>}
+          actions={<Link to="/reports">Return to Mission Archive</Link>}
+        />
+      </ForgeWorkspace>
     );
   }
 
   if (!manifest) {
-    return <div style={{ padding: 60 }}>Loading decision graph…</div>;
+    return (
+      <ForgeWorkspace active="archive" truthLabel="Loading graph">
+        <ForgeStatePanel eyebrow="Decision graph" title="Reconstructing the route…" description="Loading observed decisions, state transitions, and branch context." />
+      </ForgeWorkspace>
+    );
   }
 
   return <DecisionGraphExplorer manifest={manifest} />;
@@ -285,96 +303,117 @@ export function DecisionGraphExplorer({
     (selectedEventId && computed.events.find((e) => e.event_id === selectedEventId)) ||
     computed.events.find((e) => e.week === currentWeek) ||
     computed.events[0];
+  const moveWeek = (delta: number) => {
+    setAutoPlay(false);
+    setCurrentWeek((week) => Math.max(0, Math.min(computed.maxWeek, week + delta)));
+  };
 
   return (
     <ReactFlowProvider>
-      <div className={embedded ? "dg-embedded" : ""}>
-        {!embedded && (
-          <>
-            <header className="masthead">
-              <span className="kicker">
-                <Link to={`/issue/balance/${encodeURIComponent(manifest.issue_id)}`}>
-                  ← Back to issue
-                </Link>
-              </span>
-              <span className="issue-line">
-                Decision graph · run seed {String(manifest.seed ?? "—")} · policy{" "}
-                <em>{manifest.policy}</em>
-              </span>
-              <span className="date">{new Date().toUTCString()}</span>
-            </header>
+      {embedded ? (
+        <div className="dg-embedded">
+          <DecisionGraphBody
+            computed={computed}
+            styled={styled}
+            embedded
+            currentWeek={currentWeek}
+            selectedEventId={selectedEventId}
+            autoPlay={autoPlay}
+            containerRef={containerRef}
+            rfRef={rfRef}
+            selectedEvent={selectedEvent}
+            currentStep={currentStep}
+            setCurrentWeek={setCurrentWeek}
+            setSelectedEventId={setSelectedEventId}
+            setAutoPlay={setAutoPlay}
+            moveWeek={moveWeek}
+          />
+        </div>
+      ) : (
+        <ForgeWorkspace className="forge-graph-workspace" active="archive" truthLabel={manifest.public_demo ? "Illustrative graph" : "Observed route evidence"}>
+          <ForgePageHeader
+            back={{ to: `/issue/balance/${encodeURIComponent(manifest.issue_id)}`, label: "Evidence dossier" }}
+            eyebrow={`Route explorer / seed ${String(manifest.seed ?? "—")}`}
+            title="Decision Graph"
+            description={manifest.public_notice ?? "Walk the agent route week by week, inspect each selected choice, and compare the observed path with available branches."}
+            aside={<ForgeMetricStrip items={[
+              { value: manifest.policy, label: "Policy", tone: "evidence" },
+              { value: computed.events.length, label: "Events triggered" },
+              { value: computed.maxWeek, label: "Weeks simulated" },
+              { value: manifest.final_ending_id || "unknown", label: "Final ending", tone: "warning" },
+            ]} />}
+          />
 
-            <section className="cover">
-              <div className="issue-meta">
-                <span>
-                  <strong>{manifest.policy}</strong>
-                  policy played
-                </span>
-                <span>
-                  <strong>{computed.events.length}</strong>
-                  events triggered
-                </span>
-                <span>
-                  <strong>{computed.maxWeek}</strong>
-                  weeks simulated
-                </span>
-                <span>
-                  <strong>{manifest.final_ending_id || "unknown"}</strong>
-                  final ending
-                </span>
-              </div>
-              <h1>
-                The decision <em>graph</em>
-              </h1>
-              <p className="deck">
-                {manifest.public_notice ??
-                  `Every event the engine could trigger is drawn on a single canvas,
-                  one lane per event_type seen in the data, ${computed.maxWeek} weeks
-                  across. The terracotta line is the path this run actually took.`}
-              </p>
-            </section>
-          </>
-        )}
-
-        {manifest.public_demo && !embedded && (
-          <div className="notice-strip">
-            <strong>Illustrative graph</strong>
-            <span>
-              This public graph is intentionally small. It demonstrates the
-              interaction model without publishing the private full event graph.
-            </span>
+          {manifest.public_demo && (
+            <div className="notice-strip">
+              <strong>Illustrative graph</strong>
+              <span>This small public graph demonstrates the interaction model; its unobserved branches are illustrative, while the highlighted agent path is the supplied run evidence.</span>
+            </div>
+          )}
+          <div className="forge-graph-layout">
+            <DecisionGraphBody
+              computed={computed}
+              styled={styled}
+              embedded={false}
+              currentWeek={currentWeek}
+              selectedEventId={selectedEventId}
+              autoPlay={autoPlay}
+              containerRef={containerRef}
+              rfRef={rfRef}
+              selectedEvent={selectedEvent}
+              currentStep={currentStep}
+              setCurrentWeek={setCurrentWeek}
+              setSelectedEventId={setSelectedEventId}
+              setAutoPlay={setAutoPlay}
+              moveWeek={moveWeek}
+            />
           </div>
-        )}
+        </ForgeWorkspace>
+      )}
+    </ReactFlowProvider>
+  );
+}
 
+function DecisionGraphBody({
+  computed,
+  styled,
+  embedded,
+  currentWeek,
+  selectedEventId,
+  autoPlay,
+  containerRef,
+  rfRef,
+  selectedEvent,
+  currentStep,
+  setCurrentWeek,
+  setSelectedEventId,
+  setAutoPlay,
+  moveWeek,
+}: {
+  computed: ComputedGraph;
+  styled: { nodes: Node[]; edges: Edge[] };
+  embedded: boolean;
+  currentWeek: number;
+  selectedEventId: string | null;
+  autoPlay: boolean;
+  containerRef: MutableRefObject<HTMLDivElement | null>;
+  rfRef: MutableRefObject<unknown>;
+  selectedEvent: DecisionGraphEvent | null;
+  currentStep: TriggeredStep | undefined;
+  setCurrentWeek: Dispatch<SetStateAction<number>>;
+  setSelectedEventId: Dispatch<SetStateAction<string | null>>;
+  setAutoPlay: Dispatch<SetStateAction<boolean>>;
+  moveWeek: (delta: number) => void;
+}) {
+  return (
+      <div className={embedded ? "dg-embedded" : ""}>
         <div className={embedded ? "dg-shell dg-shell-embedded" : "dg-shell"}>
           {/* Legend */}
-          <div
-            style={{
-              display: "flex",
-              gap: 18,
-              flexWrap: "wrap",
-              alignItems: "center",
-              fontFamily: "var(--mono)",
-              fontSize: 11,
-              letterSpacing: "0.08em",
-              color: "var(--ink-soft)",
-              margin: "18px 0",
-            }}
-          >
+          <div className="forge-graph-legend">
             {computed.laneOrder.map((lane) => (
               <span key={lane}>
                 <span
                   className={`swatch ${lane}`}
-                  style={{
-                    display: "inline-block",
-                    width: 14,
-                    height: 14,
-                    borderRadius: "50%",
-                    verticalAlign: "middle",
-                    marginRight: 6,
-                    border: "1px solid var(--ink)",
-                    background: "var(--paper)",
-                  }}
                 />
                 {lane} event (
                 {computed.layout.events.filter((e) => {
@@ -385,18 +424,7 @@ export function DecisionGraphExplorer({
               </span>
             ))}
             <span>
-              <span
-                style={{
-                  display: "inline-block",
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  verticalAlign: "middle",
-                  marginRight: 6,
-                  background: "var(--accent)",
-                  border: "1px solid var(--accent)",
-                }}
-              />
+              <span className="swatch path-swatch" />
               agent path
             </span>
           </div>
@@ -404,14 +432,8 @@ export function DecisionGraphExplorer({
           {/* React Flow canvas */}
           <div
             ref={containerRef}
-            style={{
-              width: "100%",
-              height: embedded ? 460 : 640,
-              border: "1px solid var(--ink)",
-              borderTop: "4px double var(--ink)",
-              borderBottom: "4px double var(--ink)",
-              background: "var(--paper-deep)",
-            }}
+            className="forge-graph-canvas"
+            style={{ height: embedded ? 460 : undefined }}
           >
             <ReactFlow
               nodes={styled.nodes}
@@ -452,52 +474,58 @@ export function DecisionGraphExplorer({
               {Array.from({ length: computed.maxWeek + 1 }, (_, w) => {
                 const triggeredHere = computed.events.find((e) => e.week === w);
                 return (
-                  <div
+                  <button
                     key={w}
+                    type="button"
+                    aria-label={`Go to week ${w}${triggeredHere ? `, ${triggeredHere.title || triggeredHere.event_id}` : ""}`}
+                    aria-current={w === currentWeek ? "step" : undefined}
                     className={`timeline-cell ${
                       triggeredHere ? "is-triggered" : ""
                     } ${w === currentWeek ? "is-current" : ""}`}
-                    onClick={() => setCurrentWeek(w)}
+                    onClick={() => { setAutoPlay(false); setCurrentWeek(w); }}
                   >
                     <span className="w">{w}</span>
                     <span className="dot" />
-                  </div>
+                  </button>
                 );
               })}
             </div>
             <div className="dg-controls">
               <div className="row">
                 <button
+                  type="button"
+                  onClick={() => moveWeek(-1)}
+                  disabled={currentWeek <= 0}
+                >
+                  <CaretLeft size={15} /> Previous
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveWeek(1)}
+                  disabled={currentWeek >= computed.maxWeek}
+                >
+                  Next <CaretRight size={15} />
+                </button>
+                <button
+                  type="button"
                   onClick={() => {
                     setCurrentWeek(0);
                     setAutoPlay(false);
                   }}
                 >
-                  ⟲ Reset
+                  <ArrowCounterClockwise size={15} /> Reset
                 </button>
-                <button onClick={() => setAutoPlay((p) => !p)}>
-                  {autoPlay ? "⏸ Pause" : "▶ Play"}
+                <button type="button" onClick={() => setAutoPlay((p) => !p)}>
+                  {autoPlay ? <><Pause size={15} weight="fill" /> Pause</> : <><Play size={15} weight="fill" /> Play</>}
                 </button>
-                <span style={{ color: "var(--muted)" }}>W</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={computed.maxWeek}
-                  value={currentWeek}
-                  onChange={(e) => setCurrentWeek(Number(e.target.value))}
-                />
-                <span
-                  style={{
-                    color: "var(--accent)",
-                    fontWeight: 600,
-                    minWidth: 28,
-                  }}
-                >
-                  {currentWeek}
-                </span>
+                <label className="dg-range-label">
+                  Week
+                  <input type="range" min={0} max={computed.maxWeek} value={currentWeek} onChange={(e) => { setAutoPlay(false); setCurrentWeek(Number(e.target.value)); }} />
+                  <span className="dg-week-value">{currentWeek}</span>
+                </label>
               </div>
-              <div className="row" style={{ color: "var(--muted)" }}>
-                click any week · drag slider
+              <div className="row dg-helper">
+                Select a week, use the transport controls, or inspect a node.
               </div>
             </div>
           </div>
@@ -583,7 +611,6 @@ export function DecisionGraphExplorer({
           )}
         </div>
       </div>
-    </ReactFlowProvider>
   );
 }
 

@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ArrowSquareOut } from "@phosphor-icons/react";
 import ReactMarkdown from "react-markdown";
+import {
+  ForgeMetricStrip,
+  ForgePageHeader,
+  ForgeStatePanel,
+  ForgeWorkspace,
+} from "@/components/competition/ForgeWorkspace";
 import { fetchDecisionGraphManifest, fetchIssueManifest } from "@/lib/api";
 import { DecisionGraphExplorer } from "@/pages/DecisionGraphPage";
 import type {
@@ -33,42 +40,53 @@ export function IssuePage() {
 
   if (error) {
     return (
-      <div style={{ padding: 60 }}>
-        <h1>Issue not found</h1>
-        <pre
-          style={{
-            background: "var(--paper-deep)",
-            padding: 18,
-            fontFamily: "var(--mono)",
-            fontSize: 12,
-            color: "var(--ink-soft)",
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {error}
-        </pre>
-        <Link to="/">← Back to front page</Link>
-      </div>
+      <ForgeWorkspace active="archive" truthLabel="Evidence unavailable">
+        <ForgeStatePanel
+          eyebrow="Evidence dossier / load failure"
+          title="This test cell could not be opened."
+          tone="error"
+          description={<pre>{error}</pre>}
+          actions={<Link to="/reports">Return to Mission Archive</Link>}
+        />
+      </ForgeWorkspace>
     );
   }
 
   if (!manifest) {
-    return <div style={{ padding: 60 }}>Loading issue…</div>;
+    return (
+      <ForgeWorkspace active="archive" truthLabel="Loading evidence">
+        <ForgeStatePanel eyebrow="Evidence dossier" title="Assembling the test cell…" description="Loading its gate verdict, route evidence, findings, and agent outputs." />
+      </ForgeWorkspace>
+    );
   }
 
+  const summary = manifest.summary ?? {};
+  const subtitle = [
+    manifest.source_summary?.source_scenario ?? summary.scenario,
+    manifest.source_summary?.source_policy ?? summary.policy,
+    manifest.source_summary?.source_difficulty ?? summary.difficulty,
+  ].filter(Boolean).join(" / ");
+
   return (
-    <div>
-      <Cover manifest={manifest} />
+    <ForgeWorkspace
+      active="archive"
+      truthLabel={manifest.public_demo ? "Public evidence set" : "Local evidence set"}
+    >
+      <ForgePageHeader
+        back={{ to: "/reports", label: "Mission Archive" }}
+        eyebrow={`${manifest.kind} dossier / ${manifest.id}`}
+        title={manifest.id.replace(/-/g, " ")}
+        description={subtitle ? `${manifest.kind} issue · ${subtitle}` : `${manifest.kind} issue`}
+        aside={<ForgeMetricStrip items={[
+          { value: manifest.raw_runs_count || 0, label: "Runs simulated", tone: "evidence" },
+          { value: manifest.anomalies.length, label: "Anomalies", tone: manifest.anomalies.length ? "warning" : undefined },
+          { value: manifest.value_findings.length, label: "Value findings" },
+          { value: Object.keys(manifest.agent_markdown ?? {}).length, label: "Agent outputs" },
+        ]} />}
+      />
 
       {manifest.gate_report && (
-        <div
-          style={{
-            padding: "0 60px",
-            marginTop: 24,
-          }}
-        >
-          <GateBanner report={manifest.gate_report} />
-        </div>
+        <GateBanner report={manifest.gate_report} />
       )}
 
       <nav className="tab-rail">
@@ -76,6 +94,7 @@ export function IssuePage() {
         <a href="#pulse">Pulse</a>
         <a href="#value">Value findings</a>
         <a href="#agents">Agent columns</a>
+        {manifest.kind === "balance" && <a href="#decision-graph">Decision graph</a>}
         {manifest.anomalies.length > 0 && <a href="#anomalies">Anomalies</a>}
         {manifest.hasOwnProperty("source_summary") && <a href="#trace">Trace</a>}
       </nav>
@@ -89,58 +108,13 @@ export function IssuePage() {
         <AnomaliesSection manifest={manifest} />
         <AgentColumns manifest={manifest} />
       </main>
-    </div>
+    </ForgeWorkspace>
   );
 }
 
 /* ------------------------------------------------------------------ */
 /* Sub-components                                                      */
 /* ------------------------------------------------------------------ */
-
-function Cover({ manifest }: { manifest: IssueManifest }) {
-  const summary = manifest.summary ?? {};
-  const subtitle = [
-    manifest.source_summary?.source_scenario ?? summary.scenario,
-    manifest.source_summary?.source_policy ?? summary.policy,
-    manifest.source_summary?.source_difficulty ?? summary.difficulty,
-  ]
-    .filter(Boolean)
-    .join(" / ");
-  return (
-    <section className="cover">
-      <div className="issue-meta">
-        <span>
-          <strong>{manifest.raw_runs_count || 0}</strong>
-          runs simulated
-        </span>
-        <span>
-          <strong>{manifest.anomalies.length}</strong>
-          anomalies surfaced
-        </span>
-        <span>
-          <strong>{manifest.value_findings.length}</strong>
-          value findings
-        </span>
-        <span>
-          <strong>{Object.keys(manifest.agent_markdown ?? {}).length}</strong>
-          agent outputs
-        </span>
-        {manifest.public_demo && (
-          <span>
-            <strong>PUBLIC</strong>
-            sanitized dataset
-          </span>
-        )}
-      </div>
-      <h1>{manifest.id.replace(/-/g, " ")}</h1>
-      <p className="deck">
-        {subtitle
-          ? `${manifest.kind} issue · ${subtitle}`
-          : `${manifest.kind} issue`}
-      </p>
-    </section>
-  );
-}
 
 function EmbeddedDecisionGraph({ issueId }: { issueId: string }) {
   const [manifest, setManifest] = useState<DecisionGraphManifest | null>(null);
@@ -162,9 +136,12 @@ function EmbeddedDecisionGraph({ issueId }: { issueId: string }) {
         <span className="graph-eyebrow">Interactive flow map</span>
         <h2>Decision graph</h2>
         <p>
-          Highlighted path plus mock branches. Click any node to inspect route
-          options.
+          Highlighted observed path plus explicitly illustrative branches. Click
+          any node to inspect route options.
         </p>
+        <Link className="forge-action-link is-primary" to={`/decision-graph/${encodeURIComponent(issueId)}/0`}>
+          Open full explorer <ArrowSquareOut size={16} aria-hidden="true" />
+        </Link>
       </div>
       {error && <div className="graph-inline-state">Graph unavailable: {error}</div>}
       {!error && !manifest && <div className="graph-inline-state">Loading graph...</div>}

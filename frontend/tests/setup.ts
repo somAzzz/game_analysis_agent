@@ -30,3 +30,5 @@ if (!("matchMedia" in window)) {
     }),
   });
 }
+
+window.scrollTo = () => undefined;

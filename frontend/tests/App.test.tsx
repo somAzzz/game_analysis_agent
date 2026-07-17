@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router-dom";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "@/App";
@@ -233,6 +233,9 @@ describe("application routes", () => {
     renderRoute("/");
 
     expect(await screen.findByRole("heading", { name: /A patch passed its unit test/i })).toBeInTheDocument();
+    const missionNav = screen.getByRole("navigation", { name: "Competition pages" });
+    expect(missionNav.closest("header")).toHaveClass("competition-top-nav");
+    expect(within(missionNav).getByRole("link", { name: "Judge Mission" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByText(/prerecorded evidence/i)).toBeInTheDocument();
     expect(screen.getByText("CAMPAIGN")).toBeInTheDocument();
     expect(screen.getByText("REPAIR")).toBeInTheDocument();
@@ -263,13 +266,93 @@ describe("application routes", () => {
     expect(screen.getByText(/judge-demo123/i)).toBeInTheDocument();
   });
 
+  it("opens the actual Money strategy record and restores focus on Escape", async () => {
+    const user = userEvent.setup();
+    renderRoute("/");
+
+    const money = await screen.findByRole("button", { name: "Inspect Money strategy" });
+    await user.click(money);
+
+    expect(screen.getByRole("dialog", { name: "Money" })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Close Persona details" })).toHaveFocus());
+    expect(screen.getByText("career tag")).toBeInTheDocument();
+    expect(screen.getByText(/money-seed-42/i)).toBeInTheDocument();
+    const replayLink = screen.getByRole("link", { name: /Inspect Money seed 42 replay/i });
+    expect(replayLink).toHaveAttribute("href", "/playthrough-inspector?persona=money");
+    await user.tab();
+    expect(replayLink).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Close Persona details" })).toHaveFocus();
+
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Money" })).not.toBeInTheDocument());
+    expect(money).toHaveFocus();
+  });
+
+  it("keeps route nodes, week records, and evidence console synchronized", async () => {
+    const user = userEvent.setup();
+    renderRoute("/playthrough-inspector");
+
+    expect(screen.getByRole("heading", { name: /Money runs the evidence/i })).toBeInTheDocument();
+    const playthroughNav = screen.getByRole("navigation", { name: "Competition pages" });
+    expect(playthroughNav.closest("header")).toHaveClass("competition-top-nav");
+    expect(within(playthroughNav).getByRole("link", { name: "Playthrough Inspector" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("button", { name: "Go to recorded week 1" })).toHaveAttribute("aria-current", "step");
+    expect(screen.getByLabelText("Money current state at recorded week 1")).toHaveAttribute("data-runner-frame", "1");
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+    expect(screen.getByRole("heading", { name: "germany_language_track_start" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Money current state at recorded week 2")).toHaveAttribute("data-runner-frame", "2");
+
+    await user.click(screen.getByRole("button", { name: "Previous" }));
+    expect(screen.getByLabelText("Money current state at recorded week 1")).toHaveAttribute("data-runner-frame", "1");
+
+    await user.click(screen.getByRole("button", { name: "W3 Attractor" }));
+    expect(screen.getByRole("heading", { name: "missing_school_registration" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Money current state at recorded week 3")).toHaveAttribute("data-runner-frame", "1");
+    expect(screen.getByText("Stress 49 → 82")).toBeInTheDocument();
+    expect(screen.getByText("Arrears €373 → €628")).toBeInTheDocument();
+    expect(within(screen.getByRole("article")).getByText("€628")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Go to recorded week 3" })).toHaveAttribute("aria-current", "step");
+
+    await user.click(screen.getByRole("button", { name: /W19 after_exam_void/i }));
+    expect(screen.getByRole("heading", { name: "after_exam_void" })).toBeInTheDocument();
+    expect(screen.getByText("cashflow_collapse")).toBeInTheDocument();
+    expect(within(screen.getByRole("article")).getByText("€3,862")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Go to recorded week 19" })).toHaveAttribute("aria-current", "step");
+  });
+
+  it("switches verified Persona paths and exposes a current-state-only runner tooltip", async () => {
+    const user = userEvent.setup();
+    renderRoute("/playthrough-inspector?persona=visa");
+
+    expect(screen.getByRole("heading", { name: /Visa runs the evidence/i })).toBeInTheDocument();
+    expect(within(screen.getByRole("navigation", { name: "Competition pages" })).getByRole("link", { name: "Mission Archive" })).toHaveAttribute("href", "/reports");
+    expect(screen.getByRole("button", { name: "Use Visa strategy playthrough" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByLabelText("Visa current state at recorded week 1")).toBeInTheDocument();
+    const tooltip = screen.getByRole("tooltip");
+    expect(within(tooltip).getByText("€172")).toBeInTheDocument();
+    expect(tooltip).not.toHaveTextContent("→");
+
+    await user.click(screen.getByRole("button", { name: "W3 Attractor" }));
+    expect(screen.getByText("Arrears €343 → €598")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Use Social strategy playthrough" }));
+    expect(screen.getByRole("heading", { name: /Social runs the evidence/i })).toBeInTheDocument();
+    expect(screen.getByLabelText("Social current state at recorded week 1")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Go to recorded week 1" })).toHaveAttribute("aria-current", "step");
+  });
+
   it("renders the report index and filters cards with search and severity controls", async () => {
     const user = userEvent.setup();
     renderRoute("/reports");
 
     expect(
-      await screen.findByRole("heading", { name: /The Analysis Console/i }),
+      await screen.findByRole("heading", { name: /Mission Archive/i }),
     ).toBeInTheDocument();
+    const archiveNav = screen.getByRole("navigation", { name: "Competition pages" });
+    expect(archiveNav.closest("header")).toHaveClass("competition-top-nav");
+    expect(within(archiveNav).getByRole("link", { name: "Mission Archive" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("heading", { name: "Critical Balance" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Calm Route" })).toBeInTheDocument();
 
@@ -286,6 +369,14 @@ describe("application routes", () => {
     await user.click(screen.getByRole("button", { name: "Info (1)" }));
     expect(screen.queryByRole("heading", { name: "Critical Balance" })).not.toBeInTheDocument();
     expect(screen.getByText("1 visible report")).toBeInTheDocument();
+
+    await user.type(
+      screen.getByPlaceholderText("policy, scenario, outcome, severity..."),
+      "no-such-report",
+    );
+    expect(screen.getByRole("heading", { name: "No test cells match." })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /Clear filters/i }));
+    expect(screen.getByRole("heading", { name: "Critical Balance" })).toBeInTheDocument();
   });
 
   it("navigates from a report card to the issue page", async () => {
@@ -312,7 +403,7 @@ describe("application routes", () => {
     expect(
       await screen.findByRole("heading", {
         level: 1,
-        name: /The decision graph/i,
+        name: /Decision Graph/i,
       }),
     ).toBeInTheDocument();
     expect(apiMocks.fetchDecisionGraphManifest).toHaveBeenCalledWith(
@@ -321,6 +412,9 @@ describe("application routes", () => {
     );
     expect(screen.getByText("graduated")).toBeInTheDocument();
     expect(screen.getByTestId("react-flow")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Previous/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Next/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Go to week 0/i })).toHaveAttribute("aria-current", "step");
   });
 
   it("renders the 404 page and returns to the report index", async () => {
@@ -328,10 +422,10 @@ describe("application routes", () => {
     renderRoute("/not-a-real-route");
 
     expect(
-      screen.getByRole("heading", { level: 1, name: /404 · lost the plot/i }),
+      screen.getByRole("heading", { level: 1, name: /This route left the playable area/i }),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("link", { name: /Back to the front page/i }));
+    await user.click(screen.getByRole("link", { name: /Open Judge Mission/i }));
     expect(await screen.findByRole("heading", { name: /A patch passed its unit test/i })).toBeInTheDocument();
   });
 
@@ -342,7 +436,7 @@ describe("application routes", () => {
     renderRoute("/reports");
 
     expect(
-      await screen.findByRole("heading", { name: "Failed to load manifest" }),
+      await screen.findByRole("heading", { name: "The evidence index is offline." }),
     ).toBeInTheDocument();
     expect(screen.getByText("manifest service unavailable")).toBeInTheDocument();
   });

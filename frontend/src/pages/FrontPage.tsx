@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { ArrowClockwise, FunnelX } from "@phosphor-icons/react";
+import {
+  ForgeMetricStrip,
+  ForgePageHeader,
+  ForgeStatePanel,
+  ForgeWorkspace,
+} from "@/components/competition/ForgeWorkspace";
 import { fetchFrontManifest } from "@/lib/api";
 import type { FrontManifest, IssueCard, IssueKind, Severity } from "@/types";
 
@@ -65,20 +72,24 @@ export function FrontPage() {
 
   if (error) {
     return (
-      <div className="state-message">
-        <h1>Failed to load manifest</h1>
-        <pre>{error}</pre>
-        <p>
-          Run <code>python tools/build_public_demo.py --copy-to-public</code> for
-          the public demo, or <code>python tools/build_dashboard.py all</code> for
-          private local reports.
-        </p>
-      </div>
+      <ForgeWorkspace active="archive" truthLabel="Manifest unavailable">
+        <ForgeStatePanel
+          eyebrow="Mission archive / load failure"
+          title="The evidence index is offline."
+          tone="error"
+          description={<><pre>{error}</pre><p>Rebuild the dashboard manifest, then retry this evidence view.</p></>}
+          actions={<button type="button" onClick={() => window.location.reload()}><ArrowClockwise size={16} /> Retry</button>}
+        />
+      </ForgeWorkspace>
     );
   }
 
   if (!manifest) {
-    return <div className="state-message">Loading report index...</div>;
+    return (
+      <ForgeWorkspace active="archive" truthLabel="Loading manifest">
+        <ForgeStatePanel eyebrow="Mission archive" title="Indexing evidence…" description="Loading report cells and their traceable test manifests." />
+      </ForgeWorkspace>
+    );
   }
 
   const { counts } = manifest;
@@ -87,40 +98,23 @@ export function FrontPage() {
   const severityCounts = countBy(manifest.issues, "severity");
 
   return (
-    <div>
-      <header className="masthead">
-        <span className="kicker">Vol. 0.4 · Traceable reports</span>
-        <span className="issue-line">
-          {manifest.public_demo ? "Public sanitized edition" : "Private local edition"}
-        </span>
-        <span className="date">{formatDate(manifest.generated_at)}</span>
-      </header>
-
-      <section className="banner">
-        <div className="banner-inner">
-          <div>
-            <h1>
-              The Analysis
-              <br />
-              <span className="accent">
-                <em>Console</em>
-              </span>
-            </h1>
-            <p className="deck" style={{ marginTop: 22 }}>
-              A dashboard for simulation balance, boundary probes, and LLM
-              playtests. It keeps the design-readability of the old report, but
-              adds the controls needed to find risky runs, compare test cells,
-              and trace how each public page was derived.
-            </p>
-          </div>
-          <div className="meta-col">
-            <strong>{String(counts.issues).padStart(2, "0")}</strong>
-            <span>public report cards</span>
-            <strong style={{ marginTop: 12 }}>{counts.decision_graphs}</strong>
-            <span>safe graph demo</span>
-          </div>
-        </div>
-      </section>
+    <ForgeWorkspace
+      active="archive"
+      truthLabel={manifest.public_demo ? "Public evidence set" : "Local evidence set"}
+    >
+      <ForgePageHeader
+        eyebrow={`Evidence inventory / ${formatDate(manifest.generated_at)}`}
+        title="Mission Archive"
+        description="Find the test cell that needs a closer look, then move from verdict to trace, route, and replay evidence without leaving the competition workspace."
+        aside={
+          <ForgeMetricStrip items={[
+            { value: counts.issues, label: "Report cells", tone: "evidence" },
+            { value: counts.total_runs, label: "Runs represented" },
+            { value: counts.total_anomalies, label: "Anomalies", tone: counts.total_anomalies ? "warning" : undefined },
+            { value: counts.decision_graphs, label: "Interactive graphs", tone: "evidence" },
+          ]} />
+        }
+      />
 
       {manifest.public_notice && (
         <div className="notice-strip">
@@ -136,36 +130,6 @@ export function FrontPage() {
       )}
 
       <main>
-        <div className="section-rule">
-          <span className="num">01</span>
-          <span className="label">Signal board</span>
-        </div>
-        <div className="kpi-strip">
-          <div className="kpi">
-            <span className="num">{counts.total_runs}</span>
-            <span className="label">Runs represented</span>
-          </div>
-          <div className="kpi">
-            <span className="num">
-              <em>{counts.total_anomalies}</em>
-            </span>
-            <span className="label">Anomaly observations</span>
-            <span className="label" style={{ color: "var(--accent-deep)" }}>
-              {counts.total_critical} critical cards
-            </span>
-          </div>
-          <div className="kpi">
-            <span className="num">{kindCounts.balance ?? 0}</span>
-            <span className="label">Balance cells</span>
-          </div>
-          <div className="kpi">
-            <span className="num">
-              <em>{counts.decision_graphs}</em>
-            </span>
-            <span className="label">Decision graphs</span>
-          </div>
-        </div>
-
         <section className="dashboard-controls" aria-label="Report filters">
           <label className="search-box">
             <span>Search reports</span>
@@ -209,7 +173,7 @@ export function FrontPage() {
         </section>
 
         <div className="section-rule">
-          <span className="num">02</span>
+          <span className="num">Cells</span>
           <span className="label">
             {filteredIssues.length} visible report{filteredIssues.length === 1 ? "" : "s"}
           </span>
@@ -221,14 +185,23 @@ export function FrontPage() {
         </div>
 
         {filteredIssues.length === 0 && (
-          <div className="empty-panel">No reports match the current filters.</div>
+          <ForgeStatePanel
+            eyebrow="Filter result"
+            title="No test cells match."
+            description="The evidence is still here—your current search and filters have narrowed it to zero visible reports."
+            actions={
+              <button type="button" onClick={() => { setQuery(""); setKind("all"); setSeverity("all"); setSort("severity"); }}>
+                <FunnelX size={16} /> Clear filters
+              </button>
+            }
+          />
         )}
 
         <div className="byline-rule">
           Game Analysis Agent · Reports Index · {formatDate(manifest.generated_at)}
         </div>
       </main>
-    </div>
+    </ForgeWorkspace>
   );
 }
 
@@ -245,7 +218,7 @@ function IssueCardView({ card, idx }: { card: IssueCard; idx: number }) {
         {card.has_decision_graph ? " · GRAPH" : ""}
       </span>
       {card.has_decision_graph && (
-        <span className="graph-ribbon">Open decision graph</span>
+        <span className="graph-ribbon">Graph available</span>
       )}
       <h3>{card.title}</h3>
       <div className="deck">{card.subtitle || "(no subtitle)"}</div>

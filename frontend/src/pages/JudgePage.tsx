@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   createJudgeCampaign,
   fetchJudgeCampaign,
@@ -15,6 +14,8 @@ import type {
   JudgeProvider,
   JudgeProviderStatus,
 } from "@/types";
+import { JudgeMissionExperience } from "@/components/competition/JudgeMissionExperience";
+import { ForgeTopNav } from "@/components/competition/ForgeWorkspace";
 
 const PROVIDER_LABEL: Record<JudgeProvider, string> = {
   replay: "Deterministic policy Replay",
@@ -131,11 +132,14 @@ export function JudgePage() {
 
   if (!experiment) {
     return (
-      <main className="judge-shell judge-loading">
-        <p className="judge-kicker">Playtest Forge / evaluator view</p>
-        <h1>Evidence is being verified.</h1>
-        <p role="status">{activity}</p>
-      </main>
+      <div className="judge-shell">
+        <ForgeTopNav active="mission" truthLabel="Verifying evidence" />
+        <main className="judge-loading">
+          <p className="judge-kicker">Playtest Forge / evaluator view</p>
+          <h1>Evidence is being verified.</h1>
+          <p role="status">{activity}</p>
+        </main>
+      </div>
     );
   }
 
@@ -146,11 +150,10 @@ export function JudgePage() {
 
   return (
     <div className="judge-shell">
-      <header className="judge-nav">
-        <Link className="judge-wordmark" to="/">PLAYTEST / FORGE</Link>
-        <span>Codex-led causal game testing</span>
-        <Link to="/reports">Report archive ↗</Link>
-      </header>
+      <ForgeTopNav
+        active="mission"
+        truthLabel={source === "static" ? "Signed static evidence" : "Judge API connected"}
+      />
 
       <section className="judge-hero" aria-labelledby="judge-title">
         <div>
@@ -168,6 +171,8 @@ export function JudgePage() {
         </p>
         <p className="judge-mode"><span aria-hidden="true">●</span> {source === "static" ? "Static evaluator copy" : "Judge API connected"} · prerecorded evidence · hashes verified before publication</p>
       </section>
+
+      <JudgeMissionExperience />
 
       <main className="judge-ledger">
         <section className="judge-stage" aria-labelledby="campaign-title">
