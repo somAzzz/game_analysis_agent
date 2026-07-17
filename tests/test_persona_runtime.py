@@ -54,9 +54,7 @@ def _context() -> WeekContext:
 
 
 def _request(index: int = 0) -> PersonaDecisionRequest:
-    return PersonaDecisionRequest.from_context(
-        _context(), request_id=f"newbie-42-w1-{index}"
-    )
+    return PersonaDecisionRequest.from_context(_context(), request_id=f"newbie-42-w1-{index}")
 
 
 def _result(
@@ -172,9 +170,7 @@ def test_explicit_live_provider_without_key_fails_instead_of_replaying() -> None
 def test_existing_local_and_replay_providers_are_validated(
     provider: str, expected_mode: str
 ) -> None:
-    selection = PersonaRuntimeSettings.from_env(
-        {"PERSONA_PROVIDER": provider}
-    ).resolve_provider()
+    selection = PersonaRuntimeSettings.from_env({"PERSONA_PROVIDER": provider}).resolve_provider()
 
     assert selection.selected.value == provider
     assert selection.mode.value == expected_mode
@@ -209,6 +205,20 @@ def test_retry_is_bounded_and_does_not_switch_provider() -> None:
     assert result.metadata.mode == PersonaProviderMode.LIVE
     assert result.metadata.attempt_count == 2
     assert gateway.calls == governed.calls_used == 2
+
+
+def test_governed_gateway_forwards_audit_sink() -> None:
+    class AuditedGateway(_Gateway):
+        def set_audit_sink(self, sink) -> None:  # noqa: ANN001
+            self.audit_sink = sink
+
+    gateway = AuditedGateway()
+    governed = GovernedPersonaGateway(gateway, limits=PersonaRuntimeLimits())
+    sink = object()
+
+    governed.set_audit_sink(sink)
+
+    assert gateway.audit_sink is sink
 
 
 def test_live_failure_stays_live_when_retries_are_exhausted() -> None:
@@ -276,8 +286,7 @@ def test_concurrency_cap_is_enforced() -> None:
 
 def test_redaction_covers_keys_and_authorization_headers() -> None:
     message = (
-        "sk-secret-123 Authorization: Bearer live-token "
-        "api_key=another-secret token: final-secret"
+        "sk-secret-123 Authorization: Bearer live-token api_key=another-secret token: final-secret"
     )
 
     redacted = redact_sensitive_text(message)

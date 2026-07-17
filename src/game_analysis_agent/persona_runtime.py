@@ -58,9 +58,7 @@ class PersonaRuntimeLimits(BaseModel):
         if weeks < 1 or weeks > self.max_weeks:
             violations.append(f"weeks must be between 1 and {self.max_weeks}")
         if concurrency < 1 or concurrency > self.max_concurrency:
-            violations.append(
-                f"concurrency must be between 1 and {self.max_concurrency}"
-            )
+            violations.append(f"concurrency must be between 1 and {self.max_concurrency}")
         if violations:
             raise PersonaRuntimeConfigurationError("; ".join(violations))
 
@@ -91,9 +89,7 @@ class PersonaRuntimeSettings(BaseModel):
     limits: PersonaRuntimeLimits = Field(default_factory=PersonaRuntimeLimits)
 
     @classmethod
-    def from_env(
-        cls, environ: Mapping[str, str] | None = None
-    ) -> PersonaRuntimeSettings:
+    def from_env(cls, environ: Mapping[str, str] | None = None) -> PersonaRuntimeSettings:
         source = os.environ if environ is None else environ
         return cls(
             provider=source.get("PERSONA_PROVIDER", "auto"),
@@ -109,9 +105,7 @@ class PersonaRuntimeSettings(BaseModel):
                 max_concurrency=_env_int(source, "PERSONA_MAX_CONCURRENCY", 4),
                 max_calls=_env_int(source, "PERSONA_MAX_CALLS", 600),
                 max_retries=_env_int(source, "PERSONA_MAX_RETRIES", 1),
-                retry_backoff_s=_env_float(
-                    source, "PERSONA_RETRY_BACKOFF_SECONDS", 0.5
-                ),
+                retry_backoff_s=_env_float(source, "PERSONA_RETRY_BACKOFF_SECONDS", 0.5),
             ),
         )
 
@@ -138,9 +132,7 @@ class PersonaRuntimeSettings(BaseModel):
             raise PersonaRuntimeConfigurationError(
                 "PERSONA_PROVIDER=openai requires a non-placeholder OPENAI_API_KEY"
             )
-        if provider == PersonaProvider.DEEPSEEK and not _usable_secret(
-            self.deepseek_api_key
-        ):
+        if provider == PersonaProvider.DEEPSEEK and not _usable_secret(self.deepseek_api_key):
             raise PersonaRuntimeConfigurationError(
                 "PERSONA_PROVIDER=deepseek requires a non-placeholder DEEPSEEK_API_KEY"
             )
@@ -202,6 +194,13 @@ class GovernedPersonaGateway:
         self._budget_lock = threading.Lock()
         self._calls_used = 0
 
+    def set_audit_sink(self, sink) -> None:
+        """Forward per-call audit capture to the selected provider adapter."""
+
+        setter = getattr(self.gateway, "set_audit_sink", None)
+        if callable(setter):
+            setter(sink)
+
     @property
     def calls_used(self) -> int:
         with self._budget_lock:
@@ -230,9 +229,7 @@ class GovernedPersonaGateway:
             ),
         )
 
-    def choose_event(
-        self, request: PersonaEventChoiceRequest
-    ) -> PersonaEventChoiceResult:
+    def choose_event(self, request: PersonaEventChoiceRequest) -> PersonaEventChoiceResult:
         result = self._run(lambda: self.gateway.choose_event(request))
         if result is None:
             return PersonaEventChoiceResult(
@@ -350,9 +347,7 @@ def _env_float(source: Mapping[str, str], name: str, default: float) -> float:
     return default if raw is None else float(raw)
 
 
-def _runtime_error(
-    category: PersonaErrorCategory, message: str
-) -> PersonaProviderError:
+def _runtime_error(category: PersonaErrorCategory, message: str) -> PersonaProviderError:
     return PersonaProviderError(category=category, message=message, retryable=False)
 
 

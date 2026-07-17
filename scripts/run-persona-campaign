@@ -1,0 +1,58 @@
+#!/bin/sh
+set -eu
+
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+gaa_persona_max_runs=${PERSONA_MAX_RUNS-}
+gaa_persona_max_weeks=${PERSONA_MAX_WEEKS-}
+gaa_persona_max_concurrency=${PERSONA_MAX_CONCURRENCY-}
+gaa_persona_max_calls=${PERSONA_MAX_CALLS-}
+if [ -f "$ROOT/.env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . "$ROOT/.env"
+  set +a
+fi
+[ -z "$gaa_persona_max_runs" ] || PERSONA_MAX_RUNS=$gaa_persona_max_runs
+[ -z "$gaa_persona_max_weeks" ] || PERSONA_MAX_WEEKS=$gaa_persona_max_weeks
+[ -z "$gaa_persona_max_concurrency" ] || PERSONA_MAX_CONCURRENCY=$gaa_persona_max_concurrency
+[ -z "$gaa_persona_max_calls" ] || PERSONA_MAX_CALLS=$gaa_persona_max_calls
+export PERSONA_MAX_RUNS PERSONA_MAX_WEEKS PERSONA_MAX_CONCURRENCY PERSONA_MAX_CALLS
+
+case "${1:-}" in
+  -h|--help)
+    echo "usage: scripts/run-persona-campaign PROVIDER [OPTIONS]"
+    echo "providers: openai, vllm, sglang, deepseek"
+    cd "$ROOT"
+    exec uv run python tools/run_persona_campaign.py --provider vllm --help
+    ;;
+esac
+PROVIDER=${1:-vllm}
+if [ "$#" -gt 0 ]; then
+  shift
+fi
+case "$PROVIDER" in
+  openai|vllm|sglang|deepseek) ;;
+  *) echo "provider must be openai, vllm, sglang, or deepseek" >&2; exit 2 ;;
+esac
+
+: "${GODOT_BIN:=$ROOT/scripts/godot-docker-wrapper}"
+export GODOT_BIN
+gaa_prepare_embedded=0
+if [ -z "${GAME_PROJECT_PATH:-}" ]; then
+  GAME_PROJECT_PATH="$ROOT/reports/persona-runtime/game"
+  export GAME_PROJECT_PATH
+  gaa_prepare_embedded=1
+fi
+if [ "$gaa_prepare_embedded" -eq 1 ]; then
+  uv run python "$ROOT/tools/prepare_embedded_demo.py" \
+    --output "$GAME_PROJECT_PATH" --replace --json
+elif [ ! -f "$GAME_PROJECT_PATH/project.godot" ]; then
+  echo "GAME_PROJECT_PATH does not contain project.godot" >&2
+  exit 2
+fi
+
+cd "$ROOT"
+exec uv run python tools/run_persona_campaign.py \
+  --provider "$PROVIDER" \
+  --game-root "$GAME_PROJECT_PATH" \
+  "$@"

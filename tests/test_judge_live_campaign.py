@@ -43,7 +43,9 @@ def test_live_executor_marks_fallback_evidence_partial(monkeypatch, tmp_path: Pa
             return SimpleNamespace(steps=[SimpleNamespace(week=1, validation=validation)]), []
 
     monkeypatch.setattr("game_analysis_agent.build_week_campaign.InteractivePlayerAgent", FakeAgent)
-    monkeypatch.setattr("game_analysis_agent.build_week_campaign.build_probe", lambda _settings: object())
+    monkeypatch.setattr(
+        "game_analysis_agent.build_week_campaign.build_probe", lambda _settings: object()
+    )
     request = CampaignRequest(
         campaign_id="judge-live-test",
         personas=("newbie",),
@@ -114,11 +116,12 @@ def test_judge_live_campaign_returns_only_redacted_aggregate(monkeypatch, tmp_pa
         cancelled=SimpleNamespace(is_set=lambda: False),
     )
 
+    secret = "sk-" + "never-serialize-this"
     output = run_judge_live_campaign(
         job,
         project_root=tmp_path,
         environment={
-            "OPENAI_API_KEY": "sk-never-serialize-this",
+            "OPENAI_API_KEY": secret,
             "OPENAI_PERSONA_MODEL": "gpt-test",
             "GAME_PROJECT_PATH": str(tmp_path / "game"),
             "GODOT_BIN": "godot4",
@@ -128,5 +131,5 @@ def test_judge_live_campaign_returns_only_redacted_aggregate(monkeypatch, tmp_pa
     assert output["mode"] == "live"
     assert output["completed_cells"] == 1
     assert output["provider_evidence"]["response_ids"] == ["resp_1"]
-    assert "sk-never-serialize-this" not in str(output)
+    assert secret not in str(output)
     assert gateway.validated == {"runs": 1, "weeks": 2, "concurrency": 1}

@@ -4,7 +4,7 @@ version = "0.2.0"
 description = "Development-side local LLM agent pipeline for Godot balance / boundary / bug / value analysis."
 requires-python = ">=3.10"
 dependencies = [
-    "openai>=1.0.0",
+    "openai>=2.44.0",
     "pydantic>=2.0.0",
     "PyYAML>=6.0",
 ]

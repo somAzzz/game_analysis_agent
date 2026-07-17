@@ -88,11 +88,7 @@ class LocalChatPersonaGateway:
                     "JSON object using legal ids. Do not inspect or patch source."
                 ),
                 prompt=prompt,
-                step_name=(
-                    f"week-{week}"
-                    if attempt == 1
-                    else f"week-{week}-repair-1"
-                ),
+                step_name=(f"week-{week}" if attempt == 1 else f"week-{week}-repair-1"),
                 max_tokens=self.decision_max_tokens,
                 attempt=attempt,
             )
@@ -110,19 +106,15 @@ class LocalChatPersonaGateway:
                 continue
             saw_model = True
             try:
-                decision = PlayerDecision.model_validate(
-                    _normalize_decision(parsed, request)
-                )
-            except ValidationError:
-                errors = ["structured output failed Pydantic validation"]
+                decision = PlayerDecision.model_validate(_normalize_decision(parsed, request))
+            except ValidationError as exc:
+                errors = _validation_errors(exc)
                 continue
             errors = validate_player_decision(decision, request.context)
             if errors:
                 continue
             metadata.parse_status = (
-                PersonaParseStatus.PARSED
-                if attempt == 1
-                else PersonaParseStatus.REPAIRED
+                PersonaParseStatus.PARSED if attempt == 1 else PersonaParseStatus.REPAIRED
             )
             return PersonaDecisionResult(
                 status=PersonaResultStatus.COMPLETED,
@@ -137,27 +129,19 @@ class LocalChatPersonaGateway:
             error=_invalid_output(errors, saw_model=saw_model),
         )
 
-    def choose_event(
-        self, request: PersonaEventChoiceRequest
-    ) -> PersonaEventChoiceResult:
+    def choose_event(self, request: PersonaEventChoiceRequest) -> PersonaEventChoiceResult:
         week = _request_week(request.request_id, request.context.state.week)
         errors = ["structured output missing"]
         saw_model = False
         metadata: PersonaCallMetadata | None = None
         for attempt in (1, 2):
             prompt = (
-                _event_prompt(request)
-                if attempt == 1
-                else _event_repair_prompt(request, errors)
+                _event_prompt(request) if attempt == 1 else _event_repair_prompt(request, errors)
             )
             content, call_metadata, failure = self._chat(
                 system="Select one legal game event option. Never invent an id.",
                 prompt=prompt,
-                step_name=(
-                    f"week-{week}-event"
-                    if attempt == 1
-                    else f"week-{week}-event-repair-1"
-                ),
+                step_name=(f"week-{week}-event" if attempt == 1 else f"week-{week}-event-repair-1"),
                 max_tokens=self.event_max_tokens,
                 attempt=attempt,
             )
@@ -189,9 +173,7 @@ class LocalChatPersonaGateway:
             if errors:
                 continue
             metadata.parse_status = (
-                PersonaParseStatus.PARSED
-                if attempt == 1
-                else PersonaParseStatus.REPAIRED
+                PersonaParseStatus.PARSED if attempt == 1 else PersonaParseStatus.REPAIRED
             )
             return PersonaEventChoiceResult(
                 status=PersonaResultStatus.COMPLETED,
@@ -291,20 +273,42 @@ class LocalChatPersonaGateway:
 
 
 def _decision_prompt(request: PersonaDecisionRequest) -> str:
-    return (
-        "/no_think\nChoose legal weekly actions and return one compact PlayerDecision JSON.\n"
-        + request.context.model_dump_json()
+    context = request.context
+    compact = {
+        "week": context.state.week,
+        "persona": context.persona,
+        "persona_strategy": context.persona_strategy,
+        "state": context.state.model_dump(mode="json"),
+        "top_risks": [risk.model_dump(mode="json") for risk in context.top_risks],
+        "available_actions": [
+            action.model_dump(mode="json") for action in context.available_actions
+        ],
+        "current_event_id": context.current_event_id,
+        "event_choices": [choice.model_dump(mode="json") for choice in context.event_choices],
+        "max_action_slots": context.max_action_slots,
+        "memory": context.memory.model_dump(mode="json"),
+    }
+    return "\n".join(
+        [
+            "/no_think",
+            "Choose one or more legal action ids, up to max_action_slots.",
+            json.dumps(compact, ensure_ascii=False, separators=(",", ":")),
+            (
+                "Return only compact JSON with exactly these fields: "
+                '{"actions":["legal_action_id"],"event_choice_id":"legal_choice_id",'
+                '"risk_awareness":["short risk"],"expected_tradeoff":"short text",'
+                '"confidence":0.0}. Confidence must be a number from 0 to 1.'
+            ),
+        ]
     )
 
 
-def _decision_repair_prompt(
-    request: PersonaDecisionRequest, errors: list[str]
-) -> str:
+def _decision_repair_prompt(request: PersonaDecisionRequest, errors: list[str]) -> str:
     return (
-        "Repair the previous PlayerDecision once. Errors: "
+        _decision_prompt(request)
+        + "\nPrevious errors: "
         + json.dumps(errors, ensure_ascii=False)
-        + "\nLegal context:\n"
-        + request.context.model_dump_json()
+        + ". Return one corrected JSON object only."
     )
 
 
@@ -326,14 +330,12 @@ def _event_prompt(request: PersonaEventChoiceRequest) -> str:
             "/no_think",
             "Choose exactly one event_choice_id from the JSON context.",
             json.dumps(compact, ensure_ascii=False, separators=(",", ":")),
-            "Return only compact JSON: {\"event_choice_id\":\"...\"}.",
+            'Return only compact JSON: {"event_choice_id":"..."}.',
         ]
     )
 
 
-def _event_repair_prompt(
-    request: PersonaEventChoiceRequest, errors: list[str]
-) -> str:
+def _event_repair_prompt(request: PersonaEventChoiceRequest, errors: list[str]) -> str:
     return (
         _event_prompt(request)
         + "\nPrevious errors: "
@@ -365,9 +367,7 @@ def _extract_json_object(content: str) -> dict[str, Any] | None:
     return None
 
 
-def _normalize_decision(
-    parsed: dict[str, Any], request: PersonaDecisionRequest
-) -> dict[str, Any]:
+def _normalize_decision(parsed: dict[str, Any], request: PersonaDecisionRequest) -> dict[str, Any]:
     context = request.context
     if parsed.get("tool") == "step" and isinstance(parsed.get("arguments"), dict):
         parsed = {
@@ -376,18 +376,43 @@ def _normalize_decision(
             "strategic_goal": "json fallback tool call",
             "expected_tradeoff": "model emitted step tool JSON",
         }
-    normalized = dict(parsed)
-    rationale = str(normalized.pop("rationale", "") or "")
-    normalized.setdefault("week", context.state.week)
-    normalized.setdefault("persona", context.persona)
-    normalized.setdefault("strategic_goal", rationale)
-    normalized.setdefault("event_choice_id", "")
-    normalized.setdefault("risk_awareness", [])
-    normalized.setdefault(
-        "expected_tradeoff", normalized.get("strategic_goal") or rationale
-    )
-    normalized.setdefault("confidence", 0.5)
-    return normalized
+    rationale = str(parsed.get("rationale", "") or "")
+    raw_actions = parsed.get("actions", [])
+    if not isinstance(raw_actions, list):
+        raw_actions = [] if raw_actions in (None, "") else [raw_actions]
+    valid_action_ids = {action.id for action in context.available_actions}
+    actions = [str(item).strip() for item in raw_actions if str(item).strip() in valid_action_ids]
+    risks = parsed.get("risk_awareness", [])
+    if not isinstance(risks, list):
+        risks = [] if risks in (None, "") else [risks]
+    confidence = parsed.get("confidence", 0.5)
+    try:
+        confidence = max(0.0, min(1.0, float(confidence)))
+    except (TypeError, ValueError):
+        confidence = 0.5
+    given_tradeoff = str(parsed.get("expected_tradeoff", "") or "")
+    strategic_goal = str(parsed.get("strategic_goal", "") or rationale or given_tradeoff)
+    expected_tradeoff = given_tradeoff or strategic_goal or rationale
+    event_choice_id = parsed.get("event_choice_id", "")
+    if isinstance(event_choice_id, list):
+        event_choice_id = event_choice_id[0] if event_choice_id else ""
+    return {
+        "week": context.state.week,
+        "persona": context.persona,
+        "strategic_goal": strategic_goal[:160],
+        "actions": actions,
+        "event_choice_id": str(event_choice_id or ""),
+        "risk_awareness": [str(item)[:120] for item in risks[:5]],
+        "expected_tradeoff": expected_tradeoff[:240],
+        "confidence": confidence,
+    }
+
+
+def _validation_errors(exc: ValidationError) -> list[str]:
+    return [
+        f"{'.'.join(str(item) for item in error['loc'])}: {error['msg']}"
+        for error in exc.errors(include_url=False)[:5]
+    ]
 
 
 def _invalid_output(errors: list[str], *, saw_model: bool) -> PersonaProviderError:
@@ -420,15 +445,11 @@ def _accumulate_metadata(
         update={
             "latency_ms": previous.latency_ms + current.latency_ms,
             "usage": PersonaUsage(
-                input_tokens=_sum_optional(
-                    previous.usage.input_tokens, current.usage.input_tokens
-                ),
+                input_tokens=_sum_optional(previous.usage.input_tokens, current.usage.input_tokens),
                 output_tokens=_sum_optional(
                     previous.usage.output_tokens, current.usage.output_tokens
                 ),
-                total_tokens=_sum_optional(
-                    previous.usage.total_tokens, current.usage.total_tokens
-                ),
+                total_tokens=_sum_optional(previous.usage.total_tokens, current.usage.total_tokens),
             ),
         }
     )

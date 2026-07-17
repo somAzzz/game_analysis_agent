@@ -17,6 +17,13 @@ VIEW_SCHEMA = "playthrough-view-v1"
 MANIFEST_SCHEMA = "playthrough-evidence-manifest-v1"
 PERSONAS_SCHEMA = "playthrough-personas-v1"
 TRUTH_LABEL = "prerecorded-real-godot-replay"
+TRUTH_LABELS = {
+    ("replay", "replay"): TRUTH_LABEL,
+    ("openai", "live"): "live-openai-real-godot",
+    ("deepseek", "live"): "live-deepseek-real-godot",
+    ("vllm", "local"): "local-vllm-real-godot",
+    ("sglang", "local"): "local-sglang-real-godot",
+}
 
 
 class PlaythroughViewError(RuntimeError):
@@ -41,6 +48,9 @@ def build_playthrough_views(
     gate_path = Path(public_gate_path).resolve()
     output = Path(output_dir).resolve()
     manifest = CampaignManifest.model_validate_json(campaign_path.read_text(encoding="utf-8"))
+    truth_label = truth_label_for(
+        manifest.source.provider.value, manifest.source.provider_mode.value
+    )
     clusters = _load_json(clusters_path)
     gate = _load_json(gate_path)
     if gate.get("status") != "passed":
@@ -83,7 +93,7 @@ def build_playthrough_views(
         )
         derived_artifacts.append(_artifact(output, destination, role="playthrough-view"))
 
-    persona_view = _build_persona_view(Path(personas_path), views, action_tags)
+    persona_view = _build_persona_view(Path(personas_path), views, action_tags, truth_label)
     personas_destination = output / "personas.json"
     _write_json(personas_destination, persona_view)
     derived_artifacts.append(_artifact(output, personas_destination, role="persona-view"))
@@ -91,7 +101,7 @@ def build_playthrough_views(
     evidence_manifest = {
         "schema_version": MANIFEST_SCHEMA,
         "campaign_id": manifest.request.campaign_id,
-        "truth_label": TRUTH_LABEL,
+        "truth_label": truth_label,
         "playthrough_data_ready": True,
         "frontend_implementation_requires_design_approval": True,
         "request": manifest.request.model_dump(mode="json"),
@@ -102,9 +112,7 @@ def build_playthrough_views(
         "node_count": sum(len(view["nodes"]) for view in views),
         "actual_edge_count": sum(len(view["actual_edges"]) for view in views),
         "legal_event_choice_count": sum(
-            len(node["event"]["legal_choices"])
-            for view in views
-            for node in view["nodes"]
+            len(node["event"]["legal_choices"]) for view in views for node in view["nodes"]
         ),
         "source_campaign_manifest": _artifact(source, campaign_path, role="campaign-manifest"),
         "source_public_gate": _artifact(source, gate_path, role="campaign-gate"),
@@ -116,29 +124,50 @@ def build_playthrough_views(
         "source_artifacts": sorted(source_artifacts, key=lambda item: item["path"]),
         "derived_artifacts": sorted(derived_artifacts, key=lambda item: item["path"]),
         "checks": [
-            {"id": "completed_cells", "status": "passed", "detail": f"{len(views)}/{len(manifest.cells)}"},
+            {
+                "id": "completed_cells",
+                "status": "passed",
+                "detail": f"{len(views)}/{len(manifest.cells)}",
+            },
             {"id": "raw_hashes", "status": "passed", "detail": f"{len(views)} traces"},
-            {"id": "row_citations", "status": "passed", "detail": f"{sum(len(view['nodes']) for view in views)} rows"},
+            {
+                "id": "row_citations",
+                "status": "passed",
+                "detail": f"{sum(len(view['nodes']) for view in views)} rows",
+            },
             {"id": "state_continuity", "status": "passed", "detail": "all adjacent nodes"},
             {"id": "action_legality", "status": "passed", "detail": "all selected actions"},
             {"id": "event_choice_legality", "status": "passed", "detail": "all selected choices"},
             {"id": "delta_consistency", "status": "passed", "detail": "all numeric deltas"},
-            {"id": "provider_health", "status": "passed", "detail": "0 fallback / 0 provider error"},
+            {
+                "id": "provider_health",
+                "status": "passed",
+                "detail": "0 fallback / 0 provider error",
+            },
         ],
     }
     _write_json(output / "manifest.json", evidence_manifest)
     return evidence_manifest
 
 
-def verify_playthrough_evidence(output_dir: str | Path) -> dict[str, Any]:
+def verify_playthrough_evidence(
+    output_dir: str | Path,
+    *,
+    source_root: str | Path | None = None,
+) -> dict[str, Any]:
     """Rehash retained source and derived views and recheck aggregate counts."""
 
     output = Path(output_dir).resolve()
-    source = output / "source"
+    source = Path(source_root).resolve() if source_root is not None else output / "source"
     manifest = _load_json(output / "manifest.json")
     if manifest.get("schema_version") != MANIFEST_SCHEMA:
         raise PlaythroughViewError("playthrough evidence manifest schema mismatch")
-    if manifest.get("truth_label") != TRUTH_LABEL:
+    source_identity = manifest.get("source") or {}
+    expected_truth_label = truth_label_for(
+        str(source_identity.get("provider") or ""),
+        str(source_identity.get("provider_mode") or ""),
+    )
+    if manifest.get("truth_label") != expected_truth_label:
         raise PlaythroughViewError("playthrough evidence truth label mismatch")
     if manifest.get("playthrough_data_ready") is not True:
         raise PlaythroughViewError("playthrough data is not marked ready")
@@ -160,10 +189,15 @@ def verify_playthrough_evidence(output_dir: str | Path) -> dict[str, Any]:
         if artifact.get("role") != "playthrough-view":
             continue
         view = _load_json(output / str(artifact["path"]))
-        if view.get("schema_version") != VIEW_SCHEMA or view.get("truth_label") != TRUTH_LABEL:
+        if (
+            view.get("schema_version") != VIEW_SCHEMA
+            or view.get("truth_label") != expected_truth_label
+        ):
             raise PlaythroughViewError(f"invalid derived playthrough view: {artifact['path']}")
         if view.get("branch_semantics", {}).get("projected_counterfactual_states") is not False:
-            raise PlaythroughViewError(f"counterfactual branch truth is ambiguous: {artifact['path']}")
+            raise PlaythroughViewError(
+                f"counterfactual branch truth is ambiguous: {artifact['path']}"
+            )
         views.append(view)
     node_count = sum(len(view.get("nodes") or []) for view in views)
     edge_count = sum(len(view.get("actual_edges") or []) for view in views)
@@ -194,15 +228,23 @@ def build_cell_view(
     trace = Path(trace_path)
     summary = Path(summary_path)
     request = result.request
+    truth_label = truth_label_for(
+        result.source.provider.value,
+        result.source.provider_mode.value,
+    )
     expected = next((cell for cell in manifest.cells if cell.cell_id == request.cell_id), None)
     if expected is None or expected != request:
-        raise PlaythroughViewError(f"cell {request.cell_id}: request is absent from campaign manifest")
+        raise PlaythroughViewError(
+            f"cell {request.cell_id}: request is absent from campaign manifest"
+        )
     if result.state.value != "completed" or result.error:
         raise PlaythroughViewError(f"cell {request.cell_id}: result is not a clean completion")
     if result.source != manifest.source or result.source_fingerprint != manifest.source_fingerprint:
         raise PlaythroughViewError(f"cell {request.cell_id}: source identity mismatch")
 
-    artifact = next((item for item in result.artifacts if item.path.endswith("playthrough.jsonl")), None)
+    artifact = next(
+        (item for item in result.artifacts if item.path.endswith("playthrough.jsonl")), None
+    )
     if artifact is None:
         raise PlaythroughViewError(f"cell {request.cell_id}: playthrough artifact is missing")
     if hashlib.sha256(trace.read_bytes()).hexdigest() != artifact.sha256:
@@ -219,11 +261,15 @@ def build_cell_view(
     for index, (row, citation) in enumerate(zip(rows, result.citations, strict=True), start=1):
         week = int(row.get("week", 0))
         if week != index or citation.week != week or citation.line_number != index:
-            raise PlaythroughViewError(f"cell {request.cell_id}: non-contiguous week at line {index}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: non-contiguous week at line {index}"
+            )
         if row.get("run_id") != request.cell_id:
             raise PlaythroughViewError(f"cell {request.cell_id}: run id mismatch at week {week}")
         if canonical_sha256(row) != citation.record_sha256:
-            raise PlaythroughViewError(f"cell {request.cell_id}: citation hash mismatch at week {week}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: citation hash mismatch at week {week}"
+            )
 
         before_wrapper = _mapping(row, "state_before", request.cell_id, week)
         before = _mapping(before_wrapper, "state", request.cell_id, week)
@@ -231,30 +277,48 @@ def build_cell_view(
         result_payload = _mapping(row, "result", request.cell_id, week)
         result_state = _mapping(result_payload, "state", request.cell_id, week)
         if result_state != after:
-            raise PlaythroughViewError(f"cell {request.cell_id}: result/state_after mismatch at week {week}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: result/state_after mismatch at week {week}"
+            )
         if previous_after is not None and before != previous_after:
-            raise PlaythroughViewError(f"cell {request.cell_id}: broken state continuity at week {week}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: broken state continuity at week {week}"
+            )
 
         available = _string_list(row.get("available_actions"))
         chosen = _string_list(row.get("chosen_actions"))
         if not available or not chosen or not set(chosen).issubset(available):
-            raise PlaythroughViewError(f"cell {request.cell_id}: illegal selected action at week {week}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: illegal selected action at week {week}"
+            )
         decision = _mapping(row, "decision", request.cell_id, week)
         if _string_list(decision.get("actions")) != chosen:
-            raise PlaythroughViewError(f"cell {request.cell_id}: decision/action mismatch at week {week}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: decision/action mismatch at week {week}"
+            )
         if decision.get("persona") != request.persona.value or int(decision.get("week", 0)) != week:
-            raise PlaythroughViewError(f"cell {request.cell_id}: decision identity mismatch at week {week}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: decision identity mismatch at week {week}"
+            )
 
         event_id = str(row.get("triggered_event_id") or "")
         choice_id = str(row.get("event_choice_id") or "")
         legal_choices = result_payload.get("event_choices") or []
-        if not isinstance(legal_choices, list) or any(not isinstance(item, dict) for item in legal_choices):
-            raise PlaythroughViewError(f"cell {request.cell_id}: invalid event choices at week {week}")
+        if not isinstance(legal_choices, list) or any(
+            not isinstance(item, dict) for item in legal_choices
+        ):
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: invalid event choices at week {week}"
+            )
         legal_choice_ids = {str(item.get("choice_id") or "") for item in legal_choices}
         if event_id and choice_id not in legal_choice_ids:
-            raise PlaythroughViewError(f"cell {request.cell_id}: illegal event choice at week {week}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: illegal event choice at week {week}"
+            )
         if not event_id and (choice_id or legal_choices):
-            raise PlaythroughViewError(f"cell {request.cell_id}: choice without event at week {week}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: choice without event at week {week}"
+            )
 
         full_numeric_delta = _numeric_delta(before, after)
         expected_delta = {
@@ -276,16 +340,31 @@ def build_cell_view(
         }
         delta = row.get("delta") or {}
         if not isinstance(delta, dict) or delta != expected_delta:
-            raise PlaythroughViewError(f"cell {request.cell_id}: state delta mismatch at week {week}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: state delta mismatch at week {week}"
+            )
         validation = _mapping(row, "validation", request.cell_id, week)
         if validation.get("valid") is not True or validation.get("fallback_used") is not False:
-            raise PlaythroughViewError(f"cell {request.cell_id}: invalid/fallback decision at week {week}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: invalid/fallback decision at week {week}"
+            )
         anomalies = row.get("anomalies") or []
         if not isinstance(anomalies, list) or any(not isinstance(item, dict) for item in anomalies):
-            raise PlaythroughViewError(f"cell {request.cell_id}: malformed anomaly evidence at week {week}")
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: malformed anomaly evidence at week {week}"
+            )
         calls = row.get("persona_calls") or []
-        if not isinstance(calls, list) or any(not _healthy_replay_call(call) for call in calls):
-            raise PlaythroughViewError(f"cell {request.cell_id}: unhealthy Replay call at week {week}")
+        if not isinstance(calls, list) or any(
+            not _healthy_provider_call(
+                call,
+                provider=result.source.provider.value,
+                mode=result.source.provider_mode.value,
+            )
+            for call in calls
+        ):
+            raise PlaythroughViewError(
+                f"cell {request.cell_id}: unhealthy provider call at week {week}"
+            )
 
         nodes.append(
             {
@@ -325,7 +404,12 @@ def build_cell_view(
 
     final_ending = _final_ending(summary)
     actual_edges = [
-        {"id": f"w{week}-to-w{week + 1}", "from": f"w{week}", "to": f"w{week + 1}", "kind": "actual"}
+        {
+            "id": f"w{week}-to-w{week + 1}",
+            "from": f"w{week}",
+            "to": f"w{week + 1}",
+            "kind": "actual",
+        }
         for week in range(1, len(nodes))
     ]
     return {
@@ -334,7 +418,7 @@ def build_cell_view(
         "cell_id": request.cell_id,
         "persona": request.persona.value,
         "seed": request.seed,
-        "truth_label": TRUTH_LABEL,
+        "truth_label": truth_label,
         "provider": result.source.provider.value,
         "provider_mode": result.source.provider_mode.value,
         "provider_revision": result.source.provider_revision,
@@ -380,6 +464,7 @@ def _build_persona_view(
     personas_path: Path,
     views: list[dict[str, Any]],
     action_tags: dict[str, tuple[str, ...]],
+    truth_label: str,
 ) -> dict[str, Any]:
     config = yaml.safe_load(personas_path.read_text(encoding="utf-8"))
     personas = config.get("personas") if isinstance(config, dict) else None
@@ -388,7 +473,12 @@ def _build_persona_view(
     output = []
     for slug, contract in personas.items():
         cells = [view for view in views if view["persona"] == slug]
-        selected = [action for view in cells for node in view["nodes"] for action in node["selected_action_ids"]]
+        selected = [
+            action
+            for view in cells
+            for node in view["nodes"]
+            for action in node["selected_action_ids"]
+        ]
         tag_counts: Counter[str] = Counter()
         for action in selected:
             tag_counts.update(action_tags.get(action, ()))
@@ -405,10 +495,14 @@ def _build_persona_view(
                 "contract": contract,
                 "observed": {
                     "cell_count": len(cells),
-                    "completed_cells": sum(view["stop_reason"] in {"game_finished", "week_limit"} for view in cells),
+                    "completed_cells": sum(
+                        view["stop_reason"] in {"game_finished", "week_limit"} for view in cells
+                    ),
                     "seeds": sorted(view["seed"] for view in cells),
                     "weeks": sum(view["completed_weeks"] for view in cells),
-                    "final_endings": dict(sorted(Counter(view["final_ending"] for view in cells).items())),
+                    "final_endings": dict(
+                        sorted(Counter(view["final_ending"] for view in cells).items())
+                    ),
                     "first_cashflow_stress_attractor_weeks": sorted(first_attractor),
                     "selected_action_count": denominator,
                     "action_tag_rates": {
@@ -420,7 +514,7 @@ def _build_persona_view(
                 },
             }
         )
-    return {"schema_version": PERSONAS_SCHEMA, "truth_label": TRUTH_LABEL, "personas": output}
+    return {"schema_version": PERSONAS_SCHEMA, "truth_label": truth_label, "personas": output}
 
 
 def _action_tags(path: Path) -> dict[str, tuple[str, ...]]:
@@ -435,11 +529,30 @@ def _action_tags(path: Path) -> dict[str, tuple[str, ...]]:
     }
 
 
-def _healthy_replay_call(call: Any) -> bool:
-    if not isinstance(call, dict) or call.get("status") != "completed" or call.get("error") is not None:
+def truth_label_for(provider: str, mode: str) -> str:
+    """Return the public truth label for an exact provider/mode pair."""
+
+    try:
+        return TRUTH_LABELS[(provider, mode)]
+    except KeyError as exc:
+        raise PlaythroughViewError(
+            f"unsupported playthrough provider identity: {provider}/{mode}"
+        ) from exc
+
+
+def _healthy_provider_call(call: Any, *, provider: str, mode: str) -> bool:
+    if (
+        not isinstance(call, dict)
+        or call.get("status") != "completed"
+        or call.get("error") is not None
+    ):
         return False
     metadata = call.get("metadata")
-    return isinstance(metadata, dict) and metadata.get("provider") == "replay" and metadata.get("mode") == "replay"
+    return (
+        isinstance(metadata, dict)
+        and metadata.get("provider") == provider
+        and metadata.get("mode") == mode
+    )
 
 
 def _call_fingerprint(calls: list[Any], phase: str) -> str:
@@ -463,7 +576,9 @@ def _numeric_delta(before: dict[str, Any], after: dict[str, Any]) -> dict[str, i
 
 
 def _final_ending(path: Path) -> str:
-    match = re.search(r"^- final ending: \*\*(.+?)\*\*$", path.read_text(encoding="utf-8"), re.MULTILINE)
+    match = re.search(
+        r"^- final ending: \*\*(.+?)\*\*$", path.read_text(encoding="utf-8"), re.MULTILINE
+    )
     if not match:
         raise PlaythroughViewError(f"final ending is missing from {path.name}")
     return match.group(1)
@@ -501,7 +616,9 @@ def _load_jsonl(path: Path) -> list[dict[str, Any]]:
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
 
 def _artifact(root: Path, path: Path, *, role: str) -> dict[str, Any]:
@@ -546,5 +663,6 @@ __all__ = [
     "PlaythroughViewError",
     "build_cell_view",
     "build_playthrough_views",
+    "truth_label_for",
     "verify_playthrough_evidence",
 ]

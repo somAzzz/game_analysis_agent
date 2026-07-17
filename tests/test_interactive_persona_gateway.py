@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -116,9 +117,7 @@ def _response(parsed: object):
         output=[
             SimpleNamespace(
                 type="message",
-                content=[
-                    SimpleNamespace(type="output_text", parsed=parsed, refusal=None)
-                ],
+                content=[SimpleNamespace(type="output_text", parsed=parsed, refusal=None)],
             )
         ],
         usage=SimpleNamespace(input_tokens=10, output_tokens=5, total_tokens=15),
@@ -198,9 +197,7 @@ def test_local_unknown_action_fails_after_one_shared_repair() -> None:
     gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
 
     result = gateway.decide(
-        PersonaDecisionRequest.from_context(
-            _context(), request_id="newbie-42-w1-invalid"
-        )
+        PersonaDecisionRequest.from_context(_context(), request_id="newbie-42-w1-invalid")
     )
 
     assert result.status == PersonaResultStatus.FAILED
@@ -212,16 +209,55 @@ def test_local_unknown_action_fails_after_one_shared_repair() -> None:
     assert llm.calls == 2
 
 
-def test_factory_defaults_to_governed_hash_pinned_replay() -> None:
-    built = build_persona_gateway(
-        PersonaRuntimeSettings.from_env({}), project_root=ROOT
+def test_local_normalizes_compact_model_variations_without_hiding_invalid_ids() -> None:
+    llm = _LocalLLM(
+        [
+            json.dumps(
+                {
+                    "actions": "budget_call",
+                    "event_choice_id": "rent_pressure.ask_extension",
+                    "rationale": "protect cashflow",
+                    "risk_awareness": "money",
+                    "confidence": "0.8",
+                    "ignored_commentary": "not part of the contract",
+                }
+            )
+        ]
     )
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+
+    result = gateway.decide(
+        PersonaDecisionRequest.from_context(_context(), request_id="newbie-42-w1-normalized")
+    )
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert result.decision is not None
+    assert result.decision.actions == ["budget_call"]
+    assert result.decision.risk_awareness == ["money"]
+    assert result.decision.confidence == 0.8
+
+
+def test_local_discards_stale_action_when_another_legal_action_remains() -> None:
+    payload = _decision().model_dump(mode="json")
+    payload["actions"] = ["budget_call", "stale_action"]
+    llm = _LocalLLM([json.dumps(payload)])
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+
+    result = gateway.decide(
+        PersonaDecisionRequest.from_context(_context(), request_id="newbie-42-w1-stale-action")
+    )
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert result.decision is not None
+    assert result.decision.actions == ["budget_call"]
+
+
+def test_factory_defaults_to_governed_hash_pinned_replay() -> None:
+    built = build_persona_gateway(PersonaRuntimeSettings.from_env({}), project_root=ROOT)
 
     assert built.selection.selected == PersonaProvider.REPLAY
     result = built.gateway.decide(
-        PersonaDecisionRequest.from_context(
-            _context(), request_id="newbie-42-w1-decision"
-        )
+        PersonaDecisionRequest.from_context(_context(), request_id="newbie-42-w1-decision")
     )
     assert result.status == PersonaResultStatus.COMPLETED
     assert built.gateway.calls_used == 1

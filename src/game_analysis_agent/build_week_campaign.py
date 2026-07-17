@@ -5,9 +5,9 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from pathlib import Path, PurePosixPath
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -144,8 +144,14 @@ class ReplayCampaignExecutor:
         )
 
 
-class LiveCampaignExecutor:
-    """Run a real-Godot cell through one preselected governed live gateway."""
+def _validation_flag(validation: object, field: str) -> bool:
+    if isinstance(validation, Mapping):
+        return bool(validation.get(field))
+    return bool(getattr(validation, field, False))
+
+
+class PersonaCampaignExecutor:
+    """Run a real-Godot cell through one governed non-Replay gateway."""
 
     def __init__(
         self,
@@ -153,9 +159,12 @@ class LiveCampaignExecutor:
         gateway: GovernedPersonaGateway,
         settings: Settings,
         external_cancelled: Callable[[], bool] | None = None,
+        progress_callback: Callable[[CampaignCellRequest, Path, dict[str, Any]], None]
+        | None = None,
     ) -> None:
-        if gateway.provider != PersonaProvider.OPENAI or gateway.mode != PersonaProviderMode.LIVE:
-            raise ValueError("live campaign executor requires a live OpenAI gateway")
+        if gateway.provider == PersonaProvider.REPLAY or gateway.mode == PersonaProviderMode.REPLAY:
+            raise ValueError("persona campaign executor requires a non-Replay gateway")
+        self.progress_callback = progress_callback
         self.gateway = gateway
         self.settings = settings
         self.external_cancelled = external_cancelled or (lambda: False)
@@ -166,6 +175,9 @@ class LiveCampaignExecutor:
         output_dir: Path,
         context: CampaignExecutionContext,
     ) -> CellExecutionOutcome:
+        if request.provider != self.gateway.provider:
+            raise ValueError("campaign request/gateway provider mismatch")
+
         def cancelled() -> bool:
             if self.external_cancelled():
                 self.gateway.cancellation.cancel()
@@ -178,6 +190,11 @@ class LiveCampaignExecutor:
             settings=self.settings,
             max_weeks=request.max_weeks,
             persona=request.persona.value,
+            progress_callback=(
+                (lambda event: self.progress_callback(request, output_dir, event))
+                if self.progress_callback is not None
+                else None
+            ),
             difficulty=request.difficulty,
             scenario=request.scenario,
             seed=request.seed,
@@ -190,18 +207,22 @@ class LiveCampaignExecutor:
         )
         completed = len(result.steps)
         if completed < 1:
-            raise RuntimeError("live campaign cell produced no weekly evidence")
+            raise RuntimeError("persona campaign cell produced no weekly evidence")
         fallback_weeks = [
             step.week
             for step in result.steps
-            if not step.validation.valid or step.validation.fallback_used
+            if not _validation_flag(step.validation, "valid")
+            or _validation_flag(step.validation, "fallback_used")
         ]
         if fallback_weeks:
             return CellExecutionOutcome(
                 state=CampaignCellState.PARTIAL,
                 stop_reason=CampaignStopReason.PROVIDER_FAILED,
                 completed_weeks=completed,
-                error=f"live provider produced invalid/fallback decisions at weeks {fallback_weeks}",
+                error=(
+                    f"{self.gateway.provider.value} provider produced invalid/fallback "
+                    f"decisions at weeks {fallback_weeks}"
+                ),
             )
         return CellExecutionOutcome(
             state=CampaignCellState.COMPLETED,
@@ -211,6 +232,25 @@ class LiveCampaignExecutor:
                 else CampaignStopReason.GAME_FINISHED
             ),
             completed_weeks=completed,
+        )
+
+
+class LiveCampaignExecutor(PersonaCampaignExecutor):
+    """Compatibility wrapper that accepts only the live OpenAI gateway."""
+
+    def __init__(
+        self,
+        *,
+        gateway: GovernedPersonaGateway,
+        settings: Settings,
+        external_cancelled: Callable[[], bool] | None = None,
+    ) -> None:
+        if gateway.provider != PersonaProvider.OPENAI or gateway.mode != PersonaProviderMode.LIVE:
+            raise ValueError("live campaign executor requires a live OpenAI gateway")
+        super().__init__(
+            gateway=gateway,
+            settings=settings,
+            external_cancelled=external_cancelled,
         )
 
 
@@ -260,12 +300,37 @@ def build_live_source_identity(
     request: CampaignRequest,
     model: str,
 ) -> CampaignSourceIdentity:
-    """Bind a dynamic live request to clean agent/game/model identities."""
+    """Bind a dynamic OpenAI request to clean agent/game/model identities."""
+
+    if request.provider != PersonaProvider.OPENAI:
+        raise TargetSelectionError("live source identity requires an OpenAI request")
+    return build_provider_source_identity(
+        project_root=project_root,
+        game_root=game_root,
+        request=request,
+        provider=PersonaProvider.OPENAI,
+        mode=PersonaProviderMode.LIVE,
+        model=model,
+    )
+
+
+def build_provider_source_identity(
+    *,
+    project_root: str | Path,
+    game_root: str | Path,
+    request: CampaignRequest,
+    provider: PersonaProvider,
+    mode: PersonaProviderMode,
+    model: str,
+) -> CampaignSourceIdentity:
+    """Bind a dynamic provider request to clean agent/game/model identities."""
 
     project = Path(project_root).resolve()
     game = Path(game_root).resolve()
     if _git(project, "status", "--porcelain", "--untracked-files=all"):
-        raise TargetSelectionError("live campaign requires a clean agent worktree")
+        raise TargetSelectionError("persona campaign requires a clean agent worktree")
+    if request.provider != provider:
+        raise TargetSelectionError("campaign request/source provider mismatch")
     marker = json.loads((game / ".playtest-forge-source.json").read_text(encoding="utf-8"))
     return CampaignSourceIdentity(
         agent_commit=_git(project, "rev-parse", "HEAD"),
@@ -274,8 +339,8 @@ def build_live_source_identity(
         game_tree=str(marker["tree"]),
         game_archive_sha256=str(marker["archive_sha256"]),
         campaign_config_sha256=request.fingerprint(),
-        provider=PersonaProvider.OPENAI,
-        provider_mode=PersonaProviderMode.LIVE,
+        provider=provider,
+        provider_mode=mode,
         provider_revision=f"model:{model}",
     )
 
@@ -388,12 +453,14 @@ __all__ = [
     "DEFAULT_HOLDOUT_SEEDS",
     "FrozenRepairTarget",
     "LiveCampaignExecutor",
+    "PersonaCampaignExecutor",
     "ReplayCampaignExecutor",
     "TARGET_SCHEMA",
     "TargetRubric",
     "TargetSelectionError",
-    "build_source_identity",
     "build_live_source_identity",
+    "build_provider_source_identity",
+    "build_source_identity",
     "select_repair_target",
     "write_target",
 ]
