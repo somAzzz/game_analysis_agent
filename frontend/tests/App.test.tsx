@@ -582,6 +582,24 @@ describe("application routes", () => {
         completed_weeks: 7,
         max_weeks: 20,
       }],
+      diagnostics: {
+        logical_calls: 14,
+        http_attempts: 15,
+        fallback_count: 1,
+        failure_count: 1,
+        response_metadata_missing_attempts: 1,
+        known_usage: { input_tokens: 12000, output_tokens: 2300, total_tokens: 14300 },
+        failures: [{
+          cell_id: "newbie-seed-42",
+          persona: "newbie",
+          seed: 42,
+          week: 6,
+          phase: "decision",
+          category: "malformed_response",
+          message: "actions.0: Input should be a valid string",
+          attempts: 2,
+        }],
+      },
       latest: {
         cell_id: "newbie-seed-42",
         persona: "newbie",
@@ -616,6 +634,10 @@ describe("application routes", () => {
     expect(within(card).getByText("Newbie · seed 42 · W7/20")).toBeInTheDocument();
     expect(within(card).getByText("7/20")).toBeInTheDocument();
     expect(within(card).getByText("local-vllm-real-godot")).toBeInTheDocument();
+    const diagnostics = within(card).getByRole("complementary", { name: "Partial campaign diagnostics" });
+    expect(within(diagnostics).getByText("NOT EVIDENCE")).toBeInTheDocument();
+    expect(within(diagnostics).getByText("W6 · decision · malformed_response")).toBeInTheDocument();
+    expect(within(diagnostics).getByText("14,300")).toBeInTheDocument();
   });
 
   it("switches verified Persona paths and exposes a current-state-only runner tooltip", async () => {

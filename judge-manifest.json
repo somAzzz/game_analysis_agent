@@ -1024,16 +1024,16 @@
       "sha256": "083e5cf6bcd702f558a21ea865d7c33920aa283f484da76af819a8170455f3b4"
     },
     {
-      "bytes": 15437,
+      "bytes": 16023,
       "path": "frontend/src/types.ts",
       "role": "deterministic-correctness-frontend",
-      "sha256": "350e7578687c5fe09bb6ada2587a8924545fc4bac9156e711a26f50e8ab88051"
+      "sha256": "e72931c9388c0369bf678d31c7db5d7a04b5e3506afeee89b94235129d44ec98"
     },
     {
-      "bytes": 33018,
+      "bytes": 33948,
       "path": "frontend/tests/App.test.tsx",
       "role": "deterministic-correctness-test",
-      "sha256": "423d3742ebffcde334ab76f729cb624ec1952fbe1d3bc21396a307e9ed0f2f20"
+      "sha256": "bc4020591d80c520eb9a7618ae159e3ce71439c74c2cd10ba7aee629ab17e990"
     },
     {
       "bytes": 7683,

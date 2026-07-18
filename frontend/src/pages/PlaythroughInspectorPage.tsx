@@ -154,6 +154,7 @@ export function PlaythroughInspectorPage() {
   );
   const stressMetric = metricRows.find((metric) => metric.key === "stress");
   const arrearsMetric = metricRows.find((metric) => metric.key === "arrears_amount");
+  const sessionDiagnostics = liveSession?.diagnostics;
   const sessionPercent = liveSession
     ? liveSession.status === "completed"
       ? 100
@@ -356,6 +357,36 @@ export function PlaythroughInspectorPage() {
               </p>
             )}
             <small>{liveSession.message}</small>
+            {sessionDiagnostics
+              && (sessionDiagnostics.failure_count > 0 || sessionDiagnostics.fallback_count > 0)
+              && (
+                <aside className="playthrough-session-diagnostics" aria-label="Partial campaign diagnostics">
+                  <header>
+                    <div>
+                      <span>DIAGNOSTIC ONLY</span>
+                      <strong>{sessionDiagnostics.failure_count} failed calls · {sessionDiagnostics.fallback_count} fallback weeks</strong>
+                    </div>
+                    <b>NOT EVIDENCE</b>
+                  </header>
+                  <dl>
+                    <div><dt>Logical calls</dt><dd>{sessionDiagnostics.logical_calls}</dd></div>
+                    <div><dt>HTTP attempts</dt><dd>{sessionDiagnostics.http_attempts}</dd></div>
+                    <div><dt>Known tokens</dt><dd>{sessionDiagnostics.known_usage.total_tokens.toLocaleString("en-US")}</dd></div>
+                    <div><dt>Missing metadata</dt><dd>{sessionDiagnostics.response_metadata_missing_attempts}</dd></div>
+                  </dl>
+                  <ol>
+                    {sessionDiagnostics.failures.map((failure, index) => (
+                      <li key={`${failure.cell_id}-${failure.week}-${failure.phase}-${index}`}>
+                        <strong>W{failure.week} · {failure.phase} · {failure.category}</strong>
+                        <span>{failure.message} · {failure.attempts} attempt{failure.attempts === 1 ? "" : "s"}</span>
+                      </li>
+                    ))}
+                  </ol>
+                  {sessionDiagnostics.failure_count > sessionDiagnostics.failures.length && (
+                    <small>{sessionDiagnostics.failure_count - sessionDiagnostics.failures.length} more failures remain in the private campaign report.</small>
+                  )}
+                </aside>
+              )}
           </section>
         )}
 

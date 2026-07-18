@@ -559,6 +559,19 @@ main.playthrough-page {
 .playthrough-session > p span { color: var(--judge-muted); }
 .playthrough-session > small { display: block; margin-top: 8px; color: var(--judge-muted); }
 
+.playthrough-session-diagnostics { margin-top: 14px; padding: 12px; border: 1px solid color-mix(in srgb, var(--judge-red) 55%, var(--judge-rule)); background: color-mix(in srgb, var(--judge-red) 8%, transparent); }
+.playthrough-session-diagnostics > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.playthrough-session-diagnostics > header span { display: block; color: var(--judge-red); font-size: 8px; letter-spacing: .14em; }
+.playthrough-session-diagnostics > header strong { display: block; margin-top: 4px; font: 11px/1.35 var(--judge-mono); }
+.playthrough-session-diagnostics > header > b { padding: 4px 7px; border: 1px solid var(--judge-red); color: var(--judge-red); font-size: 8px; letter-spacing: .1em; white-space: nowrap; }
+.playthrough-session-diagnostics > dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--judge-rule); }
+.playthrough-session-diagnostics dd { margin: 3px 0 0; font: 10px/1.3 var(--judge-mono); }
+.playthrough-session-diagnostics > ol { display: grid; gap: 7px; margin: 12px 0 0; padding: 0; list-style: none; }
+.playthrough-session-diagnostics > ol li { display: grid; grid-template-columns: minmax(190px, .45fr) minmax(0, 1fr); gap: 12px; padding-top: 7px; border-top: 1px solid color-mix(in srgb, var(--judge-rule) 75%, transparent); font: 9px/1.4 var(--judge-mono); }
+.playthrough-session-diagnostics > ol strong { color: var(--judge-ink); font-weight: 600; }
+.playthrough-session-diagnostics > ol span,
+.playthrough-session-diagnostics > small { color: var(--judge-muted); overflow-wrap: anywhere; }
+
 .playthrough-language-control dd { display: flex; gap: 4px; }
 .playthrough-language-control button { min-width: 42px; padding: 4px 7px; border: 1px solid var(--judge-rule); background: transparent; color: var(--judge-muted); cursor: pointer; font: inherit; font-size: 8px; }
 .playthrough-language-control button.is-active { border-color: var(--judge-cyan); background: var(--judge-cyan); color: var(--judge-bg); }
@@ -869,8 +882,10 @@ main.playthrough-page {
   .playthrough-controls > small { text-align: center; }
   .playthrough-week-columns { grid-template-columns: 1fr; }
   .playthrough-week-columns > section { border-right: 0; border-bottom: 1px solid var(--judge-rule); }
-  .playthrough-session > dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .playthrough-session > dl,
+  .playthrough-session-diagnostics > dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .playthrough-session > p { flex-direction: column; gap: 4px; }
+  .playthrough-session-diagnostics > ol li { grid-template-columns: 1fr; gap: 3px; }
   .playthrough-week-record > header { grid-template-columns: 118px minmax(0, 1fr); column-gap: 24px; }
   .playthrough-week-record > header > b { grid-column: 2; justify-self: start; }
   .playthrough-provenance { grid-template-columns: auto 1fr; }

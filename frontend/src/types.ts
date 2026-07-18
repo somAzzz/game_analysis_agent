@@ -417,6 +417,31 @@ export interface PlaytestSessionCell {
   max_weeks: number;
 }
 
+export interface PlaytestSessionFailure {
+  cell_id: string;
+  persona: PlaythroughPersonaSlug;
+  seed: number;
+  week: number;
+  phase: string;
+  category: string;
+  message: string;
+  attempts: number;
+}
+
+export interface PlaytestSessionDiagnostics {
+  logical_calls: number;
+  http_attempts: number;
+  fallback_count: number;
+  failure_count: number;
+  response_metadata_missing_attempts: number;
+  known_usage: {
+    input_tokens: number;
+    output_tokens: number;
+    total_tokens: number;
+  };
+  failures: PlaytestSessionFailure[];
+}
+
 export interface PlaytestSession {
   schema_version: "persona-campaign-session-v1";
   campaign_id: string;
@@ -440,6 +465,7 @@ export interface PlaytestSession {
     total_requested_weeks: number;
   };
   cells: PlaytestSessionCell[];
+  diagnostics?: PlaytestSessionDiagnostics;
   latest: null | {
     cell_id: string;
     persona: PlaythroughPersonaSlug;

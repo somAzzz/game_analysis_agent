@@ -176,7 +176,27 @@ def test_session_publisher_exposes_only_sanitized_week_progress(tmp_path: Path) 
         "event_choice_id": "arrival.choice_01",
         "state_after": {"week": 2, "money": 100, "stress": 20, "private": secret},
         "llm_summary": secret,
-        "persona_calls": [{"raw": secret}],
+        "validation": {"valid": False, "fallback_used": True},
+        "persona_calls": [
+            {"raw": secret},
+            {
+                "phase": "decision",
+                "status": "failed",
+                "metadata": {
+                    "response_id": "",
+                    "attempt_count": 2,
+                    "usage": {
+                        "input_tokens": 100,
+                        "output_tokens": 30,
+                        "total_tokens": 130,
+                    },
+                },
+                "error": {
+                    "category": "malformed_response",
+                    "message": f"schema rejected {secret}",
+                },
+            },
+        ],
     }
     (output / "playthrough.jsonl").write_text(
         json.dumps(row, ensure_ascii=False) + "\n",
@@ -214,6 +234,26 @@ def test_session_publisher_exposes_only_sanitized_week_progress(tmp_path: Path) 
     assert secret not in session_text
     assert "llm_summary" not in session_text
     assert "persona_calls" not in session_text
+    assert session["diagnostics"] == {
+        "logical_calls": 1,
+        "http_attempts": 2,
+        "fallback_count": 1,
+        "failure_count": 1,
+        "response_metadata_missing_attempts": 1,
+        "known_usage": {"input_tokens": 100, "output_tokens": 30, "total_tokens": 130},
+        "failures": [
+            {
+                "cell_id": cell.cell_id,
+                "persona": "newbie",
+                "seed": 42,
+                "week": 1,
+                "phase": "decision",
+                "category": "malformed_response",
+                "message": "schema rejected <redacted>",
+                "attempts": 2,
+            }
+        ],
+    }
 
     publisher.progress(
         cell,

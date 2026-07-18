@@ -36,10 +36,33 @@ export async function loadPlaytestSession(
     || !session.campaign_id
     || !session.truth_label
     || !Array.isArray(session.cells)
+    || (session.diagnostics !== undefined && !isSessionDiagnostics(session.diagnostics))
   ) {
     throw new Error("Live playtest session contract is invalid");
   }
   return session;
+}
+
+function isSessionDiagnostics(value: unknown): boolean {
+  if (!value || typeof value !== "object") return false;
+  const diagnostics = value as Record<string, unknown>;
+  const usage = diagnostics.known_usage;
+  return [
+    diagnostics.logical_calls,
+    diagnostics.http_attempts,
+    diagnostics.fallback_count,
+    diagnostics.failure_count,
+    diagnostics.response_metadata_missing_attempts,
+  ].every(isNonnegativeInteger)
+    && Boolean(usage && typeof usage === "object")
+    && ["input_tokens", "output_tokens", "total_tokens"].every(
+      (key) => isNonnegativeInteger((usage as Record<string, unknown>)[key]),
+    )
+    && Array.isArray(diagnostics.failures);
+}
+
+function isNonnegativeInteger(value: unknown): boolean {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }
 
 export async function loadLivePlaythrough(

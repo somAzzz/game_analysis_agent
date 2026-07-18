@@ -90,6 +90,7 @@ class _CampaignSessionPublisher:
                 "current_week": 0,
                 "completed_weeks": 0,
                 "max_weeks": cell.max_weeks,
+                "diagnostics": _empty_session_diagnostics(),
             }
             for cell in build_campaign_cells(request)
         ]
@@ -110,6 +111,7 @@ class _CampaignSessionPublisher:
                 "total_requested_weeks": len(cells) * request.max_weeks,
             },
             "cells": cells,
+            "diagnostics": _aggregate_session_diagnostics(cells),
             "latest": None,
             "message": "Campaign started; completed weekly decisions will appear here.",
         }
@@ -135,7 +137,9 @@ class _CampaignSessionPublisher:
                     "completed_weeks": int(event.get("completed_weeks") or 0),
                 }
             )
-            latest_row = _latest_jsonl_row(output_dir / "playthrough.jsonl")
+            playthrough_path = output_dir / "playthrough.jsonl"
+            latest_row = _latest_jsonl_row(playthrough_path)
+            record["diagnostics"] = _session_diagnostics(playthrough_path)
             self._payload["latest"] = _session_latest(cell, event, latest_row)
             self._payload["message"] = (
                 f"{cell.persona.value} seed {cell.seed}: "
@@ -213,6 +217,7 @@ class _CampaignSessionPublisher:
             "completed_weeks": sum(int(cell["completed_weeks"]) for cell in cells),
             "retained_cells": sum(cell["status"] == "retained" for cell in cells),
         }
+        self._payload["diagnostics"] = _aggregate_session_diagnostics(cells)
 
     def _write_locked(self) -> None:
         _write_json(self.path, self._payload)
@@ -252,6 +257,122 @@ def _latest_jsonl_row(path: Path) -> dict[str, Any] | None:
     except (FileNotFoundError, IndexError, json.JSONDecodeError, OSError):
         return None
     return value if isinstance(value, dict) else None
+
+
+def _empty_session_diagnostics() -> dict[str, Any]:
+    return {
+        "logical_calls": 0,
+        "http_attempts": 0,
+        "fallback_weeks": [],
+        "failure_count": 0,
+        "response_metadata_missing_attempts": 0,
+        "known_usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
+        "failures": [],
+    }
+
+
+def _session_diagnostics(path: Path) -> dict[str, Any]:
+    diagnostics = _empty_session_diagnostics()
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return diagnostics
+    for line in lines:
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(row, Mapping):
+            continue
+        week = _session_nonnegative_int(row.get("week"))
+        validation = row.get("validation")
+        if (
+            isinstance(validation, Mapping)
+            and validation.get("fallback_used") is True
+            and week not in diagnostics["fallback_weeks"]
+        ):
+            diagnostics["fallback_weeks"].append(week)
+        calls = row.get("persona_calls")
+        if not isinstance(calls, list):
+            continue
+        for call in calls:
+            if not isinstance(call, Mapping):
+                continue
+            metadata = call.get("metadata")
+            if call.get("status") not in {"completed", "failed"} or not isinstance(
+                metadata, Mapping
+            ):
+                continue
+            diagnostics["logical_calls"] += 1
+            attempts = max(1, _session_nonnegative_int(metadata.get("attempt_count")))
+            diagnostics["http_attempts"] += attempts
+            usage = metadata.get("usage")
+            usage = usage if isinstance(usage, Mapping) else {}
+            for key in ("input_tokens", "output_tokens", "total_tokens"):
+                diagnostics["known_usage"][key] += _session_nonnegative_int(usage.get(key))
+            if call.get("status") != "failed":
+                continue
+            diagnostics["failure_count"] += 1
+            if not str(metadata.get("response_id") or ""):
+                diagnostics["response_metadata_missing_attempts"] += 1
+            error = call.get("error")
+            error = error if isinstance(error, Mapping) else {}
+            if len(diagnostics["failures"]) < 12:
+                diagnostics["failures"].append(
+                    {
+                        "week": week,
+                        "phase": str(call.get("phase") or "unknown")[:40],
+                        "category": str(error.get("category") or "unknown")[:40],
+                        "message": redact_sensitive_text(
+                            str(error.get("message") or "provider call failed")
+                        )[:180],
+                        "attempts": attempts,
+                    }
+                )
+    return diagnostics
+
+
+def _aggregate_session_diagnostics(cells: list[dict[str, Any]]) -> dict[str, Any]:
+    aggregate = _empty_session_diagnostics()
+    aggregate.pop("fallback_weeks")
+    aggregate["fallback_count"] = 0
+    for cell in cells:
+        diagnostics = cell.get("diagnostics")
+        if not isinstance(diagnostics, Mapping):
+            continue
+        for key in (
+            "logical_calls",
+            "http_attempts",
+            "failure_count",
+            "response_metadata_missing_attempts",
+        ):
+            aggregate[key] += _session_nonnegative_int(diagnostics.get(key))
+        fallback_weeks = diagnostics.get("fallback_weeks")
+        if isinstance(fallback_weeks, list):
+            aggregate["fallback_count"] += len(fallback_weeks)
+        usage = diagnostics.get("known_usage")
+        usage = usage if isinstance(usage, Mapping) else {}
+        for key in ("input_tokens", "output_tokens", "total_tokens"):
+            aggregate["known_usage"][key] += _session_nonnegative_int(usage.get(key))
+        failures = diagnostics.get("failures")
+        if not isinstance(failures, list):
+            continue
+        for failure in failures:
+            if not isinstance(failure, Mapping) or len(aggregate["failures"]) >= 50:
+                continue
+            aggregate["failures"].append(
+                {
+                    "cell_id": cell["cell_id"],
+                    "persona": cell["persona"],
+                    "seed": cell["seed"],
+                    **failure,
+                }
+            )
+    return aggregate
+
+
+def _session_nonnegative_int(value: Any) -> int:
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else 0
 
 
 def run_persona_campaign(
