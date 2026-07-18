@@ -95,6 +95,74 @@ def test_replaces_only_intact_runtime_with_known_generated_files(tmp_path: Path)
     assert not generated.exists()
 
 
+def test_repeatedly_replaces_runtime_with_godot_script_uid_sidecar(tmp_path: Path) -> None:
+    output = tmp_path / "game-runtime"
+    prepare_embedded_game_runtime(ROOT, output)
+    generated = output / "scripts/data/DataLoader.gd.uid"
+
+    for _ in range(2):
+        generated.write_text("uid://xswfntxu1rf6\n", encoding="utf-8")
+
+        result = prepare_embedded_game_runtime(ROOT, output, replace=True)
+
+        assert result["status"] == "prepared"
+        assert not generated.exists()
+
+
+@pytest.mark.parametrize(
+    ("relative", "content"),
+    [
+        ("scripts/data/Missing.gd.uid", "uid://xswfntxu1rf6\n"),
+        ("scripts/data/DataLoader.gd.uid", "not-a-godot-uid\n"),
+    ],
+)
+def test_refuses_unmanaged_godot_script_uid_sidecar(
+    tmp_path: Path,
+    relative: str,
+    content: str,
+) -> None:
+    output = tmp_path / "game-runtime"
+    prepare_embedded_game_runtime(ROOT, output)
+    generated = output / relative
+    generated.write_text(content, encoding="utf-8")
+
+    with pytest.raises(GamePinError, match="unmanaged files"):
+        prepare_embedded_game_runtime(ROOT, output, replace=True)
+
+    assert generated.is_file()
+
+
+def test_replaces_runtime_with_godot_rewritten_import_sidecar(tmp_path: Path) -> None:
+    output = tmp_path / "game-runtime"
+    prepare_embedded_game_runtime(ROOT, output)
+    generated = output / "icon.svg.import"
+    original = generated.read_text(encoding="utf-8")
+    rewritten = original.replace("compress/uastc_level=0\n", "")
+    assert rewritten != original
+    generated.write_text(rewritten, encoding="utf-8")
+
+    result = prepare_embedded_game_runtime(ROOT, output, replace=True)
+
+    assert result["status"] == "prepared"
+    assert generated.read_text(encoding="utf-8") == original
+
+
+def test_refuses_import_sidecar_pointing_to_an_unmanaged_source(tmp_path: Path) -> None:
+    output = tmp_path / "game-runtime"
+    prepare_embedded_game_runtime(ROOT, output)
+    generated = output / "icon.svg.import"
+    content = generated.read_text(encoding="utf-8")
+    generated.write_text(
+        content.replace('source_file="res://icon.svg"', 'source_file="res://owner.svg"'),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(GamePinError, match="modified runtime game"):
+        prepare_embedded_game_runtime(ROOT, output, replace=True)
+
+    assert 'source_file="res://owner.svg"' in generated.read_text(encoding="utf-8")
+
+
 def test_refuses_runtime_with_unmanaged_extra_file(tmp_path: Path) -> None:
     output = tmp_path / "game-runtime"
     prepare_embedded_game_runtime(ROOT, output)

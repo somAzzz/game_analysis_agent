@@ -794,10 +794,10 @@
       "sha256": "5dc96425dc59d52bc8d9c5b981e4aedbc791386e131cc5c397bd1c17b4e074c0"
     },
     {
-      "bytes": 29084,
+      "bytes": 30901,
       "path": "src/game_analysis_agent/build_week_game_pin.py",
       "role": "embedded-demo-overlay-service",
-      "sha256": "959dfc5a1dd8fc5b0f5a612cd260482fef7c0437ca1893ce831c188ca65edef1"
+      "sha256": "2ccc3652a63cff753a76b6efde49f9157e216cbde7c35c804f28b9f5886757a0"
     },
     {
       "bytes": 91899,

@@ -23,6 +23,7 @@ RUNTIME_OVERLAY_FILE = ".playtest-forge-runtime-overlay.json"
 RUNTIME_OVERLAY_SCHEMA_VERSION = "build-week-game-runtime-overlay-v1"
 _SHA1 = re.compile(r"^[0-9a-f]{40}$")
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
+_GODOT_SCRIPT_UID = re.compile(rb"uid://[a-z0-9]+(?:\r?\n)?\Z")
 
 
 class GamePinError(RuntimeError):
@@ -601,6 +602,11 @@ def _require_managed_runtime_destination(
             relative == "balance_runs.jsonl"
             or relative.startswith(".godot/")
             or relative.startswith("reports/")
+            or _is_managed_godot_script_uid(
+                candidate,
+                relative=relative,
+                expected_paths=expected_paths,
+            )
         ):
             raise GamePinError("refusing to replace a runtime containing unmanaged files")
     if not expected_paths.issubset(actual_paths):
@@ -610,9 +616,14 @@ def _require_managed_runtime_destination(
         relative = item["path"]
         candidate = path / relative
         expected_digest = overlay_digests.get(relative, item["sha256"])
-        if (
-            _portable_mode(candidate) != item["mode"]
-            or hashlib.sha256(candidate.read_bytes()).hexdigest() != expected_digest
+        actual_digest = hashlib.sha256(candidate.read_bytes()).hexdigest()
+        if _portable_mode(candidate) != item["mode"] or (
+            actual_digest != expected_digest
+            and not _is_managed_godot_import_sidecar(
+                candidate,
+                relative=relative,
+                expected_paths=expected_paths,
+            )
         ):
             raise GamePinError("refusing to replace a modified runtime game")
     for relative, expected_digest in overlay_digests.items():
@@ -622,6 +633,52 @@ def _require_managed_runtime_destination(
             or hashlib.sha256(candidate.read_bytes()).hexdigest() != expected_digest
         ):
             raise GamePinError("refusing to replace a modified runtime overlay")
+
+
+def _is_managed_godot_script_uid(
+    candidate: Path,
+    *,
+    relative: str,
+    expected_paths: set[str],
+) -> bool:
+    """Recognize the sidecar Godot creates beside a managed GDScript."""
+
+    if not relative.endswith(".gd.uid"):
+        return False
+    script_relative = relative.removesuffix(".uid")
+    script = candidate.with_suffix("")
+    if script_relative not in expected_paths or script.is_symlink() or not script.is_file():
+        return False
+    try:
+        return _GODOT_SCRIPT_UID.fullmatch(candidate.read_bytes()) is not None
+    except OSError:
+        return False
+
+
+def _is_managed_godot_import_sidecar(
+    candidate: Path,
+    *,
+    relative: str,
+    expected_paths: set[str],
+) -> bool:
+    """Recognize generated import metadata for a managed source asset."""
+
+    if not relative.endswith(".import"):
+        return False
+    source_relative = relative.removesuffix(".import")
+    source = candidate.with_suffix("")
+    if source_relative not in expected_paths or source.is_symlink() or not source.is_file():
+        return False
+    try:
+        lines = candidate.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        return False
+    return (
+        lines[:1] == ["[remap]"]
+        and "[deps]" in lines
+        and "[params]" in lines
+        and f'source_file="res://{source_relative}"' in lines
+    )
 
 
 def _safe_git_path(value: Any, *, index: int) -> str:
