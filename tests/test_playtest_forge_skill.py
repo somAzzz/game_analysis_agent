@@ -82,3 +82,18 @@ def test_skill_scripts_are_executable_and_preflight_passes() -> None:
     )
     assert completed.returncode == 0, completed.stderr
     assert '"status": "passed"' in completed.stdout
+
+
+def test_viewer_staging_outputs_do_not_dirty_the_worktree() -> None:
+    generated = (
+        "frontend/public/experiment-index.json",
+        "frontend/public/experiments/example/judge-experiment.json",
+        "frontend/public/live-playthrough/session.json",
+    )
+    for relative in generated:
+        completed = subprocess.run(
+            ["git", "check-ignore", "--quiet", "--no-index", relative],
+            cwd=ROOT,
+            check=False,
+        )
+        assert completed.returncode == 0, relative

@@ -36,6 +36,8 @@ frontend/coverage/
 frontend/public/manifest.json
 frontend/public/browse/
 frontend/public/judge-demo.json
+frontend/public/experiment-index.json
+frontend/public/experiments/
 frontend/public/live-playthrough/
 npm-debug.log*
 yarn-debug.log*
