@@ -1,817 +1,368 @@
-# game_analysis_agent
+# Playtest Forge
 
-## Judge / automated evaluator quickstart
+> A Codex-directed game QA agent that turns automated tests and persona
+> playthroughs into bounded repair experiments—and rejects patches when fixed
+> and unseen-holdout evidence does not support them.
 
-The primary review path is repository-only and offline:
+[Open the public Judge experience](https://somazzz.github.io/game_analysis_agent/)
+· [Evaluator guide](JUDGE.md)
+· [Developer guide](docs/DEVELOPER_GUIDE.md)
+· [中文说明](README.zh-CN.md)
+
+Playtest Forge is an OpenAI Build Week 2026 developer-tool submission. The
+reference integration tests the embedded Godot demo **Study in Germany**, but
+the workflow is designed around reusable contracts: typed gameplay steps,
+swappable persona providers, immutable evidence, bounded source changes, and
+machine plus human review.
+
+![Playtest Forge Judge Mission showing the Campaign, Repair, and Proof ledger](docs/plans/openai_build_week_2026/product_design/audit-90s-2026-07-17/01-judge-start.png)
+
+The central result is intentionally not a perfect game patch. Codex proposed
+plausible changes, ran real-game fixed and unseen-holdout experiments, and
+rejected both candidates because the player-level failure cluster did not
+improve. Preventing an unsupported repair from shipping is the demonstrated
+agent capability.
+
+## Evaluate in 60 seconds
+
+From the repository root:
 
 ```bash
 ./judge --mode inspect --offline --json --output-dir -
 ./judge --mode replay --offline --json --output-dir -
 ```
 
-Inspect needs only Python 3.9+ and validates 599 committed artifact hashes,
-schemas, provenance gates, and seven exact public claim references. Replay adds
-the locked `uv` environment and consumes hash-pinned persona fixtures; it does
-not need Godot, Docker, a GPU, network, an API key, a browser, or an external
-game checkout. The complete demo source is embedded and hash-inventoried under
-`demo/study-in-germany`. Both commands print one `judge-result-v1` JSON object. Expected
-status is `passed`; `failed` and `unsupported` are never fallback successes.
+Expected results:
 
-The committed case is explicitly **prerecorded Replay evidence** driven by a
-deterministic persona-policy fixture, not a recorded LLM playthrough: Codex formed
-and implemented a bounded repair hypothesis, then rejected the candidate after
-fixed and holdout cohorts both failed to improve the target cluster. It is not
-presented as a fresh OpenAI call or a successful game fix. See [JUDGE.md](JUDGE.md)
-for the evidence map, commands, exit codes, and limitations.
+- **Inspect:** `passed`; 599 committed files and seven public claims verified.
+- **Replay:** `passed`; campaign, exact persona Replay, deterministic fixture,
+  designed-failure, and rejected-repair gates rechecked.
 
-To prepare the complete evaluator UI from locked dependencies, run
-`scripts/setup-evaluator`; use `EVALUATOR_OFFLINE=1 scripts/setup-evaluator`
-when dependency caches are already populated. `tools/judge_doctor.py` reports
-whether a selected native, container, real-game, or live-OpenAI mode is ready
-without printing environment secrets.
+Inspect needs Python 3.9+ only. Replay additionally uses `uv` and the committed
+lockfile. Neither path needs Godot, Docker, a GPU, network, an API key, a
+browser, an open port, or a sibling game checkout. `failed` and `unsupported`
+are non-success states; the evaluator does not convert missing capabilities
+into passes.
 
-## Codex Skill discovery and evaluator route
+## What judges can inspect
 
-The complete reusable workflow is checked in at
-[`.agents/skills/playtest-forge/SKILL.md`](.agents/skills/playtest-forge/SKILL.md).
-When Codex starts from the repository root, it scans `.agents/skills` and sees
-the Skill metadata automatically. Codex can then select it implicitly from the
-task description; explicit `$playtest-forge` invocation is more deterministic
-for judging.
+The Judge page uses one evidence model for machine evaluation and Human Review.
+Its experiment selector exposes these committed proof-complete records:
 
-Recommended AI-review sequence:
+| Evidence set | Observation source | Campaign | Repair proof | Decision |
+| --- | --- | ---: | --- | --- |
+| Signed reference | Prerecorded deterministic Replay over committed real-Godot-derived evidence | 18 cells · 342 weeks · 18/18 target | Fixed 18→18; unseen 18→18 | **Rejected** |
+| Local vLLM A | `qwen3.6-27b-nvfp4` + real Godot | 48 cells · 912 weeks · 41/48 target | Fixed 48→48; unseen 18→18 | **Rejected** |
+| Local vLLM B | `qwen3.6-27b-nvfp4` + real Godot | 48 cells · 912 weeks · 43/48 target | Fixed 48→48; unseen 18→18 | **Rejected** |
 
-1. Run the two offline Judge commands above.
-2. Invoke:
+The A/B observation campaigns are fresh local-model playthroughs. Their formal
+baseline/patched proof cohorts use the frozen
+`fixture-authoring-policy-v1` decision policy against the same real Godot game,
+so stochastic hypothesis discovery is separated from deterministic causal
+comparison. Local evidence is never labeled OpenAI evidence, and Replay is
+never labeled live.
 
-   ```text
-   Use $playtest-forge to review the committed automated and persona-playthrough
-   evidence, explain the rejected candidate, and propose the next bounded experiment.
-   ```
+Both candidates passed focused legality, invariant, decision-validity,
+provider-health, persona-preservation, ending, and designed-failure gates. They
+failed the two causal target-reduction gates, so neither patch was merged.
 
-3. Verify that the response distinguishes automated, live, focused, and
-   prerecorded evidence; cites fixed and holdout results; and does not claim
-   the rejected patch was merged.
+## Explore the evidence
 
-If `$playtest-forge` is unavailable in the evaluator UI, read `SKILL.md`
-directly and follow its routed references. This fallback preserves the review
-workflow for non-Codex or restricted evaluators. The full Skill bundle is
-tracked by Git and hash-verified by `judge-manifest.json`; it is not excluded
-because `.agents` is a hidden directory. See the official
-[Codex Skills guide](https://learn.chatgpt.com/docs/build-skills) for repository
-discovery and explicit/implicit invocation behavior.
+The static frontend is a no-key, no-rebuild evaluator surface:
+
+- `/#/` — Campaign → Repair → Proof → Human Review Judge ledger.
+- `/#/playthrough-inspector` — strategy, seed, week, state, action, event, and
+  provenance review.
+- `/#/reports` — report and issue archive.
+
+Example retained paths:
+
+```text
+/#/playthrough-inspector?experiment=vllm-cohort-a-pressure-feedback-v1&persona=money&seed=42
+/#/playthrough-inspector?experiment=vllm-cohort-b-survival-recovery-v1&persona=study&seed=50
+```
+
+A/B retain 96 self-contained persona/seed views: 1,824 weekly nodes and 1,728
+observed transitions. The exact patch diff, baseline and patched cohorts,
+provider/model labels, evidence fingerprint, machine recommendation, and
+`candidate_not_merged` disposition remain visible from the same experiment.
+
+Human Review does not create a second evidence system. A reviewer can inspect
+the complete evidence and diff, see the machine recommendation, choose
+Approve / Reject / Needs more evidence, add a note, and export
+`human_review.json`. It never merges automatically. Static hosting is read-only;
+durable review records require the Judge API.
+
+## Why the rejected experiments matter
+
+The campaigns confirmed the owner's pressure/burnout observation: stress
+saturates across unlike personas and recovery is rare. Candidate A reduced one
+crisis-specific weekly stress increment. Candidate B strengthened one intended
+cashflow recovery action. Both moved the selected mechanism legally, but neither
+changed target membership on fixed or unseen cohorts.
+
+That result narrows the next experiment: trace the cumulative pressure channels
+and cashflow-ending trigger instead of increasing either patch after seeing the
+outcome. A symptom metric moving while the player-level target is unchanged is
+not reported as a successful repair.
+
+See the [A/B proof closeout](docs/reviews/openai_build_week_2026/LOCAL_VLLM_AB_REPAIR_PROOF_2026-07-17.md)
+for the frozen hypotheses, sensitivity checks, exact gates, and pressure
+cross-check.
 
 ## How Codex, GPT-5.6, and humans are used
 
-Codex is the primary build and repair director. From the repository root it
-loads `playtest-forge`, freezes persona/seed/holdout and acceptance gates before
-source edits, launches the shared campaign services, proposes an allowlisted
-candidate in an isolated game worktree, and publishes the exact patch plus a
-machine accept/reject recommendation. The Judge UI exposes the same evidence
-fingerprint to automated evaluators and human reviewers.
+### Codex
 
-GPT-5.6 is implemented as the optional live Persona action provider through the
-same contract used by local vLLM. Keys remain server-side; the browser can only
-select a provider and start a bounded campaign. The final release checklist
-still requires one retained, redacted GPT-5.6 campaign, so prerecorded Replay
-and local-vLLM records are not represented as OpenAI calls.
+Codex is the repair director. It loads the repository Skill, freezes the test
+contract before source inspection, cites campaign facts, selects one mechanism,
+creates an isolated game worktree, makes an allowlisted candidate change, runs
+focused plus fixed/holdout proof, and writes the machine recommendation.
 
-Humans choose the experiment scope and frozen policy, may inspect every retained
-cohort and exact diff, and record Approve / Reject / Needs more evidence with a
-reviewer note. Human review never rewrites evidence and never auto-merges a game
-patch. See the [submission compliance audit](docs/reviews/openai_build_week_2026/SUBMISSION_COMPLIANCE_AUDIT_2026-07-17.md).
-
-Development-side AI agent pipeline for simulation games. The current reference
-integration is the Godot `study-in-germany` demo, but the project is structured
-as a reusable game QA agent framework for balance testing, boundary probing,
-bug discovery, value analysis, quality gates, and interactive LLM playtesting.
-
-The embedded game is intentionally a demo, not a complete commercial game. It
-is the exact pinned baseline used by the committed campaign. This verifies all
-canonical files, creates a writable runtime copy, and records the Agent probe
-overlay separately from game-source changes:
-
-```bash
-uv run python tools/prepare_embedded_demo.py \
-  --output reports/local-game-runtime --replace --json
-```
-
-## Live Demo
-
-**Open the public dashboard:**  
-**[https://somazzz.github.io/game_analysis_agent/](https://somazzz.github.io/game_analysis_agent/)**
-
-The GitHub Pages root is the sanitized Campaign → Repair → Proof Judge story;
-the report and decision-graph archive remains under `/reports`. Static hosting
-is clearly labeled prerecorded evidence and needs no Godot, local LLM, API key,
-or external game assets.
-
-The agent is not embedded in the game runtime as an NPC. Instead, it runs beside
-the game as a QA and design-review system:
+Codex officially supports repository Skills under `.agents/skills` and loads a
+selected Skill through progressive disclosure; see the [official Codex Skills
+guide](https://learn.chatgpt.com/docs/build-skills). Launch Codex from this repository
+root, then explicitly invoke the checked-in workflow:
 
 ```text
-Godot headless game runners
-  ├─ Monte Carlo simulation
-  ├─ boundary/extreme-state probes
-  ├─ event/action/ending graph export
-  └─ interactive probe driven by an LLM player
+Use $playtest-forge to review the committed automated and persona-playthrough
+evidence, explain the rejected candidate, and propose the next bounded experiment.
+```
+
+Repository guidance in [AGENTS.md](AGENTS.md) requires the two offline Judge
+commands first and routes game testing, diagnosis, balance, and repair work to
+[`playtest-forge`](.agents/skills/playtest-forge/SKILL.md). If a non-Codex
+evaluator does not expose Skills, it can read the tracked, hash-verified
+`SKILL.md` directly.
+
+### GPT-5.6
+
+GPT-5.6 is implemented as the optional live Persona action provider. It shares
+the same typed campaign service, real-Godot step contract, frozen profile,
+limits, progress records, public bundle, frontend view, and evidence gates as
+local vLLM. Credentials remain server-side.
+
+This repository does **not yet claim a retained GPT-5.6 campaign**. The current
+committed LLM evidence is local vLLM, and the signed reference is prerecorded
+Replay. One bounded, redacted GPT-5.6 run remains a release requirement; this
+README must be updated only after that bundle passes the same provenance and
+privacy gates.
+
+### Humans
+
+Humans choose scope, provider, frozen profile, and whether a machine
+recommendation should be approved. They can request more evidence and leave a
+durable note, but they cannot mutate the underlying experiment through the
+review interface. Game patches are never auto-merged.
+
+## System shape
+
+```text
+Codex + playtest-forge
+        │ freezes scope, evidence contract, gates, and change budget
+        ▼
+Typed campaign / gameplay services
+        │
+        ├── deterministic Replay
+        ├── local vLLM / SGLang
+        └── live OpenAI / DeepSeek
         │
         ▼
-Python analysis layer
-  ├─ ending, weekly metric, action, event, and choice statistics
-  ├─ anomaly and invariant detection
-  ├─ value/playability analysis
-  ├─ quality gates
-  └─ traceable report manifests
+Real Godot probe → raw cells → sanitized public bundle
         │
         ▼
-LLM agent layer
-  ├─ balance
-  ├─ content_qa
-  ├─ event_graph
-  ├─ bug_hunter
-  ├─ boundary_prober
-  ├─ value_reviewer
-  └─ interactive_player
+Failure clusters → one bounded candidate → fixed + unseen proof
         │
         ▼
-Reports and dashboard
-  ├─ Markdown / JSON / CSV reports
-  ├─ report_manifest.json + reports/report_index.json
-  ├─ static HTML dashboard
-  └─ React + React Flow dashboard
+Machine recommendation → Judge UI → Human Review
 ```
 
-The default local LLM backend is an OpenAI-compatible vLLM server. The Docker
-Compose stack is configured for NVIDIA's Qwen3.6 27B NVFP4 checkpoint with
-ModelOpt quantization, Qwen3 reasoning parsing, and optional MTP speculative
-decoding. You can also point the client at SGLang or DeepSeek-compatible
-endpoints.
+The CLI, future MCP adapter, Judge API, and Skill are not allowed to duplicate
+gameplay logic. Transport-independent services remain the architectural source
+of truth. MCP is not required for the Build Week delivery.
 
-中文说明保留在 [README.zh-CN.md](README.zh-CN.md).
+## Run the evaluator UI
 
-## License, attribution, and competition scope
-
-The project is available under the [MIT License](LICENSE). See
-[ATTRIBUTION.md](ATTRIBUTION.md) for third-party and artwork provenance, and
-[the prior-versus-Build-Week disclosure](submission/build-week-2026/PRIOR_VS_BUILD_WEEK.md)
-for the exact competition scope.
-
-## Current Status
-
-- Python package: `game-analysis-agent` (`pyproject.toml` version `0.2.0`).
-- Main orchestration CLI: `tools/run_gameplay_agent.py`.
-- Analysis agents: `balance`, `content_qa`, `event_graph`, `bug_hunter`,
-  `boundary_prober`, `value_reviewer`, and `interactive_player`.
-- Supported orchestration subcommands: `sim`, `analyze`, `probe`, `export`,
-  `validate`, `matrix`, `compare-matrix`, `index`, `gates`, `eval`, `qa`,
-  `play`, and `all`.
-- Report outputs are designed to be traceable through `run_id`,
-  `report_manifest.json`, and `reports/report_index.json`.
-- Frontend dashboard tests use Vitest, jsdom, and Testing Library; production
-  builds use Vite.
-- Python tests use pytest and the whole repository is checked by Ruff.
-
-## Requirements
-
-The evaluator paths have progressively larger requirements:
-
-- Inspect: Python 3.9+ only.
-- Replay: `uv` and the committed lockfile; no model or game rebuild.
-- Embedded real-Godot run: Godot 4.4 or the Docker wrapper; the demo is already
-  under `demo/study-in-germany` and is copied to a writable runtime.
-- Live persona run: a server-side OpenAI key and a configured Godot runtime.
-- External game checkouts and local/DeepSeek-compatible endpoints are optional
-  development adapters, not Judge requirements.
-
-The pure Python analyzers and tests can run without Godot or a live LLM.
-
-### Supported delivery paths
-
-| Path | Supported environment | Rebuild/model/key required |
-|---|---|---|
-| GitHub Pages | Current desktop/mobile browsers | None |
-| `./judge --mode inspect` | Python 3.9+ on Linux or macOS | None |
-| `./judge --mode replay` | Linux or macOS with locked `uv` environment | No model, Godot, Docker, or key |
-| Judge container/dashboard | Docker Engine 24+ on linux/amd64 or linux/arm64 | Image build/pull only; no model or key |
-| Real game authoring | Host Codex + Godot 4.4 or Docker Godot wrapper | Writable demo runtime |
-| Local persona campaign | Host Codex + Docker Godot/vLLM sidecars | NVIDIA-compatible local model stack |
-| OpenAI persona campaign | Host Codex + Godot runtime | Server-side OpenAI API key |
-
-## Quick Start A: No Godot, No LLM
-
-Use this path to inspect the project shape, run tests, and build a dashboard
-from committed sample reports.
+### Static, read-only mode
 
 ```bash
-cp .env.example .env
-uv venv .venv
-source .venv/bin/activate
-uv pip install -e ".[dev]"
-uv run pytest -q -ra
-uv run ruff check .
-uv run python tools/build_dashboard.py all --reports examples/sample_reports
-```
-
-Open:
-
-```text
-examples/sample_reports/index.html
-```
-
-The richer React demo dataset lives under `frontend/public-demo/` and is safe to
-show publicly because private raw runs, complete event graphs, and gameplay text
-are withheld.
-
-## Quick Start B: With Local LLM
-
-Edit `.env` for an OpenAI-compatible local endpoint:
-
-```bash
-LLM_PROVIDER=vllm
-VLLM_BASE_URL=http://localhost:8000/v1
-VLLM_API_KEY=local-dev-token
-LLM_MODEL=nvidia/Qwen3.6-27B-NVFP4
-LLM_SERVED_MODEL_NAME=qwen3.6-27b-nvfp4
-```
-
-Run LLM review agents against a report directory:
-
-```bash
-uv run python tools/run_gameplay_agent.py qa \
-  --report-dir examples/sample_reports/balance/sample_balance_report
-```
-
-Or run only one agent:
-
-```bash
-uv run python tools/run_agent.py balance \
-  examples/sample_reports/balance/sample_balance_report
-```
-
-## Quick Start C: Full Godot Integration
-
-Prepare the embedded target game and set the Godot CLI:
-
-```bash
-uv run python tools/prepare_embedded_demo.py \
-  --output reports/local-game-runtime --replace --json
-export GAME_PROJECT_PATH="$PWD/reports/local-game-runtime"
-export GODOT_BIN=godot4
-```
-
-Run the main CLI help:
-
-```bash
-uv run python tools/run_gameplay_agent.py --help
-```
-
-Run the simple end-to-end path:
-
-```bash
-uv run python tools/run_gameplay_agent.py all --runs 20 --policy balanced
-```
-
-`all` runs simulation/analysis, catalog export, all Godot validators, the LLM
-QA agents, and quality gates in that order. Use `--skip-qa` when a live model
-endpoint is unavailable; deterministic validation and gates still run.
-
-## Quick Start: Docker + vLLM
-
-Start the local vLLM service and persistent Godot sidecar:
-
-```bash
-cp .env.example .env
-# Edit .env: HF_TOKEN, GAME_PROJECT_PATH, CUDA_VISIBLE_DEVICES, etc.
-docker compose pull vllm
-docker compose --profile local-nvidia --profile game-tools up -d vllm godot
-docker compose logs -f vllm
-docker compose ps
-```
-
-Wait until both services are healthy. Run gameplay commands from the host so
-the repository wrapper can execute Godot inside the sidecar:
-
-```bash
-uv run python tools/run_gameplay_agent.py play \
-  --report-dir reports/play/local-smoke \
-  --persona newbie --weeks 5 --seed 42
-```
-
-The opt-in `agent` container is for pure-Python analysis and QA of existing
-reports. It intentionally cannot execute commands in the Godot sidecar.
-
-See [docs/operations/DOCKER.md](docs/operations/DOCKER.md) and
-[docs/operations/VLLM_QWEN_LOCAL_AGENT.md](docs/operations/VLLM_QWEN_LOCAL_AGENT.md) for deployment
-details.
-
-For the future MCP surface, follow the
-[service-first MCP migration plan](docs/architecture/MCP_MIGRATION_PLAN.md). The existing
-CLI must be refactored onto typed services before any MCP wrapper is added.
-
-## Common Workflows
-
-Run Monte Carlo simulation through the Godot project:
-
-```bash
-uv run python tools/run_gameplay_agent.py sim --runs 100 --policy balanced
-```
-
-Analyze an existing `raw_runs.jsonl` report directory:
-
-```bash
-uv run python tools/run_gameplay_agent.py analyze \
-  --report-dir reports/balance/<run_id>
-```
-
-Run boundary probes:
-
-```bash
-uv run python tools/run_gameplay_agent.py probe \
-  --extreme "zero_money,deep_debt,flag_chaos"
-```
-
-Export the game event/action/ending catalog:
-
-```bash
-uv run python tools/run_gameplay_agent.py export
-```
-
-Run all six Godot validators (`content`, `json-content`, `economy`, `risk`,
-`route`, and `demo`):
-
-```bash
-uv run python tools/run_gameplay_agent.py validate \
-  --report-dir reports/validation/<run_id>
-```
-
-Route and demo prerequisite traces are generated fresh by default. Existing
-inputs are reused only with the explicit `--reuse-inputs` option. Use repeated
-`--check` options to select a subset.
-
-Evaluate quality gates:
-
-```bash
-uv run python tools/run_gameplay_agent.py gates \
-  --report-dir reports/balance/<run_id>
-```
-
-Run LLM QA agents for a report:
-
-```bash
-uv run python tools/run_gameplay_agent.py qa \
-  --report-dir reports/balance/<run_id>
-```
-
-Run only one LLM agent:
-
-```bash
-uv run python tools/run_agent.py balance reports/balance/<run_id>
-```
-
-Drive the game with the interactive LLM player:
-
-```bash
-uv run python tools/run_gameplay_agent.py play \
-  --report-dir reports/play/<run_id> --weeks 20
-```
-
-Evaluate an already recorded playthrough without contacting Godot or an LLM:
-
-```bash
-uv run python tools/run_gameplay_agent.py eval \
-  --report-dir reports/play/<run_id>
-```
-
-This writes `agent_eval.json` with decision validity, fallback/repair, illegal
-action, event-choice, anomaly, risk acknowledgement, persona alignment, and LLM
-error/latency metrics. Weekly prompts prefer the producer-native
-`RiskEvaluator.get_top_risks` payload; missing, malformed, or stale guidance
-uses a compatibility fallback whose source and reason remain in the trace.
-
-Capture the producer-native interactive snapshot without an LLM:
-
-```bash
-uv run python tools/run_gameplay_agent.py interactive-probe \
-  --report-dir reports/interactive/<run_id>
-```
-
-This command fails if the game omits the versioned
-`RiskEvaluator.get_top_risks` guidance.
-
-Plan or execute the strict test matrix:
-
-```bash
-# Validate and enumerate the plan without running its cells.
-uv run python tools/run_gameplay_agent.py matrix --dry-run --jobs 4
-
-# Execute cells concurrently; a later invocation can resume completed cells.
-uv run python tools/run_gameplay_agent.py matrix --jobs 4
-uv run python tools/run_gameplay_agent.py matrix --jobs 4 --resume
-```
-
-The committed `config/matrix.yaml` expands to 140 stable cells: 126 simulation
-cells (difficulty x policy x scenario x seed), 8 boundary cells, and 6 persona
-play cells. Matrix state is written atomically to `matrix_manifest.json`,
-`matrix_summary.json`, and per-cell `cell_manifest.json` files. The strict YAML
-schema rejects unknown or invalid keys before any cell runs.
-Every matrix and cell manifest also records an exact runtime-source SHA-256;
-`--resume` reruns prior successes whenever executable Agent bytes changed.
-
-Run and compare a fixed-seed before/after experiment. Each `--out` directory
-owns isolated cell report directories, so the second execution cannot overwrite
-the first:
-
-```bash
-uv run python tools/run_gameplay_agent.py matrix \
-  --out reports/matrix/before --jobs 4
-
-# Apply the code change under test; keep config/matrix.yaml unchanged.
-uv run python tools/run_gameplay_agent.py matrix \
-  --out reports/matrix/after --jobs 4
-
-uv run python tools/run_gameplay_agent.py compare-matrix \
-  --before reports/matrix/before \
-  --after reports/matrix/after \
-  --out reports/compare/matrix
-```
-
-`compare-matrix` fails closed unless both executions are complete, non-dry-run,
-and matching in config hash, cell set, parameters, commands, and seeds. It
-independently revalidates simulation, boundary, and persona evidence, including
-CSV schemas, coverage/catalog consistency, trace contracts, report source
-fingerprints, and recomputed Agent metrics. Artifact content may differ and is
-exactly what the per-cell diff and `matrix_compare_summary.json` record.
-
-Build the report index:
-
-```bash
-uv run python tools/run_gameplay_agent.py index
-```
-
-Run the simple end-to-end path:
-
-```bash
-uv run python tools/run_gameplay_agent.py all --runs 20 --policy balanced
-```
-
-## Adapting to Another Game
-
-The reference game is `study-in-germany`, but the expected integration surface
-is intentionally small:
-
-1. Export the game's actions, events, endings, and state metrics.
-2. Implement a headless simulation command for repeatable runs.
-3. Emit `raw_runs.jsonl` with weekly state, actions, events, choices, and final
-   ending.
-4. Configure `config/gates.yaml` for project-specific quality thresholds.
-5. Run the Python analyzers and LLM review agents.
-6. Build the static or React dashboard for reviewers.
-
-## Reports and Traceability
-
-Report directories live under `reports/`, usually grouped by kind:
-
-```text
-reports/
-  balance/<run_id>/
-  boundary/<run_id>/
-  play/<run_id>/
-  browse/
-  index.html
-  manifest.json
-  report_index.json
-```
-
-Typical balance report files include:
-
-```text
-raw_runs.jsonl
-summary.json
-ending_distribution.csv
-weekly_stats.csv
-action_pick_rates.csv
-event_trigger_rates.csv
-choice_pick_rates.csv
-anomalies.jsonl
-bugs.jsonl
-bugs_summary.md
-value_report.json
-route_report.json
-coverage_report.json
-gate_report.json
-agent_diagnosis.md
-tuning_proposal.md
-content_issues.md
-event_graph_report.md
-bug_diagnosis.md
-boundary_report.md
-value_review.md
-report_manifest.json
-```
-
-Interactive playtest reports also include:
-
-```text
-playthrough.jsonl
-playthrough_summary.md
-playthrough_agent_report.json
-agent_eval.json
-report_manifest.json
-```
-
-The `trace-manifest-v2` `report_manifest.json` records the report-level
-`run_id`, command parameters, source/generated files, hashes, modification
-times, and trace indexes back to JSONL line numbers. Its provenance block also
-captures the agent and game Git commits/dirty state, Python/platform/Godot
-versions or availability, an exact runtime-source SHA-256 that distinguishes
-different dirty worktrees, and config/prompt tree hashes. Frontends should use
-`reports/report_index.json` for list views and open each report's manifest for
-drill-down.
-
-## Test System
-
-If the host has no `godot4` binary, use the cached Docker image through the
-repository wrapper. It preserves absolute host paths and runs as the current
-user, so reports are not root-owned:
-
-```bash
-export GAME_PROJECT_PATH=/home/bo/projects/python/study-in-germany
-export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
-docker compose --profile game-tools --profile local-nvidia up -d godot vllm
-"$GODOT_BIN" --version
-
-uv run python tools/run_gameplay_agent.py interactive-probe \
-  --report-dir reports/interactive/docker-smoke
-```
-
-The wrapper reuses the compose `godot` service and falls back to a one-shot
-container when the service is not running. The default image is
-`barichello/godot-ci:4.4`; override it with `GODOT_DOCKER_IMAGE`. See
-[AGENTS.md](AGENTS.md) for mount and CI-integrity details.
-
-### Real local-LLM agent testing
-
-The most direct end-to-end test lets the local LLM choose actions while the
-real Godot project advances. First verify the producer-native game contract
-without contacting the model:
-
-```bash
-docker compose --profile local-nvidia --profile game-tools up -d vllm godot
-docker compose ps
-
-uv run python tools/run_gameplay_agent.py interactive-probe \
-  --report-dir reports/interactive/local-smoke
-```
-
-Then run a short LLM smoke test and independently evaluate the recorded
-evidence:
-
-```bash
-uv run python tools/run_gameplay_agent.py play \
-  --report-dir reports/play/local-newbie-smoke \
-  --persona newbie \
-  --difficulty normal \
-  --scenario default_first_semester \
-  --seed 42 \
-  --weeks 5
-
-uv run python tools/run_gameplay_agent.py eval \
-  --report-dir reports/play/local-newbie-smoke
-
-uv run python -m json.tool \
-  reports/play/local-newbie-smoke/agent_eval.json
-```
-
-For a release-sized playthrough, change `--weeks` to `20`. Available
-personas are `newbie`, `study`, `money`, `social`, `visa`, and
-`slacker`. A clean result has `valid: true`, `strict_passed: true`, empty
-`errors` and `quality_errors` lists,
-`final_valid_rate >= 0.95`, `fallback_rate <= 0.05`,
-`illegal_action_rate == 0`, `llm_error_rate <= 0.05`, and
-`anomaly_rate_per_5_weeks <= 1`. Also review `persona_alignment_rate` and
-`risk_acknowledgement_rate`; they measure behavioral quality rather than
-basic trace validity.
-
-To make the review agents inspect fresh real-game data, build the evidence in
-one directory and then run `qa`:
-
-```bash
-REPORT=reports/balance/local-real-42
-
-uv run python tools/run_gameplay_agent.py sim \
-  --report-dir "$REPORT" --runs 200 --weeks 20 \
-  --policy balanced --difficulty normal --seed 42
-uv run python tools/run_gameplay_agent.py export --report-dir "$REPORT"
-uv run python tools/run_gameplay_agent.py probe \
-  --report-dir "$REPORT" --runs 30 --weeks 20 \
-  --policy balanced --seed 42 \
-  --extreme "zero_money,deep_debt,no_energy,flag_chaos"
-uv run python tools/run_gameplay_agent.py qa --report-dir "$REPORT"
-uv run python tools/run_gameplay_agent.py gates --report-dir "$REPORT"
-```
-
-`play` writes `playthrough.jsonl`, `playthrough_summary.md`,
-`playthrough_agent_report.json`, `agent_eval.json`, and
-`report_manifest.json`. Run `eval` even though `play` already writes the
-evaluation: the separate command gives invalid recorded evidence a non-zero
-exit status. The current game demo has three known balance failures, so the
-monolithic `all` command can correctly stop at validation before model QA;
-the modular sequence above keeps those stages independently inspectable.
-
-Run the deterministic local checks from the repository root:
-
-```bash
-uv sync --extra dev --locked
-uv run pytest -q -ra
-uv run ruff check .
-
 cd frontend
 npm ci
-npm test
-npm run test:coverage
-npm run build
+npm run prepare:public
+npm run dev -- --host 127.0.0.1
 ```
 
-Pull requests and pushes run the Python suite, full-repository Ruff, frontend
-coverage floors, the public production build, and a strict dry-run of all 140
-matrix cells. The scheduled/manual real-Godot job verifies the embedded demo
-against its pinned upstream content tree, verifies the official Godot archive checksum,
-generates and analyzes a fresh trace, runs all six validators with fresh
-prerequisites, enforces deterministic smoke gates, validates the cross-repo
-contracts, captures canonical interactive risk guidance, and uploads the
-evidence. See [Game artifact contract
-testing](docs/operations/GAME_CONTRACT_TESTING.md).
+Open `http://127.0.0.1:5173/`. Static mode can switch among the signed reference
+and local A/B evidence, but it cannot run providers or persist Human Review.
 
-## Dashboards
-
-Build the static HTML dashboard and frontend manifests:
+Build the GitHub Pages artifact with:
 
 ```bash
-uv run python tools/build_dashboard.py all
-```
-
-Build it from the committed sample reports:
-
-```bash
-uv run python tools/build_dashboard.py all --reports examples/sample_reports
-```
-
-This writes:
-
-```text
-reports/index.html
-reports/browse/<kind>/<id>/index.html
-reports/browse/decision_graph/<issue_id>/<run_id>/index.html
-reports/manifest.json
-reports/browse/<kind>/<id>/manifest.json
-reports/browse/decision_graph/<issue_id>/<run_id>/manifest.json
-```
-
-Render one decision graph:
-
-```bash
-uv run python tools/build_dashboard.py decision-graph \
-  --report-dir reports/balance/<run_id> --run-id 0
-```
-
-Use the React + React Flow dashboard:
-
-```bash
-uv run python tools/build_dashboard.py emit-frontend-manifest \
-  --reports reports --frontend-public frontend/public
-
 cd frontend
 npm ci
-npm test
-npm run test:coverage
-npm run dev
-npm run build
+npm run build:public
 ```
 
-Development server:
+The output is `frontend/dist/`. Pushes to `main` or
+`OpenAI-build-week-2026` trigger the Pages workflow; until deployment completes,
+the repository evidence and local build are the source of truth.
 
-```text
-http://localhost:5173
+### Judge API mode
+
+```bash
+cd frontend && npm run build:public && cd ..
+uv run python tools/run_judge_api.py \
+  --host 127.0.0.1 \
+  --port 8080 \
+  --frontend frontend/dist
 ```
 
-Production build output:
+Open `http://127.0.0.1:8080/`. This mode enables the same experiment registry,
+durable Human Review, and bounded provider readiness actions. API keys are read
+only by the server process and are never entered in the browser.
 
-```text
-frontend/dist/
+### Docker evaluator
+
+```bash
+docker compose up -d dashboard
+docker compose --profile judge run --rm replay
 ```
 
-## Project Layout
+The Judge image runs unprivileged. Offline Replay has no network and a read-only
+root filesystem. The final local A/B image passed restricted Inspect, Replay,
+Dashboard, and read-only API checks; no new immutable multi-architecture digest
+is claimed until the final image is published.
+
+## Start a Codex-guided playtest
+
+Do not begin with an API call. From the repository root:
+
+```bash
+.agents/skills/playtest-forge/scripts/preflight
+.agents/skills/playtest-forge/scripts/session-options --provider vllm --json
+```
+
+Codex then offers three frozen 20-week profiles:
+
+| Profile | Matrix | Worst-case calls | What it proves |
+| --- | ---: | ---: | --- |
+| `one-strategy` | chosen persona × seed 42 | 40 | Provider, agent, Godot, retention, weekly UI |
+| `six-strategy` | six personas × seed 42 | 240 | Same-seed persona divergence |
+| `repair-evidence` | six personas × seeds 42/43/44 | 720 | Evidence adequate to select one repair target |
+
+The user chooses profile, provider, and—when applicable—persona before any
+model spend. Local and API providers execute through the same service. A
+one-strategy or one-seed run can validate the agent but cannot prove a repair.
+
+Before a full campaign, start the viewer and governed API in separate terminals:
+
+```bash
+scripts/run-judge-dev --host 127.0.0.1 --port 8080
+npm --prefix frontend run prepare:public
+npm --prefix frontend run dev -- --host 127.0.0.1
+```
+
+Then open `http://127.0.0.1:5173/#/playthrough-inspector`. Codex executes the
+exact command emitted by `session-options`, monitors weekly progress, verifies
+the completed public bundle and frontend view, and does not edit the game or
+spend API credit without explicit approval.
+
+For real-game authoring without a host Godot binary, use the repository Docker
+wrapper described in the [Developer Guide](docs/DEVELOPER_GUIDE.md) and
+[Docker Guide](docs/operations/DOCKER.md).
+
+## Supported delivery paths
+
+| Path | Requirements | Model/key required |
+| --- | --- | --- |
+| GitHub Pages | Current desktop/mobile browser | No |
+| `judge --mode inspect` | Python 3.9+ | No |
+| `judge --mode replay` | Linux/macOS + locked `uv` environment | No |
+| Judge dashboard/container | Docker Engine 24+; linux/amd64 or linux/arm64 | No |
+| Real-game authoring | Host Codex + Godot 4.4 or Docker wrapper | No model for automation |
+| Local persona campaign | Host Codex + Godot + local vLLM/SGLang | Local model |
+| OpenAI persona campaign | Host Codex + Godot runtime | Server-side API key |
+
+The competition delivery is deliberately hybrid: Codex runs on the host while
+Docker can supply Godot and local-vLLM sidecars. The Judge image is an evaluator
+surface, not an all-in-one autonomous repair container, and it never receives a
+Docker socket.
+
+## Verification
+
+```bash
+uv run ruff check .
+uv run pytest -q
+npm --prefix frontend test -- --run
+npm --prefix frontend run build:public
+```
+
+Latest local closeout:
+
+- Python suite passed with only declared environment-dependent skips.
+- Frontend: 25 tests passed and the production build completed.
+- A/B campaign, repair, and playthrough bundle verifiers passed.
+- Judge Inspect verified 599 committed artifacts; Replay passed all five checks.
+- Restricted Docker Inspect/Replay and read-only Dashboard/API checks passed.
+
+## Build Week scope
+
+Build Week work added the governed Codex Skill, shared persona-provider
+contract, real-Godot campaign services, frozen repair protocol, signed evaluator,
+embedded demo, experiment registry, scalable persona/seed replay, exact patch
+evidence, Human Review layer, static Judge experience, and restricted Docker
+delivery.
+
+The project existed before Build Week. The exact prior-versus-new boundary is
+documented in
+[`PRIOR_VS_BUILD_WEEK.md`](submission/build-week-2026/PRIOR_VS_BUILD_WEEK.md).
+The project is MIT licensed; third-party and generated-asset provenance is in
+[ATTRIBUTION.md](ATTRIBUTION.md).
+
+## Current limitations and submission status
+
+- The retained local A/B candidates were rejected and were not merged. This is
+  evidence that the agent can reject unsupported repairs, not a claim that the
+  demo's pressure/cashflow balance is fixed.
+- A retained, redacted GPT-5.6 campaign is still pending.
+- The public demo video, primary `/feedback` Session ID, final Devpost team
+  checks, private-repository judge access, and final published image metadata
+  remain owner/release actions.
+- The embedded Study in Germany project is a competition demo, not a complete
+  commercial game.
+- Live persona work requires a compatible model endpoint; real gameplay still
+  requires Godot 4.4 or the Docker wrapper.
+- Full campaign authoring is a host-Codex plus runtime-sidecar workflow, not an
+  all-container path.
+
+See the
+[submission compliance audit](docs/reviews/openai_build_week_2026/SUBMISSION_COMPLIANCE_AUDIT_2026-07-17.md)
+for the fail-closed checklist based on the
+[official Build Week rules](https://openai.devpost.com/rules) and
+[event page](https://openai.com/build-week/).
+
+## Repository map
 
 ```text
-config/
-  agent_profiles.yaml       Agent prompt/profile definitions
-  gates.yaml                Quality gate thresholds
-  matrix.yaml               Executable strict scenario/persona test matrix
-  player_personas.yaml      Interactive player personas
-
-docs/
-  README.md                   Audience-keyed index — start here
-  architecture/               Developer + reviewer reference (evergreen)
-  operations/                 Docker + vLLM + contract test plans
-  portfolio/                  Public / portfolio summary
-  reviews/                    Date-sorted audits and gap analyses
-  plans/                      WIP designs and design iterations
-  legacy/                     Superseded docs (not linked from README)
-  assets/                     Preview images and PDFs
-
-examples/
-  sample_reports/           Tiny sanitized reports for dashboard demos
-
-frontend/
-  React + Vite dashboard with React Flow decision graphs
-
-prompts/
-  System and user prompts for each LLM agent
-
-scripts/tools/
-  Godot helper scripts and lightweight validation/probe utilities
-
-src/game_analysis_agent/
-  analytics.py
-  agent_eval.py
-  anomaly_detector.py
-  anomaly_semantics.py
-  bug_summarizer.py
-  contracts.py
-  coverage.py
-  env.py
-  game_tools.py
-  llm_client.py
-  quality_gates.py
-  report_bundle.py
-  report_manifest.py
-  schemas.py
-  settings.py
-  test_matrix.py
-  tool_loop.py
-  value_analyzer.py
-  agents/
-
-tools/
-  analyze_balance.py
-  build_dashboard.py
-  compare_matrix.py
-  compare_reports.py
-  emit_manifest.py
-  generate_agent_prompt.py
-  run_agent.py
-  run_balance_sim.sh
-  run_gameplay_agent.py
-  run_vllm_qwen.sh
-
-tests/
-  Unit tests and smoke tests
+.agents/skills/playtest-forge/    Reusable Codex workflow and references
+config/                           Frozen profiles, targets, gates, contracts
+demo/study-in-germany/            Embedded, pinned Godot baseline
+examples/build_week_2026/         Sanitized signed campaign and repair evidence
+frontend/                         Judge, Playthrough Inspector, reports, review UI
+game-overlays/                    Audited runtime-only demo probe overlays
+src/game_analysis_agent/          Typed services, providers, analysis, registry
+tools/ and scripts/               CLI adapters, evaluators, Docker/Godot helpers
+docs/                             Architecture, operations, reviews, developer guide
+judge + judge-manifest.json       Offline evaluator and signed table of contents
 ```
 
 ## Documentation
 
-Start at [docs/README.md](docs/README.md) — audience-keyed index.
-
-Selected entry points:
-
-- [Build Week 2026 reviewer hub](docs/plans/openai_build_week_2026/README.md)
+- [Evaluator guide](JUDGE.md)
+- [Complete developer guide](docs/DEVELOPER_GUIDE.md)
+- [Build Week reviewer hub](docs/plans/openai_build_week_2026/README.md)
 - [Architecture](docs/architecture/ARCHITECTURE.md)
-- [Data Contracts](docs/architecture/DATA_CONTRACTS.md)
-- [Gameplay Agent](docs/architecture/GAMEPLAY_AGENT.md)
-- [Godot Integration](docs/architecture/GODOT_INTEGRATION.md)
-- [Integration with study-in-germany](docs/architecture/INTEGRATION_WITH_STUDY_IN_GERMANY.md)
-- [Service-first MCP Migration Plan](docs/architecture/MCP_MIGRATION_PLAN.md)
-- [Docker Deployment](docs/operations/DOCKER.md)
-- [Local vLLM + Qwen](docs/operations/VLLM_QWEN_LOCAL_AGENT.md)
-- [Game artifact contract testing](docs/operations/GAME_CONTRACT_TESTING.md)
-- [Portfolio Notes](docs/portfolio/PORTFOLIO.md)
-- [Local LLM Real-Game Audit (2026-07-13)](docs/reviews/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md)
-- [Interactive Playtest Plan](docs/plans/interactive_playtest/README.md)
-- [Review Documents](docs/reviews/README.md)
-
-## Current Limitations
-
-The deterministic Python/frontend suites do not need Godot or an LLM. Real
-simulation, validators, and live interactive play still require a compatible
-Godot 4 binary; live persona evaluation additionally requires an LLM endpoint.
-The reference demo is embedded, so CI and evaluators need no private-repository
-token or sibling checkout. The final local A/B Judge image has passed no-network, read-only Inspect
-and Replay plus a read-only, dropped-capability Dashboard/API check after packaging
-the embedded game overlays and signed static experiment fixtures. Full local/OpenAI
-campaign authoring intentionally remains a host-Codex plus Docker-sidecar path rather than an all-container path.
-After any committed evidence or frontend change, the final image must still be
-rebuilt and the same restricted acceptance rows rerun. The project is MIT
-licensed; the remaining G5 blockers are submission evidence and owner actions,
-not licensing.
-
-## Notes
-
-- Success is not the only valid game outcome. Designed failure, recovery, and
-  mixed endings are part of the review standard, and the test matrix reflects
-  that.
-- The default vLLM context length is configured by `LLM_MAX_MODEL_LEN`
-  (`32768` by default). Do not reduce it only to make tests faster if the goal
-  is realistic LLM playtesting.
-- Generated reports, frontend build output, caches, and local dependencies are
-  intentionally ignored by git.
+- [Docker and local-vLLM delivery](docs/operations/DOCKER.md)
+- [Service-first MCP migration plan](docs/architecture/MCP_MIGRATION_PLAN.md)
+- [Review index](docs/reviews/README.md)
+- [Chinese README](README.zh-CN.md)
