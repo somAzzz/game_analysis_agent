@@ -23,8 +23,17 @@
   "license_path": "LICENSE",
   "privacy_review": {
     "status": "completed",
-    "reviewed_at": "2026-07-16T20:22:56Z",
+    "reviewed_at": "2026-07-18T13:18:20Z",
     "raw_prompts_committed": false,
     "raw_model_outputs_committed": false
+  },
+  "live_openai_evidence": {
+    "status": "verified",
+    "provider": "openai",
+    "model": "gpt-5.6-luna",
+    "truth_label": "live-openai-real-godot",
+    "campaign_id": "openai-all-six-seed-42-20w",
+    "completed_at": "2026-07-18T13:11:59.815927Z",
+    "public_bundle": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign"
   }
 }

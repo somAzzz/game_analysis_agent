@@ -37,7 +37,8 @@ and holdout verification, and rejected the candidate when the evidence did not
 support it. The retained core task ID is
 `019f6816-fe0d-78a2-9001-1890b32ef820`.
 
-GPT-5.6 is the optional live Persona decision provider through the OpenAI
-Responses API. The committed playthrough evidence remains truthfully labeled
-deterministic Replay until a separate restricted-key live run is completed and
-its sanitized evidence is imported. No live claim is inferred from Replay.
+GPT-5.6 is the live Persona decision provider through the OpenAI Responses
+API. A separate restricted-key `gpt-5.6-luna` campaign is now retained as a
+sanitized, hash-verified campaign-only record. The signed repair proof remains
+truthfully labeled deterministic Replay; no live claim is inferred from Replay,
+and no repair decision is inferred from the OpenAI campaign.

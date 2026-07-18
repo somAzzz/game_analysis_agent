@@ -34,7 +34,8 @@ From the repository root:
 
 Expected results:
 
-- **Inspect:** `passed`; 599 committed files and seven public claims verified.
+- **Inspect:** `passed`; every artifact and public claim listed in the committed
+  Judge manifest is hash/schema verified.
 - **Replay:** `passed`; campaign, exact persona Replay, deterministic fixture,
   designed-failure, and rejected-repair gates rechecked.
 
@@ -47,11 +48,13 @@ into passes.
 ## What judges can inspect
 
 The Judge page uses one evidence model for machine evaluation and Human Review.
-Its static selector exposes only intentionally curated proof-complete records:
+Its static selector exposes intentionally curated records with explicit
+lifecycle labels:
 
 | Evidence set | Observation source | Proof | Decision |
 | --- | --- | --- | --- |
 | Signed reference | Prerecorded deterministic Replay over committed real-Godot-derived evidence | Fixed and unseen-holdout rejection proof | **Rejected** |
+| OpenAI six-persona campaign | Live `gpt-5.6-luna`, real Godot 4.4, seed 42, 20-week cap | Campaign gate and per-persona replay; repair proof has not run | **Campaign only** |
 | Bilingual choice identity | Deterministic Godot 4.4, zero model calls | Fixed 42/43/44 and holdout 1042/1043/1044 semantic preservation | **Accepted** |
 
 Raw local-vLLM A/B campaigns are development evidence, not submission assets.
@@ -122,11 +125,13 @@ the same typed campaign service, real-Godot step contract, frozen profile,
 limits, progress records, public bundle, frontend view, and evidence gates as
 local vLLM. Credentials remain server-side.
 
-This repository does **not yet claim a retained GPT-5.6 campaign**. The current
-committed LLM evidence is local vLLM, and the signed reference is prerecorded
-Replay. One bounded, redacted GPT-5.6 run remains a release requirement; this
-README must be updated only after that bundle passes the same provenance and
-privacy gates.
+The retained live campaign used OpenAI `gpt-5.6-luna` with real Godot 4.4:
+all six personas at seed 42 completed, producing 114 gameplay records and 228
+sanitized provider-call records with 100% valid decisions, 0% fallback, and 0%
+provider errors. Its public bundle passed provenance, schema, hash, and privacy
+gates. The static Judge and Playthrough Inspector expose this record as
+**CAMPAIGN ONLY** because no patch, fixed cohort, unseen holdout, or repair
+decision was produced from it.
 
 ### Humans
 
@@ -172,9 +177,10 @@ npm run prepare:public
 npm run dev -- --host 127.0.0.1
 ```
 
-Open `http://127.0.0.1:5173/`. Static mode exposes the curated signed and
-deterministic proof records only; it cannot run providers or persist Human
-Review. Private local-model logs are not copied into this build.
+Open `http://127.0.0.1:5173/`. Static mode exposes the curated signed,
+deterministic, and sanitized live-OpenAI records; it cannot run providers or
+persist Human Review. Private local-model logs and private OpenAI traces are not
+copied into this build.
 
 Build the GitHub Pages artifact with:
 
@@ -234,7 +240,7 @@ npm --prefix frontend run dev -- --host 127.0.0.1
 
 Open `http://127.0.0.1:5173/#/playthrough-inspector`. At this point Vite has not
 started Judge API, selected Godot, or called a model; it only shows retained
-signed/local evidence.
+public evidence.
 
 Codex next asks two required questions:
 
@@ -304,13 +310,16 @@ npm --prefix frontend test -- --run
 npm --prefix frontend run build:public
 ```
 
-Latest local closeout:
+Latest local closeout on 2026-07-18:
 
-- Python suite passed with only declared environment-dependent skips.
-- Frontend: 25 tests passed and the production build completed.
-- Private local-vLLM A/B logs are excluded from Git and the static frontend.
-- Judge Inspect and Replay pass against the reduced curated evidence set.
-- Restricted Docker Inspect/Replay and read-only Dashboard/API checks passed.
+- Python: 511 passed, 1 declared environment skip; Ruff passed.
+- Frontend: 28 passed; the production Pages build completed.
+- Judge Inspect: 206 hash/schema artifacts and 9 exact claims passed; Replay
+  passed.
+- The current local linux/amd64 Judge image passed no-network, read-only,
+  drop-all-capabilities Inspect/Replay and read-only Dashboard/API checks.
+- Private local-vLLM A/B logs, OpenAI session files, prompts, and model response
+  bodies are excluded from Git and the static frontend.
 
 ## Build Week scope
 
@@ -331,11 +340,12 @@ The project is MIT licensed; third-party and generated-asset provenance is in
 - Local A/B candidates were rejected and not merged. Their raw logs remain
   operator-local; only summarized findings are retained in documentation. This
   is not a claim that the demo's pressure/cashflow balance is fixed.
-- A retained, redacted GPT-5.6 campaign is still pending.
-- The public demo video, primary `/feedback` Session ID, final Devpost team
-  checks, private-repository judge access, and final published image metadata
-  remain owner/release actions. The `/feedback/` session is submission metadata
-  only and is intentionally ignored by Git.
+- The retained OpenAI campaign is observation evidence, not completed repair
+  proof; no OpenAI-derived game patch is accepted or merged.
+- The public demo video, final Devpost team checks, non-builder manual/clean-room
+  review, and any claim of a newly published current-revision image remain
+  owner/release actions. `/feedback/` exports are submission metadata only and
+  remain intentionally ignored by Git.
 - The embedded Study in Germany project is a competition demo, not a complete
   commercial game.
 - Live persona work requires a compatible model endpoint; real gameplay still

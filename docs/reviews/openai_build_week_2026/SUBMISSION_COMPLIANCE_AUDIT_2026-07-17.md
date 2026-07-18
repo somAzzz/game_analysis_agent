@@ -36,16 +36,16 @@ published OpenAI-compatible endpoint. MCP is not required for this delivery path
 
 | Requirement | State | Repository evidence / remaining action |
 |---|---|---|
-| Builds and runs consistently | Pass | Python (494 passed, 1 environment skip), frontend (25 passed), Judge Inspect/Replay, and the final local A/B image all pass. |
+| Builds and runs consistently | Pass | Current Python/frontend suites, production frontend build, and Judge Inspect/Replay are rerun before branch publication; dated results are reported in the final handoff. |
 | No-rebuild judge path | Pass | `./judge --mode inspect --offline` and `./judge --mode replay --offline`; GitHub Pages is static. |
 | Supported platforms documented | Pass after this audit | Linux amd64/arm64 and macOS native evidence exists; live Godot/vLLM requirements are separated from Judge requirements. |
 | Codex use documented | Pass after this audit | Repository Skill, frozen repair plans, bounded patches, evidence gates, and human decision boundary are documented. |
-| GPT-5.6 use demonstrated | Blocked | Adapter and server-side key boundary exist, but the release still needs one retained, redacted, bounded GPT-5.6 campaign. |
+| GPT-5.6 use demonstrated | Pass (2026-07-18) | A sanitized, hash-verified `gpt-5.6-luna` campaign retains six personas, seed 42, 114 gameplay records, and zero fallback/provider errors. |
 | Prior work distinguished | Pass | `submission/build-week-2026/PRIOR_VS_BUILD_WEEK.md`. |
 | Public/private repository access | Owner action | If private, share with `testing@devpost.com` and `build-week-event@openai.com` before the deadline. |
 | Team invitations accepted | Owner action | Verify every Devpost invite is accepted before the deadline. |
 | Public demo video under 3 minutes | Blocked | Record, upload publicly to YouTube, verify signed-out playback, duration, audio, and captions. |
-| Primary `/feedback` session ID | Owner action | Retrieve from the primary build thread and place it in final submission metadata. |
+| Primary `/feedback` session ID | Owner action | Confirm the chosen primary build-thread ID in Devpost; `/feedback/` exports remain untracked and private. |
 | License and attribution | Pass | MIT `LICENSE` and `ATTRIBUTION.md`. |
 | Free judge access | In progress | Pages and offline Judge are unrestricted; verify final repository/image visibility. |
 | English submission materials | Pass | Primary README, evaluator UI, Devpost draft, and judge docs are English. |
@@ -57,20 +57,26 @@ tiers, Skill discovery, license/attribution, and prior-versus-new disclosure. Th
 the stale artifact count and obsolete Docker/license limitations, and adds an explicit supported
 platform/delivery matrix plus a focused Codex/GPT-5.6/human-decision explanation.
 
-The final local image `playtest-forge-judge:ab-final` passed read-only, no-network
-Inspect and Replay; Inspect verified 599 signed files. Its read-only, dropped-capability
-Dashboard/API exposed signed Replay and both local A/B proof-complete experiments.
-The image is local evidence, not a published multi-architecture digest.
+On 2026-07-18 the current local image
+`playtest-forge-judge:submission-current` passed no-network, read-only,
+drop-all-capabilities Inspect and Replay. Its read-only Dashboard/API returned
+the signed proof, live OpenAI campaign-only record, and deterministic
+correctness proof. This is local linux/amd64 evidence, not a published
+current-revision multi-architecture
+digest; the older GHCR digest is retained only as historical evidence.
 
-The README must not say that a live GPT-5.6 experiment exists until the redacted bundle passes the
-same provider, provenance, and privacy gates as local vLLM. Local evidence cannot be relabeled as
-OpenAI evidence, and prerecorded Replay cannot be relabeled as an LLM run.
+On 2026-07-18 the redacted live bundle passed provider, provenance, schema,
+hash, and privacy gates and was imported as
+`examples/build_week_2026/experiments/openai-all-six-seed-42-20w`. The static
+Judge truthfully labels it OPENAI API / CAMPAIGN ONLY. Local evidence is not
+relabeled as OpenAI evidence, prerecorded Replay is not relabeled as an LLM run,
+and the live campaign is not relabeled as repair proof.
 
 ## Final release blockers
 
-- Retain one bounded GPT-5.6 campaign and update the claim ledger truthfully.
 - Complete the manual-versus-Forge comparison and non-builder clean-room evaluation.
 - Record and validate the public YouTube demo.
-- Retrieve the primary Codex `/feedback` session ID.
+- Confirm the primary Codex `/feedback` session ID in the Devpost form without
+  publishing the private `/feedback/` export.
 - Verify Devpost team invitations and repository access for both judging accounts.
 - Run the final G4/G5 gates without weakening their required checks.

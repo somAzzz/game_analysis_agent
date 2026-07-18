@@ -37,7 +37,7 @@ needs network, Docker, Godot, a model key, or a sibling game checkout.
 | --- | --- |
 | Automated play | Real Godot 4.4 simulation and validators on the embedded demo |
 | Persona Replay | Deterministically authored persona-policy fixture over retained real-Godot rows; not a recorded LLM playthrough |
-| OpenAI live | Optional bounded live persona provider; remains blocked until GPT-5.6 response evidence is imported |
+| OpenAI live | Retained `gpt-5.6-luna` campaign: six personas, seed 42, 20-week cap, real Godot, 114 gameplay rows, zero fallback/provider error; campaign-only, not repair proof |
 | Repair | Codex-directed isolated candidate change, fixed and holdout A/B proof, explicit rejection, no automatic merge |
 | Skill | Transferable facts → inference → one mechanism → fixed/holdout → accept/reject workflow |
 
@@ -50,6 +50,10 @@ UI updates, and repair boundary.
 Official submission status: [Build Week compliance audit](../../reviews/openai_build_week_2026/SUBMISSION_COMPLIANCE_AUDIT_2026-07-17.md) records the controlling rules, hybrid delivery decision, and release blockers.
 
 Completed causal follow-up: [local-vLLM A/B repair proof](../../reviews/openai_build_week_2026/LOCAL_VLLM_AB_REPAIR_PROOF_2026-07-17.md) summarizes two rejected closures and the deterministic proof policy. Raw A/B campaign and Persona/seed logs remain operator-local and are not submission assets.
+
+Current delivery evidence: [2026-07-18 local current-revision Docker closeout](../../reviews/openai_build_week_2026/CURRENT_REVISION_DELIVERY_2026-07-18.md) records the manifest packaging defect, fix, restricted container proof, and published-image boundary.
+
+Live model evidence: [OpenAI six-persona campaign review](../../reviews/openai_build_week_2026/OPENAI_LIVE_CAMPAIGN_2026-07-18.md) records the public gate, exact static replay surface, privacy boundary, and campaign-only limitation.
 
 Latest game evidence: [25-seed local-vLLM full-flow audit](../../reviews/openai_build_week_2026/local-vllm-25-seed-audit-2026-07-17/README.md) records 150 real-Godot cells, agent reliability findings, game findings, and the pressure/burnout cross-check.
 
@@ -80,9 +84,9 @@ Current remediation: [full-campaign implementation review](../../reviews/openai_
   delivery fingerprint changes; old passing rows are marked stale.
 - Live OpenAI evidence must prove the GPT-5.6 model family. DeepSeek can test
   OpenAI-compatible wiring but cannot close the OpenAI competition gate.
-- G5 remains blocked by live model
-  evidence, non-builder clean-room/manual comparison, final video, and final
-  published URLs/assets. A Codex task id alone does not prove its model.
+- G5 remains blocked by non-builder clean-room/manual comparison, final
+  video, current-revision delivery evidence, and final URLs/assets. A Codex task
+  id alone does not prove its model.
 
 ## Platform handoff
 
@@ -91,6 +95,7 @@ and Linux amd64/arm64 platform rows have retained evidence. The submission
 frontend now packages `game-overlays/` plus the curated signed and deterministic
 static experiment index; raw local-vLLM A/B logs are excluded. Any later
 evidence or frontend change requires the same rebuild and acceptance rows
-before publication. Live OpenAI still needs a
-restricted server-side key. Missing external evidence remains a failed or stale
-gate; it is never promoted from source inspection.
+before publication. The retained live OpenAI bundle is sanitized and requires
+no key to inspect; starting a new live campaign still requires a restricted
+server-side key. Missing external evidence remains a failed or stale gate; it
+is never promoted from source inspection.

@@ -30,14 +30,15 @@ for a missing required capability. Optional missing tools are warnings.
 
 | Delivery path | Dated result | Claim level |
 | --- | --- | --- |
-| macOS 26.5.2 arm64, native Inspect/Replay/UI | Passed at `be56673` / contract `6fd5874d` | Current evidence |
+| macOS 26.5.2 arm64, native Inspect/Replay/UI | Passed at `be56673` / contract `6fd5874d` | Historical; contract changed |
 | macOS arm64, Docker dashboard/Replay | Optional; Docker absent | Not required for release |
-| macOS arm64, fresh pinned Godot 4.4 | Passed at `be56673` / contract `6fd5874d` | Current evidence |
-| Linux amd64 native/container | Passed in run `29531033847` / contract `6fd5874d` | Current evidence |
-| Linux amd64, fresh pinned Godot 4.4 | Passed in run `29531033847`; five validators passed and three declared demo findings matched exactly | Current evidence |
-| Linux arm64 container | Passed natively in run `29531033847` by registry index digest | Current evidence |
-| Published amd64/arm64 image | GHCR index `sha256:59601230928f…` from run `29531033847` | Current evidence |
-| Live OpenAI campaign | Not run; no server key | Optional capability only |
+| macOS arm64, fresh pinned Godot 4.4 | Passed at `be56673` / contract `6fd5874d` | Historical; contract changed |
+| Linux amd64 native/container | Passed in run `29531033847` / contract `6fd5874d` | Historical; contract changed |
+| Linux amd64, fresh pinned Godot 4.4 | Passed in run `29531033847`; five validators passed and three declared demo findings matched exactly | Historical; contract changed |
+| Linux arm64 container | Passed natively in run `29531033847` by registry index digest | Historical; contract changed |
+| Published amd64/arm64 image | GHCR index `sha256:59601230928f…` from run `29531033847` | Historical image; not claimed for current revision |
+| Current local Linux amd64 image | Local tag `playtest-forge-judge:submission-current`; restricted Inspect/Replay and Dashboard/API passed on 2026-07-18 | Current local evidence; not published |
+| Live OpenAI campaign | `gpt-5.6-luna`, six personas, seed 42, 114 rows, zero fallback/provider error | Current committed campaign-only evidence |
 
 See `docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json` for
 the machine-readable checks. “Historical,” “target,” and “workflow
@@ -76,9 +77,11 @@ Inspect is a Python-standard-library program. It reads
 then checks:
 
 1. manifest and declared artifact schemas;
-2. byte size and SHA-256 for 599 public evidence, Skill, expected-failure gate, embedded-demo, and local-vLLM A/B artifacts;
-3. seven public claims against exact RFC 6901 JSON pointers;
-4. committed campaign, repair, and independent G2/G3 review evidence.
+2. byte size and SHA-256 for every manifest-listed public evidence, Skill,
+   expected-failure gate, embedded-demo, and curated experiment artifact;
+3. every public claim against exact RFC 6901 JSON pointers;
+4. committed Replay/OpenAI campaigns, repair, and independent G2/G3 review
+   evidence.
 
 It requires Python 3.9+ only. It does not import the project package and does
 not need `uv`, Docker, Godot, network, secrets, GPU, TTY, browser, port, or a

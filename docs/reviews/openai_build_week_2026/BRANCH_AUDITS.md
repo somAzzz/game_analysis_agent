@@ -62,3 +62,11 @@ was imported alongside completed Linux amd64 and official-Godot job artifacts.
 PR #5 remains the delivery channel; Linux results are accepted only from
 completed jobs and downloaded artifacts at the same contract fingerprint.
 Skipped optional jobs are recorded as skipped, not passed.
+
+## 2026-07-18 evidence update
+
+The earlier audit's live-GPT blocker is closed by the sanitized
+`openai-all-six-seed-42-20w` campaign. It is published as OPENAI API /
+CAMPAIGN ONLY and does not inherit the signed Replay repair decision. Remaining
+release work is the non-builder manual/clean-room review, current-revision
+delivery closeout, Devpost owner checks, and the public video.

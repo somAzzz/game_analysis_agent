@@ -54,14 +54,22 @@ def review() -> dict[str, Any]:
     completed_links = {
         "https://github.com/somAzzz/game_analysis_agent",
         "https://somazzz.github.io/game_analysis_agent/",
-        published_image,
     }
+    image_claim = next(
+        item for item in ledger["pending_external_claims"] if item["id"] == "multiarch_image"
+    )
+    image_state_ok = (
+        published_image in drafts["devpost"]
+        if image_claim["status"] == "completed"
+        else published_image not in drafts["devpost"]
+    )
     placeholder_state_ok = (
         all(item in drafts["devpost"] for item in pending_placeholders)
         and "{{REPOSITORY_URL}}" not in drafts["devpost"]
         and "{{PUBLIC_UI_URL}}" not in drafts["devpost"]
         and "{{IMAGE_REFERENCE_AND_DIGEST}}" not in drafts["devpost"]
         and all(item in drafts["devpost"] for item in completed_links)
+        and image_state_ok
     )
     checks.append({"id": "external_placeholders", "status": "passed" if placeholder_state_ok else "failed", "errors": []})
     combined = "\n".join(drafts.values())

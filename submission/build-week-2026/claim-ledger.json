@@ -7,83 +7,234 @@
       "id": "campaign_scale",
       "status": "verified",
       "approved_text": "18 persona/seed cells produced 342 real-Godot gameplay weeks.",
-      "used_in": ["devpost", "video"],
+      "used_in": [
+        "devpost",
+        "video"
+      ],
       "evidence": [
-        {"path": "examples/build_week_2026/campaign-v1/campaign_summary.json", "json_pointer": "/metrics/completed_cells", "equals": 18},
-        {"path": "examples/build_week_2026/campaign-v1/campaign_summary.json", "json_pointer": "/metrics/total_weeks", "equals": 342}
+        {
+          "path": "examples/build_week_2026/campaign-v1/campaign_summary.json",
+          "json_pointer": "/metrics/completed_cells",
+          "equals": 18
+        },
+        {
+          "path": "examples/build_week_2026/campaign-v1/campaign_summary.json",
+          "json_pointer": "/metrics/total_weeks",
+          "equals": 342
+        }
       ]
     },
     {
       "id": "failure_convergence",
       "status": "verified",
       "approved_text": "All 18 campaign cells entered the selected cashflow/stress failure cluster.",
-      "used_in": ["devpost", "video"],
+      "used_in": [
+        "devpost",
+        "video"
+      ],
       "evidence": [
-        {"path": "examples/build_week_2026/campaign-v1/failure_clusters.json", "json_pointer": "/clusters/0/member_count", "equals": 18}
+        {
+          "path": "examples/build_week_2026/campaign-v1/failure_clusters.json",
+          "json_pointer": "/clusters/0/member_count",
+          "equals": 18
+        }
       ]
     },
     {
       "id": "provider_health",
       "status": "verified",
       "approved_text": "The committed campaign recorded 100% valid decisions, 0% fallback, and 0% provider errors.",
-      "used_in": ["devpost"],
+      "used_in": [
+        "devpost"
+      ],
       "evidence": [
-        {"path": "examples/build_week_2026/campaign-v1/campaign_summary.json", "json_pointer": "/metrics/valid_rate", "equals": 1.0},
-        {"path": "examples/build_week_2026/campaign-v1/campaign_summary.json", "json_pointer": "/metrics/fallback_rate", "equals": 0.0},
-        {"path": "examples/build_week_2026/campaign-v1/campaign_summary.json", "json_pointer": "/metrics/provider_error_rate", "equals": 0.0}
+        {
+          "path": "examples/build_week_2026/campaign-v1/campaign_summary.json",
+          "json_pointer": "/metrics/valid_rate",
+          "equals": 1.0
+        },
+        {
+          "path": "examples/build_week_2026/campaign-v1/campaign_summary.json",
+          "json_pointer": "/metrics/fallback_rate",
+          "equals": 0.0
+        },
+        {
+          "path": "examples/build_week_2026/campaign-v1/campaign_summary.json",
+          "json_pointer": "/metrics/provider_error_rate",
+          "equals": 0.0
+        }
       ]
     },
     {
       "id": "bounded_patch",
       "status": "verified",
       "approved_text": "Codex proposed one bounded candidate: 2 allowlisted files, 35 additions, and 5 deletions.",
-      "used_in": ["devpost", "video"],
+      "used_in": [
+        "devpost",
+        "video"
+      ],
       "evidence": [
-        {"path": "examples/build_week_2026/experiment-v1/repair_experiment.json", "json_pointer": "/patch/changed_files", "equals": 2},
-        {"path": "examples/build_week_2026/experiment-v1/repair_experiment.json", "json_pointer": "/patch/added_lines", "equals": 35},
-        {"path": "examples/build_week_2026/experiment-v1/repair_experiment.json", "json_pointer": "/patch/deleted_lines", "equals": 5}
+        {
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json",
+          "json_pointer": "/patch/changed_files",
+          "equals": 2
+        },
+        {
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json",
+          "json_pointer": "/patch/added_lines",
+          "equals": 35
+        },
+        {
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json",
+          "json_pointer": "/patch/deleted_lines",
+          "equals": 5
+        }
       ]
     },
     {
       "id": "candidate_rejected",
       "status": "verified",
       "approved_text": "Fixed and unseen holdout cohorts both reduced target-cluster membership by 0%, so Codex rejected the candidate and it was not merged.",
-      "used_in": ["devpost", "video"],
+      "used_in": [
+        "devpost",
+        "video"
+      ],
       "evidence": [
-        {"path": "examples/build_week_2026/experiment-v1/repair_experiment.json", "json_pointer": "/decision", "equals": "rejected"},
-        {"path": "examples/build_week_2026/experiment-v1/comparison.json", "json_pointer": "/fixed_relative_reduction", "equals": 0.0},
-        {"path": "examples/build_week_2026/experiment-v1/comparison.json", "json_pointer": "/holdout_relative_reduction", "equals": 0.0}
+        {
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json",
+          "json_pointer": "/decision",
+          "equals": "rejected"
+        },
+        {
+          "path": "examples/build_week_2026/experiment-v1/comparison.json",
+          "json_pointer": "/fixed_relative_reduction",
+          "equals": 0.0
+        },
+        {
+          "path": "examples/build_week_2026/experiment-v1/comparison.json",
+          "json_pointer": "/holdout_relative_reduction",
+          "equals": 0.0
+        }
       ]
     },
     {
       "id": "codex_centrality",
       "status": "verified",
       "approved_text": "In the retained core task, Codex owned the hypothesis, bounded patch, and accept/reject judgment.",
-      "used_in": ["devpost", "video"],
+      "used_in": [
+        "devpost",
+        "video"
+      ],
       "evidence": [
-        {"path": "examples/build_week_2026/experiment-v1/repair_experiment.json", "json_pointer": "/codex/hypothesis_owned_by_codex", "equals": true},
-        {"path": "examples/build_week_2026/experiment-v1/repair_experiment.json", "json_pointer": "/codex/patch_owned_by_codex", "equals": true},
-        {"path": "examples/build_week_2026/experiment-v1/repair_experiment.json", "json_pointer": "/codex/decision_owned_by_codex", "equals": true}
+        {
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json",
+          "json_pointer": "/codex/hypothesis_owned_by_codex",
+          "equals": true
+        },
+        {
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json",
+          "json_pointer": "/codex/patch_owned_by_codex",
+          "equals": true
+        },
+        {
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json",
+          "json_pointer": "/codex/decision_owned_by_codex",
+          "equals": true
+        }
       ]
     },
     {
       "id": "core_session",
       "status": "verified",
       "approved_text": "Core Codex task: 019f6816-fe0d-78a2-9001-1890b32ef820.",
-      "used_in": ["devpost"],
+      "used_in": [
+        "devpost"
+      ],
       "evidence": [
-        {"path": "examples/build_week_2026/experiment-v1/repair_experiment.json", "json_pointer": "/codex/feedback_session_id", "equals": "019f6816-fe0d-78a2-9001-1890b32ef820"}
+        {
+          "path": "examples/build_week_2026/experiment-v1/repair_experiment.json",
+          "json_pointer": "/codex/feedback_session_id",
+          "equals": "019f6816-fe0d-78a2-9001-1890b32ef820"
+        }
+      ]
+    },
+    {
+      "id": "live_openai_campaign",
+      "status": "verified",
+      "approved_text": "A retained live OpenAI gpt-5.6-luna campaign completed all six personas at seed 42 with 114 gameplay records, 0% fallback, and 0% provider errors.",
+      "used_in": [
+        "devpost",
+        "video"
+      ],
+      "evidence": [
+        {
+          "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_manifest.json",
+          "json_pointer": "/source/provider_revision",
+          "equals": "model:gpt-5.6-luna"
+        },
+        {
+          "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json",
+          "json_pointer": "/metrics/completed_cells",
+          "equals": 6
+        },
+        {
+          "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json",
+          "json_pointer": "/metrics/total_weeks",
+          "equals": 114
+        },
+        {
+          "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json",
+          "json_pointer": "/metrics/fallback_rate",
+          "equals": 0.0
+        },
+        {
+          "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json",
+          "json_pointer": "/metrics/provider_error_rate",
+          "equals": 0.0
+        }
       ]
     }
   ],
   "pending_external_claims": [
-    {"id": "linux_delivery", "status": "completed", "required_artifact": "GitHub Actions run 29531033847 plus committed amd64, official-Godot, and native arm64 evidence"},
-    {"id": "multiarch_image", "status": "completed", "required_artifact": "judge-image-metadata.json with registry index digest sha256:59601230928f6da17f88dda1dd869cfee9a8a1b87323c442297bddad97f5a8c2"},
-    {"id": "manual_time_comparison", "status": "not_measured", "required_artifact": "timed non-builder baseline and Forge task"},
-    {"id": "live_openai_campaign", "status": "not_run", "required_artifact": "redacted server-side provider/campaign record"},
-    {"id": "clean_room_reviewer", "status": "not_run", "required_artifact": "dated non-builder review"},
-    {"id": "video_url", "status": "missing", "required_artifact": "signed-out-accessible public or unlisted YouTube URL under 3:00"},
-    {"id": "repository_url", "status": "completed", "required_artifact": "public repository verified at https://github.com/somAzzz/game_analysis_agent on 2026-07-16"},
-    {"id": "public_ui_url", "status": "completed", "required_artifact": "HTTPS GitHub Pages URL returned HTTP 200 on 2026-07-16"}
+    {
+      "id": "linux_delivery",
+      "status": "completed",
+      "required_artifact": "GitHub Actions run 29531033847 plus committed amd64, official-Godot, and native arm64 evidence"
+    },
+    {
+      "id": "multiarch_image",
+      "status": "stale",
+      "required_artifact": "current-revision multi-architecture digest, or removal from final release gate"
+    },
+    {
+      "id": "manual_time_comparison",
+      "status": "not_measured",
+      "required_artifact": "timed non-builder baseline and Forge task"
+    },
+    {
+      "id": "live_openai_campaign",
+      "status": "completed",
+      "required_artifact": "committed sanitized campaign, gate report, and six-persona replay view"
+    },
+    {
+      "id": "clean_room_reviewer",
+      "status": "not_run",
+      "required_artifact": "dated non-builder review"
+    },
+    {
+      "id": "video_url",
+      "status": "missing",
+      "required_artifact": "signed-out-accessible public or unlisted YouTube URL under 3:00"
+    },
+    {
+      "id": "repository_url",
+      "status": "completed",
+      "required_artifact": "public repository verified at https://github.com/somAzzz/game_analysis_agent on 2026-07-16"
+    },
+    {
+      "id": "public_ui_url",
+      "status": "completed",
+      "required_artifact": "HTTPS GitHub Pages URL returned HTTP 200 on 2026-07-16"
+    }
   ]
 }

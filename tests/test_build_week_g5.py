@@ -31,7 +31,7 @@ def test_current_submission_fails_closed_on_external_release_blockers() -> None:
     review = review_g5(project_root=ROOT)
 
     assert review["status"] == "failed"
-    assert review["failure_count"] == 6
+    assert review["failure_count"] == 7
     assert set(review["failures"]) == {
         "prior_gates",
         "claim_ledger",
@@ -39,6 +39,7 @@ def test_current_submission_fails_closed_on_external_release_blockers() -> None:
         "manual_comparison",
         "clean_room_review",
         "video_review",
+        "published_image",
     }
 
 
@@ -60,6 +61,8 @@ def test_complete_synthetic_submission_can_pass_all_g5_checks(tmp_path: Path) ->
         "examples/build_week_2026/campaign-v1/failure_clusters.json",
         "examples/build_week_2026/experiment-v1/repair_experiment.json",
         "examples/build_week_2026/experiment-v1/comparison.json",
+        "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_manifest.json",
+        "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json",
     ):
         _copy(source, tmp_path)
 
@@ -92,6 +95,7 @@ def test_complete_synthetic_submission_can_pass_all_g5_checks(tmp_path: Path) ->
     }
     for before, after in replacements.items():
         devpost = devpost.replace(before, after)
+    devpost += f"\n- Published Judge image: {image_ref}@{digest}\n"
     devpost_path.write_text(devpost, encoding="utf-8")
 
     metadata_path = tmp_path / "submission/build-week-2026/release-metadata.json"

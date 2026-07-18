@@ -21,13 +21,14 @@ API key, browser, or private game checkout.”
 
 ## 0:35–1:02 — Campaign
 
-Screen: Campaign section, 18 / 342 / 100% / 18-of-18 facts; briefly show the
-Replay/OpenAI provider choice.
+Screen: Campaign section, 18 / 342 / 100% / 18-of-18 facts; use the experiment
+dropdown to switch to the OPENAI API campaign and open one persona/seed path.
 
 Voice: “18 persona/seed cells produced 342 real-Godot gameplay weeks. All 18
-campaign cells entered the selected cashflow/stress failure cluster. Replay is
-the deterministic policy-fixture judge path; the same contract can use an OpenAI live persona
-subagent when the server is configured.”
+campaign cells entered the selected cashflow/stress failure cluster. A retained
+live OpenAI gpt-5.6-luna campaign completed all six personas at seed 42 with 114
+gameplay records, 0% fallback, and 0% provider errors. It is clearly labeled
+campaign only because repair proof has not run.”
 
 ## 1:02–1:32 — Repair
 
