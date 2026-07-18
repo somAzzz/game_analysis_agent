@@ -49,7 +49,7 @@ UI updates, and repair boundary.
 
 Official submission status: [Build Week compliance audit](../../reviews/openai_build_week_2026/SUBMISSION_COMPLIANCE_AUDIT_2026-07-17.md) records the controlling rules, hybrid delivery decision, and release blockers.
 
-Completed causal follow-up: [local-vLLM A/B repair proof](../../reviews/openai_build_week_2026/LOCAL_VLLM_AB_REPAIR_PROOF_2026-07-17.md) records two full rejected closures, deterministic proof policy, and persistent Persona/seed views.
+Completed causal follow-up: [local-vLLM A/B repair proof](../../reviews/openai_build_week_2026/LOCAL_VLLM_AB_REPAIR_PROOF_2026-07-17.md) summarizes two rejected closures and the deterministic proof policy. Raw A/B campaign and Persona/seed logs remain operator-local and are not submission assets.
 
 Latest game evidence: [25-seed local-vLLM full-flow audit](../../reviews/openai_build_week_2026/local-vllm-25-seed-audit-2026-07-17/README.md) records 150 real-Godot cells, agent reliability findings, game findings, and the pressure/burnout cross-check.
 
@@ -87,10 +87,10 @@ Current remediation: [full-campaign implementation review](../../reviews/openai_
 ## Platform handoff
 
 Offline Judge, native API/UI, embedded runtime preparation, pinned Godot 4.4,
-and Linux amd64/arm64 platform rows have retained evidence. This host rebuilt the final local A/B Judge image with `game-overlays/`, the
-signed static experiment index, and full proof evidence. No-network, read-only
-Inspect and Replay passed; the read-only, dropped-capability Dashboard/API exposed
-signed Replay plus A/B as `proof_complete`. Any later evidence or frontend change
-requires the same rebuild and acceptance rows before publication. Live OpenAI still needs a
+and Linux amd64/arm64 platform rows have retained evidence. The submission
+frontend now packages `game-overlays/` plus the curated signed and deterministic
+static experiment index; raw local-vLLM A/B logs are excluded. Any later
+evidence or frontend change requires the same rebuild and acceptance rows
+before publication. Live OpenAI still needs a
 restricted server-side key. Missing external evidence remains a failed or stale
 gate; it is never promoted from source inspection.

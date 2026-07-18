@@ -127,12 +127,12 @@ The supported competition delivery is deliberately hybrid:
   The OpenAI provider uses the same campaign request, progress, aggregation, and
   experiment-registry contracts, with the key retained server-side.
 
-The final local A/B Judge image contains `game-overlays/`, the signed static
-experiment index, and full A/B evidence. It passed no-network, read-only Inspect
-and Replay plus a read-only, dropped-capability Dashboard/API check. The first
-rebuild exposed a missing `frontend/public-demo/` copy; `Dockerfile.judge` now
-packages those signed fixtures. Publish a new immutable multi-architecture digest
-only from this final source state. The `agent` container is
+The Judge image contains `game-overlays/` plus the curated signed and
+deterministic static experiment fixtures. Raw local-vLLM A/B logs are excluded
+from both the image and Git. The first rebuild exposed a missing
+`frontend/public-demo/` copy; `Dockerfile.judge` packages only the curated
+fixtures. Publish a new immutable multi-architecture digest only after rerunning
+the restricted image checks from this source state. The `agent` container is
 not claimed as a controller for sibling containers.
 
 ## 8. Configurable knobs

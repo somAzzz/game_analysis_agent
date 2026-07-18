@@ -47,45 +47,31 @@ into passes.
 ## What judges can inspect
 
 The Judge page uses one evidence model for machine evaluation and Human Review.
-Its experiment selector exposes these committed proof-complete records:
+Its static selector exposes only intentionally curated proof-complete records:
 
-| Evidence set | Observation source | Campaign | Repair proof | Decision |
-| --- | --- | ---: | --- | --- |
-| Signed reference | Prerecorded deterministic Replay over committed real-Godot-derived evidence | 18 cells · 342 weeks · 18/18 target | Fixed 18→18; unseen 18→18 | **Rejected** |
-| Local vLLM A | `qwen3.6-27b-nvfp4` + real Godot | 48 cells · 912 weeks · 41/48 target | Fixed 48→48; unseen 18→18 | **Rejected** |
-| Local vLLM B | `qwen3.6-27b-nvfp4` + real Godot | 48 cells · 912 weeks · 43/48 target | Fixed 48→48; unseen 18→18 | **Rejected** |
+| Evidence set | Observation source | Proof | Decision |
+| --- | --- | --- | --- |
+| Signed reference | Prerecorded deterministic Replay over committed real-Godot-derived evidence | Fixed and unseen-holdout rejection proof | **Rejected** |
+| Bilingual choice identity | Deterministic Godot 4.4, zero model calls | Fixed 42/43/44 and holdout 1042/1043/1044 semantic preservation | **Accepted** |
 
-The A/B observation campaigns are fresh local-model playthroughs. Their formal
-baseline/patched proof cohorts use the frozen
-`fixture-authoring-policy-v1` decision policy against the same real Godot game,
-so stochastic hypothesis discovery is separated from deterministic causal
-comparison. Local evidence is never labeled OpenAI evidence, and Replay is
-never labeled live.
-
-Both candidates passed focused legality, invariant, decision-validity,
-provider-health, persona-preservation, ending, and designed-failure gates. They
-failed the two causal target-reduction gates, so neither patch was merged.
+Raw local-vLLM A/B campaigns are development evidence, not submission assets.
+They are excluded from the static experiment index, public frontend bundle, and
+Git tracking. Fresh local or OpenAI campaigns can still appear dynamically when
+the localhost Judge API is running, with their exact provider labels.
 
 ## Explore the evidence
 
 The static frontend is a no-key, no-rebuild evaluator surface:
 
 - `/#/` — Campaign → Repair → Proof → Human Review Judge ledger.
-- `/#/playthrough-inspector` — strategy, seed, week, state, action, event, and
-  provenance review.
+- `/#/playthrough-inspector` — signed strategy, seed, week, state, action,
+  event, and provenance review.
 - `/#/reports` — report and issue archive.
 
-Example retained paths:
-
-```text
-/#/playthrough-inspector?experiment=vllm-cohort-a-pressure-feedback-v1&persona=money&seed=42
-/#/playthrough-inspector?experiment=vllm-cohort-b-survival-recovery-v1&persona=study&seed=50
-```
-
-A/B retain 96 self-contained persona/seed views: 1,824 weekly nodes and 1,728
-observed transitions. The exact patch diff, baseline and patched cohorts,
-provider/model labels, evidence fingerprint, machine recommendation, and
-`candidate_not_merged` disposition remain visible from the same experiment.
+The exact signed patch diff, fixed and holdout cohorts, evidence fingerprint,
+machine recommendation, and `candidate_not_merged` disposition remain visible.
+The accepted bilingual correctness record exposes its exact diff and hash-bound
+deterministic proof without depending on private local-model traces.
 
 Human Review does not create a second evidence system. A reviewer can inspect
 the complete evidence and diff, see the machine recommendation, choose
@@ -93,22 +79,16 @@ Approve / Reject / Needs more evidence, add a note, and export
 `human_review.json`. It never merges automatically. Static hosting is read-only;
 durable review records require the Judge API.
 
-## Why the rejected experiments matter
+## Internal local-model evidence
 
-The campaigns confirmed the owner's pressure/burnout observation: stress
-saturates across unlike personas and recovery is rare. Candidate A reduced one
-crisis-specific weekly stress increment. Candidate B strengthened one intended
-cashflow recovery action. Both moved the selected mechanism legally, but neither
-changed target membership on fixed or unseen cohorts.
-
-That result narrows the next experiment: trace the cumulative pressure channels
-and cashflow-ending trigger instead of increasing either patch after seeing the
-outcome. A symptom metric moving while the player-level target is unchanged is
-not reported as a successful repair.
+The local-vLLM A/B runs remain useful internal diagnosis: they confirmed the
+pressure/burnout observation and rejected two ineffective bounded candidates.
+Only their concise review report is retained for project history; raw campaign,
+repair, and playthrough logs stay operator-local and are not published in the
+frontend.
 
 See the [A/B proof closeout](docs/reviews/openai_build_week_2026/LOCAL_VLLM_AB_REPAIR_PROOF_2026-07-17.md)
-for the frozen hypotheses, sensitivity checks, exact gates, and pressure
-cross-check.
+for the summarized hypotheses and gate outcomes.
 
 ## How Codex, GPT-5.6, and humans are used
 
@@ -192,8 +172,9 @@ npm run prepare:public
 npm run dev -- --host 127.0.0.1
 ```
 
-Open `http://127.0.0.1:5173/`. Static mode can switch among the signed reference
-and local A/B evidence, but it cannot run providers or persist Human Review.
+Open `http://127.0.0.1:5173/`. Static mode exposes the curated signed and
+deterministic proof records only; it cannot run providers or persist Human
+Review. Private local-model logs are not copied into this build.
 
 Build the GitHub Pages artifact with:
 
@@ -229,9 +210,10 @@ docker compose --profile judge run --rm replay
 ```
 
 The Judge image runs unprivileged. Offline Replay has no network and a read-only
-root filesystem. The final local A/B image passed restricted Inspect, Replay,
-Dashboard, and read-only API checks; no new immutable multi-architecture digest
-is claimed until the final image is published.
+root filesystem. The evaluator image contains only curated signed and
+deterministic static evidence; private local-model logs are excluded. No new
+immutable multi-architecture digest is claimed until the final image is
+published.
 
 ## Start a Codex-guided playtest
 
@@ -239,10 +221,29 @@ Do not begin with an API call. From the repository root:
 
 ```bash
 .agents/skills/playtest-forge/scripts/preflight
-.agents/skills/playtest-forge/scripts/session-options --provider vllm --json
+.agents/skills/playtest-forge/scripts/session-options --choices-only --json
 ```
 
-Codex then offers three frozen 20-week profiles:
+Codex then stages committed evidence and starts the read-only viewer before
+asking either question:
+
+```bash
+npm --prefix frontend run prepare:public
+npm --prefix frontend run dev -- --host 127.0.0.1
+```
+
+Open `http://127.0.0.1:5173/#/playthrough-inspector`. At this point Vite has not
+started Judge API, selected Godot, or called a model; it only shows retained
+signed/local evidence.
+
+Codex next asks two required questions:
+
+1. Godot runtime: local Godot 4.4 or the Docker Godot wrapper.
+2. LLM: OpenAI API, local vLLM, or no LLM.
+
+No LLM means deterministic automation plus committed Replay, with zero model
+calls and no new persona evidence. For a model-backed run, Codex then offers
+three frozen 20-week profiles:
 
 | Profile | Matrix | Worst-case calls | What it proves |
 | --- | ---: | ---: | --- |
@@ -250,19 +251,25 @@ Codex then offers three frozen 20-week profiles:
 | `six-strategy` | six personas × seed 42 | 240 | Same-seed persona divergence |
 | `repair-evidence` | six personas × seeds 42/43/44 | 720 | Evidence adequate to select one repair target |
 
-The user chooses profile, provider, and—when applicable—persona before any
-model spend. Local and API providers execute through the same service. A
+The user confirms Godot and LLM before choosing a profile and—when
+applicable—persona. Local and API providers execute through the same service. A
 one-strategy or one-seed run can validate the agent but cannot prove a repair.
 
-Before a full campaign, start the viewer and governed API in separate terminals:
+The Vite viewer remains running while choices are made. After Godot, LLM,
+profile, and any required persona are frozen, start the governed API in a
+second terminal with the selected runtime:
 
 ```bash
-scripts/run-judge-dev --host 127.0.0.1 --port 8080
-npm --prefix frontend run prepare:public
-npm --prefix frontend run dev -- --host 127.0.0.1
+# Local Godot
+GODOT_BIN=/resolved/godot4 \
+  scripts/run-judge-dev --host 127.0.0.1 --port 8080
+
+# Docker Godot
+GODOT_BIN="$PWD/scripts/godot-docker-wrapper" \
+  scripts/run-judge-dev --host 127.0.0.1 --port 8080
 ```
 
-Then open `http://127.0.0.1:5173/#/playthrough-inspector`. Codex executes the
+Refresh the already-open inspector after the API connects. Codex executes the
 exact command emitted by `session-options`, monitors weekly progress, verifies
 the completed public bundle and frontend view, and does not edit the game or
 spend API credit without explicit approval.
@@ -301,8 +308,8 @@ Latest local closeout:
 
 - Python suite passed with only declared environment-dependent skips.
 - Frontend: 25 tests passed and the production build completed.
-- A/B campaign, repair, and playthrough bundle verifiers passed.
-- Judge Inspect verified 599 committed artifacts; Replay passed all five checks.
+- Private local-vLLM A/B logs are excluded from Git and the static frontend.
+- Judge Inspect and Replay pass against the reduced curated evidence set.
 - Restricted Docker Inspect/Replay and read-only Dashboard/API checks passed.
 
 ## Build Week scope
@@ -321,13 +328,14 @@ The project is MIT licensed; third-party and generated-asset provenance is in
 
 ## Current limitations and submission status
 
-- The retained local A/B candidates were rejected and were not merged. This is
-  evidence that the agent can reject unsupported repairs, not a claim that the
-  demo's pressure/cashflow balance is fixed.
+- Local A/B candidates were rejected and not merged. Their raw logs remain
+  operator-local; only summarized findings are retained in documentation. This
+  is not a claim that the demo's pressure/cashflow balance is fixed.
 - A retained, redacted GPT-5.6 campaign is still pending.
 - The public demo video, primary `/feedback` Session ID, final Devpost team
   checks, private-repository judge access, and final published image metadata
-  remain owner/release actions.
+  remain owner/release actions. The `/feedback/` session is submission metadata
+  only and is intentionally ignored by Git.
 - The embedded Study in Germany project is a competition demo, not a complete
   commercial game.
 - Live persona work requires a compatible model endpoint; real gameplay still
