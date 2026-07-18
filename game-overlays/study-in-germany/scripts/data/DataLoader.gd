@@ -111,10 +111,9 @@ static func event_from_dict(record: Dictionary):
 	event.source_order = int(record.get("source_order", 0))
 	event.choices = []
 	var localized_choices = localized.get("choices", [])
-	for index in range(_array(record.get("choices", [])).size()):
-		var choice_record = _array(record.get("choices", []))[index]
+	for choice_record in _array(record.get("choices", [])):
 		if choice_record is Dictionary:
-			var choice_copy = localized_choices[index] if localized_choices is Array and index < localized_choices.size() else {}
+			var choice_copy := _localized_choice(localized_choices, str(choice_record.get("text", "")))
 			event.choices.append(choice_from_dict(choice_record, choice_copy))
 	return event
 
@@ -122,7 +121,7 @@ static func choice_from_dict(record: Dictionary, localized: Dictionary = {}):
 	var choice = EventChoiceDefScript.new()
 	choice.text_zh = str(record.get("text", ""))
 	choice.text_en = str(localized.get("en", choice.text_zh))
-	choice.text = choice.text_en
+	choice.text = choice.text_zh
 	choice.requirements = _dict(record.get("requirements", {}))
 	choice.success_rate = float(record.get("success_rate", 1.0))
 	choice.success_modifiers = _dict(record.get("success_modifiers", {}))
@@ -131,6 +130,14 @@ static func choice_from_dict(record: Dictionary, localized: Dictionary = {}):
 	choice.set_flag = str(record.get("set_flag", ""))
 	choice.next_event_id = str(record.get("next_event_id", ""))
 	return choice
+
+static func _localized_choice(localized_choices, source_text: String) -> Dictionary:
+	if not (localized_choices is Array):
+		return {}
+	for candidate in localized_choices:
+		if candidate is Dictionary and str(candidate.get("zh", "")) == source_text:
+			return candidate
+	return {}
 
 static func character_from_dict(record: Dictionary):
 	var character = CharacterDefScript.new()

@@ -36,11 +36,16 @@ export function localizedChoice(
   locale: EventLocale,
 ): string {
   if (!choice) return locale === "en" ? "No event choice" : "没有事件选项";
+  const sourceText = choice.text_zh ?? choice.text;
+  const sourceMatch = catalog.events[eventId]?.choices.find(
+    (item) => item.zh === sourceText,
+  );
+  if (sourceMatch?.[locale]) return sourceMatch[locale];
   const direct = locale === "en" ? choice.text_en : choice.text_zh;
   if (direct) return direct;
   const match = CHOICE_INDEX.exec(choice.choice_id);
   const index = match ? Number(match[1]) - 1 : -1;
-  return catalog.events[eventId]?.choices[index]?.[locale] ?? choice.text;
+  return catalog.events[eventId]?.choices[index]?.[locale] ?? sourceText;
 }
 
 function humanizeEventId(eventId: string): string {

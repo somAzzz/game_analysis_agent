@@ -899,29 +899,33 @@
     },
     "desperate_illegal_work_offer": {
       "body": {
-        "en": "Your account is empty; hunger and stress are rising. Someone offers cash-in-hand work: daily pay, no ID checks, no contract. It could save this month, or jeopardize your residency.",
+        "en": "Your account is empty, and both hunger and stress are rising. Someone offers cash-in-hand work with same-day pay, no ID check, and no contract. It could get you through the month, but it could also put your residence status at risk.",
         "zh": "账户已经见底，饥饿和压力一起上升。有人说有现金工，当天结账、不问身份、不签合同。它能救这个月，也可能把你推向居留风险。"
       },
       "choices": [
         {
-          "en": "Seek Student Union aid",
+          "en": "Seek emergency aid from the student union",
           "zh": "找学生会紧急援助"
         },
         {
-          "en": "Borrow from friends/parents",
+          "en": "Ask a friend for a short-term loan",
+          "zh": "找朋友临时借钱"
+        },
+        {
+          "en": "Borrow from classmates or your parents",
           "zh": "向同学或父母借钱"
         },
         {
-          "en": "Take the cash job",
+          "en": "Take the cash-in-hand job",
           "zh": "接下现金黑工"
         },
         {
-          "en": "Use food banks/cheap canteens",
+          "en": "Use a food bank or a subsidized canteen",
           "zh": "去食物救助/低价食堂"
         }
       ],
       "title": {
-        "en": "Temptation of Illegal Work",
+        "en": "Temptation of Cash-in-Hand Work When Broke",
         "zh": "没钱后的黑工诱惑"
       }
     },
@@ -2915,29 +2919,33 @@
     },
     "semester_fee_due": {
       "body": {
-        "en": "Your university sent a Semesterbeitrag email. While most German public universities don't charge high tuition, semester fees, student union dues, and transit tickets must still be paid on time.",
+        "en": "Your university has sent a Semesterbeitrag notice. Most German public universities do not charge conventional tuition, but the semester contribution, student-union fees, and transit pass still have to be paid on time.",
         "zh": "学校发来 Semesterbeitrag 邮件。德国多数公立大学不是传统高学费，但学期费、学生会费和交通票仍要按时缴。"
       },
       "choices": [
         {
-          "en": "Pay on time",
+          "en": "Pay the semester contribution on time",
           "zh": "按时缴费"
         },
         {
-          "en": "Confirm deadline first",
+          "en": "Check the payment deadline first",
           "zh": "先确认截止日期"
         },
         {
-          "en": "Handle prudently",
+          "en": "Ask a friend to cover the semester contribution",
+          "zh": "找朋友周转学期费"
+        },
+        {
+          "en": "Handle the situation carefully",
           "zh": "稳妥处理"
         },
         {
-          "en": "Seek help",
+          "en": "Ask for help covering the payment",
           "zh": "寻求帮助"
         }
       ],
       "title": {
-        "en": "Semester Fee Reminder",
+        "en": "Semester Contribution Payment Reminder",
         "zh": "学期费提醒"
       }
     },
