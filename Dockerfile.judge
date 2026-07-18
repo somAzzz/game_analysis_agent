@@ -34,6 +34,11 @@ COPY examples/build_week_2026/ ./examples/build_week_2026/
 COPY docs/reviews/openai_build_week_2026/ ./docs/reviews/openai_build_week_2026/
 COPY frontend/public-demo/ ./frontend/public-demo/
 COPY frontend/dist/ ./frontend/dist/
+COPY frontend/src/lib/api.ts frontend/src/lib/eventLocalization.ts ./frontend/src/lib/
+COPY frontend/src/pages/JudgePage.tsx ./frontend/src/pages/
+COPY frontend/src/types.ts ./frontend/src/
+COPY frontend/tests/App.test.tsx frontend/tests/api.test.ts frontend/tests/eventLocalization.test.ts ./frontend/tests/
+COPY tests/test_event_localization.py tests/test_experiment_registry.py tests/test_judge_inspect.py ./tests/
 
 RUN useradd --create-home --uid 10001 judge \
  && chown -R judge:judge /app

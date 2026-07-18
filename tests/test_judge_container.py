@@ -14,12 +14,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_judge_dockerfile_pins_multiarch_base_and_runs_unprivileged() -> None:
     dockerfile = (ROOT / "Dockerfile.judge").read_text(encoding="utf-8")
+    dockerignore = (ROOT / ".dockerignore").read_text(encoding="utf-8")
 
     assert re.search(r"python:3\.12\.10-slim-bookworm@sha256:[0-9a-f]{64}", dockerfile)
     assert "--platform=" not in dockerfile
     assert "USER judge" in dockerfile
     assert 'ENTRYPOINT ["./judge"]' in dockerfile
     assert "UV_CACHE_DIR=/tmp/uv-cache" in dockerfile
+    for test_path in (
+        "tests/test_event_localization.py",
+        "tests/test_experiment_registry.py",
+        "tests/test_judge_inspect.py",
+    ):
+        assert f"!{test_path}" in dockerignore
     for required in (
         "judge-manifest.json",
         "COPY .agents/ ./.agents/",
@@ -27,6 +34,11 @@ def test_judge_dockerfile_pins_multiarch_base_and_runs_unprivileged() -> None:
         "COPY scripts/tools/ ./scripts/tools/",
         "COPY game-overlays/ ./game-overlays/",
         "COPY frontend/public-demo/ ./frontend/public-demo/",
+        "COPY frontend/src/lib/api.ts frontend/src/lib/eventLocalization.ts ./frontend/src/lib/",
+        "COPY frontend/src/pages/JudgePage.tsx ./frontend/src/pages/",
+        "COPY frontend/src/types.ts ./frontend/src/",
+        "COPY frontend/tests/App.test.tsx frontend/tests/api.test.ts frontend/tests/eventLocalization.test.ts ./frontend/tests/",
+        "COPY tests/test_event_localization.py tests/test_experiment_registry.py tests/test_judge_inspect.py ./tests/",
         "fixtures/",
         "examples/build_week_2026/",
     ):
