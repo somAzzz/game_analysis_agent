@@ -137,6 +137,16 @@ def test_committed_judge_manifest_passes_dependency_free_inspect() -> None:
     manifest = json.loads((ROOT / "judge-manifest.json").read_text(encoding="utf-8"))
     assert len(payload["artifacts"]) == len(manifest["artifacts"])
     roles = [item["role"] for item in payload["artifacts"]]
-    assert roles.count("local-vllm-experiment-evidence") >= 38
-    assert roles.count("local-vllm-playthrough-evidence") >= 400
-    assert payload["checks"][2]["detail"] == ("7 public claims resolved to exact JSON values")
+    assert roles.count("local-vllm-experiment-evidence") == 0
+    assert roles.count("local-vllm-playthrough-evidence") == 0
+    assert roles.count("deterministic-correctness-evidence") >= 3
+    assert roles.count("deterministic-correctness-frontend") >= 5
+    private_ids = {
+        "vllm-cohort-a-pressure-feedback-v1",
+        "vllm-cohort-b-survival-recovery-v1",
+    }
+    assert all(
+        not any(experiment_id in item["path"] for experiment_id in private_ids)
+        for item in payload["artifacts"]
+    )
+    assert payload["checks"][2]["detail"] == ("8 public claims resolved to exact JSON values")

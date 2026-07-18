@@ -66,6 +66,122 @@ function ExperimentSelector({ experiments, selected, disabled, onChange }: { exp
   );
 }
 
+function CorrectnessExperimentView({
+  experiment,
+  experiments,
+  loading,
+  onChange,
+}: {
+  experiment: JudgeExperiment;
+  experiments: JudgeExperimentSummary[];
+  loading: boolean;
+  onChange: (id: string) => void;
+}) {
+  const proof = experiment.correctness_proof;
+  const patch = experiment.patch;
+  if (!proof || !patch) return null;
+  return (
+    <div className="judge-shell">
+      <ForgeTopNav active="mission" truthLabel="Accepted deterministic evidence" />
+      <section className="judge-hero" aria-labelledby="judge-title">
+        <div>
+          <p className="judge-kicker">OpenAI Build Week 2026 · Judge Mode</p>
+          <h1 id="judge-title">A content identity defect faced its proof.<br /><em>The gates accepted it.</em></h1>
+        </div>
+        <aside className="judge-verdict" data-decision="accepted" aria-label="Experiment decision status">
+          <span>Machine recommendation</span><strong>ACCEPTED</strong><small>Retained in the submission branch</small>
+        </aside>
+        <p className="judge-thesis">Chinese source text remains the mechanical identity; detailed English copy is now display-only and can no longer shift or hide choices.</p>
+        <p className="judge-mode"><span aria-hidden="true">●</span> deterministic Godot 4.4 · zero model calls · evidence hashes verified</p>
+      </section>
+      <JudgeMissionExperience />
+      <main className="judge-ledger">
+        <ExperimentSelector experiments={experiments} selected={experiment} disabled={loading} onChange={onChange} />
+        <section className="judge-stage" aria-labelledby="correctness-observation-title">
+          <div className="judge-stage-marker"><span>01</span><b>OBSERVE</b></div>
+          <div className="judge-stage-body">
+            <p className="judge-eyebrow">One identity mechanism · two concrete failures</p>
+            <h2 id="correctness-observation-title">Positional localization shifted five-choice events out of alignment.</h2>
+            <div className="judge-metrics" aria-label="Correctness facts">
+              <Metric value={String(proof.baseline_identity_errors)} label="baseline identity errors" intent="danger" />
+              <Metric value={String(proof.patched_identity_errors)} label="patched identity errors" />
+              <Metric value="128" label="bilingual events covered" />
+              <Metric value={String(proof.provider_calls)} label="model calls" />
+            </div>
+            <p className="judge-copy">The semester-fee borrowing choice was hidden, while a borrowing effect inherited the label “Take the cash job.” The focused economy validator caught both failures.</p>
+          </div>
+        </section>
+        <section className="judge-stage" aria-labelledby="correctness-repair-title">
+          <div className="judge-stage-marker"><span>02</span><b>REPAIR</b></div>
+          <div className="judge-stage-body">
+            <p className="judge-eyebrow">Stable source identity · exact bilingual copy</p>
+            <h2 id="correctness-repair-title">Codex matched localized choices by Chinese source text, not array position.</h2>
+            <blockquote>{experiment.hypothesis}</blockquote>
+            <div className="judge-patch">
+              <div>
+                <span>Accepted patch</span>
+                <strong>{patch.changed_files} files · +{patch.added_lines} / −{patch.deleted_lines}</strong>
+                <code>{patch.patched_commit.slice(0, 12)}</code>
+              </div>
+              <ul>{patch.modified_paths.map((path) => <li key={path}>{path}</li>)}</ul>
+              <div className="judge-stamp" aria-label="Candidate repair accepted">ACCEPTED</div>
+            </div>
+            <details id="candidate-patch-diff" className="judge-diff">
+              <summary><span>View exact accepted diff</span><code>sha256 {patch.patch_sha256.slice(0, 12)}</code></summary>
+              <div className="judge-diff-meta">
+                <p><span>Baseline</span><code>{patch.baseline_commit.slice(0, 12)}</code></p>
+                <p><span>Disposition</span><strong>{patch.disposition.replaceAll("_", " ")}</strong></p>
+              </div>
+              <pre aria-label="Exact accepted source diff"><code>{patch.diff}</code></pre>
+            </details>
+          </div>
+        </section>
+        <section className="judge-stage" aria-labelledby="correctness-proof-title">
+          <div className="judge-stage-marker"><span>03</span><b>PROOF</b></div>
+          <div className="judge-stage-body">
+            <p className="judge-eyebrow">Fixed seeds + unseen holdout · semantic preservation</p>
+            <h2 id="correctness-proof-title">The defect disappeared without changing game outcomes.</h2>
+            <div className="judge-comparison">
+              <div>
+                <h3>Fixed cohort</h3>
+                <strong>{proof.fixed_seeds.join(" / ")}</strong>
+                <p>Trajectories, final states, and endings remained identical.</p>
+              </div>
+              <div>
+                <h3>Unseen holdout</h3>
+                <strong>{proof.holdout_seeds.join(" / ")}</strong>
+                <p>Trajectories, final states, and endings remained identical.</p>
+              </div>
+            </div>
+            <div className="judge-gates">
+              <h3>Acceptance gates</h3>
+              <ol>{experiment.gates.map((gate) => (
+                <li key={gate.gate_id} className="passed">
+                  <span aria-hidden="true">✓</span>
+                  <div><b>{gate.gate_id.replaceAll("_", " ")}</b><small>{gate.detail}</small></div>
+                  <em>passed</em>
+                </li>
+              ))}</ol>
+            </div>
+            <p className="judge-decision"><span>Machine recommendation</span><strong>accepted</strong>{experiment.decision_reason}</p>
+          </div>
+        </section>
+        <section className="judge-stage judge-human-stage" aria-labelledby="correctness-visible-title">
+          <div className="judge-stage-marker"><span>04</span><b>VISIBLE</b></div>
+          <div className="judge-stage-body">
+            <p className="judge-eyebrow">Submission frontend · review-ready proof</p>
+            <h2 id="correctness-visible-title">The accepted repair remains reviewable without publishing local campaign logs.</h2>
+            <p className="judge-copy">Inspect the exact accepted diff and its hash-bound fixed and holdout evidence above. Development-only model traces stay private to the operator.</p>
+            <nav className="judge-review-evidence-links" aria-label="Accepted repair evidence">
+              <a href="#candidate-patch-diff">Review accepted patch diff</a>
+            </nav>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
 function PendingStage({ number, label, title }: { number: string; label: string; title: string }) {
   return (
     <section className="judge-stage judge-stage-pending">
@@ -120,7 +236,7 @@ export function JudgePage() {
         applyExperiment(frozen);
         setExperiments(staticIndex.experiments);
         setSource("static");
-        setActivity("Static evaluator mode: signed and local A/B proof evidence is available without a server.");
+        setActivity("Static evaluator mode: signed and deterministic proof evidence is available without a server.");
       } catch (error) {
         if (active) setActivity("Evidence unavailable: " + errorMessage(error));
       }
@@ -277,6 +393,17 @@ export function JudgePage() {
           <p role="status">{activity}</p>
         </main>
       </div>
+    );
+  }
+
+  if (experiment.proof_kind === "content_correctness") {
+    return (
+      <CorrectnessExperimentView
+        experiment={experiment}
+        experiments={experiments}
+        loading={experimentLoading}
+        onChange={(id) => { void handleExperimentChange(id); }}
+      />
     );
   }
 

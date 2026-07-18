@@ -74,3 +74,40 @@ def test_committed_metadata_path_escape_fails_closed(tmp_path: Path) -> None:
     )
 
     assert ExperimentRegistry(tmp_path)._committed_experiments() == ()
+
+
+def test_committed_correctness_experiment_is_hash_verified_and_accepted() -> None:
+    registry = ExperimentRegistry(ROOT)
+
+    index = registry.list()
+    summary = next(
+        item
+        for item in index["experiments"]
+        if item["experiment_id"] == "localization-choice-identity-v1"
+    )
+    detail = registry.get(summary["experiment_id"])
+
+    assert summary["source_label"] == "DETERMINISTIC GODOT"
+    assert detail["proof_kind"] == "content_correctness"
+    assert detail["decision"] == "accepted"
+    assert detail["correctness_proof"]["patched_identity_errors"] == 0
+    assert detail["patch"]["disposition"] == "integrated_uncommitted"
+    assert "Ask a friend to cover the semester contribution" in detail["patch"]["diff"]
+
+
+def test_private_local_ab_campaigns_are_not_frontend_visible(monkeypatch) -> None:  # noqa: ANN001
+    registry = ExperimentRegistry(ROOT)
+    private = _local_campaign().model_copy(
+        update={
+            "experiment_id": "vllm-cohort-a-pressure-feedback-v1",
+            "campaign_id": "vllm-audit-25seed-cohort-a",
+        }
+    )
+    monkeypatch.setattr(registry, "_committed_experiments", lambda: ())
+    monkeypatch.setattr(registry, "_committed_correctness_experiments", lambda: ())
+    monkeypatch.setattr(registry, "_runtime_campaigns", lambda: (private,))
+    monkeypatch.setattr(registry, "_runtime_repairs", lambda _campaigns: ())
+
+    experiment_ids = {item["experiment_id"] for item in registry.list()["experiments"]}
+
+    assert private.experiment_id not in experiment_ids

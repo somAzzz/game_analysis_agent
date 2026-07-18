@@ -52,5 +52,13 @@ pnpm-debug.log*
 reports/**
 !reports/.gitkeep
 
+# Private evaluator feedback and local vLLM A/B evidence. These stay on the
+# operator machine and must never enter a submission or static frontend build.
+/feedback/
+/examples/build_week_2026/experiments/vllm-cohort-a-pressure-feedback-v1/
+/examples/build_week_2026/experiments/vllm-cohort-b-survival-recovery-v1/
+/frontend/public-demo/experiments/vllm-cohort-a-pressure-feedback-v1/
+/frontend/public-demo/experiments/vllm-cohort-b-survival-recovery-v1/
+
 # Editor workspace files.
 *.code-workspace

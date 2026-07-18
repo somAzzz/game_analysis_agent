@@ -1,6 +1,0 @@
-{
-  "eligible": true,
-  "schema_version": "repair-target-eligibility-v1",
-  "target": "cashflow-stress-attractor",
-  "target_path": "reports/persona-campaigns/vllm-audit-25seed-cohort-a/public/repair_target.json"
-}

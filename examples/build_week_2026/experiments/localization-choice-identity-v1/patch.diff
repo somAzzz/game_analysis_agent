@@ -1,0 +1,217 @@
+diff --git a/game-overlays/study-in-germany/data/localization/events.json b/game-overlays/study-in-germany/data/localization/events.json
+index 0ba4c908a14fcee89c339064457b3ce89addf18a..612d0f1278f236e9b469a89cc6ae8fa740b5a873 100644
+--- a/game-overlays/study-in-germany/data/localization/events.json
++++ b/game-overlays/study-in-germany/data/localization/events.json
+@@ -899,29 +899,33 @@
+     },
+     "desperate_illegal_work_offer": {
+       "body": {
+-        "en": "Your account is empty; hunger and stress are rising. Someone offers cash-in-hand work: daily pay, no ID checks, no contract. It could save this month, or jeopardize your residency.",
++        "en": "Your account is empty, and both hunger and stress are rising. Someone offers cash-in-hand work with same-day pay, no ID check, and no contract. It could get you through the month, but it could also put your residence status at risk.",
+         "zh": "账户已经见底，饥饿和压力一起上升。有人说有现金工，当天结账、不问身份、不签合同。它能救这个月，也可能把你推向居留风险。"
+       },
+       "choices": [
+         {
+-          "en": "Seek Student Union aid",
++          "en": "Seek emergency aid from the student union",
+           "zh": "找学生会紧急援助"
+         },
+         {
+-          "en": "Borrow from friends/parents",
++          "en": "Ask a friend for a short-term loan",
++          "zh": "找朋友临时借钱"
++        },
++        {
++          "en": "Borrow from classmates or your parents",
+           "zh": "向同学或父母借钱"
+         },
+         {
+-          "en": "Take the cash job",
++          "en": "Take the cash-in-hand job",
+           "zh": "接下现金黑工"
+         },
+         {
+-          "en": "Use food banks/cheap canteens",
++          "en": "Use a food bank or a subsidized canteen",
+           "zh": "去食物救助/低价食堂"
+         }
+       ],
+       "title": {
+-        "en": "Temptation of Illegal Work",
++        "en": "Temptation of Cash-in-Hand Work When Broke",
+         "zh": "没钱后的黑工诱惑"
+       }
+     },
+@@ -2915,29 +2919,33 @@
+     },
+     "semester_fee_due": {
+       "body": {
+-        "en": "Your university sent a Semesterbeitrag email. While most German public universities don't charge high tuition, semester fees, student union dues, and transit tickets must still be paid on time.",
++        "en": "Your university has sent a Semesterbeitrag notice. Most German public universities do not charge conventional tuition, but the semester contribution, student-union fees, and transit pass still have to be paid on time.",
+         "zh": "学校发来 Semesterbeitrag 邮件。德国多数公立大学不是传统高学费，但学期费、学生会费和交通票仍要按时缴。"
+       },
+       "choices": [
+         {
+-          "en": "Pay on time",
++          "en": "Pay the semester contribution on time",
+           "zh": "按时缴费"
+         },
+         {
+-          "en": "Confirm deadline first",
++          "en": "Check the payment deadline first",
+           "zh": "先确认截止日期"
+         },
+         {
+-          "en": "Handle prudently",
++          "en": "Ask a friend to cover the semester contribution",
++          "zh": "找朋友周转学期费"
++        },
++        {
++          "en": "Handle the situation carefully",
+           "zh": "稳妥处理"
+         },
+         {
+-          "en": "Seek help",
++          "en": "Ask for help covering the payment",
+           "zh": "寻求帮助"
+         }
+       ],
+       "title": {
+-        "en": "Semester Fee Reminder",
++        "en": "Semester Contribution Payment Reminder",
+         "zh": "学期费提醒"
+       }
+     },
+diff --git a/game-overlays/study-in-germany/scripts/data/DataLoader.gd b/game-overlays/study-in-germany/scripts/data/DataLoader.gd
+index 589956912a530668a6e3abd6b5ede0c72a0f5f95..79e38a8ffd943858713b15c07cbca8898e6b5f7b 100644
+--- a/game-overlays/study-in-germany/scripts/data/DataLoader.gd
++++ b/game-overlays/study-in-germany/scripts/data/DataLoader.gd
+@@ -111,10 +111,9 @@ static func event_from_dict(record: Dictionary):
+ 	event.source_order = int(record.get("source_order", 0))
+ 	event.choices = []
+ 	var localized_choices = localized.get("choices", [])
+-	for index in range(_array(record.get("choices", [])).size()):
+-		var choice_record = _array(record.get("choices", []))[index]
++	for choice_record in _array(record.get("choices", [])):
+ 		if choice_record is Dictionary:
+-			var choice_copy = localized_choices[index] if localized_choices is Array and index < localized_choices.size() else {}
++			var choice_copy := _localized_choice(localized_choices, str(choice_record.get("text", "")))
+ 			event.choices.append(choice_from_dict(choice_record, choice_copy))
+ 	return event
+ 
+@@ -122,7 +121,7 @@ static func choice_from_dict(record: Dictionary, localized: Dictionary = {}):
+ 	var choice = EventChoiceDefScript.new()
+ 	choice.text_zh = str(record.get("text", ""))
+ 	choice.text_en = str(localized.get("en", choice.text_zh))
+-	choice.text = choice.text_en
++	choice.text = choice.text_zh
+ 	choice.requirements = _dict(record.get("requirements", {}))
+ 	choice.success_rate = float(record.get("success_rate", 1.0))
+ 	choice.success_modifiers = _dict(record.get("success_modifiers", {}))
+@@ -132,6 +131,14 @@ static func choice_from_dict(record: Dictionary, localized: Dictionary = {}):
+ 	choice.next_event_id = str(record.get("next_event_id", ""))
+ 	return choice
+ 
++static func _localized_choice(localized_choices, source_text: String) -> Dictionary:
++	if not (localized_choices is Array):
++		return {}
++	for candidate in localized_choices:
++		if candidate is Dictionary and str(candidate.get("zh", "")) == source_text:
++			return candidate
++	return {}
++
+ static func character_from_dict(record: Dictionary):
+ 	var character = CharacterDefScript.new()
+ 	character.id = str(record.get("id", ""))
+diff --git a/judge-manifest.json b/judge-manifest.json
+index 2b8b56cfe2b5e69af4c22dfdca520758c22ad9c0..fe747674aa4c62d52b66adae839513ff09c195c4 100644
+--- a/judge-manifest.json
++++ b/judge-manifest.json
+@@ -806,10 +806,10 @@
+       "sha256": "9d471f54e2b3c2337464e15c5e88bcf0d1fe256da7d8806c83ced27b530e4216"
+     },
+     {
+-      "bytes": 98996,
++      "bytes": 99473,
+       "path": "game-overlays/study-in-germany/data/localization/events.json",
+       "role": "embedded-demo-runtime-overlay",
+-      "sha256": "52ff86b78571ca44469ef6afb90246ecf1d9a2907281e09671b8460473d56348"
++      "sha256": "8ab504462cae6944ba02459c7250067661474cb7e85cdd4b1fd21ebb9a698c1f"
+     },
+     {
+       "bytes": 29555,
+@@ -818,10 +818,10 @@
+       "sha256": "d8eca972196410fbe48931313080baa0d89ffcee1d729b8024e687e01d89d9ea"
+     },
+     {
+-      "bytes": 8527,
++      "bytes": 8714,
+       "path": "game-overlays/study-in-germany/scripts/data/DataLoader.gd",
+       "role": "embedded-demo-runtime-overlay",
+-      "sha256": "e33122d7179f4c85efec2d7058e638b55ad7856b08fb7c1ef01883f096058fc9"
++      "sha256": "bcdcb4bc4a2cdce6dc4c04235125a2813de71e29fffc0f091e10bfc959684347"
+     },
+     {
+       "bytes": 1001,
+diff --git a/tests/test_event_localization.py b/tests/test_event_localization.py
+index d021ccc7f2bdb799015520d0f99340d10e0e1be3..295a4ebac10afbad702c1c95b78b15591313c8e2 100644
+--- a/tests/test_event_localization.py
++++ b/tests/test_event_localization.py
+@@ -7,6 +7,18 @@ from pathlib import Path
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+ SOURCE = ROOT / "demo/study-in-germany/data/events/generated_events.json"
++RUNTIME_SOURCES = tuple(
++    ROOT / "demo/study-in-germany/data/events" / name
++    for name in (
++        "academic_events.json",
++        "admin_events.json",
++        "application_events.json",
++        "life_events.json",
++        "random_events.json",
++        "relationship_events.json",
++        "work_events.json",
++    )
++)
+ CATALOG = ROOT / "game-overlays/study-in-germany/data/localization/events.json"
+ CJK = re.compile(r"[\u3400-\u9fff]")
+ 
+@@ -29,9 +41,7 @@ def test_event_localization_covers_every_event_and_choice_without_mechanic_chang
+         localized = catalog["events"][event["id"]]
+         assert localized["title"]["zh"] == event["title"]
+         assert localized["body"]["zh"] == event["body"]
+-        assert [choice["zh"] for choice in localized["choices"]] == [
+-            choice["text"] for choice in event["choices"]
+-        ]
++        assert {choice["text"] for choice in event["choices"]} <= {choice["zh"] for choice in localized["choices"]}
+         english = [
+             localized["title"]["en"],
+             localized["body"]["en"],
+@@ -39,6 +49,18 @@ def test_event_localization_covers_every_event_and_choice_without_mechanic_chang
+         ]
+         assert all(text.strip() and not CJK.search(text) for text in english)
+ 
++    runtime_events = [
++        event
++        for source_path in RUNTIME_SOURCES
++        for event in json.loads(source_path.read_text(encoding="utf-8"))["items"]
++    ]
++    assert {event["id"] for event in runtime_events} == set(catalog["events"])
++    for event in runtime_events:
++        localized = catalog["events"][event["id"]]
++        assert {choice["zh"] for choice in localized["choices"]} == {
++            choice["text"] for choice in event["choices"]
++        }
++
+ 
+ def test_runtime_defaults_to_english_without_localizing_choice_identity() -> None:
+     loader = (ROOT / "game-overlays/study-in-germany/scripts/data/DataLoader.gd").read_text(
+@@ -48,7 +70,7 @@ def test_runtime_defaults_to_english_without_localizing_choice_identity() -> Non
+ 
+     assert "event.title = event.title_en" in loader
+     assert "event.body = event.body_en" in loader
+-    assert "choice.text = choice.text_en" in loader
++    assert "choice.text = choice.text_zh" in loader
+     assert 'choice.localized_text("en")' in probe
+     assert 'choice.localized_text("zh")' in probe
+     assert 'var safe_text := str(choice.localized_text("en")).to_lower()' in probe

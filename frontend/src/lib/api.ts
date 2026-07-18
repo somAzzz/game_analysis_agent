@@ -155,7 +155,7 @@ export function fetchJudgeExperiments(): Promise<JudgeExperimentIndex> {
   return judgeJSON<JudgeExperimentIndex>("experiments");
 }
 
-export function fetchJudgeExperiment(experimentId = "cashflow-drift-repair-v1"): Promise<JudgeExperiment> {
+export function fetchJudgeExperiment(experimentId = "localization-choice-identity-v1"): Promise<JudgeExperiment> {
   return judgeJSON<JudgeExperiment>("experiments/" + encodeURIComponent(experimentId));
 }
 
@@ -189,7 +189,7 @@ export async function fetchStaticJudgeExperiments(): Promise<JudgeExperimentInde
 }
 
 export async function fetchStaticJudgeExperiment(
-  experimentId = "cashflow-drift-repair-v1",
+  experimentId = "localization-choice-identity-v1",
 ): Promise<JudgeExperiment> {
   const path = experimentId === "cashflow-drift-repair-v1"
     ? assetPath("judge-demo.json")

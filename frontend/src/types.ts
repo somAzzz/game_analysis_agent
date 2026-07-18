@@ -325,6 +325,32 @@ export interface JudgeExperimentIndex {
 export interface JudgeExperiment extends Omit<JudgeExperimentSummary, "schema_version"> {
   schema_version: string;
   status: string;
+  proof_kind?: "balance_target" | "content_correctness";
+  correctness_proof?: {
+    baseline_identity_errors: number;
+    patched_identity_errors: number;
+    fixed_seeds: number[];
+    holdout_seeds: number[];
+    fixed_semantic_trajectory_equal: boolean;
+    holdout_semantic_trajectory_equal: boolean;
+    fixed_final_states_equal: boolean;
+    holdout_final_states_equal: boolean;
+    fixed_endings_equal: boolean;
+    holdout_endings_equal: boolean;
+    focused_economy: "passed";
+    required_validators: string[];
+    expected_demo_failure_count: number;
+    inspect: "passed";
+    replay: "passed";
+    pytest_passed: number;
+    pytest_skipped: number;
+    ruff: "passed";
+    provider_calls: number;
+    artifacts: {
+      path: string;
+      sha256: string;
+    }[];
+  };
   evidence_fingerprint: string;
   human_review: HumanReviewRecord | null;
   decision: "accepted" | "rejected" | null;
@@ -355,7 +381,7 @@ export interface JudgeExperiment extends Omit<JudgeExperimentSummary, "schema_ve
     patch_path: string;
     patch_sha256: string;
     canonical_source_path: string;
-    disposition: "candidate_not_merged";
+    disposition: "candidate_not_merged" | "integrated_uncommitted";
     diff: string;
   } | null;
   codex: {

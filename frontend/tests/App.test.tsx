@@ -237,6 +237,52 @@ const experiment: JudgeExperiment = {
   mode: "prerecorded",
 };
 
+const acceptedExperiment: JudgeExperiment = {
+  ...experiment,
+  schema_version: "judge-public-experiment-v3",
+  proof_kind: "content_correctness",
+  experiment_id: "localization-choice-identity-v1",
+  title: "Accepted · bilingual choice identity repair",
+  source_label: "DETERMINISTIC GODOT",
+  provider_mode: "offline-real-godot",
+  model: "no-llm-deterministic-automation",
+  campaign_id: "localization-choice-identity-v1",
+  campaign: { ...experiment.campaign, personas: ["balanced"], seeds: [42, 43, 44, 1042, 1043, 1044], cells: 6, weeks: 120, target_members: 2, target_personas: 0 },
+  decision: "accepted",
+  decision_reason: "Both identity errors were removed while fixed and holdout semantics remained identical.",
+  hypothesis: "Localized choices were matched by array position instead of stable Chinese source identity.",
+  mechanism_class: "localized_choice_source_identity",
+  comparison: null,
+  cohorts: [],
+  gates: [
+    { gate_id: "choice_identity", status: "passed", detail: "focused economy identity errors: 2 → 0", evidence_paths: [] },
+    { gate_id: "holdout_semantic_preservation", status: "passed", detail: "holdout trajectories remained identical", evidence_paths: [] },
+  ],
+  patch: { ...experiment.patch!, disposition: "integrated_uncommitted" },
+  correctness_proof: {
+    baseline_identity_errors: 2,
+    patched_identity_errors: 0,
+    fixed_seeds: [42, 43, 44],
+    holdout_seeds: [1042, 1043, 1044],
+    fixed_semantic_trajectory_equal: true,
+    holdout_semantic_trajectory_equal: true,
+    fixed_final_states_equal: true,
+    holdout_final_states_equal: true,
+    fixed_endings_equal: true,
+    holdout_endings_equal: true,
+    focused_economy: "passed",
+    required_validators: ["content", "json-content", "economy", "risk", "route"],
+    expected_demo_failure_count: 3,
+    inspect: "passed",
+    replay: "passed",
+    pytest_passed: 492,
+    pytest_skipped: 3,
+    ruff: "passed",
+    provider_calls: 0,
+    artifacts: [],
+  },
+};
+
 const experimentIndex: JudgeExperimentIndex = {
   schema_version: "judge-experiment-index-v1",
   experiments: [{
@@ -252,11 +298,11 @@ const experimentIndex: JudgeExperimentIndex = {
 
 const campaignOnlyExperiment: JudgeExperiment = {
   ...experiment,
-  experiment_id: "vllm-audit-25seed-cohort-a", title: "Cohort A local campaign",
+  experiment_id: "local-campaign-test", title: "Local campaign test",
   source_kind: "local_vllm", source_label: "LOCAL vLLM", provider: "vllm", provider_mode: "local",
-  model: "qwen3.6-27b-nvfp4", lifecycle_status: "campaign_complete", campaign_id: "vllm-audit-25seed-cohort-a",
+  model: "qwen3.6-27b-nvfp4", lifecycle_status: "campaign_complete", campaign_id: "local-campaign-test",
   campaign: { ...experiment.campaign, cells: 48, weeks: 912, target_members: 41 },
-  campaign_bundle_path: "reports/persona-campaigns/vllm-audit-25seed-cohort-a/public", repair_bundle_path: null,
+  campaign_bundle_path: "reports/persona-campaigns/local-campaign-test/public", repair_bundle_path: null,
   evidence_fingerprint: "1".repeat(64), decision: null, decision_reason: null, hypothesis: null, mechanism_class: null,
   comparison: null, cohorts: [], gates: [], patch: null, codex: null, mode: "local",
 };
@@ -323,6 +369,40 @@ describe("application routes", () => {
     expect(patchDetails).toHaveAttribute("open");
   });
 
+  it("shows the accepted bilingual choice repair as a dedicated correctness proof", async () => {
+    apiMocks.fetchJudgeExperiment.mockResolvedValue(acceptedExperiment);
+    apiMocks.fetchJudgeExperiments.mockResolvedValue({
+      schema_version: "judge-experiment-index-v1",
+      experiments: [{
+        schema_version: "judge-experiment-summary-v1",
+        experiment_id: acceptedExperiment.experiment_id,
+        title: acceptedExperiment.title,
+        source_kind: acceptedExperiment.source_kind,
+        source_label: acceptedExperiment.source_label,
+        provider: acceptedExperiment.provider,
+        provider_mode: acceptedExperiment.provider_mode,
+        model: acceptedExperiment.model,
+        lifecycle_status: acceptedExperiment.lifecycle_status,
+        campaign_id: acceptedExperiment.campaign_id,
+        campaign: acceptedExperiment.campaign,
+        campaign_bundle_path: acceptedExperiment.campaign_bundle_path,
+        repair_bundle_path: acceptedExperiment.repair_bundle_path,
+        completed_at: acceptedExperiment.completed_at,
+      }],
+    });
+    renderRoute("/");
+
+    expect(await screen.findByRole("heading", { name: /A content identity defect faced its proof/i })).toBeInTheDocument();
+    expect(screen.getAllByText("ACCEPTED").length).toBeGreaterThan(0);
+    expect(screen.getByText("2", { selector: "strong" })).toBeInTheDocument();
+    expect(screen.getAllByText("0", { selector: "strong" }).length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByRole("heading", { name: /The defect disappeared without changing game outcomes/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Review accepted patch diff" })).toHaveAttribute(
+      "href",
+      "#candidate-patch-diff",
+    );
+  });
+
   it("switches to a discovered local campaign without fabricating repair proof", async () => {
     const user = userEvent.setup();
     apiMocks.fetchJudgeExperiment.mockImplementation((experimentId?: string) =>
@@ -335,13 +415,13 @@ describe("application routes", () => {
     expect(within(selector).getByRole("option", { name: /LOCAL vLLM.*CAMPAIGN ONLY/i })).toBeInTheDocument();
     await user.selectOptions(selector, campaignOnlyExperiment.experiment_id);
 
-    expect(await screen.findByRole("heading", { name: "Cohort A local campaign" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Local campaign test" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "No bounded repair has been published." })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Fixed and unseen holdout proof has not run." })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Record final decision" })).not.toBeInTheDocument();
   });
 
-  it("switches frozen A/B evidence when the Judge API is unavailable", async () => {
+  it("switches frozen static evidence when the Judge API is unavailable", async () => {
     const user = userEvent.setup();
     apiMocks.fetchJudgeExperiments.mockRejectedValue(new Error("offline"));
     apiMocks.fetchJudgeExperiment.mockRejectedValue(new Error("offline"));
@@ -354,7 +434,7 @@ describe("application routes", () => {
     expect(selector).toBeEnabled();
     await user.selectOptions(selector, campaignOnlyExperiment.experiment_id);
 
-    expect(await screen.findByRole("heading", { name: "Cohort A local campaign" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Local campaign test" })).toBeInTheDocument();
     expect(apiMocks.fetchStaticJudgeExperiment).toHaveBeenCalledWith(campaignOnlyExperiment.experiment_id);
     expect(screen.queryByRole("button", { name: "Record final decision" })).not.toBeInTheDocument();
   });

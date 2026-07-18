@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -37,6 +38,13 @@ def main() -> int:
     ]
     index = {"schema_version": "judge-experiment-index-v1", "experiments": summaries}
     STATIC_INDEX.write_text(json.dumps(index, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    published_ids = {str(item["experiment_id"]) for item in summaries}
+    if STATIC_EXPERIMENT_ROOT.exists():
+        for child in STATIC_EXPERIMENT_ROOT.iterdir():
+            if child.is_dir() and child.name not in published_ids:
+                shutil.rmtree(child)
+
     for summary in summaries:
         experiment_id = summary["experiment_id"]
         if experiment_id == PUBLIC_EXPERIMENT_ID:

@@ -182,21 +182,76 @@ for playthrough_cell in sorted((PLAYTHROUGH_ROOT / "cells").glob("*.json")):
 ARTIFACTS["frontend/public-demo/judge-demo.json"] = ("judge-static-experiment", None)
 ARTIFACTS["frontend/public-demo/experiment-index.json"] = ("judge-static-index", None)
 
+ACCEPTED_CORRECTNESS_IMPLEMENTATION = {
+    "src/game_analysis_agent/experiment_registry.py": "deterministic-correctness-registry",
+    "tools/build_judge_frontend_demo.py": "deterministic-correctness-publisher",
+    "frontend/src/lib/api.ts": "deterministic-correctness-frontend",
+    "frontend/src/lib/eventLocalization.ts": "deterministic-correctness-frontend",
+    "frontend/src/pages/JudgePage.tsx": "deterministic-correctness-frontend",
+    "frontend/src/types.ts": "deterministic-correctness-frontend",
+    "frontend/tests/App.test.tsx": "deterministic-correctness-test",
+    "frontend/tests/api.test.ts": "deterministic-correctness-test",
+    "frontend/tests/eventLocalization.test.ts": "deterministic-correctness-test",
+    "tests/test_event_localization.py": "deterministic-correctness-test",
+    "tests/test_experiment_registry.py": "deterministic-correctness-test",
+    "tests/test_judge_inspect.py": "deterministic-correctness-test",
+}
+for implementation_path, role in ACCEPTED_CORRECTNESS_IMPLEMENTATION.items():
+    ARTIFACTS[implementation_path] = (role, None)
+
 for experiment_file in sorted((ROOT / "frontend/public-demo/experiments").rglob("*")):
     if experiment_file.is_file():
+        relative = experiment_file.relative_to(ROOT).as_posix()
+        role = (
+            "deterministic-correctness-frontend"
+            if "localization-choice-identity-v1" in relative
+            else "local-vllm-playthrough-evidence"
+        )
         ARTIFACTS[experiment_file.relative_to(ROOT).as_posix()] = (
-            "local-vllm-playthrough-evidence",
+            role,
             None,
         )
 
 for experiment_file in sorted((ROOT / "examples/build_week_2026/experiments").rglob("*")):
     if experiment_file.is_file():
+        relative = experiment_file.relative_to(ROOT).as_posix()
+        role = (
+            "deterministic-correctness-evidence"
+            if "localization-choice-identity-v1" in relative
+            else "local-vllm-experiment-evidence"
+        )
         ARTIFACTS[experiment_file.relative_to(ROOT).as_posix()] = (
-            "local-vllm-experiment-evidence",
+            role,
             None,
         )
 
 CLAIMS = [
+    {
+        "id": "accepted_localization_choice_identity",
+        "statement": "The deterministic bilingual choice-identity repair is accepted: focused identity errors fell from two to zero, and no model call was used.",
+        "evidence": [
+            {
+                "path": "examples/build_week_2026/experiments/localization-choice-identity-v1/accepted_experiment.json",
+                "json_pointer": "/decision",
+                "equals": "accepted",
+            },
+            {
+                "path": "examples/build_week_2026/experiments/localization-choice-identity-v1/accepted_experiment.json",
+                "json_pointer": "/correctness_proof/baseline_identity_errors",
+                "equals": 2,
+            },
+            {
+                "path": "examples/build_week_2026/experiments/localization-choice-identity-v1/accepted_experiment.json",
+                "json_pointer": "/correctness_proof/patched_identity_errors",
+                "equals": 0,
+            },
+            {
+                "path": "examples/build_week_2026/experiments/localization-choice-identity-v1/accepted_experiment.json",
+                "json_pointer": "/correctness_proof/provider_calls",
+                "equals": 0,
+            },
+        ],
+    },
     {
         "id": "playthrough_inspector_evidence",
         "statement": "The Playthrough Inspector is backed by 18 verified real-Godot Replay cells, 342 weekly nodes, and 324 observed state transitions.",
@@ -370,7 +425,7 @@ def build_manifest() -> dict[str, object]:
         "limitations": [
             "Inspect validates committed evidence; it does not perform a fresh model or Godot run.",
             "The committed persona decisions are deterministic policy-authored Replay fixtures, not recorded or fresh OpenAI responses.",
-            "The candidate repair was rejected and is not merged into the game baseline.",
+            "The three cashflow/balance candidates remain rejected and unmerged; the separate bilingual choice-identity correctness repair is accepted and integrated in the submission overlay.",
             "Live OpenAI Judge Mode requires a separately supplied server-side API key.",
             "The embedded Study in Germany source is a competition demo, not a complete game.",
         ],

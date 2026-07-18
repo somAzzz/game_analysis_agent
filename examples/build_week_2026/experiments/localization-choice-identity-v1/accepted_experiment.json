@@ -1,0 +1,199 @@
+{
+  "schema_version": "judge-public-experiment-v3",
+  "proof_kind": "content_correctness",
+  "experiment_id": "localization-choice-identity-v1",
+  "title": "Accepted · bilingual choice identity repair",
+  "source_kind": "signed",
+  "source_label": "DETERMINISTIC GODOT",
+  "provider": "replay",
+  "provider_mode": "offline-real-godot",
+  "model": "no-llm-deterministic-automation",
+  "lifecycle_status": "proof_complete",
+  "campaign_id": "localization-choice-identity-v1",
+  "campaign": {
+    "gate_status": "passed",
+    "personas": [
+      "balanced"
+    ],
+    "seeds": [
+      42,
+      43,
+      44,
+      1042,
+      1043,
+      1044
+    ],
+    "max_weeks": 20,
+    "cells": 6,
+    "weeks": 120,
+    "target_members": 2,
+    "target_personas": 0,
+    "valid_rate": 1.0,
+    "fallback_rate": 0.0,
+    "provider_error_rate": 0.0,
+    "mean_final_money": null,
+    "mean_max_stress": null,
+    "request_fingerprint": "c09eb0f8193ef8013e84fd19def7587927498a658c887085424741d7338456a4",
+    "source_fingerprint": "920b1634f62546d50c3167c7f095c0c6217bebfe805efb6974bc75aa7365b44b"
+  },
+  "campaign_bundle_path": "examples/build_week_2026/experiments/localization-choice-identity-v1",
+  "repair_bundle_path": "examples/build_week_2026/experiments/localization-choice-identity-v1/accepted_experiment.json",
+  "completed_at": "2026-07-18T08:31:30.823867+00:00",
+  "status": "passed",
+  "decision": "accepted",
+  "decision_reason": "The focused economy validator removed both choice-identity errors; fixed and unseen-holdout trajectories, final states, and endings remained identical; all protected gates passed.",
+  "hypothesis": "Localized choice arrays were matched by position while runtime mechanics identify choices by the original Chinese source text, so one missing localized entry shifted later display labels and hid the semester-fee borrowing choice.",
+  "mechanism_class": "localized_choice_source_identity",
+  "comparison": null,
+  "cohorts": [],
+  "gates": [
+    {
+      "gate_id": "choice_identity",
+      "status": "passed",
+      "detail": "focused economy identity errors: 2 → 0",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ]
+    },
+    {
+      "gate_id": "bilingual_catalog",
+      "status": "passed",
+      "detail": "all 128 runtime events and every source choice have exact non-empty Chinese and English copy",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ]
+    },
+    {
+      "gate_id": "fixed_semantic_preservation",
+      "status": "passed",
+      "detail": "seeds 42/43/44 retained identical semantic trajectories, final states, and endings",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ]
+    },
+    {
+      "gate_id": "holdout_semantic_preservation",
+      "status": "passed",
+      "detail": "unseen seeds 1042/1043/1044 retained identical semantic trajectories, final states, and endings",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ]
+    },
+    {
+      "gate_id": "godot_contracts",
+      "status": "passed",
+      "detail": "content, JSON content, economy, risk, and route validators passed under Godot 4.4",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ]
+    },
+    {
+      "gate_id": "designed_findings_preserved",
+      "status": "passed",
+      "detail": "the same three declared demo findings remained and matched the expected-failures contract",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ]
+    },
+    {
+      "gate_id": "repository_regression",
+      "status": "passed",
+      "detail": "Inspect, Replay, 492 pytest cases, and Ruff passed; 3 tests remained intentionally skipped",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ]
+    },
+    {
+      "gate_id": "frontend_source_identity",
+      "status": "passed",
+      "detail": "Playthrough Inspector resolves retained choices by stable Chinese source text before stale retained English copy",
+      "evidence_paths": [
+        "frontend/tests/eventLocalization.test.ts"
+      ]
+    },
+    {
+      "gate_id": "provider_health",
+      "status": "passed",
+      "detail": "zero model calls; deterministic automation evidence is not relabeled as vLLM or OpenAI",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ]
+    }
+  ],
+  "patch": {
+    "baseline_commit": "b4b303906df146abd137062cf8769789707e9ba0",
+    "patched_commit": "525bad1f287c84a88c828df55cc1475b180b9422",
+    "patched_tree": "74982dfca1e52e11cd80bf0884183bfed28b561c",
+    "mechanism_class": "localized_choice_source_identity",
+    "modified_paths": [
+      "game-overlays/study-in-germany/data/localization/events.json",
+      "game-overlays/study-in-germany/scripts/data/DataLoader.gd",
+      "tests/test_event_localization.py",
+      "judge-manifest.json"
+    ],
+    "changed_files": 4,
+    "added_lines": 61,
+    "deleted_lines": 24,
+    "patch_path": "examples/build_week_2026/experiments/localization-choice-identity-v1/patch.diff",
+    "patch_sha256": "c09eb0f8193ef8013e84fd19def7587927498a658c887085424741d7338456a4",
+    "canonical_source_path": "game-overlays/study-in-germany",
+    "disposition": "integrated_uncommitted"
+  },
+  "codex": {
+    "task_reference": "localization-choice-identity-20260718",
+    "feedback_session_id": "primary-codex-build-thread",
+    "model": "codex-runtime",
+    "skill": "playtest-forge",
+    "hypothesis_owned_by_codex": true,
+    "patch_owned_by_codex": true,
+    "decision_owned_by_codex": true
+  },
+  "mode": "offline-real-godot",
+  "human_review": null,
+  "correctness_proof": {
+    "baseline_identity_errors": 2,
+    "patched_identity_errors": 0,
+    "fixed_seeds": [
+      42,
+      43,
+      44
+    ],
+    "holdout_seeds": [
+      1042,
+      1043,
+      1044
+    ],
+    "fixed_semantic_trajectory_equal": true,
+    "holdout_semantic_trajectory_equal": true,
+    "fixed_final_states_equal": true,
+    "holdout_final_states_equal": true,
+    "fixed_endings_equal": true,
+    "holdout_endings_equal": true,
+    "focused_economy": "passed",
+    "required_validators": [
+      "content",
+      "json-content",
+      "economy",
+      "risk",
+      "route"
+    ],
+    "expected_demo_failure_count": 3,
+    "inspect": "passed",
+    "replay": "passed",
+    "pytest_passed": 492,
+    "pytest_skipped": 3,
+    "ruff": "passed",
+    "provider_calls": 0,
+    "artifacts": [
+      {
+        "path": "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json",
+        "sha256": "920b1634f62546d50c3167c7f095c0c6217bebfe805efb6974bc75aa7365b44b"
+      },
+      {
+        "path": "examples/build_week_2026/experiments/localization-choice-identity-v1/patch.diff",
+        "sha256": "c09eb0f8193ef8013e84fd19def7587927498a658c887085424741d7338456a4"
+      }
+    ]
+  }
+}
+

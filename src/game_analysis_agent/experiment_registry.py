@@ -18,6 +18,18 @@ from .repair_experiment import RepairExperimentRecord, file_sha256
 SIGNED_CAMPAIGN_ID = "build-week-2026-evidence-v1"
 SIGNED_EXPERIMENT_ID = "cashflow-drift-repair-v1"
 TARGET_CLUSTER_ID = "cashflow-stress-attractor"
+PRIVATE_EXPERIMENT_IDS = frozenset(
+    {
+        "vllm-cohort-a-pressure-feedback-v1",
+        "vllm-cohort-b-survival-recovery-v1",
+    }
+)
+PRIVATE_CAMPAIGN_IDS = frozenset(
+    {
+        "vllm-audit-25seed-cohort-a",
+        "vllm-audit-25seed-cohort-b",
+    }
+)
 
 
 class ExperimentRegistryError(RuntimeError):
@@ -29,9 +41,7 @@ class ExperimentSummary(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    schema_version: Literal["judge-experiment-summary-v1"] = (
-        "judge-experiment-summary-v1"
-    )
+    schema_version: Literal["judge-experiment-summary-v1"] = "judge-experiment-summary-v1"
     experiment_id: str
     title: str
     source_kind: Literal["signed", "local_vllm", "openai_api"]
@@ -52,9 +62,7 @@ class CommittedExperimentMetadata(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    schema_version: Literal["judge-committed-experiment-v1"] = (
-        "judge-committed-experiment-v1"
-    )
+    schema_version: Literal["judge-committed-experiment-v1"] = "judge-committed-experiment-v1"
     experiment_id: str
     title: str
     campaign_bundle_path: str
@@ -83,12 +91,16 @@ class ExperimentRegistry:
             raise ExperimentRegistryError("experiment is not available")
         if summary.repair_bundle_path is None:
             return self._campaign_only(summary)
+        if summary.repair_bundle_path.endswith("/accepted_experiment.json"):
+            return self._correctness_proof(summary)
         return self._proof(summary)
 
     def _summaries(self) -> tuple[ExperimentSummary, ...]:
         summaries: list[ExperimentSummary] = [self._signed()]
         by_campaign = {SIGNED_CAMPAIGN_ID: summaries[0]}
         for summary in self._committed_experiments():
+            by_campaign[summary.campaign_id] = summary
+        for summary in self._committed_correctness_experiments():
             by_campaign[summary.campaign_id] = summary
         for summary in self._runtime_campaigns():
             by_campaign.setdefault(summary.campaign_id, summary)
@@ -102,7 +114,12 @@ class ExperimentRegistry:
                 reverse=True,
             )
         )
-        return tuple(ordered)
+        return tuple(
+            item
+            for item in ordered
+            if item.experiment_id not in PRIVATE_EXPERIMENT_IDS
+            and item.campaign_id not in PRIVATE_CAMPAIGN_IDS
+        )
 
     def _signed(self) -> ExperimentSummary:
         campaign = self.project / "examples/build_week_2026/campaign-v1"
@@ -162,6 +179,72 @@ class ExperimentRegistry:
                 )
             )
         return tuple(found)
+
+    def _committed_correctness_experiments(self) -> tuple[ExperimentSummary, ...]:
+        root = self.project / "examples/build_week_2026/experiments"
+        found = []
+        for path in sorted(root.glob("*/accepted_experiment.json")):
+            try:
+                payload = self._load_correctness_experiment(path)
+                found.append(
+                    ExperimentSummary(
+                        experiment_id=str(payload["experiment_id"]),
+                        title=str(payload["title"]),
+                        source_kind=str(payload["source_kind"]),
+                        source_label=str(payload["source_label"]),
+                        provider=str(payload["provider"]),
+                        provider_mode=str(payload["provider_mode"]),
+                        model=str(payload["model"]),
+                        lifecycle_status=str(payload["lifecycle_status"]),
+                        campaign_id=str(payload["campaign_id"]),
+                        campaign=dict(payload["campaign"]),
+                        campaign_bundle_path=str(payload["campaign_bundle_path"]),
+                        repair_bundle_path=self._relative(path),
+                        completed_at=str(payload["completed_at"]),
+                    )
+                )
+            except (KeyError, OSError, TypeError, ValueError, RuntimeError):
+                continue
+        return tuple(found)
+
+    def _correctness_proof(self, summary: ExperimentSummary) -> dict[str, object]:
+        if summary.repair_bundle_path is None:
+            raise ExperimentRegistryError("correctness proof path is missing")
+        return self._load_correctness_experiment(self._project_path(summary.repair_bundle_path))
+
+    def _load_correctness_experiment(self, path: Path) -> dict[str, object]:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if (
+            payload.get("schema_version") != "judge-public-experiment-v3"
+            or payload.get("proof_kind") != "content_correctness"
+            or payload.get("status") != "passed"
+            or payload.get("decision") != "accepted"
+            or payload.get("lifecycle_status") != "proof_complete"
+        ):
+            raise ExperimentRegistryError("invalid accepted correctness experiment")
+        gates = payload.get("gates")
+        if (
+            not isinstance(gates, list)
+            or not gates
+            or any(not isinstance(item, dict) or item.get("status") != "passed" for item in gates)
+        ):
+            raise ExperimentRegistryError("correctness experiment has a failed gate")
+        proof = payload.get("correctness_proof")
+        if not isinstance(proof, dict):
+            raise ExperimentRegistryError("correctness proof is missing")
+        for artifact in proof.get("artifacts", []):
+            artifact_path = self._project_path(str(artifact["path"]))
+            if _sha256(artifact_path) != str(artifact["sha256"]):
+                raise ExperimentRegistryError("correctness artifact hash mismatch")
+        patch = payload.get("patch")
+        if not isinstance(patch, dict):
+            raise ExperimentRegistryError("correctness patch is missing")
+        patch_path = self._project_path(str(patch["patch_path"]))
+        if _sha256(patch_path) != str(patch["patch_sha256"]):
+            raise ExperimentRegistryError("correctness patch hash mismatch")
+        payload["patch"] = dict(patch) | {"diff": patch_path.read_text(encoding="utf-8")}
+        payload["evidence_fingerprint"] = _sha256(path)
+        return payload
 
     def _runtime_campaigns(self) -> tuple[ExperimentSummary, ...]:
         roots = [
@@ -274,9 +357,7 @@ class ExperimentRegistry:
         }
 
     def _campaign_only(self, summary: ExperimentSummary) -> dict[str, object]:
-        fingerprint = _sha256(
-            self.project / summary.campaign_bundle_path / "gate_report.json"
-        )
+        fingerprint = _sha256(self.project / summary.campaign_bundle_path / "gate_report.json")
         return {
             **summary.model_dump(mode="json"),
             "schema_version": "judge-public-experiment-v2",
@@ -299,9 +380,7 @@ class ExperimentRegistry:
         bundle = self.project / str(summary.repair_bundle_path)
         gate = verify_public_repair_bundle(bundle)
         record_path = bundle / "repair_experiment.json"
-        record = RepairExperimentRecord.model_validate_json(
-            record_path.read_text(encoding="utf-8")
-        )
+        record = RepairExperimentRecord.model_validate_json(record_path.read_text(encoding="utf-8"))
         return {
             **summary.model_dump(mode="json"),
             "schema_version": "judge-public-experiment-v2",

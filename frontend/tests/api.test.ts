@@ -207,7 +207,7 @@ describe("manifest API", () => {
 
     expect(fetchMock.mock.calls.map((call) => call[0])).toEqual([
       "/api/provider-status", "/api/provider-test", "/api/campaigns",
-      "/api/campaigns/judge-abc", "/api/experiments", "/api/experiments/cashflow-drift-repair-v1",
+      "/api/campaigns/judge-abc", "/api/experiments", "/api/experiments/localization-choice-identity-v1",
     ]);
     const createBody = String(fetchMock.mock.calls[2]?.[1]?.body);
     expect(createBody).toBe('{"provider":"openai"}');
@@ -219,7 +219,7 @@ describe("manifest API", () => {
     fetchMock.mockResolvedValue(responseWith(experiment));
 
     await expect(fetchStaticJudgeExperiment()).resolves.toEqual(experiment);
-    expect(fetchMock).toHaveBeenCalledWith("/judge-demo.json", {
+    expect(fetchMock).toHaveBeenCalledWith("/experiments/localization-choice-identity-v1/judge-experiment.json", {
       headers: { Accept: "application/json" },
     });
   });

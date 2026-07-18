@@ -117,11 +117,11 @@ describe("live playthrough index", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
 
-    const bundle = await loadExperimentPlaythrough("vllm-cohort-a-pressure-feedback-v1", undefined, { persona: "money", seed: 42 });
+    const bundle = await loadExperimentPlaythrough("local-campaign-test", undefined, { persona: "money", seed: 42 });
 
     expect(bundle?.cell.seed).toBe(42);
     expect(fetchMock.mock.calls.map(([input]) => String(input))).toContain(
-      "/experiments/vllm-cohort-a-pressure-feedback-v1/playthrough/cells/money-seed-42.json",
+      "/experiments/local-campaign-test/playthrough/cells/money-seed-42.json",
     );
     await expect(loadExperimentPlaythrough("../private")).rejects.toThrow("Experiment id is unsafe");
   });

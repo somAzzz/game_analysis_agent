@@ -1,0 +1,200 @@
+{
+  "campaign": {
+    "cells": 6,
+    "fallback_rate": 0.0,
+    "gate_status": "passed",
+    "max_weeks": 20,
+    "mean_final_money": null,
+    "mean_max_stress": null,
+    "personas": [
+      "balanced"
+    ],
+    "provider_error_rate": 0.0,
+    "request_fingerprint": "c09eb0f8193ef8013e84fd19def7587927498a658c887085424741d7338456a4",
+    "seeds": [
+      42,
+      43,
+      44,
+      1042,
+      1043,
+      1044
+    ],
+    "source_fingerprint": "920b1634f62546d50c3167c7f095c0c6217bebfe805efb6974bc75aa7365b44b",
+    "target_members": 2,
+    "target_personas": 0,
+    "valid_rate": 1.0,
+    "weeks": 120
+  },
+  "campaign_bundle_path": "examples/build_week_2026/experiments/localization-choice-identity-v1",
+  "campaign_id": "localization-choice-identity-v1",
+  "codex": {
+    "decision_owned_by_codex": true,
+    "feedback_session_id": "primary-codex-build-thread",
+    "hypothesis_owned_by_codex": true,
+    "model": "codex-runtime",
+    "patch_owned_by_codex": true,
+    "skill": "playtest-forge",
+    "task_reference": "localization-choice-identity-20260718"
+  },
+  "cohorts": [],
+  "comparison": null,
+  "completed_at": "2026-07-18T08:31:30.823867+00:00",
+  "correctness_proof": {
+    "artifacts": [
+      {
+        "path": "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json",
+        "sha256": "920b1634f62546d50c3167c7f095c0c6217bebfe805efb6974bc75aa7365b44b"
+      },
+      {
+        "path": "examples/build_week_2026/experiments/localization-choice-identity-v1/patch.diff",
+        "sha256": "c09eb0f8193ef8013e84fd19def7587927498a658c887085424741d7338456a4"
+      }
+    ],
+    "baseline_identity_errors": 2,
+    "expected_demo_failure_count": 3,
+    "fixed_endings_equal": true,
+    "fixed_final_states_equal": true,
+    "fixed_seeds": [
+      42,
+      43,
+      44
+    ],
+    "fixed_semantic_trajectory_equal": true,
+    "focused_economy": "passed",
+    "holdout_endings_equal": true,
+    "holdout_final_states_equal": true,
+    "holdout_seeds": [
+      1042,
+      1043,
+      1044
+    ],
+    "holdout_semantic_trajectory_equal": true,
+    "inspect": "passed",
+    "patched_identity_errors": 0,
+    "provider_calls": 0,
+    "pytest_passed": 492,
+    "pytest_skipped": 3,
+    "replay": "passed",
+    "required_validators": [
+      "content",
+      "json-content",
+      "economy",
+      "risk",
+      "route"
+    ],
+    "ruff": "passed"
+  },
+  "decision": "accepted",
+  "decision_reason": "The focused economy validator removed both choice-identity errors; fixed and unseen-holdout trajectories, final states, and endings remained identical; all protected gates passed.",
+  "evidence_fingerprint": "4df6764245ac64ace44242f7e392d3fbdd6fb07497a1357b2e2aed8218fc7584",
+  "experiment_id": "localization-choice-identity-v1",
+  "gates": [
+    {
+      "detail": "focused economy identity errors: 2 \u2192 0",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ],
+      "gate_id": "choice_identity",
+      "status": "passed"
+    },
+    {
+      "detail": "all 128 runtime events and every source choice have exact non-empty Chinese and English copy",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ],
+      "gate_id": "bilingual_catalog",
+      "status": "passed"
+    },
+    {
+      "detail": "seeds 42/43/44 retained identical semantic trajectories, final states, and endings",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ],
+      "gate_id": "fixed_semantic_preservation",
+      "status": "passed"
+    },
+    {
+      "detail": "unseen seeds 1042/1043/1044 retained identical semantic trajectories, final states, and endings",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ],
+      "gate_id": "holdout_semantic_preservation",
+      "status": "passed"
+    },
+    {
+      "detail": "content, JSON content, economy, risk, and route validators passed under Godot 4.4",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ],
+      "gate_id": "godot_contracts",
+      "status": "passed"
+    },
+    {
+      "detail": "the same three declared demo findings remained and matched the expected-failures contract",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ],
+      "gate_id": "designed_findings_preserved",
+      "status": "passed"
+    },
+    {
+      "detail": "Inspect, Replay, 492 pytest cases, and Ruff passed; 3 tests remained intentionally skipped",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ],
+      "gate_id": "repository_regression",
+      "status": "passed"
+    },
+    {
+      "detail": "Playthrough Inspector resolves retained choices by stable Chinese source text before stale retained English copy",
+      "evidence_paths": [
+        "frontend/tests/eventLocalization.test.ts"
+      ],
+      "gate_id": "frontend_source_identity",
+      "status": "passed"
+    },
+    {
+      "detail": "zero model calls; deterministic automation evidence is not relabeled as vLLM or OpenAI",
+      "evidence_paths": [
+        "examples/build_week_2026/experiments/localization-choice-identity-v1/evidence.json"
+      ],
+      "gate_id": "provider_health",
+      "status": "passed"
+    }
+  ],
+  "human_review": null,
+  "hypothesis": "Localized choice arrays were matched by position while runtime mechanics identify choices by the original Chinese source text, so one missing localized entry shifted later display labels and hid the semester-fee borrowing choice.",
+  "lifecycle_status": "proof_complete",
+  "mechanism_class": "localized_choice_source_identity",
+  "mode": "offline-real-godot",
+  "model": "no-llm-deterministic-automation",
+  "patch": {
+    "added_lines": 61,
+    "baseline_commit": "b4b303906df146abd137062cf8769789707e9ba0",
+    "canonical_source_path": "game-overlays/study-in-germany",
+    "changed_files": 4,
+    "deleted_lines": 24,
+    "diff": "diff --git a/game-overlays/study-in-germany/data/localization/events.json b/game-overlays/study-in-germany/data/localization/events.json\nindex 0ba4c908a14fcee89c339064457b3ce89addf18a..612d0f1278f236e9b469a89cc6ae8fa740b5a873 100644\n--- a/game-overlays/study-in-germany/data/localization/events.json\n+++ b/game-overlays/study-in-germany/data/localization/events.json\n@@ -899,29 +899,33 @@\n     },\n     \"desperate_illegal_work_offer\": {\n       \"body\": {\n-        \"en\": \"Your account is empty; hunger and stress are rising. Someone offers cash-in-hand work: daily pay, no ID checks, no contract. It could save this month, or jeopardize your residency.\",\n+        \"en\": \"Your account is empty, and both hunger and stress are rising. Someone offers cash-in-hand work with same-day pay, no ID check, and no contract. It could get you through the month, but it could also put your residence status at risk.\",\n         \"zh\": \"\u8d26\u6237\u5df2\u7ecf\u89c1\u5e95\uff0c\u9965\u997f\u548c\u538b\u529b\u4e00\u8d77\u4e0a\u5347\u3002\u6709\u4eba\u8bf4\u6709\u73b0\u91d1\u5de5\uff0c\u5f53\u5929\u7ed3\u8d26\u3001\u4e0d\u95ee\u8eab\u4efd\u3001\u4e0d\u7b7e\u5408\u540c\u3002\u5b83\u80fd\u6551\u8fd9\u4e2a\u6708\uff0c\u4e5f\u53ef\u80fd\u628a\u4f60\u63a8\u5411\u5c45\u7559\u98ce\u9669\u3002\"\n       },\n       \"choices\": [\n         {\n-          \"en\": \"Seek Student Union aid\",\n+          \"en\": \"Seek emergency aid from the student union\",\n           \"zh\": \"\u627e\u5b66\u751f\u4f1a\u7d27\u6025\u63f4\u52a9\"\n         },\n         {\n-          \"en\": \"Borrow from friends/parents\",\n+          \"en\": \"Ask a friend for a short-term loan\",\n+          \"zh\": \"\u627e\u670b\u53cb\u4e34\u65f6\u501f\u94b1\"\n+        },\n+        {\n+          \"en\": \"Borrow from classmates or your parents\",\n           \"zh\": \"\u5411\u540c\u5b66\u6216\u7236\u6bcd\u501f\u94b1\"\n         },\n         {\n-          \"en\": \"Take the cash job\",\n+          \"en\": \"Take the cash-in-hand job\",\n           \"zh\": \"\u63a5\u4e0b\u73b0\u91d1\u9ed1\u5de5\"\n         },\n         {\n-          \"en\": \"Use food banks/cheap canteens\",\n+          \"en\": \"Use a food bank or a subsidized canteen\",\n           \"zh\": \"\u53bb\u98df\u7269\u6551\u52a9/\u4f4e\u4ef7\u98df\u5802\"\n         }\n       ],\n       \"title\": {\n-        \"en\": \"Temptation of Illegal Work\",\n+        \"en\": \"Temptation of Cash-in-Hand Work When Broke\",\n         \"zh\": \"\u6ca1\u94b1\u540e\u7684\u9ed1\u5de5\u8bf1\u60d1\"\n       }\n     },\n@@ -2915,29 +2919,33 @@\n     },\n     \"semester_fee_due\": {\n       \"body\": {\n-        \"en\": \"Your university sent a Semesterbeitrag email. While most German public universities don't charge high tuition, semester fees, student union dues, and transit tickets must still be paid on time.\",\n+        \"en\": \"Your university has sent a Semesterbeitrag notice. Most German public universities do not charge conventional tuition, but the semester contribution, student-union fees, and transit pass still have to be paid on time.\",\n         \"zh\": \"\u5b66\u6821\u53d1\u6765 Semesterbeitrag \u90ae\u4ef6\u3002\u5fb7\u56fd\u591a\u6570\u516c\u7acb\u5927\u5b66\u4e0d\u662f\u4f20\u7edf\u9ad8\u5b66\u8d39\uff0c\u4f46\u5b66\u671f\u8d39\u3001\u5b66\u751f\u4f1a\u8d39\u548c\u4ea4\u901a\u7968\u4ecd\u8981\u6309\u65f6\u7f34\u3002\"\n       },\n       \"choices\": [\n         {\n-          \"en\": \"Pay on time\",\n+          \"en\": \"Pay the semester contribution on time\",\n           \"zh\": \"\u6309\u65f6\u7f34\u8d39\"\n         },\n         {\n-          \"en\": \"Confirm deadline first\",\n+          \"en\": \"Check the payment deadline first\",\n           \"zh\": \"\u5148\u786e\u8ba4\u622a\u6b62\u65e5\u671f\"\n         },\n         {\n-          \"en\": \"Handle prudently\",\n+          \"en\": \"Ask a friend to cover the semester contribution\",\n+          \"zh\": \"\u627e\u670b\u53cb\u5468\u8f6c\u5b66\u671f\u8d39\"\n+        },\n+        {\n+          \"en\": \"Handle the situation carefully\",\n           \"zh\": \"\u7a33\u59a5\u5904\u7406\"\n         },\n         {\n-          \"en\": \"Seek help\",\n+          \"en\": \"Ask for help covering the payment\",\n           \"zh\": \"\u5bfb\u6c42\u5e2e\u52a9\"\n         }\n       ],\n       \"title\": {\n-        \"en\": \"Semester Fee Reminder\",\n+        \"en\": \"Semester Contribution Payment Reminder\",\n         \"zh\": \"\u5b66\u671f\u8d39\u63d0\u9192\"\n       }\n     },\ndiff --git a/game-overlays/study-in-germany/scripts/data/DataLoader.gd b/game-overlays/study-in-germany/scripts/data/DataLoader.gd\nindex 589956912a530668a6e3abd6b5ede0c72a0f5f95..79e38a8ffd943858713b15c07cbca8898e6b5f7b 100644\n--- a/game-overlays/study-in-germany/scripts/data/DataLoader.gd\n+++ b/game-overlays/study-in-germany/scripts/data/DataLoader.gd\n@@ -111,10 +111,9 @@ static func event_from_dict(record: Dictionary):\n \tevent.source_order = int(record.get(\"source_order\", 0))\n \tevent.choices = []\n \tvar localized_choices = localized.get(\"choices\", [])\n-\tfor index in range(_array(record.get(\"choices\", [])).size()):\n-\t\tvar choice_record = _array(record.get(\"choices\", []))[index]\n+\tfor choice_record in _array(record.get(\"choices\", [])):\n \t\tif choice_record is Dictionary:\n-\t\t\tvar choice_copy = localized_choices[index] if localized_choices is Array and index < localized_choices.size() else {}\n+\t\t\tvar choice_copy := _localized_choice(localized_choices, str(choice_record.get(\"text\", \"\")))\n \t\t\tevent.choices.append(choice_from_dict(choice_record, choice_copy))\n \treturn event\n \n@@ -122,7 +121,7 @@ static func choice_from_dict(record: Dictionary, localized: Dictionary = {}):\n \tvar choice = EventChoiceDefScript.new()\n \tchoice.text_zh = str(record.get(\"text\", \"\"))\n \tchoice.text_en = str(localized.get(\"en\", choice.text_zh))\n-\tchoice.text = choice.text_en\n+\tchoice.text = choice.text_zh\n \tchoice.requirements = _dict(record.get(\"requirements\", {}))\n \tchoice.success_rate = float(record.get(\"success_rate\", 1.0))\n \tchoice.success_modifiers = _dict(record.get(\"success_modifiers\", {}))\n@@ -132,6 +131,14 @@ static func choice_from_dict(record: Dictionary, localized: Dictionary = {}):\n \tchoice.next_event_id = str(record.get(\"next_event_id\", \"\"))\n \treturn choice\n \n+static func _localized_choice(localized_choices, source_text: String) -> Dictionary:\n+\tif not (localized_choices is Array):\n+\t\treturn {}\n+\tfor candidate in localized_choices:\n+\t\tif candidate is Dictionary and str(candidate.get(\"zh\", \"\")) == source_text:\n+\t\t\treturn candidate\n+\treturn {}\n+\n static func character_from_dict(record: Dictionary):\n \tvar character = CharacterDefScript.new()\n \tcharacter.id = str(record.get(\"id\", \"\"))\ndiff --git a/judge-manifest.json b/judge-manifest.json\nindex 2b8b56cfe2b5e69af4c22dfdca520758c22ad9c0..fe747674aa4c62d52b66adae839513ff09c195c4 100644\n--- a/judge-manifest.json\n+++ b/judge-manifest.json\n@@ -806,10 +806,10 @@\n       \"sha256\": \"9d471f54e2b3c2337464e15c5e88bcf0d1fe256da7d8806c83ced27b530e4216\"\n     },\n     {\n-      \"bytes\": 98996,\n+      \"bytes\": 99473,\n       \"path\": \"game-overlays/study-in-germany/data/localization/events.json\",\n       \"role\": \"embedded-demo-runtime-overlay\",\n-      \"sha256\": \"52ff86b78571ca44469ef6afb90246ecf1d9a2907281e09671b8460473d56348\"\n+      \"sha256\": \"8ab504462cae6944ba02459c7250067661474cb7e85cdd4b1fd21ebb9a698c1f\"\n     },\n     {\n       \"bytes\": 29555,\n@@ -818,10 +818,10 @@\n       \"sha256\": \"d8eca972196410fbe48931313080baa0d89ffcee1d729b8024e687e01d89d9ea\"\n     },\n     {\n-      \"bytes\": 8527,\n+      \"bytes\": 8714,\n       \"path\": \"game-overlays/study-in-germany/scripts/data/DataLoader.gd\",\n       \"role\": \"embedded-demo-runtime-overlay\",\n-      \"sha256\": \"e33122d7179f4c85efec2d7058e638b55ad7856b08fb7c1ef01883f096058fc9\"\n+      \"sha256\": \"bcdcb4bc4a2cdce6dc4c04235125a2813de71e29fffc0f091e10bfc959684347\"\n     },\n     {\n       \"bytes\": 1001,\ndiff --git a/tests/test_event_localization.py b/tests/test_event_localization.py\nindex d021ccc7f2bdb799015520d0f99340d10e0e1be3..295a4ebac10afbad702c1c95b78b15591313c8e2 100644\n--- a/tests/test_event_localization.py\n+++ b/tests/test_event_localization.py\n@@ -7,6 +7,18 @@ from pathlib import Path\n \n ROOT = Path(__file__).resolve().parents[1]\n SOURCE = ROOT / \"demo/study-in-germany/data/events/generated_events.json\"\n+RUNTIME_SOURCES = tuple(\n+    ROOT / \"demo/study-in-germany/data/events\" / name\n+    for name in (\n+        \"academic_events.json\",\n+        \"admin_events.json\",\n+        \"application_events.json\",\n+        \"life_events.json\",\n+        \"random_events.json\",\n+        \"relationship_events.json\",\n+        \"work_events.json\",\n+    )\n+)\n CATALOG = ROOT / \"game-overlays/study-in-germany/data/localization/events.json\"\n CJK = re.compile(r\"[\\u3400-\\u9fff]\")\n \n@@ -29,9 +41,7 @@ def test_event_localization_covers_every_event_and_choice_without_mechanic_chang\n         localized = catalog[\"events\"][event[\"id\"]]\n         assert localized[\"title\"][\"zh\"] == event[\"title\"]\n         assert localized[\"body\"][\"zh\"] == event[\"body\"]\n-        assert [choice[\"zh\"] for choice in localized[\"choices\"]] == [\n-            choice[\"text\"] for choice in event[\"choices\"]\n-        ]\n+        assert {choice[\"text\"] for choice in event[\"choices\"]} <= {choice[\"zh\"] for choice in localized[\"choices\"]}\n         english = [\n             localized[\"title\"][\"en\"],\n             localized[\"body\"][\"en\"],\n@@ -39,6 +49,18 @@ def test_event_localization_covers_every_event_and_choice_without_mechanic_chang\n         ]\n         assert all(text.strip() and not CJK.search(text) for text in english)\n \n+    runtime_events = [\n+        event\n+        for source_path in RUNTIME_SOURCES\n+        for event in json.loads(source_path.read_text(encoding=\"utf-8\"))[\"items\"]\n+    ]\n+    assert {event[\"id\"] for event in runtime_events} == set(catalog[\"events\"])\n+    for event in runtime_events:\n+        localized = catalog[\"events\"][event[\"id\"]]\n+        assert {choice[\"zh\"] for choice in localized[\"choices\"]} == {\n+            choice[\"text\"] for choice in event[\"choices\"]\n+        }\n+\n \n def test_runtime_defaults_to_english_without_localizing_choice_identity() -> None:\n     loader = (ROOT / \"game-overlays/study-in-germany/scripts/data/DataLoader.gd\").read_text(\n@@ -48,7 +70,7 @@ def test_runtime_defaults_to_english_without_localizing_choice_identity() -> Non\n \n     assert \"event.title = event.title_en\" in loader\n     assert \"event.body = event.body_en\" in loader\n-    assert \"choice.text = choice.text_en\" in loader\n+    assert \"choice.text = choice.text_zh\" in loader\n     assert 'choice.localized_text(\"en\")' in probe\n     assert 'choice.localized_text(\"zh\")' in probe\n     assert 'var safe_text := str(choice.localized_text(\"en\")).to_lower()' in probe\n",
+    "disposition": "integrated_uncommitted",
+    "mechanism_class": "localized_choice_source_identity",
+    "modified_paths": [
+      "game-overlays/study-in-germany/data/localization/events.json",
+      "game-overlays/study-in-germany/scripts/data/DataLoader.gd",
+      "tests/test_event_localization.py",
+      "judge-manifest.json"
+    ],
+    "patch_path": "examples/build_week_2026/experiments/localization-choice-identity-v1/patch.diff",
+    "patch_sha256": "c09eb0f8193ef8013e84fd19def7587927498a658c887085424741d7338456a4",
+    "patched_commit": "525bad1f287c84a88c828df55cc1475b180b9422",
+    "patched_tree": "74982dfca1e52e11cd80bf0884183bfed28b561c"
+  },
+  "proof_kind": "content_correctness",
+  "provider": "replay",
+  "provider_mode": "offline-real-godot",
+  "repair_bundle_path": "examples/build_week_2026/experiments/localization-choice-identity-v1/accepted_experiment.json",
+  "schema_version": "judge-public-experiment-v3",
+  "source_kind": "signed",
+  "source_label": "DETERMINISTIC GODOT",
+  "status": "passed",
+  "title": "Accepted \u00b7 bilingual choice identity repair"
+}
