@@ -1,0 +1,8 @@
+{
+  "campaign_bundle_path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign",
+  "completed_at": "2026-07-18T13:11:59.815927Z",
+  "experiment_id": "openai-all-six-seed-42-20w",
+  "playthrough_bundle_path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough",
+  "schema_version": "judge-committed-campaign-v1",
+  "title": "OpenAI \u00b7 all six personas \u00b7 seed 42 \u00b7 20 weeks"
+}

@@ -35,6 +35,7 @@
       "experiment_id": "cashflow-drift-repair-v1",
       "lifecycle_status": "proof_complete",
       "model": "deterministic-persona-policy-fixture",
+      "playthrough_bundle_path": null,
       "provider": "replay",
       "provider_mode": "prerecorded",
       "repair_bundle_path": "examples/build_week_2026/experiment-v1",
@@ -42,6 +43,48 @@
       "source_kind": "signed",
       "source_label": "SIGNED REPLAY",
       "title": "Signed cashflow repair replay"
+    },
+    {
+      "campaign": {
+        "cells": 6,
+        "fallback_rate": 0.0,
+        "gate_status": "passed",
+        "max_weeks": 20,
+        "mean_final_money": 0.833333,
+        "mean_max_stress": 100.0,
+        "personas": [
+          "newbie",
+          "study",
+          "money",
+          "social",
+          "visa",
+          "slacker"
+        ],
+        "provider_error_rate": 0.0,
+        "request_fingerprint": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+        "seeds": [
+          42
+        ],
+        "source_fingerprint": "113c7f4438c324992bda241a7f01863feb033e014eee1a1a68385773e500fc74",
+        "target_members": 6,
+        "target_personas": 6,
+        "valid_rate": 1.0,
+        "weeks": 114
+      },
+      "campaign_bundle_path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign",
+      "campaign_id": "openai-all-six-seed-42-20w",
+      "completed_at": "2026-07-18T13:11:59.815927Z",
+      "experiment_id": "openai-all-six-seed-42-20w",
+      "lifecycle_status": "campaign_complete",
+      "model": "gpt-5.6-luna",
+      "playthrough_bundle_path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough",
+      "provider": "openai",
+      "provider_mode": "live",
+      "repair_bundle_path": null,
+      "schema_version": "judge-experiment-summary-v1",
+      "source_kind": "openai_api",
+      "source_label": "OPENAI API",
+      "title": "OpenAI \u00b7 all six personas \u00b7 seed 42 \u00b7 20 weeks"
     },
     {
       "campaign": {
@@ -76,6 +119,7 @@
       "experiment_id": "localization-choice-identity-v1",
       "lifecycle_status": "proof_complete",
       "model": "no-llm-deterministic-automation",
+      "playthrough_bundle_path": null,
       "provider": "replay",
       "provider_mode": "offline-real-godot",
       "repair_bundle_path": "examples/build_week_2026/experiments/localization-choice-identity-v1/accepted_experiment.json",

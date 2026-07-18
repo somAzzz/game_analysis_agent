@@ -313,6 +313,7 @@ export interface JudgeExperimentSummary {
   campaign_id: string;
   campaign: JudgeCampaignEvidence;
   campaign_bundle_path: string;
+  playthrough_bundle_path: string | null;
   repair_bundle_path: string | null;
   completed_at: string | null;
 }

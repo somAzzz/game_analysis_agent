@@ -1,0 +1,77 @@
+{
+  "artifacts": [
+    {
+      "bytes": 4274,
+      "path": "campaign_manifest.json",
+      "records": null,
+      "sha256": "f4b687a480f55932d628d3a7fbf2a7c9a88e6d4574e13ebb78406c03d0f0d8b0"
+    },
+    {
+      "bytes": 19451,
+      "path": "campaign_summary.json",
+      "records": null,
+      "sha256": "b5b547becf7a605ba7d6f42a900a172d88037efbe5924a5d6269496412e9a6ec"
+    },
+    {
+      "bytes": 42964,
+      "path": "persona_runs.jsonl",
+      "records": 114,
+      "sha256": "a881ebcce2b9aad2600d35b5658f556177331f497686c4d1e8fd29e52e9c19eb"
+    },
+    {
+      "bytes": 2531,
+      "path": "agent_eval.jsonl",
+      "records": 6,
+      "sha256": "5db28d78c9e5356cfc08eee76c726cfd9e815ee84a365f804c8735fc813f13bb"
+    },
+    {
+      "bytes": 124379,
+      "path": "llm_calls.jsonl",
+      "records": 228,
+      "sha256": "48cc34abe28fff49893144a6975b9b4d2ae59eb16c20e3b64180a575f0ddb324"
+    },
+    {
+      "bytes": 8599,
+      "path": "failure_clusters.json",
+      "records": null,
+      "sha256": "2843d8eb69247b6b59d66f5b5f24f35883e07c3ec226cac4e4339d8420c8a3bc"
+    }
+  ],
+  "campaign_id": "openai-all-six-seed-42-20w",
+  "checks": [
+    {
+      "detail": "6/6 ordered cells",
+      "id": "expected_cells",
+      "status": "passed"
+    },
+    {
+      "detail": "6/6 completed",
+      "id": "completed_cells",
+      "status": "passed"
+    },
+    {
+      "detail": "manifest and aggregation fingerprints",
+      "id": "identity",
+      "status": "passed"
+    },
+    {
+      "detail": "all artifacts reparsed",
+      "id": "schemas",
+      "status": "passed"
+    },
+    {
+      "detail": "6 artifacts hashed",
+      "id": "hashes",
+      "status": "passed"
+    },
+    {
+      "detail": "no forbidden fields or secrets",
+      "id": "public_safety",
+      "status": "passed"
+    }
+  ],
+  "request_fingerprint": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+  "schema_version": "campaign-bundle-gate-v1",
+  "source_fingerprint": "113c7f4438c324992bda241a7f01863feb033e014eee1a1a68385773e500fc74",
+  "status": "passed"
+}

@@ -149,4 +149,6 @@ def test_committed_judge_manifest_passes_dependency_free_inspect() -> None:
         not any(experiment_id in item["path"] for experiment_id in private_ids)
         for item in payload["artifacts"]
     )
-    assert payload["checks"][2]["detail"] == ("8 public claims resolved to exact JSON values")
+    assert roles.count("live-openai-campaign-evidence") >= 10
+    assert roles.count("live-openai-frontend-evidence") >= 10
+    assert payload["checks"][2]["detail"] == ("9 public claims resolved to exact JSON values")

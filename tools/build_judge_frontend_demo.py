@@ -35,6 +35,9 @@ def main() -> int:
             item["lifecycle_status"] == "proof_complete"
             and item["campaign_bundle_path"].startswith("examples/build_week_2026/experiments/")
         )
+        or str(item.get("playthrough_bundle_path") or "").startswith(
+            "examples/build_week_2026/experiments/"
+        )
     ]
     index = {"schema_version": "judge-experiment-index-v1", "experiments": summaries}
     STATIC_INDEX.write_text(json.dumps(index, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -55,6 +58,12 @@ def main() -> int:
             json.dumps(service.experiment(experiment_id), indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
+        playthrough_path = summary.get("playthrough_bundle_path")
+        if playthrough_path:
+            playthrough_target = target.parent / "playthrough"
+            if playthrough_target.exists():
+                shutil.rmtree(playthrough_target)
+            shutil.copytree(ROOT / str(playthrough_path), playthrough_target)
     print(f"wrote {len(TARGETS) + len(summaries)} Judge demo fixtures")
     return 0
 

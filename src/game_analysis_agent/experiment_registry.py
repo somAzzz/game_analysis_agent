@@ -53,6 +53,7 @@ class ExperimentSummary(BaseModel):
     campaign_id: str
     campaign: dict[str, Any]
     campaign_bundle_path: str
+    playthrough_bundle_path: str | None = None
     repair_bundle_path: str | None = None
     completed_at: str | None = None
 
@@ -67,6 +68,19 @@ class CommittedExperimentMetadata(BaseModel):
     title: str
     campaign_bundle_path: str
     repair_bundle_path: str
+
+
+class CommittedCampaignMetadata(BaseModel):
+    """Pointers for a committed campaign and its sanitized replay view."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    schema_version: Literal["judge-committed-campaign-v1"] = "judge-committed-campaign-v1"
+    experiment_id: str
+    title: str
+    campaign_bundle_path: str
+    playthrough_bundle_path: str
+    completed_at: str
 
 
 class ExperimentRegistry:
@@ -98,6 +112,8 @@ class ExperimentRegistry:
     def _summaries(self) -> tuple[ExperimentSummary, ...]:
         summaries: list[ExperimentSummary] = [self._signed()]
         by_campaign = {SIGNED_CAMPAIGN_ID: summaries[0]}
+        for summary in self._committed_campaigns():
+            by_campaign[summary.campaign_id] = summary
         for summary in self._committed_experiments():
             by_campaign[summary.campaign_id] = summary
         for summary in self._committed_correctness_experiments():
@@ -144,6 +160,76 @@ class ExperimentRegistry:
             repair_bundle_path=self._relative(repair),
             completed_at=record.completed_at.isoformat(),
         )
+
+    def _committed_campaigns(self) -> tuple[ExperimentSummary, ...]:
+        root = self.project / "examples/build_week_2026/experiments"
+        found = []
+        for path in sorted(root.glob("*/campaign-metadata.json")):
+            try:
+                metadata = CommittedCampaignMetadata.model_validate_json(
+                    path.read_text(encoding="utf-8")
+                )
+                campaign = self._project_path(metadata.campaign_bundle_path)
+                playthrough = self._project_path(metadata.playthrough_bundle_path)
+                summary = self._summary_from_campaign(campaign)
+                self._verify_committed_playthrough(playthrough, summary)
+                if metadata.experiment_id != summary.campaign_id:
+                    raise ExperimentRegistryError("metadata experiment id differs from campaign")
+            except (KeyError, OSError, TypeError, ValueError, RuntimeError):
+                continue
+            found.append(
+                summary.model_copy(
+                    update={
+                        "experiment_id": metadata.experiment_id,
+                        "title": metadata.title,
+                        "playthrough_bundle_path": self._relative(playthrough),
+                        "completed_at": metadata.completed_at,
+                    }
+                )
+            )
+        return tuple(found)
+
+    def _verify_committed_playthrough(
+        self,
+        playthrough: Path,
+        summary: ExperimentSummary,
+    ) -> None:
+        manifest = json.loads((playthrough / "manifest.json").read_text(encoding="utf-8"))
+        if (
+            manifest.get("schema_version") != "playthrough-evidence-manifest-v1"
+            or manifest.get("playthrough_data_ready") is not True
+            or manifest.get("campaign_id") != summary.campaign_id
+            or manifest.get("request_fingerprint")
+            != summary.campaign.get("request_fingerprint")
+        ):
+            raise ExperimentRegistryError("committed playthrough identity is invalid")
+        source = manifest.get("source") or {}
+        if summary.source_kind != "openai_api":
+            raise ExperimentRegistryError("committed campaign must be OpenAI evidence")
+        if (
+            manifest.get("truth_label") != "live-openai-real-godot"
+            or source.get("provider") != summary.provider
+            or source.get("provider_mode") != summary.provider_mode
+            or source.get("provider_revision") != f"model:{summary.model}"
+            or manifest.get("cell_count") != summary.campaign.get("cells")
+            or manifest.get("node_count") != summary.campaign.get("weeks")
+            or any(check.get("status") != "passed" for check in manifest.get("checks") or [])
+        ):
+            raise ExperimentRegistryError("committed playthrough truth label is invalid")
+        artifacts = manifest.get("derived_artifacts") or []
+        if not artifacts:
+            raise ExperimentRegistryError("committed playthrough has no derived artifacts")
+        for artifact in artifacts:
+            artifact_path = (playthrough / str(artifact["path"])).resolve()
+            try:
+                artifact_path.relative_to(playthrough.resolve())
+            except ValueError as exc:
+                raise ExperimentRegistryError("playthrough artifact escapes bundle") from exc
+            if (
+                artifact_path.stat().st_size != int(artifact["bytes"])
+                or _sha256(artifact_path) != str(artifact["sha256"])
+            ):
+                raise ExperimentRegistryError("committed playthrough artifact hash mismatch")
 
     def _committed_experiments(self) -> tuple[ExperimentSummary, ...]:
         root = self.project / "examples/build_week_2026/experiments"

@@ -287,6 +287,7 @@
     "patched_commit": "c42b1c84630497427d895bf963103f8b40f5976d",
     "patched_tree": "ce5264c46b900493237acd4a42a65a0f8f884f62"
   },
+  "playthrough_bundle_path": null,
   "provider": "replay",
   "provider_mode": "prerecorded",
   "repair_bundle_path": "examples/build_week_2026/experiment-v1",

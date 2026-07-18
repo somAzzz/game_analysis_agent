@@ -1,0 +1,68 @@
+{
+  "campaign_id": "openai-all-six-seed-42-20w",
+  "cell_count": 6,
+  "cells": [
+    {
+      "attractor_count": 2,
+      "cell_id": "money-seed-42-b965cd87a14f",
+      "completed_weeks": 19,
+      "final_ending": "living_imbalance",
+      "path": "cells/money-seed-42.json",
+      "persona": "money",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "newbie-seed-42-b3fd42b3bc17",
+      "completed_weeks": 19,
+      "final_ending": "living_imbalance",
+      "path": "cells/newbie-seed-42.json",
+      "persona": "newbie",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "slacker-seed-42-0887a1172174",
+      "completed_weeks": 19,
+      "final_ending": "burnout_pause",
+      "path": "cells/slacker-seed-42.json",
+      "persona": "slacker",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 1,
+      "cell_id": "social-seed-42-8529ae48470c",
+      "completed_weeks": 19,
+      "final_ending": "living_imbalance",
+      "path": "cells/social-seed-42.json",
+      "persona": "social",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "study-seed-42-832f407df65d",
+      "completed_weeks": 19,
+      "final_ending": "living_imbalance",
+      "path": "cells/study-seed-42.json",
+      "persona": "study",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 2,
+      "cell_id": "visa-seed-42-5031492fa46c",
+      "completed_weeks": 19,
+      "final_ending": "living_imbalance",
+      "path": "cells/visa-seed-42.json",
+      "persona": "visa",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    }
+  ],
+  "schema_version": "playthrough-cell-index-v1",
+  "truth_label": "live-openai-real-godot"
+}

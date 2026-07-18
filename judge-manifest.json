@@ -982,28 +982,28 @@
       "sha256": "173e4bcc38c9716c422ab34c9090b1d5da1218c9f64ea28442b94858e52ab8fd"
     },
     {
-      "bytes": 13923,
+      "bytes": 13958,
       "path": "frontend/public-demo/judge-demo.json",
       "role": "judge-static-experiment",
-      "sha256": "088ca5aebe8aa6845a97dd0e1790042fcb3acc6e3c72c13988023fd8197986f4"
+      "sha256": "1c4573bcb0e592d90f46d0ab6bf4c40000cd2eb906a3671871f5680234d8201b"
     },
     {
-      "bytes": 2985,
+      "bytes": 4568,
       "path": "frontend/public-demo/experiment-index.json",
       "role": "judge-static-index",
-      "sha256": "195911e9235fbb816312a923be0b59b884cc16c7e46b95832543afea071e5255"
+      "sha256": "e993cefe7f55858c07b1e945a2538f494bfbe656d1b10e124700729887f8ad76"
     },
     {
-      "bytes": 18965,
+      "bytes": 23130,
       "path": "src/game_analysis_agent/experiment_registry.py",
       "role": "deterministic-correctness-registry",
-      "sha256": "a1b75f7fb070d724c05cc6b9728b95990fc124d46cc0861e50623439a59246c3"
+      "sha256": "b2b592625dbca07e5cd26847411f2f531e2c1a1b5e588e652bfba5d4a410f1b2"
     },
     {
-      "bytes": 2290,
+      "bytes": 2752,
       "path": "tools/build_judge_frontend_demo.py",
       "role": "deterministic-correctness-publisher",
-      "sha256": "e8a9f8a2fd1b07c9cec40a80ebebbd967a3208f0ad1be9e0cfc872c27bece2de"
+      "sha256": "c45c2fd8ebed9420bd72f72226d4069aa978868e67958bab8f95c4693fa13e6b"
     },
     {
       "bytes": 7656,
@@ -1024,10 +1024,10 @@
       "sha256": "083e5cf6bcd702f558a21ea865d7c33920aa283f484da76af819a8170455f3b4"
     },
     {
-      "bytes": 16023,
+      "bytes": 16065,
       "path": "frontend/src/types.ts",
       "role": "deterministic-correctness-frontend",
-      "sha256": "e72931c9388c0369bf678d31c7db5d7a04b5e3506afeee89b94235129d44ec98"
+      "sha256": "97638df7f7d9fe10db30775a26a2fb3f40e22d7a8ae5f5994654fc424cdaad11"
     },
     {
       "bytes": 33948,
@@ -1054,22 +1054,88 @@
       "sha256": "9a28192f8f3fb164374b1ed66b79ca50b627af747823b300516e971743ba15b4"
     },
     {
-      "bytes": 4084,
+      "bytes": 5146,
       "path": "tests/test_experiment_registry.py",
       "role": "deterministic-correctness-test",
-      "sha256": "9f75867bd25df1276483e75d8652fafbde01ba26cb0bf4bd7d5a4eac4a37aefd"
+      "sha256": "5ce9ff24cdf4ca525c3b5417a9ca34e0c85e91f05e45642aa4ff62cec95d8dab"
     },
     {
-      "bytes": 4946,
+      "bytes": 5070,
       "path": "tests/test_judge_inspect.py",
       "role": "deterministic-correctness-test",
-      "sha256": "2d7e899308bc623a5d2ed0e73c18b1b4b217f6a0c1a42984aea553fe52a45c88"
+      "sha256": "1486b3d9e546c66e3623f33b4d63f2a50f692195ac6839efdded4bbfcbc4c756"
     },
     {
       "bytes": 18470,
       "path": "frontend/public-demo/experiments/localization-choice-identity-v1/judge-experiment.json",
       "role": "deterministic-correctness-frontend",
       "sha256": "6432546621cf43a4c9bc2eb2e40b85c57bc0822bd868e43945129d50f7fc049b"
+    },
+    {
+      "bytes": 1677,
+      "path": "frontend/public-demo/experiments/openai-all-six-seed-42-20w/judge-experiment.json",
+      "role": "live-openai-frontend-evidence",
+      "sha256": "e1272f68943477da67f8c1aa649b33d3c17b410e394cf3581df0fb0cf0c6db71"
+    },
+    {
+      "bytes": 213463,
+      "path": "frontend/public-demo/experiments/openai-all-six-seed-42-20w/playthrough/cells/money-seed-42.json",
+      "role": "live-openai-frontend-evidence",
+      "sha256": "78fd0d1315f6790a7538c10a2753748479038227cd3c2ce5a168ea2610737486"
+    },
+    {
+      "bytes": 242059,
+      "path": "frontend/public-demo/experiments/openai-all-six-seed-42-20w/playthrough/cells/newbie-seed-42.json",
+      "role": "live-openai-frontend-evidence",
+      "sha256": "42291202ce2c870ce1b521ad48fd78de59aaaac277e133888266a9391e7659c7"
+    },
+    {
+      "bytes": 208205,
+      "path": "frontend/public-demo/experiments/openai-all-six-seed-42-20w/playthrough/cells/slacker-seed-42.json",
+      "role": "live-openai-frontend-evidence",
+      "sha256": "77704027abd88f11724f681054352f7beeb1e56e75f19dab4495d79ce54d7f19"
+    },
+    {
+      "bytes": 217380,
+      "path": "frontend/public-demo/experiments/openai-all-six-seed-42-20w/playthrough/cells/social-seed-42.json",
+      "role": "live-openai-frontend-evidence",
+      "sha256": "0ae06c34919a211a368aaf1bcf071ea127f25fdc9ce46589b3379f6d8b737ed3"
+    },
+    {
+      "bytes": 239289,
+      "path": "frontend/public-demo/experiments/openai-all-six-seed-42-20w/playthrough/cells/study-seed-42.json",
+      "role": "live-openai-frontend-evidence",
+      "sha256": "bc166ff6ec2b514deae099dab2aad7248e7e6e1686db146270bd862cfc3a2c91"
+    },
+    {
+      "bytes": 238847,
+      "path": "frontend/public-demo/experiments/openai-all-six-seed-42-20w/playthrough/cells/visa-seed-42.json",
+      "role": "live-openai-frontend-evidence",
+      "sha256": "5bfc9ad2e950bf0aaf3c6e520c0b019045c1e255d4d66a863008d4de13dba347"
+    },
+    {
+      "bytes": 1876,
+      "path": "frontend/public-demo/experiments/openai-all-six-seed-42-20w/playthrough/index.json",
+      "role": "live-openai-frontend-evidence",
+      "sha256": "6f5f9e80e2af41c702735637cdd91f0d9bb60a8dc68c242b937e8d9af697acb8"
+    },
+    {
+      "bytes": 10348,
+      "path": "frontend/public-demo/experiments/openai-all-six-seed-42-20w/playthrough/manifest.json",
+      "role": "live-openai-frontend-evidence",
+      "sha256": "446fd3582762ddc49c909fae5fc377698c0f35112a2a40057975e58eead6e7c1"
+    },
+    {
+      "bytes": 7611,
+      "path": "frontend/public-demo/experiments/openai-all-six-seed-42-20w/playthrough/personas.json",
+      "role": "live-openai-frontend-evidence",
+      "sha256": "1abb90cdd32b4eeeda3d448529024b73ff8b67db93c1e8f082e9530b160b2f8e"
+    },
+    {
+      "bytes": 215,
+      "path": "frontend/public-demo/experiments/openai-all-six-seed-42-20w/playthrough/repair_eligibility.json",
+      "role": "live-openai-frontend-evidence",
+      "sha256": "f5116cbf205ad0e4864ac8064f2ceab96404f49e3de0ec5f90649c7dbad1017c"
     },
     {
       "bytes": 7225,
@@ -1088,6 +1154,126 @@
       "path": "examples/build_week_2026/experiments/localization-choice-identity-v1/patch.diff",
       "role": "deterministic-correctness-evidence",
       "sha256": "c09eb0f8193ef8013e84fd19def7587927498a658c887085424741d7338456a4"
+    },
+    {
+      "bytes": 2531,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/agent_eval.jsonl",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "5db28d78c9e5356cfc08eee76c726cfd9e815ee84a365f804c8735fc813f13bb"
+    },
+    {
+      "bytes": 4274,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_manifest.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "f4b687a480f55932d628d3a7fbf2a7c9a88e6d4574e13ebb78406c03d0f0d8b0"
+    },
+    {
+      "bytes": 19451,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "b5b547becf7a605ba7d6f42a900a172d88037efbe5924a5d6269496412e9a6ec"
+    },
+    {
+      "bytes": 8599,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/failure_clusters.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "2843d8eb69247b6b59d66f5b5f24f35883e07c3ec226cac4e4339d8420c8a3bc"
+    },
+    {
+      "bytes": 2047,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/gate_report.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "a488880e639bc9663bd3b8d7a2b8d19003a2cdf360da105cce097b4ecb6817ed"
+    },
+    {
+      "bytes": 124379,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/llm_calls.jsonl",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "48cc34abe28fff49893144a6975b9b4d2ae59eb16c20e3b64180a575f0ddb324"
+    },
+    {
+      "bytes": 42964,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/persona_runs.jsonl",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "a881ebcce2b9aad2600d35b5658f556177331f497686c4d1e8fd29e52e9c19eb"
+    },
+    {
+      "bytes": 215,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/repair_eligibility.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "f5116cbf205ad0e4864ac8064f2ceab96404f49e3de0ec5f90649c7dbad1017c"
+    },
+    {
+      "bytes": 2142,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/repair_target.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "4c4806d0aa0bb9f23b768688f02ccd5a1bb5ac1bf7f282ff1709e41bf74c8aa3"
+    },
+    {
+      "bytes": 438,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign-metadata.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "80ded4a3c08a59aae5c68e29ff6320dbfd1f8c94b99ae31a916496273dfe08d7"
+    },
+    {
+      "bytes": 213463,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough/cells/money-seed-42.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "78fd0d1315f6790a7538c10a2753748479038227cd3c2ce5a168ea2610737486"
+    },
+    {
+      "bytes": 242059,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough/cells/newbie-seed-42.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "42291202ce2c870ce1b521ad48fd78de59aaaac277e133888266a9391e7659c7"
+    },
+    {
+      "bytes": 208205,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough/cells/slacker-seed-42.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "77704027abd88f11724f681054352f7beeb1e56e75f19dab4495d79ce54d7f19"
+    },
+    {
+      "bytes": 217380,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough/cells/social-seed-42.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "0ae06c34919a211a368aaf1bcf071ea127f25fdc9ce46589b3379f6d8b737ed3"
+    },
+    {
+      "bytes": 239289,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough/cells/study-seed-42.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "bc166ff6ec2b514deae099dab2aad7248e7e6e1686db146270bd862cfc3a2c91"
+    },
+    {
+      "bytes": 238847,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough/cells/visa-seed-42.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "5bfc9ad2e950bf0aaf3c6e520c0b019045c1e255d4d66a863008d4de13dba347"
+    },
+    {
+      "bytes": 1876,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough/index.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "6f5f9e80e2af41c702735637cdd91f0d9bb60a8dc68c242b937e8d9af697acb8"
+    },
+    {
+      "bytes": 10348,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough/manifest.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "446fd3582762ddc49c909fae5fc377698c0f35112a2a40057975e58eead6e7c1"
+    },
+    {
+      "bytes": 7611,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough/personas.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "1abb90cdd32b4eeeda3d448529024b73ff8b67db93c1e8f082e9530b160b2f8e"
+    },
+    {
+      "bytes": 215,
+      "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/playthrough/repair_eligibility.json",
+      "role": "live-openai-campaign-evidence",
+      "sha256": "f5116cbf205ad0e4864ac8064f2ceab96404f49e3de0ec5f90649c7dbad1017c"
     }
   ],
   "claims": [
@@ -1116,6 +1302,37 @@
       ],
       "id": "accepted_localization_choice_identity",
       "statement": "The deterministic bilingual choice-identity repair is accepted: focused identity errors fell from two to zero, and no model call was used."
+    },
+    {
+      "evidence": [
+        {
+          "equals": "model:gpt-5.6-luna",
+          "json_pointer": "/source/provider_revision",
+          "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_manifest.json"
+        },
+        {
+          "equals": 6,
+          "json_pointer": "/metrics/completed_cells",
+          "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json"
+        },
+        {
+          "equals": 114,
+          "json_pointer": "/metrics/total_weeks",
+          "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json"
+        },
+        {
+          "equals": 0.0,
+          "json_pointer": "/metrics/fallback_rate",
+          "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json"
+        },
+        {
+          "equals": 0.0,
+          "json_pointer": "/metrics/provider_error_rate",
+          "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json"
+        }
+      ],
+      "id": "live_openai_campaign",
+      "statement": "The retained live OpenAI gpt-5.6-luna campaign completed six personas with 114 gameplay records and zero fallback/provider errors."
     },
     {
       "evidence": [
@@ -1261,7 +1478,7 @@
   "evidence_revision": "build-week-2026-p3-g3-v1",
   "limitations": [
     "Inspect validates committed evidence; it does not perform a fresh model or Godot run.",
-    "The committed persona decisions are deterministic policy-authored Replay fixtures, not recorded or fresh OpenAI responses.",
+    "Offline Inspect/Replay do not make fresh model calls; the signed repair proof is deterministic Replay, while the separately retained live OpenAI campaign remains campaign-only evidence.",
     "The three cashflow/balance candidates remain rejected and unmerged; the separate bilingual choice-identity correctness repair is accepted and integrated in the submission overlay.",
     "Live OpenAI Judge Mode requires a separately supplied server-side API key.",
     "The embedded Study in Germany source is a competition demo, not a complete game."

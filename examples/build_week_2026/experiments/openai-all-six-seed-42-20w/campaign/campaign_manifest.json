@@ -1,0 +1,113 @@
+{
+  "cells": [
+    {
+      "campaign_fingerprint": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+      "campaign_id": "openai-all-six-seed-42-20w",
+      "cell_id": "newbie-seed-42-b3fd42b3bc17",
+      "difficulty": "normal",
+      "max_weeks": 20,
+      "output_dir": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/newbie-seed-42-b3fd42b3bc17",
+      "persona": "newbie",
+      "provider": "openai",
+      "scenario": "default_first_semester",
+      "seed": 42
+    },
+    {
+      "campaign_fingerprint": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+      "campaign_id": "openai-all-six-seed-42-20w",
+      "cell_id": "study-seed-42-832f407df65d",
+      "difficulty": "normal",
+      "max_weeks": 20,
+      "output_dir": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/study-seed-42-832f407df65d",
+      "persona": "study",
+      "provider": "openai",
+      "scenario": "default_first_semester",
+      "seed": 42
+    },
+    {
+      "campaign_fingerprint": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+      "campaign_id": "openai-all-six-seed-42-20w",
+      "cell_id": "money-seed-42-b965cd87a14f",
+      "difficulty": "normal",
+      "max_weeks": 20,
+      "output_dir": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/money-seed-42-b965cd87a14f",
+      "persona": "money",
+      "provider": "openai",
+      "scenario": "default_first_semester",
+      "seed": 42
+    },
+    {
+      "campaign_fingerprint": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+      "campaign_id": "openai-all-six-seed-42-20w",
+      "cell_id": "social-seed-42-8529ae48470c",
+      "difficulty": "normal",
+      "max_weeks": 20,
+      "output_dir": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/social-seed-42-8529ae48470c",
+      "persona": "social",
+      "provider": "openai",
+      "scenario": "default_first_semester",
+      "seed": 42
+    },
+    {
+      "campaign_fingerprint": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+      "campaign_id": "openai-all-six-seed-42-20w",
+      "cell_id": "visa-seed-42-5031492fa46c",
+      "difficulty": "normal",
+      "max_weeks": 20,
+      "output_dir": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/visa-seed-42-5031492fa46c",
+      "persona": "visa",
+      "provider": "openai",
+      "scenario": "default_first_semester",
+      "seed": 42
+    },
+    {
+      "campaign_fingerprint": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+      "campaign_id": "openai-all-six-seed-42-20w",
+      "cell_id": "slacker-seed-42-0887a1172174",
+      "difficulty": "normal",
+      "max_weeks": 20,
+      "output_dir": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/slacker-seed-42-0887a1172174",
+      "persona": "slacker",
+      "provider": "openai",
+      "scenario": "default_first_semester",
+      "seed": 42
+    }
+  ],
+  "created_at": "2026-07-18T13:11:59.815927Z",
+  "request": {
+    "campaign_id": "openai-all-six-seed-42-20w",
+    "concurrency": 4,
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "personas": [
+      "newbie",
+      "study",
+      "money",
+      "social",
+      "visa",
+      "slacker"
+    ],
+    "provider": "openai",
+    "report_root": "reports/persona-campaigns",
+    "scenario": "default_first_semester",
+    "schema_version": "persona-campaign-request-v1",
+    "seeds": [
+      42
+    ]
+  },
+  "request_fingerprint": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+  "schema_version": "persona-campaign-manifest-v1",
+  "source": {
+    "agent_commit": "fb1a09ac14b35396c7424b5066c28196a7896889",
+    "agent_dirty": false,
+    "agent_tree": "81ba89c5844cfa99f4049df05a368c1fefc48ebe",
+    "campaign_config_sha256": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "openai",
+    "provider_mode": "live",
+    "provider_revision": "model:gpt-5.6-luna"
+  },
+  "source_fingerprint": "113c7f4438c324992bda241a7f01863feb033e014eee1a1a68385773e500fc74"
+}

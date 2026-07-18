@@ -95,6 +95,32 @@ def test_committed_correctness_experiment_is_hash_verified_and_accepted() -> Non
     assert "Ask a friend to cover the semester contribution" in detail["patch"]["diff"]
 
 
+def test_committed_openai_campaign_is_hash_verified_and_replayable() -> None:
+    registry = ExperimentRegistry(ROOT)
+
+    summary = next(
+        item
+        for item in registry.list()["experiments"]
+        if item["experiment_id"] == "openai-all-six-seed-42-20w"
+    )
+    detail = registry.get(summary["experiment_id"])
+
+    assert summary["source_label"] == "OPENAI API"
+    assert summary["lifecycle_status"] == "campaign_complete"
+    assert summary["campaign"]["cells"] == 6
+    assert summary["campaign"]["weeks"] == 114
+    assert summary["campaign"]["fallback_rate"] == 0
+    assert summary["playthrough_bundle_path"].endswith("/playthrough")
+    assert detail["decision"] is None
+    assert detail["patch"] is None
+
+    static = ROOT / "frontend/public-demo/experiments/openai-all-six-seed-42-20w"
+    assert (static / "judge-experiment.json").is_file()
+    assert (static / "playthrough/index.json").is_file()
+    assert len(list((static / "playthrough/cells").glob("*.json"))) == 6
+    assert not (static / "playthrough/session.json").exists()
+
+
 def test_private_local_ab_campaigns_are_not_frontend_visible(monkeypatch) -> None:  # noqa: ANN001
     registry = ExperimentRegistry(ROOT)
     private = _local_campaign().model_copy(

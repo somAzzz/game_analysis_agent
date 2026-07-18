@@ -205,7 +205,11 @@ for experiment_file in sorted((ROOT / "frontend/public-demo/experiments").rglob(
         role = (
             "deterministic-correctness-frontend"
             if "localization-choice-identity-v1" in relative
-            else "local-vllm-playthrough-evidence"
+            else (
+                "live-openai-frontend-evidence"
+                if "openai-all-six-seed-42-20w" in relative
+                else "local-vllm-playthrough-evidence"
+            )
         )
         ARTIFACTS[experiment_file.relative_to(ROOT).as_posix()] = (
             role,
@@ -218,7 +222,11 @@ for experiment_file in sorted((ROOT / "examples/build_week_2026/experiments").rg
         role = (
             "deterministic-correctness-evidence"
             if "localization-choice-identity-v1" in relative
-            else "local-vllm-experiment-evidence"
+            else (
+                "live-openai-campaign-evidence"
+                if "openai-all-six-seed-42-20w" in relative
+                else "local-vllm-experiment-evidence"
+            )
         )
         ARTIFACTS[experiment_file.relative_to(ROOT).as_posix()] = (
             role,
@@ -249,6 +257,37 @@ CLAIMS = [
                 "path": "examples/build_week_2026/experiments/localization-choice-identity-v1/accepted_experiment.json",
                 "json_pointer": "/correctness_proof/provider_calls",
                 "equals": 0,
+            },
+        ],
+    },
+    {
+        "id": "live_openai_campaign",
+        "statement": "The retained live OpenAI gpt-5.6-luna campaign completed six personas with 114 gameplay records and zero fallback/provider errors.",
+        "evidence": [
+            {
+                "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_manifest.json",
+                "json_pointer": "/source/provider_revision",
+                "equals": "model:gpt-5.6-luna",
+            },
+            {
+                "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json",
+                "json_pointer": "/metrics/completed_cells",
+                "equals": 6,
+            },
+            {
+                "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json",
+                "json_pointer": "/metrics/total_weeks",
+                "equals": 114,
+            },
+            {
+                "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json",
+                "json_pointer": "/metrics/fallback_rate",
+                "equals": 0.0,
+            },
+            {
+                "path": "examples/build_week_2026/experiments/openai-all-six-seed-42-20w/campaign/campaign_summary.json",
+                "json_pointer": "/metrics/provider_error_rate",
+                "equals": 0.0,
             },
         ],
     },
@@ -424,7 +463,7 @@ def build_manifest() -> dict[str, object]:
         "claims": CLAIMS,
         "limitations": [
             "Inspect validates committed evidence; it does not perform a fresh model or Godot run.",
-            "The committed persona decisions are deterministic policy-authored Replay fixtures, not recorded or fresh OpenAI responses.",
+            "Offline Inspect/Replay do not make fresh model calls; the signed repair proof is deterministic Replay, while the separately retained live OpenAI campaign remains campaign-only evidence.",
             "The three cashflow/balance candidates remain rejected and unmerged; the separate bilingual choice-identity correctness repair is accepted and integrated in the submission overlay.",
             "Live OpenAI Judge Mode requires a separately supplied server-side API key.",
             "The embedded Study in Germany source is a competition demo, not a complete game.",
