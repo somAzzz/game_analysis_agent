@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import json
 from types import SimpleNamespace
 
 import httpx
-from openai import APITimeoutError, RateLimitError
+from openai import APITimeoutError, OpenAI, RateLimitError
 
 from game_analysis_agent.openai_persona_gateway import (
+    DEFAULT_OPENAI_MAX_OUTPUT_TOKENS,
     DEFAULT_OPENAI_PERSONA_MODEL,
     OpenAIResponsesPersonaGateway,
 )
@@ -39,6 +41,32 @@ class _Responses:
 class _Client:
     def __init__(self, outcomes: list[object]) -> None:
         self.responses = _Responses(outcomes)
+
+
+class _RawAPIResponse:
+    def __init__(self, payload: dict) -> None:
+        self._payload = payload
+
+    def json(self) -> dict:
+        return self._payload
+
+
+class _RawResponses(_Responses):
+    @property
+    def with_raw_response(self):
+        return self
+
+    def parse(self, **kwargs):  # noqa: ANN003
+        self.calls.append(kwargs)
+        outcome = self.outcomes.pop(0)
+        if isinstance(outcome, Exception):
+            raise outcome
+        return _RawAPIResponse(outcome)
+
+
+class _RawClient:
+    def __init__(self, outcomes: list[object]) -> None:
+        self.responses = _RawResponses(outcomes)
 
 
 def _context() -> WeekContext:
@@ -90,8 +118,55 @@ def _response(*, parsed=None, refusal: str = "", response_id: str = "resp_test")
     )
 
 
+def _raw_response(
+    *,
+    text: str,
+    response_id: str = "resp_raw",
+    status: str = "completed",
+    incomplete_reason: str | None = None,
+) -> dict:
+    return {
+        "id": response_id,
+        "created_at": 1.0,
+        "model": "gpt-5.6-luna-2026-06-01",
+        "object": "response",
+        "output": [
+            {
+                "id": f"msg_{response_id}",
+                "content": [
+                    {
+                        "annotations": [],
+                        "logprobs": [],
+                        "text": text,
+                        "type": "output_text",
+                    }
+                ],
+                "role": "assistant",
+                "status": "completed",
+                "type": "message",
+            }
+        ],
+        "parallel_tool_calls": True,
+        "tool_choice": "auto",
+        "tools": [],
+        "status": status,
+        "incomplete_details": ({"reason": incomplete_reason} if incomplete_reason else None),
+        "usage": {
+            "input_tokens": 100,
+            "input_tokens_details": {"cached_tokens": 0},
+            "output_tokens": 30,
+            "output_tokens_details": {"reasoning_tokens": 0},
+            "total_tokens": 130,
+        },
+    }
+
+
 def _gateway(outcomes: list[object]) -> OpenAIResponsesPersonaGateway:
     return OpenAIResponsesPersonaGateway(api_key="sk-test", client=_Client(outcomes))
+
+
+def _raw_gateway(outcomes: list[object]) -> OpenAIResponsesPersonaGateway:
+    return OpenAIResponsesPersonaGateway(api_key="sk-test", client=_RawClient(outcomes))
 
 
 def _request() -> PersonaDecisionRequest:
@@ -169,9 +244,7 @@ def test_unknown_action_is_rejected_after_one_repair() -> None:
 
 
 def test_one_schema_repair_can_produce_a_legal_decision() -> None:
-    gateway = _gateway(
-        [_response(parsed=_decision(action="ghost")), _response(parsed=_decision())]
-    )
+    gateway = _gateway([_response(parsed=_decision(action="ghost")), _response(parsed=_decision())])
 
     result = gateway.decide(_request())
 
@@ -199,3 +272,87 @@ def test_event_choice_uses_shared_structured_contract() -> None:
     assert result.status == PersonaResultStatus.COMPLETED
     assert result.choice is not None
     assert result.choice.event_choice_id == "rent_pressure.ask_extension"
+
+
+def test_raw_response_validation_retains_usage_and_repairs_once() -> None:
+    malformed = _raw_response(text=json.dumps({"week": "wrong"}), response_id="resp_bad")
+    repaired = _raw_response(text=_decision().model_dump_json(), response_id="resp_repaired")
+    gateway = _raw_gateway([malformed, repaired])
+
+    result = gateway.decide(_request())
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert result.metadata.response_id == "resp_repaired"
+    assert result.metadata.attempt_count == 2
+    assert result.metadata.parse_status == PersonaParseStatus.REPAIRED
+    assert result.metadata.usage.total_tokens == 260
+    assert (
+        gateway._client.responses.calls[0]["max_output_tokens"] == DEFAULT_OPENAI_MAX_OUTPUT_TOKENS
+    )
+
+
+def test_raw_malformed_response_is_typed_without_losing_envelope() -> None:
+    gateway = _raw_gateway(
+        [
+            _raw_response(text="not-json", response_id="resp_bad_1"),
+            _raw_response(text="still-not-json", response_id="resp_bad_2"),
+        ]
+    )
+
+    result = gateway.decide(_request())
+
+    assert result.status == PersonaResultStatus.FAILED
+    assert result.error is not None
+    assert result.error.category == PersonaErrorCategory.MALFORMED_RESPONSE
+    assert "Invalid JSON" in result.error.message
+    assert result.metadata.response_id == "resp_bad_2"
+    assert result.metadata.usage.total_tokens == 260
+
+
+def test_incomplete_raw_response_gets_one_bounded_repair() -> None:
+    incomplete = _raw_response(
+        text="{",
+        response_id="resp_incomplete",
+        status="incomplete",
+        incomplete_reason="max_output_tokens",
+    )
+    repaired = _raw_response(text=_decision().model_dump_json(), response_id="resp_complete")
+    gateway = _raw_gateway([incomplete, repaired])
+
+    result = gateway.decide(_request())
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert result.metadata.response_id == "resp_complete"
+    assert result.metadata.parse_status == PersonaParseStatus.REPAIRED
+    assert result.metadata.usage.total_tokens == 260
+
+
+def test_real_sdk_raw_wrapper_does_not_raise_before_gateway_repair() -> None:
+    payloads = iter(
+        [
+            _raw_response(text=json.dumps({"week": "wrong"}), response_id="resp_sdk_bad"),
+            _raw_response(text=_decision().model_dump_json(), response_id="resp_sdk_good"),
+        ]
+    )
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content)
+        assert body["text"]["format"]["type"] == "json_schema"
+        return httpx.Response(200, json=next(payloads), request=request)
+
+    http_client = httpx.Client(transport=httpx.MockTransport(handle))
+    client = OpenAI(
+        api_key="sk-test",
+        base_url="https://openai.test/v1",
+        http_client=http_client,
+        max_retries=0,
+    )
+    try:
+        result = OpenAIResponsesPersonaGateway(api_key="sk-test", client=client).decide(_request())
+    finally:
+        client.close()
+
+    assert result.status == PersonaResultStatus.COMPLETED, (result.error, result.metadata)
+    assert result.metadata.response_id == "resp_sdk_good"
+    assert result.metadata.parse_status == PersonaParseStatus.REPAIRED
+    assert result.metadata.usage.total_tokens == 260

@@ -14,6 +14,8 @@ from openai import (
     RateLimitError,
 )
 from openai import APITimeoutError as OpenAITimeoutError
+from openai.types.responses.response import Response
+from pydantic import ValidationError
 
 from .persona_gateway import (
     PersonaCallMetadata,
@@ -36,6 +38,7 @@ from .persona_runtime import redact_sensitive_text
 from .schemas import PlayerDecision
 
 DEFAULT_OPENAI_PERSONA_MODEL = "gpt-5.6-luna"
+DEFAULT_OPENAI_MAX_OUTPUT_TOKENS = 1200
 
 
 @dataclass
@@ -58,7 +61,7 @@ class OpenAIResponsesPersonaGateway:
         model: str = DEFAULT_OPENAI_PERSONA_MODEL,
         client: Any | None = None,
         timeout_s: float = 30.0,
-        max_output_tokens: int = 700,
+        max_output_tokens: int = DEFAULT_OPENAI_MAX_OUTPUT_TOKENS,
     ) -> None:
         if not api_key.strip():
             raise ValueError("OpenAI API key is required for the live persona gateway")
@@ -92,9 +95,7 @@ class OpenAIResponsesPersonaGateway:
             metadata=outcome.metadata,
         )
 
-    def choose_event(
-        self, request: PersonaEventChoiceRequest
-    ) -> PersonaEventChoiceResult:
+    def choose_event(self, request: PersonaEventChoiceRequest) -> PersonaEventChoiceResult:
         outcome = self._structured_request(
             schema=PersonaEventChoice,
             system=_event_system_prompt(),
@@ -134,15 +135,13 @@ class OpenAIResponsesPersonaGateway:
             prompt = initial_prompt if attempt == 1 else repair_prompt(last_errors)
             started = time.perf_counter()
             try:
-                response = self._client.responses.parse(
+                response = _request_response(
+                    self._client.responses,
                     model=self.model,
-                    input=[
-                        {"role": "system", "content": system},
-                        {"role": "user", "content": prompt},
-                    ],
-                    text_format=schema,
+                    system=system,
+                    prompt=prompt,
+                    schema=schema,
                     max_output_tokens=self.max_output_tokens,
-                    store=False,
                 )
             except Exception as exc:
                 total_latency_ms += int((time.perf_counter() - started) * 1000)
@@ -153,7 +152,7 @@ class OpenAIResponsesPersonaGateway:
                     parse_status=PersonaParseStatus.FAILED,
                 )
                 return _Outcome(None, metadata, _provider_error(exc))
-            parsed, refusal = _response_content(response)
+            parsed, output_text, refusal = _response_content(response)
             total_latency_ms += int((time.perf_counter() - started) * 1000)
             usage = _response_usage(response)
             total_usage = _sum_usage(total_usage, usage)
@@ -175,15 +174,25 @@ class OpenAIResponsesPersonaGateway:
                         retryable=False,
                     ),
                 )
-            if parsed is None:
+            incomplete_reason = _incomplete_reason(response)
+            if incomplete_reason:
+                last_errors = [f"response incomplete: {incomplete_reason}"]
+                continue
+            if parsed is None and not output_text:
                 last_errors = ["structured output missing"]
                 continue
-            saw_parsed = True
             try:
-                value = parsed if isinstance(parsed, schema) else schema.model_validate(parsed)
-            except Exception:
-                last_errors = ["structured output failed Pydantic validation"]
+                value = (
+                    parsed
+                    if isinstance(parsed, schema)
+                    else schema.model_validate(parsed)
+                    if parsed is not None
+                    else schema.model_validate_json(output_text)
+                )
+            except ValidationError as exc:
+                last_errors = _validation_errors(exc)
                 continue
+            saw_parsed = True
             last_errors = validate(value)
             if last_errors:
                 continue
@@ -229,8 +238,48 @@ class OpenAIResponsesPersonaGateway:
         )
 
 
-def _response_content(response: Any) -> tuple[Any | None, str]:
+def _request_response(
+    responses: Any,
+    *,
+    model: str,
+    system: str,
+    prompt: str,
+    schema: type,
+    max_output_tokens: int,
+) -> Any:
+    """Retain the response envelope before validating structured output."""
+
+    request = {
+        "model": model,
+        "input": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": prompt},
+        ],
+        "text_format": schema,
+        "max_output_tokens": max_output_tokens,
+        "store": False,
+    }
+    raw_responses = getattr(responses, "with_raw_response", None)
+    if raw_responses is None:
+        return responses.parse(**request)
+    raw_response = raw_responses.parse(**request)
+    return Response.model_validate(_raw_response_json(raw_response))
+
+
+def _raw_response_json(raw_response: Any) -> object:
+    json_method = getattr(raw_response, "json", None)
+    if callable(json_method):
+        return json_method()
+    http_response = getattr(raw_response, "http_response", None)
+    http_json = getattr(http_response, "json", None)
+    if callable(http_json):
+        return http_json()
+    raise TypeError("OpenAI raw response does not expose JSON content")
+
+
+def _response_content(response: Any) -> tuple[Any | None, str, str]:
     parsed = getattr(response, "output_parsed", None)
+    output_text: list[str] = []
     refusal = ""
     for output in getattr(response, "output", []) or []:
         if getattr(output, "type", "") != "message":
@@ -238,10 +287,30 @@ def _response_content(response: Any) -> tuple[Any | None, str]:
         for item in getattr(output, "content", []) or []:
             if getattr(item, "type", "") == "refusal":
                 refusal = str(getattr(item, "refusal", "") or "")
+            if getattr(item, "type", "") == "output_text":
+                text = getattr(item, "text", "")
+                if isinstance(text, str) and text:
+                    output_text.append(text)
             candidate = getattr(item, "parsed", None)
             if candidate is not None:
                 parsed = candidate
-    return parsed, refusal
+    return parsed, "".join(output_text), refusal
+
+
+def _incomplete_reason(response: Any) -> str:
+    if getattr(response, "status", "") != "incomplete":
+        return ""
+    details = getattr(response, "incomplete_details", None)
+    return _sanitize_message(str(getattr(details, "reason", "") or "unknown reason"))
+
+
+def _validation_errors(exc: ValidationError) -> list[str]:
+    errors: list[str] = []
+    for detail in exc.errors(include_url=False, include_input=False)[:6]:
+        location = ".".join(str(part) for part in detail.get("loc", ())) or "output"
+        message = str(detail.get("msg") or "invalid value")
+        errors.append(_sanitize_message(f"{location}: {message}"))
+    return errors or ["structured output failed Pydantic validation"]
 
 
 def _response_usage(response: Any) -> PersonaUsage:
@@ -278,6 +347,10 @@ def _provider_error(exc: Exception) -> PersonaProviderError:
         category = PersonaErrorCategory.TRANSPORT
         message = "OpenAI connection failed"
         retryable = True
+    elif isinstance(exc, ValidationError):
+        category = PersonaErrorCategory.MALFORMED_RESPONSE
+        message = "; ".join(_validation_errors(exc))
+        retryable = False
     else:
         category = PersonaErrorCategory.TRANSPORT
         message = f"OpenAI request failed: {exc.__class__.__name__}"
