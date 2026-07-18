@@ -23,22 +23,102 @@ responses, keys, or private traces to `session.json` or frontend assets.
 
 ## Conversation protocol
 
-### 1. Readiness without spend
+### 1. Run preflight and open the read-only evidence viewer
 
 From the repository root, run:
 
 ```bash
 .agents/skills/playtest-forge/scripts/preflight
-.agents/skills/playtest-forge/scripts/session-options --provider vllm --json
+.agents/skills/playtest-forge/scripts/session-options --choices-only --json
 ```
 
-Also inspect `.env` by field presence only, Docker/Godot availability, local
-model availability, and any existing `frontend/public/live-playthrough`
-session. Do not echo secret values. These checks must not call a model.
+These commands must not start Godot or call a model. Inspect `.env` by field
+presence only and inspect any retained `frontend/public/live-playthrough`
+session without printing secret values.
 
-### 2. Present the frozen menu
+Immediately stage the committed public evidence and start Vite in a persistent
+terminal:
 
-Offer the following choices, including their purpose and upper bounds:
+```bash
+npm --prefix frontend run prepare:public
+npm --prefix frontend run dev -- --host 127.0.0.1
+```
+
+Give the user this URL before asking either mandatory choice:
+
+```text
+http://127.0.0.1:5173/#/playthrough-inspector
+```
+
+At this stage the browser is a read-only view of retained signed/local evidence.
+Do not start `scripts/run-judge-dev`: doing so would load a Godot default before
+the user chooses a runtime. Provider-backed actions remain unavailable until
+the governed API is connected. Starting this viewer must not probe Godot or
+call a model.
+
+### 2. Ask the two mandatory choices
+
+The first user-facing menu must ask and wait for both answers:
+
+1. Godot runtime:
+   - `local-godot` — use a host Godot 4.4 executable;
+   - `docker-godot` — use `scripts/godot-docker-wrapper`.
+2. LLM:
+   - `openai-api` — live OpenAI persona decisions and possible API cost;
+   - `local-vllm` — fresh local vLLM persona decisions;
+   - `none` — deterministic automation and committed Replay, zero model calls.
+
+Do not preselect either answer because a binary, Docker daemon, endpoint, or key
+is present. Availability is readiness evidence, not user authorization.
+
+### 3. Probe only the selected runtime and provider
+
+For `local-godot`, resolve `GODOT_BIN`, then run `"$GODOT_BIN" --version`.
+Require the pinned Godot 4.4 family before a fresh real-game run. Do not silently
+fall back to Docker.
+
+For `docker-godot`, verify Docker, then run:
+
+```bash
+scripts/godot-docker-wrapper --version
+```
+
+Require the pinned Godot 4.4 family. Do not silently fall back to a host binary.
+
+For `openai-api`, check server-side `OPENAI_API_KEY` and model fields without
+printing their values. Do not call the API during readiness. For `local-vllm`,
+check the configured endpoint/model and generation-health readiness without
+starting a campaign. For `none`, perform no provider check.
+
+A selected path that is unavailable is `unsupported`. Ask the user to choose a
+different path or remediate it; do not switch automatically.
+
+### 4. Branch on the LLM choice
+
+#### No LLM
+
+Run the planner only to freeze the runtime and truth boundary:
+
+```bash
+.agents/skills/playtest-forge/scripts/session-options \
+  --godot-runtime docker-godot \
+  --llm-provider none \
+  --json
+```
+
+Use `--godot-runtime local-godot --godot-bin /resolved/godot4` for a local
+binary. Then read `references/automated-testing.md` and ask which deterministic
+matrix, focused test, boundary sweep, or Replay inspection the user wants.
+
+This route has zero model calls and no persona campaign profiles. Keep the
+static viewer open for retained evidence. Fresh Godot automation may create new
+state evidence; committed Replay only proves reproducibility. Neither is fresh
+persona-worker evidence, and a deterministic run is not automatically a live
+persona campaign in the viewer.
+
+#### OpenAI API or local vLLM
+
+After the two initial choices are confirmed, present the frozen profiles:
 
 | Profile | Matrix | Worst-case calls | Operational cap | What it can prove |
 | --- | ---: | ---: | ---: | --- |
@@ -47,66 +127,74 @@ Offer the following choices, including their purpose and upper bounds:
 | `repair-evidence` | 6 personas x seeds 42/43/44 x 20 weeks | 720 | 760 | fixed evidence adequate to select one repair target |
 
 A complete 20-week request can end after 19 decisions when the resulting state
-is week 20. Say this before execution so the user does not misread it as an
-incomplete run.
+is week 20. Say this before execution.
 
-Ask the user to choose:
+Ask for the profile and, for `one-strategy`, the persona. The user has already
+selected the Godot runtime and LLM, so do not ask those questions again unless
+readiness failed or the user changes scope. Never infer permission to spend API
+credit from the presence of a key.
 
-1. profile;
-2. provider: local `vllm`/`sglang` or API `openai`/`deepseek`;
-3. persona when `one-strategy` is selected.
-
-Recommend `one-strategy` with local vLLM first. If that succeeds, recommend
-`six-strategy` locally. Use the API only when the user explicitly selects it.
-Never infer permission to consume API credit from the presence of a key.
-
-Use the planner again with the confirmed values, for example:
+Use the planner with all confirmed values. Examples:
 
 ```bash
 .agents/skills/playtest-forge/scripts/session-options \
-  --provider openai --profile one-strategy --persona newbie --json
+  --godot-runtime docker-godot \
+  --llm-provider openai-api \
+  --profile one-strategy \
+  --persona newbie \
+  --json
 ```
-
-Run the emitted environment and command exactly. Do not hand-maintain a second
-OpenAI command or change the matrix between local and API comparisons.
-
-### 3. Start the Judge API and viewer first
-
-Start both processes in separate persistent terminals:
 
 ```bash
-scripts/run-judge-dev --host 127.0.0.1 --port 8080
-npm --prefix frontend run dev -- --host 127.0.0.1
+.agents/skills/playtest-forge/scripts/session-options \
+  --godot-runtime local-godot \
+  --godot-bin /resolved/godot4 \
+  --llm-provider local-vllm \
+  --profile six-strategy \
+  --json
 ```
 
-`scripts/run-judge-dev` loads `.env` server-side and enables the governed Judge
+Local and API providers must keep the same matrix, limits, evidence service,
+and frontend path.
+
+### 5. Connect the Judge API after the runtime is frozen
+
+Keep the Vite process from step 1 running. After Godot, LLM, profile, and any
+required persona are confirmed, start the governed API in a separate persistent
+terminal with the selected runtime:
+
+```bash
+GODOT_BIN=/resolved/godot4 \
+  scripts/run-judge-dev --host 127.0.0.1 --port 8080
+```
+
+Use this form for Docker Godot:
+
+```bash
+GODOT_BIN="$PWD/scripts/godot-docker-wrapper" \
+  scripts/run-judge-dev --host 127.0.0.1 --port 8080
+```
+
+An explicit `GODOT_BIN` must win over `.env`. `scripts/run-judge-dev` still
+loads provider configuration server-side and enables the governed Judge
 adapter. Vite proxies only `/api` to port 8080; no credential is exposed to the
-browser. Judge Mode can therefore select Replay, run a real local vLLM
-generation-health test, or select live OpenAI when its server-side key and game
-runtime are ready. Its bounded action is a readiness/demo campaign, not a
-replacement for the frozen 20-week profiles chosen in the Codex conversation.
+browser. Ask the user to refresh the already-open page after the API starts.
 Never run a Judge action campaign concurrently with the full campaign command.
 
-Give the user this URL before the campaign begins:
+Now run the planner-emitted environment and campaign command exactly. The
+browser polls `frontend/public/live-playthrough/session.json` every 1.5 seconds.
+Local and API campaigns publish through the same campaign service. The previous
+verified experiment remains selectable until the new campaign passes every
+final gate.
 
-```text
-http://127.0.0.1:5173/#/playthrough-inspector
-```
+### 6. Execute and monitor
 
-The browser polls `frontend/public/live-playthrough/session.json` every 1.5
-seconds. Both local and API campaigns publish through the same campaign service
-to this location. Each completed weekly decision updates the session card. The
-previous verified campaign remains selectable until the new campaign completes
-all gates; then the complete sanitized paths replace it atomically.
-
-### 4. Execute and monitor
-
-Run one campaign command in a persistent terminal. Monitor both process output
-and `session.json`, and tell the user when cells start, weekly records advance,
+Run one emitted campaign command in a persistent terminal. Monitor process
+output and `session.json`, and report when cells start, weekly records advance,
 final validation begins, or a failure occurs. During long calls, provide a
 concise progress update at least every 60 seconds.
 
-Treat these session states as follows:
+Treat session states as follows:
 
 - `running`: weekly UI telemetry only;
 - `finalizing`: all cells stopped; bundle and view gates are still running;
@@ -114,20 +202,22 @@ Treat these session states as follows:
 - `failed`: stop; report the sanitized error and do not silently fall back.
 
 Never cite `session.json` as completed repair evidence. Cite the final campaign
-manifest, gate report, cell rows, and their hashes only after `completed`.
+manifest, gate report, cell rows, and hashes only after `completed`.
 
-### 5. Close the conversational loop
+### 7. Close the conversational loop
 
 After completion, report:
 
-- provider, model, mode, and exact truth label;
+- selected Godot runtime and resolved executable/wrapper;
+- LLM choice, provider, model, mode, and exact truth label;
 - completed cells, recorded decisions/weeks, calls used, endings, and gate;
 - frontend evidence URL and retained bundle paths;
 - whether `repair_target_eligible` is true;
-- what the selected profile cannot prove.
+- what the selected route/profile cannot prove.
 
-Then offer the next bounded choice. Do not automatically start another cohort,
-spend API credit, choose a repair, edit the game, or merge anything.
+Then offer the next bounded choice. Do not automatically change runtime or
+provider, start another cohort, spend API credit, choose a repair, edit the
+game, or merge anything.
 
 ## Repair boundary
 

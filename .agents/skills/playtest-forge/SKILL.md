@@ -39,32 +39,46 @@ When the user asks to start testing, use the frozen orchestration in
 `references/codex-session-orchestration.md`. This is mandatory for this
 repository's interactive path:
 
-1. Run `scripts/preflight` and `scripts/session-options --json` without making
-   a model call. Inspect existing generated session/evidence and provider
-   readiness without printing secrets.
-2. Offer the three frozen profiles in recommended order: one strategy, all six
-   strategies on seed 42, or the 6 x 3 repair-evidence matrix. Explain calls,
-   cells, duration, eligibility, and cost exposure. Let the user choose the
-   profile, provider, and the persona for a one-strategy run.
-3. Do not make a provider call until those choices are confirmed. Recommend a
-   one-strategy local vLLM run first, then six-strategy local divergence, then
-   repair evidence; use OpenAI only when the user selects it.
-4. Start the governed Judge API and the Vite frontend in separate persistent
-   terminals before the campaign, then provide
-   `http://127.0.0.1:5173/#/playthrough-inspector`. The Vite `/api` proxy makes
-   Replay, local vLLM, and live OpenAI selectable in Judge Mode; full 20-week
-   profiles still execute through the frozen session command.
-5. Execute the exact command emitted by `scripts/session-options`. Local and
-   API providers must use the same typed campaign service, real-Godot probe,
-   limits, progress publisher, UI view, and evidence gates. Never create a
-   provider-specific shortcut.
-6. Monitor the command and `frontend/public/live-playthrough/session.json`.
-   Report meaningful progress at least once per minute while work continues.
-   Treat this file as in-progress UI state, not completed evidence.
-7. On completion, verify the sanitized bundle and frontend view, state the
-   exact truth label, and say whether the cohort can select a repair target.
-   A one-strategy or one-seed result can validate the agent but cannot prove a
-   repair. Never spend API credit, edit the game, or begin repair automatically.
+1. Run `scripts/preflight` and `scripts/session-options --choices-only --json`
+   without making a model call or starting Godot.
+2. Immediately stage the committed public evidence and start only the Vite
+   viewer. Give the user
+   `http://127.0.0.1:5173/#/playthrough-inspector` before asking for runtime or
+   provider. This read-only stage must not start the Judge API, select Godot, or
+   call a model; provider-backed actions remain unavailable.
+3. Make the first user-facing choice two required questions, before profile,
+   persona, cost, or execution:
+   - Godot runtime: `local-godot` or `docker-godot`;
+   - LLM: `openai-api`, `local-vllm`, or `none`.
+   Do not infer either answer from installed tools, `.env`, or prior sessions.
+4. Probe only the selected paths. For local Godot, resolve the exact executable
+   and require Godot 4.4. For Docker Godot, require Docker plus the repository
+   wrapper and verify its Godot 4.4 version. Check provider readiness by field
+   presence and health only; never print secrets or make a model call.
+5. If the user selects `none`, keep the static viewer open and route to
+   deterministic automation plus committed Replay. Read
+   `references/automated-testing.md`, state that model calls are zero and no
+   fresh persona evidence will be created, then ask for the automated test
+   scope. Do not show persona campaign profiles or relabel Replay as live
+   evidence.
+6. If the user selects an LLM, run `scripts/session-options` with the confirmed
+   `--godot-runtime` and `--llm-provider`. Offer the three frozen profiles in
+   recommended order, explain calls/cells/duration/eligibility/cost, and ask for
+   the persona only for `one-strategy`.
+7. Do not start a provider, spend API credit, or launch a campaign until Godot,
+   LLM, profile, and any required persona are all confirmed. Recommend local
+   vLLM before OpenAI only as guidance; preserve the user's explicit choice.
+8. After every required choice is frozen, start the governed Judge API with the
+   selected `GODOT_BIN`, keep the existing Vite process running, ask the user to
+   refresh the viewer, and execute the exact environment and command emitted by
+   `scripts/session-options`. Never let `.env` replace the selected runtime.
+9. Monitor the command and `frontend/public/live-playthrough/session.json`.
+   Report meaningful progress at least once per minute. Treat this file as
+   in-progress UI state, not completed evidence.
+10. On completion, verify the sanitized bundle and frontend view, state the
+    selected Godot runtime, exact provider truth label, and repair eligibility.
+    A one-strategy or one-seed result can validate the agent but cannot prove a
+    repair. Never edit the game or begin repair automatically.
 
 ## Core workflow
 

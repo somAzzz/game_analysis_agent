@@ -2,11 +2,16 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+gaa_selected_godot_bin=${GODOT_BIN-}
 if [ -f "$ROOT/.env" ]; then
   set -a
   # shellcheck disable=SC1091
   . "$ROOT/.env"
   set +a
+fi
+
+if [ -n "$gaa_selected_godot_bin" ]; then
+  GODOT_BIN=$gaa_selected_godot_bin
 fi
 
 : "${GODOT_BIN:=$ROOT/scripts/godot-docker-wrapper}"

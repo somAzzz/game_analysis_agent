@@ -1,6 +1,6 @@
 ---
 status: implemented
-updated: 2026-07-17
+updated: 2026-07-18
 audience: Build Week evaluators, maintainers, Codex operators
 scope: Codex-first full-semester playtest orchestration
 ---
@@ -9,25 +9,35 @@ scope: Codex-first full-semester playtest orchestration
 
 This update turns `playtest-forge` into the primary operator interface for a
 complete agent-project validation. The user opens Codex, selects the Skill,
-chooses a frozen test profile and provider in conversation, opens the evidence
-viewer, and watches each completed week arrive. The goal is to prove the agent
-project can test and repair a game; it is not a mandate to polish the demo.
+and receives a read-only evidence viewer before choosing local or Docker Godot
+and OpenAI API, local vLLM, or no LLM. Model-backed runs connect the governed
+API only after all required choices are frozen, then publish each completed
+week to the same viewer. The goal is to prove the agent project can test and
+repair a game; it is not a mandate to polish the demo.
 
 ## User flow
 
 1. Open this repository in Codex and select `$playtest-forge`.
 2. Ask to start a game test.
-3. Codex performs no-spend readiness checks and presents the three frozen
-   profiles below.
-4. The user confirms profile, provider, and the persona for a one-strategy run.
-5. Codex starts Playthrough Inspector, gives the URL, and executes the exact
-   generated campaign command.
-6. The inspector updates the sanitized session card after every completed
+3. Codex runs offline preflight, starts the read-only Vite evidence viewer, and
+   gives the URL. This stage does not start Judge API, Godot, or an LLM.
+4. Codex asks two required questions: local or Docker Godot, then OpenAI API,
+   local vLLM, or no LLM.
+5. Codex probes only the selected paths without a provider call. No LLM keeps
+   the static viewer open, routes to deterministic automation plus committed
+   Replay, and skips persona profiles.
+6. For a model-backed run, Codex presents the three frozen profiles below. The
+   user confirms the profile and the persona for a one-strategy run.
+7. With every choice frozen, Codex starts Judge API using the selected
+   `GODOT_BIN`, asks the user to refresh the existing viewer, and executes the
+   exact generated campaign command.
+8. The inspector updates the sanitized session card after every completed
    weekly decision. Codex also reports meaningful progress during long runs.
-7. Only after final bundle and view gates pass does the complete campaign
+9. Only after final bundle and view gates pass does the complete campaign
    replace the previous generated evidence.
-8. Codex reports what the run proved and offers the next bounded choice. It
-   never spends more API credit or edits the game without a new user decision.
+10. Codex reports what the run proved and offers the next bounded choice. It
+    never changes runtime/provider, spends more credit, or edits the game
+    without a new user decision.
 
 Frontend URL:
 
@@ -52,7 +62,11 @@ The source of truth is
 Codex reads it through:
 
 ```bash
-.agents/skills/playtest-forge/scripts/session-options --provider vllm --json
+.agents/skills/playtest-forge/scripts/session-options --choices-only --json
+.agents/skills/playtest-forge/scripts/session-options \
+  --godot-runtime docker-godot \
+  --llm-provider local-vllm \
+  --json
 ```
 
 ## One pipeline for local and API models

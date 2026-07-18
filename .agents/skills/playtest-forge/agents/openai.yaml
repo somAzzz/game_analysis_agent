@@ -1,4 +1,4 @@
 interface:
   display_name: "Playtest Forge"
   short_description: "Run governed playtests and prove bounded repairs"
-  default_prompt: "Use $playtest-forge to choose a frozen test profile and provider, start the evidence UI, stream each weekly result through the shared local/API campaign service, and repair only with fixed and holdout proof."
+  default_prompt: "Use $playtest-forge to open the read-only evidence viewer first, then ask me for local or Docker Godot and OpenAI API, local vLLM, or no LLM before running governed proof."

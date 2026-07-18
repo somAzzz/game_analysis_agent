@@ -9,8 +9,11 @@ from game_analysis_agent.campaign_contract import CampaignPersona
 from game_analysis_agent.persona_gateway import PersonaProvider
 from game_analysis_agent.playtest_session import (
     PlaytestSessionCatalog,
+    describe_no_llm_session,
     describe_playtest_profiles,
+    describe_session_choices,
     load_playtest_session_catalog,
+    provider_for_llm_choice,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,6 +55,7 @@ def test_profile_command_preserves_provider_and_every_matrix_axis() -> None:
     assert evidence["command"].count("--persona") == 6
     assert evidence["command"].count("--seed") == 3
     assert evidence["environment"] == {
+        "GODOT_BIN": "scripts/godot-docker-wrapper",
         "PERSONA_MAX_RUNS": "18",
         "PERSONA_MAX_WEEKS": "20",
         "PERSONA_MAX_CONCURRENCY": "4",
@@ -74,6 +78,65 @@ def test_local_and_api_profiles_share_the_same_campaign_shape() -> None:
         assert local_profile["command"][2:] == api_profile["command"][2:]
         assert local_profile["command"][1] == "vllm"
         assert api_profile["command"][1] == "openai"
+
+
+def test_initial_choices_require_godot_and_llm_before_profile() -> None:
+    payload = describe_session_choices()
+
+    assert payload["schema_version"] == "playtest-session-choices-v1"
+    questions = {question["id"]: question for question in payload["questions"]}
+    assert [option["id"] for option in questions["godot_runtime"]["options"]] == [
+        "local-godot",
+        "docker-godot",
+    ]
+    assert [option["id"] for option in questions["llm_provider"]["options"]] == [
+        "openai-api",
+        "local-vllm",
+        "none",
+    ]
+    assert payload["rules"]["ask_before_profile"] is True
+    assert provider_for_llm_choice("openai-api") == PersonaProvider.OPENAI
+    assert provider_for_llm_choice("local-vllm") == PersonaProvider.VLLM
+    assert provider_for_llm_choice("none") is None
+
+
+def test_selected_godot_runtime_is_frozen_into_every_campaign_command() -> None:
+    catalog = load_playtest_session_catalog(ROOT / "config/playtest_session_profiles.json")
+    local = describe_playtest_profiles(
+        catalog,
+        provider=PersonaProvider.VLLM,
+        godot_runtime="local-godot",
+        godot_bin="/opt/godot-4.4/godot4",
+    )
+    docker = describe_playtest_profiles(
+        catalog,
+        provider=PersonaProvider.OPENAI,
+        godot_runtime="docker-godot",
+    )
+
+    assert local["godot_runtime"] == "local-godot"
+    assert local["llm_provider"] == "local-vllm"
+    assert all(
+        profile["environment"]["GODOT_BIN"] == "/opt/godot-4.4/godot4"
+        for profile in local["profiles"]
+    )
+    assert docker["godot_runtime"] == "docker-godot"
+    assert docker["llm_provider"] == "openai-api"
+    assert all(
+        profile["environment"]["GODOT_BIN"] == "scripts/godot-docker-wrapper"
+        for profile in docker["profiles"]
+    )
+
+
+def test_no_llm_route_has_zero_calls_and_no_persona_profiles() -> None:
+    payload = describe_no_llm_session(godot_runtime="docker-godot")
+
+    assert payload["provider"] is None
+    assert payload["model_calls"] == 0
+    assert payload["profiles"] == []
+    assert payload["fresh_persona_evidence"] is False
+    assert payload["commands"][0] == ["scripts/godot-docker-wrapper", "--version"]
+    assert payload["route"] == "deterministic-automation-and-replay"
 
 
 def test_profile_rejects_a_call_budget_below_worst_case() -> None:
@@ -100,3 +163,14 @@ def test_profile_rejects_a_call_budget_below_worst_case() -> None:
                 ],
             }
         )
+
+
+def test_judge_dev_preserves_user_selected_godot_over_dotenv() -> None:
+    script = (ROOT / "scripts/run-judge-dev").read_text(encoding="utf-8")
+
+    capture = script.index("gaa_selected_godot_bin=${GODOT_BIN-}")
+    dotenv = script.index('. "$ROOT/.env"')
+    restore = script.index("GODOT_BIN=$gaa_selected_godot_bin")
+    default = script.index(': "${GODOT_BIN:=$ROOT/scripts/godot-docker-wrapper}"')
+
+    assert capture < dotenv < restore < default

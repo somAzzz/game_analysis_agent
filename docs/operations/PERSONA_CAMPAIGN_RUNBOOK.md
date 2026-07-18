@@ -23,17 +23,25 @@ and publish the actual path to Playthrough Inspector.
 
 ## Frozen menu
 
-Codex and manual operators must derive commands from the same profile catalog:
+Codex and manual operators first inspect the same runtime/provider choices,
+but the guided Codex route stages committed evidence and starts the read-only
+Vite viewer before asking for either answer. This early viewer does not start
+Judge API, Godot, or a model. Commands still derive from the same profile
+catalog:
 
 ```bash
-.agents/skills/playtest-forge/scripts/session-options --provider vllm --json
-.agents/skills/playtest-forge/scripts/session-options --provider openai --json
+.agents/skills/playtest-forge/scripts/session-options --choices-only --json
+.agents/skills/playtest-forge/scripts/session-options \
+  --godot-runtime docker-godot --llm-provider local-vllm --json
+.agents/skills/playtest-forge/scripts/session-options \
+  --godot-runtime docker-godot --llm-provider openai-api --json
 ```
 
-The outputs preserve the same personas, seeds, duration, budgets, service,
-Godot probe, progress publishing, and gates. They differ only by provider
-command and truth. A configured key does not authorize a call; the user must
-confirm provider and profile first.
+Local and API outputs preserve the same personas, seeds, duration, budgets,
+service, Godot probe, progress publishing, and gates. No LLM is a separate
+zero-call deterministic/Replay route and does not produce fresh persona
+evidence. A configured key or available runtime does not authorize execution;
+the user must confirm Godot, LLM, profile, and any required persona first.
 
 ## 1. Local preflight: one strategy
 
@@ -70,13 +78,13 @@ A successful run writes:
 - `repair_eligibility.json`, which is expected to say `eligible: false` for
   the single-persona preflight.
 
-Run the frontend and open `/playthrough-inspector`. It automatically prefers
-Latest campaign when generated evidence exists and retains Signed Replay as a
-manual fallback.
+If the guided flow did not already start Vite, run the frontend and open
+`/playthrough-inspector`. It automatically prefers Latest campaign when
+generated evidence exists and retains Signed Replay as a manual fallback.
 
 ```bash
-cd frontend
-npm run dev
+npm --prefix frontend run prepare:public
+npm --prefix frontend run dev -- --host 127.0.0.1
 ```
 
 ## 3. Full six-strategy local rehearsal
