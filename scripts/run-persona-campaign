@@ -2,6 +2,7 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+gaa_selected_godot_bin=${GODOT_BIN-}
 gaa_persona_max_runs=${PERSONA_MAX_RUNS-}
 gaa_persona_max_weeks=${PERSONA_MAX_WEEKS-}
 gaa_persona_max_concurrency=${PERSONA_MAX_CONCURRENCY-}
@@ -12,6 +13,7 @@ if [ -f "$ROOT/.env" ]; then
   . "$ROOT/.env"
   set +a
 fi
+[ -z "$gaa_selected_godot_bin" ] || GODOT_BIN=$gaa_selected_godot_bin
 [ -z "$gaa_persona_max_runs" ] || PERSONA_MAX_RUNS=$gaa_persona_max_runs
 [ -z "$gaa_persona_max_weeks" ] || PERSONA_MAX_WEEKS=$gaa_persona_max_weeks
 [ -z "$gaa_persona_max_concurrency" ] || PERSONA_MAX_CONCURRENCY=$gaa_persona_max_concurrency
@@ -36,6 +38,9 @@ case "$PROVIDER" in
 esac
 
 : "${GODOT_BIN:=$ROOT/scripts/godot-docker-wrapper}"
+case "$GODOT_BIN" in
+  scripts/*) GODOT_BIN="$ROOT/$GODOT_BIN" ;;
+esac
 export GODOT_BIN
 gaa_prepare_embedded=0
 if [ -z "${GAME_PROJECT_PATH:-}" ]; then

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import os
+import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -174,3 +177,63 @@ def test_judge_dev_preserves_user_selected_godot_over_dotenv() -> None:
     default = script.index(': "${GODOT_BIN:=$ROOT/scripts/godot-docker-wrapper}"')
 
     assert capture < dotenv < restore < default
+
+
+@pytest.mark.parametrize(
+    ("script_name", "arguments"),
+    [
+        ("run-judge-dev", ("--host", "127.0.0.1")),
+        ("run-persona-campaign", ("openai", "--persona", "newbie")),
+    ],
+)
+@pytest.mark.parametrize(
+    ("selected_godot", "dotenv_godot"),
+    [
+        ("/opt/godot-4.4/godot4", "scripts/godot-docker-wrapper"),
+        ("scripts/godot-docker-wrapper", "/opt/godot-4.4/godot4"),
+    ],
+)
+def test_runtime_entrypoints_preserve_selected_local_or_docker_godot_over_dotenv(
+    tmp_path: Path,
+    script_name: str,
+    arguments: tuple[str, ...],
+    selected_godot: str,
+    dotenv_godot: str,
+) -> None:
+    scripts = tmp_path / "scripts"
+    scripts.mkdir()
+    entrypoint = scripts / script_name
+    shutil.copyfile(ROOT / "scripts" / script_name, entrypoint)
+    entrypoint.chmod(0o755)
+
+    game = tmp_path / "game"
+    game.mkdir()
+    (game / "project.godot").write_text("[application]\n", encoding="utf-8")
+    (tmp_path / ".env").write_text(
+        f"GODOT_BIN={dotenv_godot}\nGAME_PROJECT_PATH='{game}'\n",
+        encoding="utf-8",
+    )
+
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    fake_uv = fake_bin / "uv"
+    fake_uv.write_text('#!/bin/sh\nprintf "%s\\n" "$GODOT_BIN"\n', encoding="utf-8")
+    fake_uv.chmod(0o755)
+
+    result = subprocess.run(
+        [str(entrypoint), *arguments],
+        cwd=tmp_path,
+        env={
+            **os.environ,
+            "GODOT_BIN": selected_godot,
+            "PATH": f"{fake_bin}{os.pathsep}{os.environ['PATH']}",
+        },
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    expected = (
+        str(tmp_path / selected_godot) if selected_godot.startswith("scripts/") else selected_godot
+    )
+    assert result.stdout.strip() == expected
