@@ -1,8 +1,8 @@
-name: Publish dashboard demo
+name: Publish Build Week dashboard demo
 
 on:
   push:
-    branches: [main, OpenAI-build-week-2026]
+    branches: [OpenAI-build-week-2026]
   workflow_dispatch:
 
 permissions:
@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.ref == 'refs/heads/OpenAI-build-week-2026'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
