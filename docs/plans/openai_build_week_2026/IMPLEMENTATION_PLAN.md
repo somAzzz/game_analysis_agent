@@ -830,20 +830,26 @@ facts until the final campaign exists.
 
 ### 12.3 Demonstration storyboard
 
-Provisional video allocation:
+The canonical recording script is
+[`submission/build-week-2026/VIDEO_SCRIPT.md`](../../../submission/build-week-2026/VIDEO_SCRIPT.md).
+It freezes the current cut at 2:55 and keeps the live OpenAI campaign,
+prerecorded repair proof, and deterministic accepted repair truthfully
+separate. Current allocation:
 
 | Time | Content |
 | --- | --- |
-| 0:00-0:20 | Problem: small game teams cannot cheaply replay diverse human behavior |
-| 0:20-0:45 | One offline command validates the evidence bundle, then the dashboard starts a short live OpenAI campaign |
-| 0:45-1:10 | Persona differences and the shared failure attractor appear |
-| 1:10-1:40 | Codex reads evidence, cites source, and states one falsifiable hypothesis |
-| 1:40-2:10 | Codex applies one constrained patch in an isolated worktree |
-| 2:10-2:40 | Same-seed and holdout proof; gates; accepted or rejected result |
-| 2:40-3:00 | Impact, reproducibility, and self-hosted local-model option |
+| 0:00-0:12 | W3 attractor to `REJECTED`: the agent must know when not to ship |
+| 0:12-0:28 | Product, audience, and Codex → GPT-5.6 → Godot → evidence-gate architecture |
+| 0:28-1:05 | Retained live GPT-5.6 campaign in Playthrough Inspector: personas, choices, state deltas, hashes, and provenance |
+| 1:05-1:30 | OpenAI campaign status: completed observation evidence, repair still pending |
+| 1:30-1:55 | Primary Codex task: cited facts, one hypothesis, frozen limits, and bounded diff |
+| 1:55-2:30 | Prerecorded fixed/holdout cashflow proof rejects an ineffective candidate |
+| 2:30-2:48 | Deterministic bilingual correctness proof shows that passing work can be accepted |
+| 2:48-2:55 | Impact, public demo/repository CTA, and reproducible Judge paths |
 
 The final cut must remain under three minutes and explicitly narrate how Codex
-and GPT-5.6 are used.
+and GPT-5.6 are used. It must not run a fresh campaign during the take or imply
+that the retained live OpenAI campaign produced either repair decision.
 
 ## 13. Implementation work breakdown
 

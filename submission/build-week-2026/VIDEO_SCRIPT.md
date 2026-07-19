@@ -1,69 +1,87 @@
-# Demo script — target 2:40
+# Demo video recording plan — target 2:55
 
-Status: recording draft. Every number below is claim-ledger approved. Do not
-record or publish until G4 passes and the final URLs are available.
+Status: recording-ready script; public YouTube URL and final signed-out review
+remain open release items. This is the canonical video plan. The implementation
+and product-design plans should link here instead of maintaining another timing
+table.
 
-## 0:00–0:16 — Thesis
+## Story and evidence boundary
 
-Screen: Judge UI hero and red REJECTED stamp.
+The video tells one story:
 
-Voice: “This patch passed its focused Godot validator. Playtest Forge still
-rejected it. Codex does not just write a fix—it plans persona evidence and
-requires fixed plus unseen holdout proof before accepting its own work.”
+> GPT-5.6 personas play the real Godot game; Codex turns their evidence into one
+> bounded repair experiment; fixed and unseen-holdout gates decide whether the
+> candidate is safe to ship.
 
-## 0:16–0:35 — Reproducible entrypoint
+The retained OpenAI campaign is **live campaign evidence only**. The rejected
+cashflow repair is a separate, hash-pinned **prerecorded Replay proof** over
+real-Godot-derived evidence. The accepted bilingual choice-identity repair is
+**deterministic Godot evidence with zero model calls**. Do not join these three
+records into one purported live repair run.
 
-Screen: run Inspect, then Replay; zoom on `status: passed` and limitations.
+Target runtime is 2:55, leaving five seconds below the three-minute limit.
+Voiceover and burned-in captions must be English. Every number below is backed
+by the committed claim ledger and currently passing Inspect/Replay evidence.
 
-Voice: “An automated judge starts here. Inspect needs only system Python;
-Replay is a locked, offline persona-policy fixture—not a recorded LLM run. Neither needs a GPU,
-API key, browser, or private game checkout.”
+## 175-second shot list and narration
 
-## 0:35–1:02 — Campaign
+| Time | Purpose | Screen and camera direction | Interaction | English narration |
+| --- | --- | --- | --- | --- |
+| 0:00–0:12 | Hook | Start tightly cropped on the Playthrough Inspector W3 attractor, then hard-cut to the Judge `REJECTED` stamp. Overlay: `A safer game agent knows when not to ship.` | No scrolling. One deliberate cut at 0:06. | “Game agents can propose fixes. The harder problem is knowing when not to ship them.” |
+| 0:12–0:28 | Product and audience | Full-frame title, then a four-node overlay: `Codex → GPT-5.6 personas → Godot 4.4 → evidence gates`. Keep the working UI visible beneath the overlay. | Fade the architecture overlay in and out; do not open source files yet. | “Playtest Forge is a developer tool for game teams. It connects semantic player simulation, a real game runtime, bounded code changes, and release-grade proof.” |
+| 0:28–1:05 | Working GPT-5.6 playthrough | Open the retained OpenAI experiment in Playthrough Inspector. Hold briefly on `OPENAI`, `live`, `gpt-5.6-luna`, and `real Godot`; then show the persona rail, actual route, event choice, state delta, evidence hash, and provenance. | Switch between two or three visibly different personas. On one path click `W1 Start`, `W3 Attractor`, and `W19 Ending`; scroll once to `Selected Choice` and `State Delta`, then once to provenance. | “GPT-5.6 receives typed game state, legal actions, event choices, and a persona intent. It chooses; Godot executes the transition. The retained live campaign completed six personas with 114 gameplay records and 228 sanitized provider-call records: one hundred percent valid decisions, zero fallback, and zero provider errors.” |
+| 1:05–1:30 | Honest campaign status | Return to Judge Mode and select `OpenAI · all six personas · seed 42 · 20 weeks`. Frame the completed campaign metrics and the visible `CAMPAIGN ONLY` or pending repair stages. | Pause on the six-persona metric cards; do not click `Run bounded campaign`. | “This is observation evidence, not a claimed repair. The interface keeps repair and proof visibly pending because one seed can validate the integration but cannot prove a change.” |
+| 1:30–1:55 | Codex contribution | Show the primary Codex task for eight to ten seconds: cited failure cluster, one falsifiable hypothesis, frozen fixed and holdout seeds, two-file allowlist, and bounded patch. Then cut to the Judge exact-diff summary. | Highlight the evidence citation, then the plan limits, then `2 files · +35 / −5`. Avoid long terminal output. | “Codex was the repair director, not just a code generator. It separated facts from hypothesis, froze seeds, thresholds and an eighty-line budget, changed one mechanism in an isolated worktree, and required proof before merge.” |
+| 1:55–2:30 | Core proof: reject the tempting fix | Select `Signed cashflow repair replay`. Show the focused validator pass, fixed comparison, holdout comparison, failed `fixed_target` and `holdout_target` gates, and final `REJECTED` stamp. Crop so the baseline and patched numbers remain readable. | Reveal fixed first, then holdout, then the failed gates. End on `candidate_not_merged`. | “The patch was legal, and mean final cash rose from zero to about eighteen on fixed seeds and sixty-one on holdouts. But target membership stayed eighteen of eighteen and maximum stress stayed one hundred. Both causal gates failed, so Codex rejected the candidate and did not merge it.” |
+| 2:30–2:48 | Prove that gates can accept | Switch to `Accepted · bilingual choice identity repair`. Show the accepted diff summary, fixed and holdout semantic-preservation proof, and `ACCEPTED`. Overlay: `Accept only when every required gate passes.` | One dropdown change and one short scroll; no detailed code reading. | “The gates are not biased toward rejection. A separate bilingual choice-identity repair passed its fixed, holdout, invariant, and regression evidence, so it was accepted.” |
+| 2:48–2:55 | Impact and call to action | End on the Judge overview with the product name, public demo URL, repository URL, and small footer: `Inspect · Replay · Docker Godot · OpenAI GPT-5.6`. | Hold the final card for seven seconds. | “Playtest Forge turns AI playthroughs into evidence-backed release decisions: observe, repair, prove—and keep permission to say no.” |
 
-Screen: Campaign section, 18 / 342 / 100% / 18-of-18 facts; use the experiment
-dropdown to switch to the OPENAI API campaign and open one persona/seed path.
+## Capture order
 
-Voice: “18 persona/seed cells produced 342 real-Godot gameplay weeks. All 18
-campaign cells entered the selected cashflow/stress failure cluster. A retained
-live OpenAI gpt-5.6-luna campaign completed all six personas at seed 42 with 114
-gameplay records, 0% fallback, and 0% provider errors. It is clearly labeled
-campaign only because repair proof has not run.”
+Preload these views before recording; record them as short clips and edit them
+to the timing table instead of performing a fresh campaign during the take:
 
-## 1:02–1:32 — Repair
+1. `/#/playthrough-inspector?experiment=openai-all-six-seed-42-20w`
+2. Judge experiment `openai-all-six-seed-42-20w`
+3. The primary Codex task with private values and unrelated history hidden
+4. Judge experiment `cashflow-drift-repair-v1`
+5. Judge experiment `localization-choice-identity-v1`
+6. The final product/repository card
 
-Screen: hypothesis, two modified paths, change counts, validator-passed note,
-then the REJECTED stamp.
+The OpenAI clip must show the retained completed public bundle. Do not spend API
+credit or risk a partial campaign merely to capture footage. If a fresh run is
+recorded separately, label it with its actual provider/runtime/session status
+and do not substitute it for the retained proof records.
 
-Voice: “In the retained core task, Codex owned the hypothesis, bounded patch,
-and accept/reject judgment. Codex proposed one bounded candidate: 2 allowlisted
-files, 35 additions, and 5 deletions. The focused validator passed. That proves
-legal implementation—not player-level repair.”
+## Recording and edit rules
 
-## 1:32–2:04 — Proof
+- Capture at 1920×1080, 30 fps, with browser zoom chosen before recording so
+  metric cards and provenance remain readable at normal YouTube size.
+- Hide the browser bookmarks bar, desktop notifications, unrelated tabs, local
+  usernames, absolute host paths, keys, tokens, raw model responses, prompts,
+  and private traces.
+- Use deliberate cursor movement, cuts, and digital crops. Do not make the
+  viewer watch dependency installation, Docker image pulls, a full campaign,
+  or long terminal commands.
+- Burn in accurate English captions. Use no unlicensed music or unrelated
+  third-party branding.
+- Never animate or edit a status in a way that changes its meaning. `running`
+  and `finalizing` are telemetry, not completed evidence; failed or partial
+  sessions remain failed or partial.
+- Keep `live OpenAI campaign`, `prerecorded Replay repair proof`, and
+  `deterministic zero-model correctness proof` visible and verbally distinct.
 
-Screen: fixed and unseen holdout comparison, then failed and passed gates.
+## Final review gate
 
-Voice: “Cash improved, but the failure did not. Fixed and unseen holdout
-cohorts both reduced target-cluster membership by 0%, so Codex rejected the
-candidate and it was not merged.”
+Before publishing, verify:
 
-## 2:04–2:27 — Architecture and safety
-
-Screen: diagram or quick code split: Codex main agent → provider contract →
-Godot → evidence → repair gates. Show provider status with no key field.
-
-Voice: “The browser never sees a secret. OpenAI runs server-side. Missing keys,
-Docker, or live runtimes are typed unavailable states, never silent Replay
-successes. Hashes connect every public claim to exact evidence.”
-
-## 2:27–2:40 — Close
-
-Screen: repository quickstart and public UI URL.
-
-Voice: “Playtest Forge is a developer tool for safer game iteration: evidence
-first, one bounded change, and permission to say no.”
-
-Recording rules: 1080p; readable terminal font; voice and burned-in captions;
-no private paths, tokens, keys, copyrighted music, or edits that imply Replay
-was a live call.
+- encoded duration is below 3:00 and the final five-second buffer survives the
+  YouTube upload;
+- voiceover and captions explicitly explain what the project does, how Codex
+  was used, and what GPT-5.6 does at runtime;
+- all displayed numbers, model/runtime labels, decisions, URLs, and commit
+  references match the final public repository revision;
+- YouTube playback is public and works signed out at 1080p with intelligible
+  audio and captions;
+- the video contains no secrets, private evidence, unsupported live claims,
+  copyrighted music, or misleading cuts.
