@@ -23,6 +23,135 @@ rejected both candidates because the player-level failure cluster did not
 improve. Preventing an unsupported repair from shipping is the demonstrated
 agent capability.
 
+Before provisioning Docker or authorizing API usage, judges can verify the
+committed project and Replay evidence without rebuilding anything:
+
+```bash
+./judge --mode inspect --offline --json --output-dir -
+./judge --mode replay --offline --json --output-dir -
+```
+
+## Competition deployment: Docker Godot + OpenAI API
+
+The primary full-fidelity Build Week deployment is deliberately hybrid:
+
+```text
+Host Codex + governed Judge API
+        │
+        ├── Docker Godot 4.4 sidecar
+        ├── OpenAI Responses API (`gpt-5.6-luna`)
+        └── local Vite Playthrough Inspector
+```
+
+Docker supplies the reproducible game runtime; OpenAI supplies live persona
+decisions. Codex remains the host-side repair director, and the OpenAI key stays
+in the server environment. The browser never receives it. The CPU-only
+`dashboard` image is a judge/evidence surface—not a controller for the sibling
+Godot container—so fresh campaigns use the host scripts below.
+
+This is the recommended competition demo path on Linux `amd64` with Docker
+Engine 24+ and Compose. Docker Desktop can provide the same interface on macOS,
+but the Godot image may require `amd64` emulation; always require the wrapper to
+report Godot 4.4 before spending API credit. Python 3.10+, `uv`, Node 20, Docker,
+and an authorized server-side OpenAI API key are required.
+
+### 1. Install and configure
+
+```bash
+cp .env.example .env
+
+# Edit the ignored .env file. Never commit the key.
+OPENAI_API_KEY=...
+OPENAI_PERSONA_MODEL=gpt-5.6-luna
+GODOT_DOCKER_MOUNT_ROOT=/absolute/path/to/parent/of/game_analysis_agent
+
+# Locked Python/frontend install, public sample build, Inspect, and Replay.
+scripts/setup-evaluator
+```
+
+The embedded, hash-inventoried game under `demo/study-in-germany` is the sample
+data; no sibling/private game checkout is required.
+
+### 2. Verify Docker Godot before any model call
+
+```bash
+docker version
+docker compose --profile game-tools up -d godot
+
+export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
+"$GODOT_BIN" --version
+docker compose ps
+```
+
+Both Docker Client and Server must be available, the `godot` service must be
+healthy, and the wrapper must report the Godot 4.4 family. An unavailable
+selected runtime is `unsupported`; the workflow never silently switches to a
+host Godot binary.
+
+### 3. Start the viewer and governed API
+
+Keep these in separate terminals from the repository root:
+
+```bash
+# Terminal 1: live-updating evidence viewer
+npm --prefix frontend run prepare:public
+npm --prefix frontend run dev -- --host 127.0.0.1
+```
+
+```bash
+# Terminal 2: server-side API and campaign controls
+GODOT_BIN="$PWD/scripts/godot-docker-wrapper" \
+  scripts/run-judge-dev --host 127.0.0.1 --port 8080
+```
+
+Open `http://127.0.0.1:5173/#/playthrough-inspector` and refresh after the API
+connects. Provider readiness checks inspect configuration and health without
+printing the key or making a model call.
+
+### 4. Run the bounded OpenAI smoke campaign
+
+Start with the one-persona profile before authorizing a larger cohort:
+
+```bash
+.agents/skills/playtest-forge/scripts/session-options \
+  --godot-runtime docker-godot \
+  --llm-provider openai-api \
+  --profile one-strategy \
+  --persona newbie \
+  --json
+```
+
+After reviewing the emitted limits and approving API usage, run its frozen
+command:
+
+```bash
+GODOT_BIN="$PWD/scripts/godot-docker-wrapper" \
+PERSONA_MAX_RUNS=1 \
+PERSONA_MAX_WEEKS=20 \
+PERSONA_MAX_CONCURRENCY=1 \
+PERSONA_MAX_CALLS=50 \
+  scripts/run-persona-campaign openai \
+    --persona newbie --seed 42 --max-weeks 20 --concurrency 1 --no-resume
+```
+
+This profile permits at most 40 decision/event calls under a 50-call operational
+cap. It validates the live provider, real Godot steps, evidence retention, and
+weekly UI, but it cannot select or prove a repair. The six-persona and
+three-seed profiles are offered only after this path succeeds.
+
+Every live run is fail-closed: partial cells, provider errors, runtime errors,
+or fallback weeks reject the campaign. `session.json` is progress telemetry;
+only a `completed` campaign whose public bundle and gates verify is citable
+evidence. Raw cells remain under `reports/persona-campaigns/`, while only the
+sanitized view is published to `frontend/public/live-playthrough/`.
+
+This deployment supports the Build Week Developer Tools requirements for clear
+installation, supported platforms, sample data, and a runnable test path. The
+public demo and offline evaluator below remain the no-secret, no-rebuild judge
+path required when Docker or an API key is unavailable. See the
+[official rules](https://openai.devpost.com/rules) and
+[Build Week FAQ](https://openai.devpost.com/details/faqs).
+
 ## Evaluate in 60 seconds
 
 From the repository root:
@@ -219,7 +348,9 @@ The Judge image runs unprivileged. Offline Replay has no network and a read-only
 root filesystem. The evaluator image contains only curated signed and
 deterministic static evidence; private local-model logs are excluded. No new
 immutable multi-architecture digest is claimed until the final image is
-published.
+published. This CPU-only evaluator is intentionally separate from the primary
+Docker-Godot + OpenAI campaign deployment above and cannot launch the Godot
+sidecar by itself.
 
 ## Start a Codex-guided playtest
 
@@ -292,6 +423,7 @@ wrapper described in the [Developer Guide](docs/DEVELOPER_GUIDE.md) and
 | `judge --mode inspect` | Python 3.9+ | No |
 | `judge --mode replay` | Linux/macOS + locked `uv` environment | No |
 | Judge dashboard/container | Docker Engine 24+; linux/amd64 or linux/arm64 | No |
+| **Competition live path** | **Host Codex + Linux amd64 Docker Godot 4.4 + Python 3.10+/Node 20** | **Server-side OpenAI key; `gpt-5.6-luna`** |
 | Real-game authoring | Host Codex + Godot 4.4 or Docker wrapper | No model for automation |
 | Local persona campaign | Host Codex + Godot + local vLLM/SGLang | Local model |
 | OpenAI persona campaign | Host Codex + Godot runtime | Server-side API key |

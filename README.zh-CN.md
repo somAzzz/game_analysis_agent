@@ -9,8 +9,8 @@
 ./judge --mode replay --offline --json --output-dir -
 ```
 
-Inspect 只需 Python 3.9+，会校验 123 个已提交证据、Skill 与 demo 源码文件的哈希、schema、来源门禁，
-以及 6 条公开结论对应的精确 JSON 指针。Replay 额外使用锁定的 `uv` 环境并消费
+Inspect 只需 Python 3.9+，当前会校验 206 个已提交证据、Skill 与 demo 源码文件的哈希、schema、来源门禁，
+以及 9 条公开结论对应的精确 JSON 指针。Replay 额外使用锁定的 `uv` 环境并消费
 哈希固定的 persona fixture；两者都不需要 Godot、Docker、GPU、网络、API key、
 浏览器、端口或相邻的私有游戏仓库。完整 demo 已固定在
 `demo/study-in-germany`。输出是单个 `judge-result-v1` JSON；只有
@@ -39,7 +39,7 @@ Python analysis layer
   └─ bug_summarizer.py          (anomaly → markdown)
         │
         ▼
-LLM agent layer (provider: vllm | sglang | deepseek)
+LLM/persona layer (provider: openai | vllm | sglang | deepseek)
   ├─ balance                    (existing) — diagnose ending distribution + tuning
   ├─ content_qa                 (existing) — review event text + choices
   ├─ event_graph                (existing) — audit trigger graph
@@ -49,33 +49,67 @@ LLM agent layer (provider: vllm | sglang | deepseek)
   └─ interactive_player         (new) — drive the simulator with tool calls
 ```
 
-默认 LLM 通过 vLLM OpenAI-compatible server 接入，模型目标为 Qwen3.6 NVFP4。实际仓库名
-或本地路径通过环境变量配置，方便替换为你机器上已经下载好的 checkpoint。
+比赛主线通过 OpenAI Responses API 使用 `gpt-5.6-luna` 生成 live persona 决策；
+本地开发仍可使用 vLLM/SGLang/DeepSeek。OpenAI key 只保留在服务端环境，绝不进入浏览器、
+公开报告或 Git。
 
 ## 快速开始
 
-### 方式 A：Docker（推荐，vLLM + Godot sidecar）
+### 比赛主线：Docker Godot + OpenAI API（推荐）
 
 ```bash
 cp .env.example .env
-# 编辑 .env 填可选的模型配置；内置 demo 不需要 GAME_PROJECT_PATH
-docker compose pull vllm
-docker compose --profile local-nvidia --profile game-tools up -d vllm godot
-docker compose logs -f vllm           # 等待 "Application startup complete"
-docker compose ps                      # 确认 vllm / godot 都是 healthy
+# 编辑被 Git 忽略的 .env：
+# OPENAI_API_KEY=...
+# OPENAI_PERSONA_MODEL=gpt-5.6-luna
+# GODOT_DOCKER_MOUNT_ROOT=/game_analysis_agent 所在目录的绝对路径
 
-# 真实玩法命令从宿主机运行，wrapper 会进入 Godot sidecar
-uv run python tools/run_gameplay_agent.py play \
-  --report-dir reports/play/local-smoke \
-  --persona newbie --weeks 5 --seed 42
+scripts/setup-evaluator
+
+# Docker Client/Server 都必须可用；这里只启动 Godot，不需要 NVIDIA GPU。
+docker version
+docker compose --profile game-tools up -d godot
+export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
+"$GODOT_BIN" --version               # 必须是 Godot 4.4
+docker compose ps                     # godot 必须 healthy
 ```
 
-详见 [docs/operations/DOCKER.md](docs/operations/DOCKER.md)。该方式会在本地启动一个
-vLLM v0.25.0 容器（默认服务 NVIDIA 官方 Qwen3.6 27B NVFP4 + MTP
-投机解码）以及一个常驻 Godot 工具容器。可选的 `agent` 容器只用于已有
-报告的纯 Python 分析/QA，不负责进入 Godot sidecar 执行游戏进程。
+比赛完整运行是混合部署：Codex、Judge API 和 campaign runner 在宿主机，Docker
+提供可复现的 Godot 4.4 sidecar，OpenAI API 提供 live persona 决策。CPU-only
+`dashboard` 镜像只是评审界面，不能控制旁边的 Godot 容器。
 
-### 方式 B：本地 Python + 已有 vLLM endpoint
+分别在两个终端启动 viewer 和服务端 API：
+
+```bash
+# 终端 1
+npm --prefix frontend run prepare:public
+npm --prefix frontend run dev -- --host 127.0.0.1
+
+# 终端 2
+GODOT_BIN="$PWD/scripts/godot-docker-wrapper" \
+  scripts/run-judge-dev --host 127.0.0.1 --port 8080
+```
+
+打开 `http://127.0.0.1:5173/#/playthrough-inspector`。先生成一个受限的
+`one-strategy` 配置：
+
+```bash
+.agents/skills/playtest-forge/scripts/session-options \
+  --godot-runtime docker-godot \
+  --llm-provider openai-api \
+  --profile one-strategy \
+  --persona newbie \
+  --json
+```
+
+确认模型调用额度后，执行 planner 输出的 `shell_preview`。该 profile 最坏 40 次
+决策/事件调用，上限 50 次，只验证 OpenAI、真实 Godot、证据保留和逐周 UI，不能证明
+游戏修复。任何 partial cell、provider/runtime error 或 fallback 都会让 campaign 失败，
+不会静默切换到 Replay。详见英文根 README 的 Competition deployment、
+[Docker 部署](docs/operations/DOCKER.md) 和
+[官方比赛规则](https://openai.devpost.com/rules)。
+
+### 本地开发备选：Python + 已有 vLLM endpoint
 
 1. 复制环境变量模板：
 
@@ -456,7 +490,8 @@ tools/
 
 1. 一台能跑 Godot 4 的机器（`godot4 --headless`）。
 2. 仓库内置的 `demo/study-in-germany`；迁移到其它游戏时才需要外部 checkout。
-3. 若要运行 fresh persona 单元，还需 vLLM / SGLang / DeepSeek 任意一个 endpoint。
+3. 若要运行 fresh persona 单元，还需服务端 OpenAI API key，或
+   vLLM / SGLang / DeepSeek 任意一个 endpoint。
 
 缺任何一个，Python 侧仍然能跑：analytics / anomaly_detector / value_analyzer / tests
 全部基于本地 fixture 自测，前端也可以基于公开样例运行测试和构建。
@@ -467,7 +502,9 @@ tools/
 Godot 4.4，并已在 macOS 完成真实模拟。历史验证还包括边界、catalog、
 五个干净 validator、交互 RiskEvaluator 契约及 Agent 关键门禁验证。游戏自身的
 `demo` validator 仍如实报告 3 个平衡失败（动作集中度 2 项、结局多样性 1 项），
-因此完整 `all` 正确返回非零；这不是测试系统跳过或伪造通过。当前没有真实 LLM
-endpoint，所以 fresh persona 矩阵仍需外部服务。CI 已直接使用哈希固定的内置
-demo，不再需要 `STUDY_IN_GERMANY_TOKEN`。当前 macOS 环境没有 Docker，因此更新后的
-容器仍需在 Linux/Docker 环境复测；最终公开发布前还需由维护者选择明确的软件许可。
+因此完整 `all` 正确返回非零；这不是测试系统跳过或伪造通过。仓库已保留经过验证的
+`gpt-5.6-luna` live OpenAI campaign；新的 fresh persona 矩阵仍需操作者提供服务端
+OpenAI key 或本地模型 endpoint。CI 已直接使用哈希固定的内置 demo，不再需要
+`STUDY_IN_GERMANY_TOKEN`。当前 macOS 环境没有 Docker，因此 Docker Godot 主线仍需在
+Linux/Docker 环境复测。仓库采用 MIT License；第三方依赖与素材来源见
+[ATTRIBUTION.md](ATTRIBUTION.md)。
