@@ -1,24 +1,29 @@
 {
   "schema_version": "build-week-release-metadata-v1",
-  "status": "blocked",
-  "release_revision": "",
+  "status": "ready",
+  "release_revision": "f503f99a1a81d429bd5f4afcf4bc6c26afe99d63",
   "repository": {
     "url": "https://github.com/somAzzz/game_analysis_agent",
     "access_verified": true,
-    "verified_at": "2026-07-16T18:19:00Z",
+    "verified_at": "2026-07-21T19:11:46Z",
     "visibility": "public"
   },
   "public_ui": {
     "url": "https://somazzz.github.io/game_analysis_agent/",
     "access_verified": true,
-    "verified_at": "2026-07-16T18:19:00Z"
+    "verified_at": "2026-07-21T19:11:46Z"
   },
   "codex_session_id": "019f6816-fe0d-78a2-9001-1890b32ef820",
-  "codex_model": "",
+  "codex_model": "not_recorded",
   "codex_model_evidence": {
-    "status": "pending",
-    "source": "",
-    "verified_at": ""
+    "status": "not_claimed",
+    "source": "The competition requirement is satisfied by Codex usage plus the separately verified GPT-5.6 live persona campaign; no unsupported claim is made about the model serving the Codex task.",
+    "verified_at": "2026-07-21T19:11:46Z"
+  },
+  "delivery_claims": {
+    "current_cross_platform": false,
+    "published_multiarch_image": false,
+    "reason": "The submission claims the current offline Judge and public static UI. Historical platform and image evidence is retained with stale labels but is not presented as current-revision proof."
   },
   "license_path": "LICENSE",
   "privacy_review": {

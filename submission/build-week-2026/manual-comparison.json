@@ -1,11 +1,11 @@
 {
   "schema_version": "build-week-manual-comparison-v1",
-  "status": "not_measured",
+  "status": "not_claimed",
   "reviewer_role": "non_builder_required",
   "task": "Identify the retained cashflow/stress failure and decide whether the candidate patch should merge.",
   "same_task": true,
   "same_stopping_rule": true,
   "manual_seconds": null,
   "forge_seconds": null,
-  "notes": "Complete with a non-builder after G4 passes; do not estimate durations."
+  "notes": "No time-saved or manual-speed comparison is claimed in the Build Week submission. This optional impact experiment remains future work; durations are intentionally not estimated."
 }

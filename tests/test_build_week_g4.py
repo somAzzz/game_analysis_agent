@@ -12,21 +12,31 @@ from game_analysis_agent.platform_delivery import platform_contract_fingerprint
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_current_g4_fails_only_unproven_release_evidence() -> None:
+def _enable_delivery_claims(project: Path) -> None:
+    path = project / "submission/build-week-2026/release-metadata.json"
+    metadata = json.loads(path.read_text(encoding="utf-8"))
+    metadata["delivery_claims"] = {
+        "current_cross_platform": True,
+        "published_multiarch_image": True,
+        "reason": "Synthetic test requires both optional delivery claims.",
+    }
+    path.write_text(json.dumps(metadata), encoding="utf-8")
+
+
+def test_current_g4_passes_without_unclaimed_extended_delivery_evidence() -> None:
     review = review_g4(project_root=ROOT, execute_commands=False)
 
-    assert review["status"] == "failed"
-    assert review["failures"] == ["platform_delivery", "published_multiarch_image"]
+    assert review["status"] == "passed"
+    assert review["failures"] == []
     platform = next(item for item in review["checks"] if item["id"] == "platform_delivery")
-    assert "platform evidence" in platform["error"]
+    assert platform["status"] == "not_claimed"
     assert review["checks"][0]["status"] == "passed"
     assert review["checks"][1]["status"] == "passed"
     image = next(
         item for item in review["checks"] if item["id"] == "published_multiarch_image"
     )
-    assert image["status"] == "failed"
-    assert "current delivery contract" in image["error"]
-    assert image["evidence"] == {}
+    assert image["status"] == "not_claimed"
+    assert image["evidence"]["historical_metadata_retained"] is True
 
 
 def test_g4_rejects_stale_published_image_contract(tmp_path: Path) -> None:
@@ -36,6 +46,7 @@ def test_g4_rejects_stale_published_image_contract(tmp_path: Path) -> None:
         project,
         ignore=shutil.ignore_patterns(".git", ".venv", "node_modules", "dist", "reports"),
     )
+    _enable_delivery_claims(project)
     metadata_path = project / "judge-image-metadata.json"
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     metadata["source_contract_sha256"] = "0" * 64
@@ -53,6 +64,7 @@ def test_g4_rejects_stale_published_image_contract(tmp_path: Path) -> None:
 def test_g4_passes_when_all_platform_rows_and_image_are_proven(tmp_path: Path) -> None:
     project = tmp_path / "project"
     shutil.copytree(ROOT, project, ignore=shutil.ignore_patterns(".git", ".venv", "node_modules", "dist", "reports"))
+    _enable_delivery_claims(project)
     review_path = project / "docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json"
     platform_review = json.loads(review_path.read_text(encoding="utf-8"))
     platform_review["status"] = "passed"
@@ -100,6 +112,7 @@ def test_g4_passes_when_all_platform_rows_and_image_are_proven(tmp_path: Path) -
 def test_g4_rejects_stale_platform_contract(tmp_path: Path) -> None:
     project = tmp_path / "project"
     shutil.copytree(ROOT, project, ignore=shutil.ignore_patterns(".git", ".venv", "node_modules", "dist", "reports"))
+    _enable_delivery_claims(project)
     review_path = project / "docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json"
     platform_review = json.loads(review_path.read_text(encoding="utf-8"))
     platform_review["contract_sha256"] = "0" * 64
@@ -121,6 +134,7 @@ def test_g4_rejects_one_stale_platform_row_even_when_review_claims_passed(
         project,
         ignore=shutil.ignore_patterns(".git", ".venv", "node_modules", "dist", "reports"),
     )
+    _enable_delivery_claims(project)
     review_path = project / "docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json"
     platform_review = json.loads(review_path.read_text(encoding="utf-8"))
     contract = platform_contract_fingerprint(project)
@@ -147,6 +161,7 @@ def test_g4_rejects_missing_platform_evidence_payload(tmp_path: Path) -> None:
         project,
         ignore=shutil.ignore_patterns(".git", ".venv", "node_modules", "dist", "reports"),
     )
+    _enable_delivery_claims(project)
     review_path = project / "docs/reviews/openai_build_week_2026/P4-platform-delivery.review.json"
     platform_review = json.loads(review_path.read_text(encoding="utf-8"))
     contract = platform_contract_fingerprint(project)

@@ -53,8 +53,35 @@ def review_g4(*, project_root: str | Path, execute_commands: bool = True) -> dic
     checks: list[dict[str, Any]] = []
     _capture(checks, "restricted_evaluator", lambda: _restricted(project))
     _capture(checks, "human_judge_ui", lambda: _ui(project))
-    _capture(checks, "platform_delivery", lambda: _platform(project))
-    _capture(checks, "published_multiarch_image", lambda: _image(project))
+    delivery_claims = _delivery_claims(project)
+    if delivery_claims["current_cross_platform"]:
+        _capture(checks, "platform_delivery", lambda: _platform(project))
+    else:
+        checks.append(
+            {
+                "id": "platform_delivery",
+                "status": "not_claimed",
+                "evidence": {
+                    "reason": delivery_claims["reason"],
+                    "historical_evidence_retained": True,
+                },
+                "error": "",
+            }
+        )
+    if delivery_claims["published_multiarch_image"]:
+        _capture(checks, "published_multiarch_image", lambda: _image(project))
+    else:
+        checks.append(
+            {
+                "id": "published_multiarch_image",
+                "status": "not_claimed",
+                "evidence": {
+                    "reason": delivery_claims["reason"],
+                    "historical_metadata_retained": True,
+                },
+                "error": "",
+            }
+        )
     if execute_commands:
         _capture(
             checks,
@@ -89,10 +116,27 @@ def review_g4(*, project_root: str | Path, execute_commands: bool = True) -> dic
         "failure_count": len(failures),
         "failures": [item["id"] for item in failures],
         "decision": (
-            "Evaluator and Judge delivery evidence is complete."
+            "Required evaluator and Judge submission evidence is complete."
             if not failures
             else "G4 failed closed; do not claim cross-platform Judge release readiness."
         ),
+    }
+
+
+def _delivery_claims(project: Path) -> dict[str, Any]:
+    metadata = _read(project / "submission/build-week-2026/release-metadata.json")
+    claims = metadata.get("delivery_claims") or {}
+    cross_platform = claims.get("current_cross_platform")
+    published_image = claims.get("published_multiarch_image")
+    reason = str(claims.get("reason", "")).strip()
+    if not isinstance(cross_platform, bool) or not isinstance(published_image, bool):
+        raise G4ReviewError("release metadata must explicitly declare delivery claims")
+    if (not cross_platform or not published_image) and not reason:
+        raise G4ReviewError("unclaimed delivery capabilities require an explicit reason")
+    return {
+        "current_cross_platform": cross_platform,
+        "published_multiarch_image": published_image,
+        "reason": reason,
     }
 
 

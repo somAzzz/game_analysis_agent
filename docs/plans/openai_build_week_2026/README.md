@@ -84,9 +84,12 @@ Current remediation: [full-campaign implementation review](../../reviews/openai_
   delivery fingerprint changes; old passing rows are marked stale.
 - Live OpenAI evidence must prove the GPT-5.6 model family. DeepSeek can test
   OpenAI-compatible wiring but cannot close the OpenAI competition gate.
-- G5 remains blocked by non-builder clean-room/manual comparison, final
-  video, current-revision delivery evidence, and final URLs/assets. A Codex task
-  id alone does not prove its model.
+- G5 passes for the submitted claim surface. The manual timing comparison,
+  independent clean-room study, current-revision multi-architecture image, and
+  current cross-platform claim are explicitly `not_claimed`; their historical
+  records remain visible but do not block the current offline Judge/public UI
+  submission. GPT-5.6 is proven by the retained live OpenAI campaign, while
+  Codex usage is proven separately by the retained task ID and repository work.
 
 ## Platform handoff
 

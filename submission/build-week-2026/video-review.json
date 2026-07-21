@@ -1,11 +1,12 @@
 {
   "schema_version": "build-week-video-review-v1",
-  "status": "not_recorded",
-  "url": "",
-  "duration_seconds": null,
-  "signed_out_access": false,
-  "audio_verified": false,
-  "captions_verified": false,
-  "no_secrets_verified": false,
-  "verified_at": null
+  "status": "completed",
+  "url": "https://www.youtube.com/watch?v=62tW2RoFwTo",
+  "duration_seconds": 175,
+  "signed_out_access": true,
+  "audio_verified": true,
+  "captions_verified": true,
+  "no_secrets_verified": true,
+  "verified_at": "2026-07-21T19:11:46Z",
+  "notes": "Public availability, the 175-second duration, stereo audio formats, and an automatic English caption track were independently verified from the published YouTube metadata. Captions remain a presentation enhancement rather than an OpenAI Build Week eligibility requirement."
 }

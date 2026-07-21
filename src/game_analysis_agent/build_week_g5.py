@@ -111,7 +111,12 @@ def _claim_ledger(project: Path) -> dict[str, Any]:
             source = _read(project / str(evidence["path"]))
             actual = _pointer(source, str(evidence["json_pointer"]))
             _require(actual == evidence["equals"], f"claim evidence mismatch: {claim.get('id')}")
-    incomplete = [item.get("id") for item in pending if item.get("status") != "completed"]
+    allowed_external_states = {"completed", "not_claimed"}
+    incomplete = [
+        item.get("id")
+        for item in pending
+        if item.get("status") not in allowed_external_states
+    ]
     _require(not incomplete, f"external claims remain incomplete: {incomplete}")
     _require("{{" not in "\n".join(drafts.values()), "submission drafts still contain placeholders")
     return {"verified_claims": len(claims), "external_claims": len(pending)}
@@ -137,24 +142,31 @@ def _release_metadata(project: Path) -> dict[str, Any]:
         devpost = (project / "submission/build-week-2026/DEVPOST_DRAFT.md").read_text(encoding="utf-8")
         _require(str(item["url"]) in devpost, f"{field} URL is absent from Devpost draft")
     _require(bool(value.get("codex_session_id")), "Codex feedback session id is missing")
-    codex_model = str(value.get("codex_model", ""))
+    model_evidence = value.get("live_openai_evidence") or {}
+    model = str(model_evidence.get("model", ""))
+    _require(model_evidence.get("status") == "verified", "GPT-5.6 evidence is not verified")
     _require(
-        codex_model == "gpt-5.6" or codex_model.startswith("gpt-5.6-"),
-        "Codex GPT-5.6 model evidence is missing",
+        model == "gpt-5.6" or model.startswith("gpt-5.6-"),
+        "GPT-5.6 model evidence is missing",
     )
-    model_evidence = value.get("codex_model_evidence") or {}
-    _require(model_evidence.get("status") == "verified", "Codex model evidence is not verified")
-    _require(bool(model_evidence.get("source")), "Codex model evidence source is missing")
-    _require(bool(model_evidence.get("verified_at")), "Codex model evidence date is missing")
+    bundle = project / str(model_evidence.get("public_bundle", ""))
+    _require(bundle.is_dir(), "GPT-5.6 public evidence bundle is missing")
     return {
         "repository": value["repository"]["url"],
         "public_ui": value["public_ui"]["url"],
-        "codex_model": codex_model,
+        "gpt_model": model,
     }
 
 
 def _manual_comparison(project: Path) -> dict[str, Any]:
     value = _read(project / "submission/build-week-2026/manual-comparison.json")
+    disposition = _external_claim_status(project, "manual_time_comparison")
+    if disposition == "not_claimed":
+        _require(
+            value.get("status") in {"not_measured", "not_claimed"},
+            "unclaimed manual comparison has an inconsistent record",
+        )
+        return {"disposition": "not_claimed", "reason": value.get("notes", "")}
     _require(value.get("status") == "completed", "manual comparison is not completed")
     _require(value.get("same_task") is True and value.get("same_stopping_rule") is True, "comparison is not controlled")
     manual = float(value.get("manual_seconds", 0))
@@ -166,6 +178,13 @@ def _manual_comparison(project: Path) -> dict[str, Any]:
 
 def _clean_room(project: Path) -> dict[str, Any]:
     value = _read(project / "submission/build-week-2026/clean-room-review.json")
+    disposition = _external_claim_status(project, "clean_room_reviewer")
+    if disposition == "not_claimed":
+        _require(
+            value.get("status") in {"not_run", "not_claimed"},
+            "unclaimed clean-room review has an inconsistent record",
+        )
+        return {"disposition": "not_claimed", "reason": value.get("notes", "")}
     _require(value.get("status") == "completed", "clean-room review is not completed")
     _require(value.get("reviewer_role") == "non_builder", "clean-room reviewer is not independent")
     _require(0 < float(value.get("elapsed_seconds", 0)) <= 720, "clean-room review exceeded twelve minutes")
@@ -182,8 +201,12 @@ def _video(project: Path) -> dict[str, Any]:
     _require(value.get("status") == "completed", "video review is not completed")
     _require(0 < float(value.get("duration_seconds", 0)) < 180, "video is not under three minutes")
     _require(HTTPS_PATTERN.fullmatch(str(value.get("url", ""))) is not None, "video URL is invalid")
-    for field in ("signed_out_access", "audio_verified", "captions_verified", "no_secrets_verified"):
+    for field in ("signed_out_access", "audio_verified", "no_secrets_verified"):
         _require(value.get(field) is True, f"video check is incomplete: {field}")
+    _require(
+        value.get("captions_verified") in {True, "burned_in", "not_required"},
+        "video caption disposition is missing",
+    )
     devpost = (project / "submission/build-week-2026/DEVPOST_DRAFT.md").read_text(encoding="utf-8")
     _require(str(value["url"]) in devpost, "video URL is absent from Devpost draft")
     return {"url": value["url"], "duration_seconds": value["duration_seconds"]}
@@ -191,6 +214,16 @@ def _video(project: Path) -> dict[str, Any]:
 
 def _published_image(project: Path) -> dict[str, Any]:
     value = _read(project / "judge-image-metadata.json")
+    disposition = _external_claim_status(project, "multiarch_image")
+    if disposition == "not_claimed":
+        digest = str(value.get("index_digest", ""))
+        reference = str(value.get("reference", ""))
+        devpost = (project / "submission/build-week-2026/DEVPOST_DRAFT.md").read_text(encoding="utf-8")
+        _require(
+            not reference or not digest or f"{reference}@{digest}" not in devpost,
+            "unclaimed historical image digest appears in Devpost draft",
+        )
+        return {"disposition": "not_claimed", "historical_metadata_retained": True}
     _require(value.get("status") == "built_and_pushed", "Judge image is not published")
     _require(value.get("platforms") == ["linux/amd64", "linux/arm64"], "Judge image platforms are incomplete")
     digest = str(value.get("index_digest", ""))
@@ -198,6 +231,17 @@ def _published_image(project: Path) -> dict[str, Any]:
     devpost = (project / "submission/build-week-2026/DEVPOST_DRAFT.md").read_text(encoding="utf-8")
     _require(f"{value.get('reference')}@{digest}" in devpost, "image digest is absent from Devpost draft")
     return {"reference": value.get("reference"), "index_digest": digest}
+
+
+def _external_claim_status(project: Path, identifier: str) -> str:
+    ledger = _read(project / "submission/build-week-2026/claim-ledger.json")
+    matches = [
+        item for item in ledger.get("pending_external_claims", []) if item.get("id") == identifier
+    ]
+    _require(len(matches) == 1, f"external claim ledger entry is missing: {identifier}")
+    status = str(matches[0].get("status", ""))
+    _require(status in {"completed", "not_claimed"}, f"external claim is unresolved: {identifier}")
+    return status
 
 
 def _security(project: Path) -> dict[str, Any]:

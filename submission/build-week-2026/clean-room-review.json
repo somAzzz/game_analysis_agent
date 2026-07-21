@@ -1,6 +1,6 @@
 {
   "schema_version": "build-week-clean-room-review-v1",
-  "status": "not_run",
+  "status": "not_claimed",
   "reviewer_role": "non_builder_required",
   "elapsed_seconds": null,
   "tasks": {
@@ -11,6 +11,6 @@
     "repair_decision": false
   },
   "criterion_scores": {},
-  "stop_ship_findings": ["Independent review has not run."],
-  "notes": "Give the reviewer only the Devpost draft, video, and repository URL."
+  "stop_ship_findings": [],
+  "notes": "No independent-review result is claimed in the Build Week submission. A non-builder clean-room usability study remains optional future evidence."
 }

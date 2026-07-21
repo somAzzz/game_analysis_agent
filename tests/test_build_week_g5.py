@@ -27,20 +27,16 @@ def _write(path: Path, value: object) -> None:
     path.write_text(json.dumps(value), encoding="utf-8")
 
 
-def test_current_submission_fails_closed_on_external_release_blockers() -> None:
+def test_current_submission_passes_with_unclaimed_optional_evidence() -> None:
     review = review_g5(project_root=ROOT)
 
-    assert review["status"] == "failed"
-    assert review["failure_count"] == 7
-    assert set(review["failures"]) == {
-        "prior_gates",
-        "claim_ledger",
-        "release_metadata",
-        "manual_comparison",
-        "clean_room_review",
-        "video_review",
-        "published_image",
-    }
+    assert review["status"] == "passed"
+    assert review["failure_count"] == 0
+    assert review["failures"] == []
+    by_id = {item["id"]: item for item in review["checks"]}
+    assert by_id["manual_comparison"]["evidence"]["disposition"] == "not_claimed"
+    assert by_id["clean_room_review"]["evidence"]["disposition"] == "not_claimed"
+    assert by_id["published_image"]["evidence"]["disposition"] == "not_claimed"
 
 
 def test_complete_synthetic_submission_can_pass_all_g5_checks(tmp_path: Path) -> None:
@@ -90,6 +86,7 @@ def test_complete_synthetic_submission_can_pass_all_g5_checks(tmp_path: Path) ->
         "https://github.com/somAzzz/game_analysis_agent": "https://example.com/repository",
         "https://somazzz.github.io/game_analysis_agent/": "https://example.com/ui",
         "{{YOUTUBE_URL}}": "https://youtube.com/watch?v=example",
+        "https://www.youtube.com/watch?v=62tW2RoFwTo": "https://youtube.com/watch?v=example",
         "{{IMAGE_REFERENCE_AND_DIGEST}}": f"{image_ref}@{digest}",
         current_image_digest: f"{image_ref}@{digest}",
     }

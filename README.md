@@ -476,10 +476,10 @@ The project is MIT licensed; third-party and generated-asset provenance is in
 - The retained OpenAI campaign is observation evidence, not completed repair
   proof; no OpenAI-derived game patch is accepted or merged.
 - The public [2:55 demo video](https://www.youtube.com/watch?v=62tW2RoFwTo) is
-  published. Final Devpost team checks, non-builder manual/clean-room review,
-  and any claim of a newly published current-revision image remain owner/release
-  actions. `/feedback/` exports are submission metadata only and remain
-  intentionally ignored by Git.
+  published. Non-builder manual/clean-room results and a newly published
+  current-revision image are explicitly not claimed; their absence is not
+  relabeled as success. `/feedback/` exports are submission metadata only and
+  remain intentionally ignored by Git.
 - The embedded Study in Germany project is a competition demo, not a complete
   commercial game.
 - Live persona work requires a compatible model endpoint; real gameplay still

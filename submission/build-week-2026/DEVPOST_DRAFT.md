@@ -6,10 +6,10 @@
 
 Category: Developer Tools
 
-Status: pre-release draft with the OpenAI evidence row complete; remaining
-blockers are the video, non-builder review records, final URLs/team checks, and
-current-revision delivery closeout. Do not publish this text until
-`RELEASE_CHECKLIST.md` is complete.
+Status: submitted Build Week description. Current public claims are limited to
+the verified repository evidence, public Judge UI, and retained OpenAI
+campaign. Historical image/platform rows and unmeasured impact studies are not
+claimed as current release proof.
 
 ## The problem
 
@@ -76,11 +76,11 @@ server key or real game runtime is absent.
 
 Core Codex task: 019f6816-fe0d-78a2-9001-1890b32ef820.
 
-## Links (release blockers)
+## Links
 
 - Repository: [github.com/somAzzz/game_analysis_agent](https://github.com/somAzzz/game_analysis_agent)
 - Public Judge UI: [somazzz.github.io/game_analysis_agent](https://somazzz.github.io/game_analysis_agent/)
-- YouTube demo under 3:00: `{{YOUTUBE_URL}}`
+- YouTube demo under 3:00: [youtu.be/62tW2RoFwTo](https://www.youtube.com/watch?v=62tW2RoFwTo)
 - Docker evaluator: build the current submission branch with
   `docker build -f Dockerfile.judge .`; no old digest is claimed for this
   revision.
@@ -89,7 +89,8 @@ Core Codex task: 019f6816-fe0d-78a2-9001-1890b32ef820.
 
 The recorded candidate did not repair the target failure. The live OpenAI
 campaign is complete but has not been used for fixed/holdout repair proof.
-Manual timing comparison, independent clean-room review, current-revision
-delivery closeout, and the final video must still be completed before release
-claims advance. Local-model vLLM remains optional and is not required to judge
-the project.
+Manual timing comparison and independent clean-room review remain optional
+future studies, so the submission makes no time-saved or independent-review
+claim. The historical multi-architecture image digest is retained in the
+repository but is not claimed for this revision. Local-model vLLM remains
+optional and is not required to judge the project.
