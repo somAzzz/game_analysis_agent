@@ -74,7 +74,7 @@
       "error": "",
       "evidence": {
         "license": "LICENSE",
-        "tracked_files_scanned": 816
+        "tracked_files_scanned": 817
       },
       "id": "license_privacy_secrets",
       "status": "passed"
@@ -84,8 +84,8 @@
   "failure_count": 0,
   "failures": [],
   "gate": "G5",
-  "generated_at": "2026-07-21T19:35:45.772021+00:00",
-  "reviewed_commit": "3ab71dbecbca183b5cd69febc53930e0a12749b6",
+  "generated_at": "2026-07-21T19:55:50.538979+00:00",
+  "reviewed_commit": "649bc50f9f22c289a346ae0edbb6b02380ad5f15",
   "schema_version": "build-week-g5-review-v1",
   "status": "passed"
 }
