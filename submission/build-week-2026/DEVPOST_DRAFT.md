@@ -60,9 +60,10 @@ locally passing patch from being promoted without causal evidence.
 
 Inspect needs only Python 3.9+. Replay uses the locked Python environment. Both
 are repository-only, offline, non-interactive, and return machine-readable
-pass/fail results. The public UI tells the same Campaign → Repair → Proof story
-and labels its static evidence. Optional live OpenAI mode is fail-closed when a
-server key or real game runtime is absent.
+pass/fail results. Neither requires a GPU, API key, Docker, Godot, network
+access, game rebuild, or fresh model/agent rerun. The public UI tells the same
+Campaign → Repair → Proof story and labels its static evidence. Optional live
+OpenAI mode is fail-closed when a server key or real game runtime is absent.
 
 ## OpenAI and Codex roles
 

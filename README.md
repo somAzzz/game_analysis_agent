@@ -24,13 +24,18 @@ rejected both candidates because the player-level failure cluster did not
 improve. Preventing an unsupported repair from shipping is the demonstrated
 agent capability.
 
-Before provisioning Docker or authorizing API usage, judges can verify the
-committed project and Replay evidence without rebuilding anything:
+**60-second offline judge path: no GPU, API key, Docker, Godot, network, or
+fresh model/agent rerun required.** Before provisioning anything, judges can
+verify the committed project and Replay evidence without rebuilding the game:
 
 ```bash
 ./judge --mode inspect --offline --json --output-dir -
 ./judge --mode replay --offline --json --output-dir -
 ```
+
+`inspect` needs only Python 3.9+. `replay` uses the locked `uv` environment;
+both consume committed, hash-pinned evidence and return machine-readable JSON
+on stdout.
 
 ## Competition deployment: Docker Godot + OpenAI API
 
