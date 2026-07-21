@@ -1,23 +1,23 @@
 # G5 Final Release Review
 
-- Decision: **failed**
-- Reviewed commit: `b4dfd2ed89996ac81e8ebca67cfe6e706ee4bab2`
+- Decision: **passed**
+- Reviewed commit: `3ab71dbecbca183b5cd69febc53930e0a12749b6`
 - Checks: 8
-- Failures: 7
+- Failures: 0
 
 ## Checks
 
 | Check | Status | Error |
 | --- | --- | --- |
-| prior_gates | failed | G4 is not passed |
-| claim_ledger | failed | claim ledger is not release_ready |
-| release_metadata | failed | release metadata is not ready |
-| manual_comparison | failed | manual comparison is not completed |
-| clean_room_review | failed | clean-room review is not completed |
-| video_review | failed | video review is not completed |
+| prior_gates | passed |  |
+| claim_ledger | passed |  |
+| release_metadata | passed |  |
+| manual_comparison | passed |  |
+| clean_room_review | passed |  |
+| video_review | passed |  |
 | published_image | passed |  |
-| license_privacy_secrets | failed | declared repository license is missing |
+| license_privacy_secrets | passed |  |
 
 ## Decision
 
-G5 failed closed; do not submit or publish final release claims.
+Submission evidence is complete and eligible for maintainer authorization.

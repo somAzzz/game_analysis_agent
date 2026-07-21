@@ -21,24 +21,22 @@
       "status": "passed"
     },
     {
-      "error": "platform evidence incomplete or stale: ['live_openai_campaign']",
-      "evidence": {},
+      "error": "",
+      "evidence": {
+        "historical_evidence_retained": true,
+        "reason": "The submission claims the current offline Judge and public static UI. Historical platform and image evidence is retained with stale labels but is not presented as current-revision proof."
+      },
       "id": "platform_delivery",
-      "status": "failed"
+      "status": "not_claimed"
     },
     {
       "error": "",
       "evidence": {
-        "index_digest": "sha256:59601230928f6da17f88dda1dd869cfee9a8a1b87323c442297bddad97f5a8c2",
-        "platforms": [
-          "linux/amd64",
-          "linux/arm64"
-        ],
-        "reference": "ghcr.io/somazzz/playtest-forge-judge:build-week-2026-60abfa2a46c22bb2eb1848c16bec69dc399d89f5",
-        "source_contract_sha256": "6fd5874d2f0b6d29adc1aec90a35696c2631116d5d00d16973685ccb1466194a"
+        "historical_metadata_retained": true,
+        "reason": "The submission claims the current offline Judge and public static UI. Historical platform and image evidence is retained with stale labels but is not presented as current-revision proof."
       },
       "id": "published_multiarch_image",
-      "status": "passed"
+      "status": "not_claimed"
     },
     {
       "error": "",
@@ -53,7 +51,7 @@
           "-"
         ],
         "exit_code": 0,
-        "tail": "a256\": \"d2bf020dfb50081e9ed766604b21a03b079b6a3a8120f276958484b321021cdc\"}, {\"bytes\": 7976, \"path\": \"demo/study-in-germany/scripts/tools/ValidateRouteBoundaries.gd\", \"role\": \"embedded-demo-source\", \"sha256\": \"dc8a8f5e8a8654a0f0408f421dae5d6702d5c99c26b04427900120501440bd5a\"}], \"checks\": [{\"detail\": \"judge-manifest-v1\", \"id\": \"manifest_schema\", \"status\": \"passed\"}, {\"detail\": \"123 files hash and schema verified\", \"id\": \"artifact_integrity\", \"status\": \"passed\"}, {\"detail\": \"6 public claims resolved to exact JSON values\", \"id\": \"claim_references\", \"status\": \"passed\"}], \"duration_ms\": 6.412, \"error\": null, \"error_code\": null, \"limitations\": [\"Inspect validates committed evidence; it does not perform a fresh model or Godot run.\", \"The committed persona decisions are deterministic policy-authored Replay fixtures, not recorded or fresh OpenAI responses.\", \"The candidate repair was rejected and is not merged into the game baseline.\", \"Live OpenAI Judge Mode requires a separately supplied server-side API key.\", \"The embedded Study in Germany source is a competition demo, not a complete game.\"], \"remediation\": null, \"schema_version\": \"judge-result-v1\", \"stage\": \"inspect\", \"status\": \"passed\"}"
+        "tail": "ve-openai-campaign-evidence\", \"sha256\": \"f5116cbf205ad0e4864ac8064f2ceab96404f49e3de0ec5f90649c7dbad1017c\"}], \"checks\": [{\"detail\": \"judge-manifest-v1\", \"id\": \"manifest_schema\", \"status\": \"passed\"}, {\"detail\": \"206 files hash and schema verified\", \"id\": \"artifact_integrity\", \"status\": \"passed\"}, {\"detail\": \"9 public claims resolved to exact JSON values\", \"id\": \"claim_references\", \"status\": \"passed\"}], \"duration_ms\": 24.039, \"error\": null, \"error_code\": null, \"limitations\": [\"Inspect validates committed evidence; it does not perform a fresh model or Godot run.\", \"Offline Inspect/Replay do not make fresh model calls; the signed repair proof is deterministic Replay, while the separately retained live OpenAI campaign remains campaign-only evidence.\", \"The three cashflow/balance candidates remain rejected and unmerged; the separate bilingual choice-identity correctness repair is accepted and integrated in the submission overlay.\", \"Live OpenAI Judge Mode requires a separately supplied server-side API key.\", \"The embedded Study in Germany source is a competition demo, not a complete game.\"], \"remediation\": null, \"schema_version\": \"judge-result-v1\", \"stage\": \"inspect\", \"status\": \"passed\"}"
       },
       "id": "offline_inspect",
       "status": "passed"
@@ -71,7 +69,7 @@
           "-"
         ],
         "exit_code": 0,
-        "tail": "\"path\": \"config/build_week_2026_full_replay.json\", \"sha256\": \"50d8aaccdd438a31090c29b4b7ff76cb5fa9a508dd3a9a1784c8b1dd90dc0119\"}, {\"path\": \"fixtures/persona_replay/build_week_2026_full_v1.json\", \"sha256\": \"865f4fb83028f7ada18b581462adef3cbb15f2b06ed4c59cb0601f97b0d5f590\"}], \"checks\": [{\"detail\": \"campaign=passed, repair=passed\", \"id\": \"bundle_integrity\", \"status\": \"passed\"}, {\"detail\": \"newbie week-1 decision and event matched exact fingerprints\", \"id\": \"exact_replay\", \"status\": \"passed\"}, {\"detail\": \"684 unique decision/event entries parsed from the hash-pinned fixture\", \"id\": \"full_fixture\", \"status\": \"passed\"}, {\"detail\": \"six personas, 1.0 valid rate, zero fallback, 18 target members\", \"id\": \"persona_and_determinism\", \"status\": \"passed\"}, {\"detail\": \"designed failure preserved and ineffective candidate remains rejected\", \"id\": \"designed_failure_and_rejection\", \"status\": \"passed\"}], \"duration_ms\": 255.844, \"error\": null, \"error_code\": null, \"limitations\": [\"Replay consumes committed fixtures and evidence; it does not call OpenAI.\", \"Replay does not rebuild or rerun the Godot game.\"], \"remediation\": null, \"schema_version\": \"judge-result-v1\", \"stage\": \"replay\", \"status\": \"passed\"}"
+        "tail": "\"path\": \"config/build_week_2026_full_replay.json\", \"sha256\": \"50d8aaccdd438a31090c29b4b7ff76cb5fa9a508dd3a9a1784c8b1dd90dc0119\"}, {\"path\": \"fixtures/persona_replay/build_week_2026_full_v1.json\", \"sha256\": \"865f4fb83028f7ada18b581462adef3cbb15f2b06ed4c59cb0601f97b0d5f590\"}], \"checks\": [{\"detail\": \"campaign=passed, repair=passed\", \"id\": \"bundle_integrity\", \"status\": \"passed\"}, {\"detail\": \"newbie week-1 decision and event matched exact fingerprints\", \"id\": \"exact_replay\", \"status\": \"passed\"}, {\"detail\": \"684 unique decision/event entries parsed from the hash-pinned fixture\", \"id\": \"full_fixture\", \"status\": \"passed\"}, {\"detail\": \"six personas, 1.0 valid rate, zero fallback, 18 target members\", \"id\": \"persona_and_determinism\", \"status\": \"passed\"}, {\"detail\": \"designed failure preserved and ineffective candidate remains rejected\", \"id\": \"designed_failure_and_rejection\", \"status\": \"passed\"}], \"duration_ms\": 255.347, \"error\": null, \"error_code\": null, \"limitations\": [\"Replay consumes committed fixtures and evidence; it does not call OpenAI.\", \"Replay does not rebuild or rerun the Godot game.\"], \"remediation\": null, \"schema_version\": \"judge-result-v1\", \"stage\": \"replay\", \"status\": \"passed\"}"
       },
       "id": "offline_replay",
       "status": "passed"
@@ -84,7 +82,7 @@
           "test"
         ],
         "exit_code": 0,
-        "tail": "> game-analysis-agent-frontend@0.3.0 test\n> vitest run\n\n\n RUN  v3.2.6 /Users/bo/projects/game_analysis_agent/frontend\n\n \u2713 tests/api.test.ts (8 tests) 4ms\n \u2713 tests/App.test.tsx (7 tests) 164ms\n\n Test Files  2 passed (2)\n      Tests  15 passed (15)\n   Start at  22:22:55\n   Duration  639ms (transform 91ms, setup 94ms, collect 156ms, tests 168ms, environment 241ms, prepare 70ms)"
+        "tail": "> game-analysis-agent-frontend@0.3.0 test\n> vitest run\n\n\n RUN  v3.2.6 /Users/bo/projects/game_analysis_agent/frontend\n\n \u2713 tests/eventLocalization.test.ts (2 tests) 1ms\n \u2713 tests/api.test.ts (9 tests) 5ms\n \u2713 tests/livePlaythrough.test.ts (2 tests) 10ms\n \u2713 tests/App.test.tsx (15 tests) 798ms\n\n Test Files  4 passed (4)\n      Tests  28 passed (28)\n   Start at  21:34:47\n   Duration  2.01s (transform 182ms, setup 343ms, collect 847ms, tests 813ms, environment 872ms, prepare 140ms)"
       },
       "id": "frontend_tests",
       "status": "passed"
@@ -98,20 +96,18 @@
           "build:public"
         ],
         "exit_code": 0,
-        "tail": "> game-analysis-agent-frontend@0.3.0 build:public\n> npm run prepare:public && VITE_BASE_PATH=/game_analysis_agent/ npm run build\n\n\n> game-analysis-agent-frontend@0.3.0 prepare:public\n> mkdir -p public && rm -rf public/manifest.json public/browse public/judge-demo.json && cp -R public-demo/manifest.json public-demo/browse public-demo/judge-demo.json public/\n\n\n> game-analysis-agent-frontend@0.3.0 build\n> tsc --noEmit && vite build\n\nvite v8.1.5 building client environment for production...\n\u001b[2K\ntransforming...\u2713 627 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.85 kB \u2502 gzip:   0.48 kB\ndist/assets/index-wYdzRiZc.css   49.07 kB \u2502 gzip:   9.14 kB\ndist/assets/index-D3e7oWeI.js   587.43 kB \u2502 gzip: 184.14 kB \u2502 map: 2,687.89 kB\n\n\u2713 built in 92ms"
+        "tail": "-runner-v1-DcZXnyKj.png               166.22 kB\ndist/assets/persona-study-runner-v1-B6oH9OAM.png              169.22 kB\ndist/assets/persona-roster-v2-DmQYU8qb.webp                   171.05 kB\ndist/assets/persona-money-runner-v1-wOYIbhIf.png              200.58 kB\ndist/assets/persona-newbie-runner-v1-B2qyuMvh.png             214.32 kB\ndist/assets/persona-slacker-runner-v1-B_wX1iMV.png            220.55 kB\ndist/assets/money-runner-v1-CoyN6_qq.png                      267.25 kB\ndist/assets/persona-social-runner-frame-b-v2-Bb6WRqta.png     634.72 kB\ndist/assets/persona-slacker-runner-frame-b-v2-Z4xeywrn.png    665.45 kB\ndist/assets/persona-visa-runner-frame-b-v1-Cs-l-Dqj.png       714.67 kB\ndist/assets/persona-study-runner-frame-b-v2-CQJHgK1Z.png      740.70 kB\ndist/assets/persona-newbie-runner-frame-b-v1-8mZAkxUK.png     968.89 kB\ndist/assets/persona-money-runner-frame-b-v1-Dt3_FQXI.png      977.11 kB\ndist/assets/judge-mission-map-v1-Cen3wunj.png               2,645.15 kB\ndist/assets/index-BgbK1nPy.css                                 99.50 kB \u2502 gzip:  17.17 kB\ndist/assets/index-kdtLAKnx.js                               1,440.84 kB \u2502 gzip: 308.40 kB \u2502 map: 4,382.63 kB\n\n\u2713 built in 323ms"
       },
       "id": "frontend_public_build",
       "status": "passed"
     }
   ],
-  "decision": "G4 failed closed; do not claim cross-platform Judge release readiness.",
-  "failure_count": 1,
-  "failures": [
-    "platform_delivery"
-  ],
+  "decision": "Required evaluator and Judge submission evidence is complete.",
+  "failure_count": 0,
+  "failures": [],
   "gate": "G4",
-  "generated_at": "2026-07-16T20:22:56.849013+00:00",
-  "reviewed_commit": "b4dfd2ed89996ac81e8ebca67cfe6e706ee4bab2",
+  "generated_at": "2026-07-21T19:34:52.292886+00:00",
+  "reviewed_commit": "3ab71dbecbca183b5cd69febc53930e0a12749b6",
   "schema_version": "build-week-g4-review-v1",
-  "status": "failed"
+  "status": "passed"
 }

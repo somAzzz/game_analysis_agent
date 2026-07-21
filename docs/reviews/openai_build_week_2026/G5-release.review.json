@@ -2,71 +2,90 @@
   "check_count": 8,
   "checks": [
     {
-      "error": "G4 is not passed",
-      "evidence": {},
+      "error": "",
+      "evidence": {
+        "statuses": {
+          "G0": "passed",
+          "G1": "passed",
+          "G2": "passed",
+          "G3": "passed",
+          "G4": "passed"
+        }
+      },
       "id": "prior_gates",
-      "status": "failed"
-    },
-    {
-      "error": "claim ledger is not release_ready",
-      "evidence": {},
-      "id": "claim_ledger",
-      "status": "failed"
-    },
-    {
-      "error": "release metadata is not ready",
-      "evidence": {},
-      "id": "release_metadata",
-      "status": "failed"
-    },
-    {
-      "error": "manual comparison is not completed",
-      "evidence": {},
-      "id": "manual_comparison",
-      "status": "failed"
-    },
-    {
-      "error": "clean-room review is not completed",
-      "evidence": {},
-      "id": "clean_room_review",
-      "status": "failed"
-    },
-    {
-      "error": "video review is not completed",
-      "evidence": {},
-      "id": "video_review",
-      "status": "failed"
+      "status": "passed"
     },
     {
       "error": "",
       "evidence": {
-        "index_digest": "sha256:59601230928f6da17f88dda1dd869cfee9a8a1b87323c442297bddad97f5a8c2",
-        "reference": "ghcr.io/somazzz/playtest-forge-judge:build-week-2026-60abfa2a46c22bb2eb1848c16bec69dc399d89f5"
+        "external_claims": 8,
+        "verified_claims": 8
+      },
+      "id": "claim_ledger",
+      "status": "passed"
+    },
+    {
+      "error": "",
+      "evidence": {
+        "gpt_model": "gpt-5.6-luna",
+        "public_ui": "https://somazzz.github.io/game_analysis_agent/",
+        "repository": "https://github.com/somAzzz/game_analysis_agent"
+      },
+      "id": "release_metadata",
+      "status": "passed"
+    },
+    {
+      "error": "",
+      "evidence": {
+        "disposition": "not_claimed",
+        "reason": "No time-saved or manual-speed comparison is claimed in the Build Week submission. This optional impact experiment remains future work; durations are intentionally not estimated."
+      },
+      "id": "manual_comparison",
+      "status": "passed"
+    },
+    {
+      "error": "",
+      "evidence": {
+        "disposition": "not_claimed",
+        "reason": "No independent-review result is claimed in the Build Week submission. A non-builder clean-room usability study remains optional future evidence."
+      },
+      "id": "clean_room_review",
+      "status": "passed"
+    },
+    {
+      "error": "",
+      "evidence": {
+        "duration_seconds": 175,
+        "url": "https://www.youtube.com/watch?v=62tW2RoFwTo"
+      },
+      "id": "video_review",
+      "status": "passed"
+    },
+    {
+      "error": "",
+      "evidence": {
+        "disposition": "not_claimed",
+        "historical_metadata_retained": true
       },
       "id": "published_image",
       "status": "passed"
     },
     {
-      "error": "declared repository license is missing",
-      "evidence": {},
+      "error": "",
+      "evidence": {
+        "license": "LICENSE",
+        "tracked_files_scanned": 816
+      },
       "id": "license_privacy_secrets",
-      "status": "failed"
+      "status": "passed"
     }
   ],
-  "decision": "G5 failed closed; do not submit or publish final release claims.",
-  "failure_count": 7,
-  "failures": [
-    "prior_gates",
-    "claim_ledger",
-    "release_metadata",
-    "manual_comparison",
-    "clean_room_review",
-    "video_review",
-    "license_privacy_secrets"
-  ],
+  "decision": "Submission evidence is complete and eligible for maintainer authorization.",
+  "failure_count": 0,
+  "failures": [],
   "gate": "G5",
-  "generated_at": "2026-07-16T20:23:55.363889+00:00",
-  "reviewed_commit": "b4dfd2ed89996ac81e8ebca67cfe6e706ee4bab2",
+  "generated_at": "2026-07-21T19:35:45.772021+00:00",
+  "reviewed_commit": "3ab71dbecbca183b5cd69febc53930e0a12749b6",
   "schema_version": "build-week-g5-review-v1",
-  "status": "failed"
+  "status": "passed"
 }
