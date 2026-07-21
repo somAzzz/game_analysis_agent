@@ -5,6 +5,7 @@
 > and unseen-holdout evidence does not support them.
 
 [Open the public Judge experience](https://somazzz.github.io/game_analysis_agent/)
+· [Watch the 2:55 demo](https://www.youtube.com/watch?v=62tW2RoFwTo)
 · [Evaluator guide](JUDGE.md)
 · [Developer guide](docs/DEVELOPER_GUIDE.md)
 · [中文说明](README.zh-CN.md)
@@ -474,10 +475,11 @@ The project is MIT licensed; third-party and generated-asset provenance is in
   is not a claim that the demo's pressure/cashflow balance is fixed.
 - The retained OpenAI campaign is observation evidence, not completed repair
   proof; no OpenAI-derived game patch is accepted or merged.
-- The public demo video, final Devpost team checks, non-builder manual/clean-room
-  review, and any claim of a newly published current-revision image remain
-  owner/release actions. `/feedback/` exports are submission metadata only and
-  remain intentionally ignored by Git.
+- The public [2:55 demo video](https://www.youtube.com/watch?v=62tW2RoFwTo) is
+  published. Final Devpost team checks, non-builder manual/clean-room review,
+  and any claim of a newly published current-revision image remain owner/release
+  actions. `/feedback/` exports are submission metadata only and remain
+  intentionally ignored by Git.
 - The embedded Study in Germany project is a competition demo, not a complete
   commercial game.
 - Live persona work requires a compatible model endpoint; real gameplay still
