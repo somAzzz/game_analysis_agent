@@ -12,6 +12,7 @@ from game_analysis_agent.openai_persona_gateway import OpenAIResponsesPersonaGat
 from game_analysis_agent.persona_gateway import (
     PersonaDecisionRequest,
     PersonaErrorCategory,
+    PersonaEventChoiceRequest,
     PersonaProvider,
     PersonaResultStatus,
 )
@@ -105,9 +106,9 @@ def _context() -> WeekContext:
     )
 
 
-def _decision(*, action: str = "budget_call") -> PlayerDecision:
+def _decision(*, action: str = "budget_call", week: int = 1) -> PlayerDecision:
     return PlayerDecision(
-        week=1,
+        week=week,
         persona="newbie",
         strategic_goal="protect cashflow",
         actions=[action],
@@ -200,12 +201,20 @@ def test_replay_openai_and_local_share_identical_interactive_semantics() -> None
     ] == ["replay", "openai", "vllm"]
 
 
-def test_local_persona_messages_keep_catalog_prefix_stable_across_weeks() -> None:
-    llm = _LocalLLM([_decision().model_dump_json(), _decision().model_dump_json()])
+def test_local_persona_messages_keep_rules_prefix_stable_when_legal_actions_change() -> None:
+    llm = _LocalLLM(
+        [
+            _decision().model_dump_json(),
+            _decision(action="rest_at_home", week=2).model_dump_json(),
+        ]
+    )
     gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
     first = _context()
     second = first.model_copy(
-        update={"state": first.state.model_copy(update={"week": 2, "money": 200})}
+        update={
+            "state": first.state.model_copy(update={"week": 2, "money": 200}),
+            "available_actions": [first.available_actions[1]],
+        }
     )
 
     gateway.decide(PersonaDecisionRequest.from_context(first, request_id="newbie-42-w1"))
@@ -214,8 +223,47 @@ def test_local_persona_messages_keep_catalog_prefix_stable_across_weeks() -> Non
     assert len(llm.messages[0]) == 3
     assert llm.messages[0][:2] == llm.messages[1][:2]
     assert llm.messages[0][2] != llm.messages[1][2]
-    assert "available_actions" in llm.messages[0][1]["content"]
-    assert "history" in llm.messages[0][2]["content"]
+    stable_prefix = llm.messages[0][1]["content"]
+    dynamic_prompt = llm.messages[0][2]["content"]
+    assert "available_actions" not in stable_prefix
+    assert '"strategic_goal"' in stable_prefix
+    assert dynamic_prompt.index('"history"') < dynamic_prompt.index('"memory_summary"')
+    assert dynamic_prompt.index('"history"') < dynamic_prompt.index('"available_actions"')
+    assert '"budget_call"' in dynamic_prompt
+    assert '"rest_at_home"' in llm.messages[1][2]["content"]
+
+
+def test_local_event_messages_keep_rules_prefix_stable_when_choices_change() -> None:
+    llm = _LocalLLM(
+        [
+            '{"event_choice_id":"rent_pressure.ask_extension"}',
+            '{"event_choice_id":"rent_pressure.pay_now"}',
+        ]
+    )
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+    first = _context()
+    second = first.model_copy(update={"event_choices": [first.event_choices[0]]})
+
+    gateway.choose_event(
+        PersonaEventChoiceRequest.from_context(
+            first, request_id="newbie-42-w1-event", selected_actions=["budget_call"]
+        )
+    )
+    gateway.choose_event(
+        PersonaEventChoiceRequest.from_context(
+            second, request_id="newbie-42-w2-event", selected_actions=["budget_call"]
+        )
+    )
+
+    assert len(llm.messages[0]) == 3
+    assert llm.messages[0][:2] == llm.messages[1][:2]
+    stable_prefix = llm.messages[0][1]["content"]
+    dynamic_prompt = llm.messages[0][2]["content"]
+    assert "event_choices" not in stable_prefix
+    assert '"event_choice_id"' in stable_prefix
+    assert dynamic_prompt.index('"history"') < dynamic_prompt.index('"event_choices"')
+    assert "rent_pressure.ask_extension" in dynamic_prompt
+    assert "rent_pressure.ask_extension" not in llm.messages[1][2]["content"]
 
 
 def test_local_reasoning_is_never_parsed_as_the_final_choice() -> None:

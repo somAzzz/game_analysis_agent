@@ -35,7 +35,7 @@
 - 合法 action 的 id/name/cost/effects/tags。
 - 当前事件 choices 的 success/failure effects。
 - persona 策略。
-- 最近 5 周压缩记忆。
+- 全部可观察、只追加的历周记录，以及放在记录之后的当前压缩 summary。
 
 不每周塞入：
 
@@ -47,6 +47,8 @@
 ## 3. 上下文长度原则
 
 当前 vLLM 默认以 `--max-model-len 65536 --max-num-seqs 4`、APC on、MTP off 启动。Hybrid APC 使用 `align` mode 和 16-token match unit；它是 prefill 优化，不是模型 262K 原生上限、容量保证或 TP/PP/DP 模型并行度。
+
+Prompt 先放固定规则/schema，再放 persona 和追加式 history，最后才放当前 state/risks 以及本轮合法 action/event choice 完整对象。合法对象不能替换成全局 catalog：后者可能暴露未解锁内容并改变 persona 证据。排序只服务于 exact-prefix 复用，不得改变 `WeekContext` 的可观察信息和合法性校验。
 
 `AGENT_MAX_TOKENS` 是输出 token 上限，不是输入 context 上限。若发生 context overflow，应优先压缩无效输入，例如全量 anomalies/raw logs，而不是降低模型可见的关键上下文。
 

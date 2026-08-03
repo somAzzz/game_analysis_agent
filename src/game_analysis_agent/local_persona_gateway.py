@@ -105,7 +105,7 @@ class LocalChatPersonaGateway:
                     "reasoning separate from the final answer. Final content must be one "
                     "PlayerDecision JSON object using legal ids. Do not inspect or patch source."
                 ),
-                prefix=_decision_prefix(request),
+                prefix=_decision_prefix(),
                 prompt=prompt,
                 step_name=(f"week-{week}" if attempt == 1 else f"week-{week}-repair-1"),
                 max_tokens=self.decision_max_tokens,
@@ -167,7 +167,7 @@ class LocalChatPersonaGateway:
                     "Think privately about the observable event tradeoff. Keep reasoning "
                     "separate; final content must select one legal event_choice_id as JSON."
                 ),
-                prefix=_event_prefix(request),
+                prefix=_event_prefix(),
                 prompt=prompt,
                 step_name=(f"week-{week}-event" if attempt == 1 else f"week-{week}-event-repair-1"),
                 max_tokens=self.event_max_tokens,
@@ -325,7 +325,7 @@ class LocalChatPersonaGateway:
 
 
 def _messages(*, system: str, prefix: str, prompt: str) -> list[dict[str, str]]:
-    """Keep immutable catalog/schema tokens before persona-week state."""
+    """Keep immutable rules/schema tokens before persona-week state."""
     return [
         {"role": "system", "content": system},
         {"role": "user", "content": prefix},
@@ -333,18 +333,10 @@ def _messages(*, system: str, prefix: str, prompt: str) -> list[dict[str, str]]:
     ]
 
 
-def _decision_prefix(request: PersonaDecisionRequest) -> str:
-    context = request.context
-    stable = {
-        "available_actions": [
-            action.model_dump(mode="json") for action in context.available_actions
-        ],
-        "max_action_slots": context.max_action_slots,
-    }
+def _decision_prefix() -> str:
     return "\n".join(
         [
             "Choose one or more legal action ids, up to max_action_slots.",
-            json.dumps(stable, ensure_ascii=False, separators=(",", ":")),
             (
                 "Final content must be compact JSON with exactly these fields: "
                 '{"strategic_goal":"short goal","actions":["legal_action_id"],'
@@ -370,6 +362,10 @@ def _decision_prompt(request: PersonaDecisionRequest) -> str:
         "state": context.state.model_dump(mode="json"),
         "top_risks": [risk.model_dump(mode="json") for risk in context.top_risks],
         "current_event_id": context.current_event_id,
+        "max_action_slots": context.max_action_slots,
+        "available_actions": [
+            action.model_dump(mode="json") for action in context.available_actions
+        ],
         "event_choices": [choice.model_dump(mode="json") for choice in context.event_choices],
     }
     return "\n".join(
@@ -390,16 +386,10 @@ def _decision_repair_prompt(request: PersonaDecisionRequest, errors: list[str]) 
     )
 
 
-def _event_prefix(request: PersonaEventChoiceRequest) -> str:
-    stable = {
-        "event_choices": [
-            choice.model_dump(mode="json") for choice in request.context.event_choices
-        ]
-    }
+def _event_prefix() -> str:
     return "\n".join(
         [
             "Choose exactly one event_choice_id from the legal choices.",
-            json.dumps(stable, ensure_ascii=False, separators=(",", ":")),
             'Final content must be compact JSON: {"event_choice_id":"..."}.',
         ]
     )
@@ -416,6 +406,9 @@ def _event_prompt(request: PersonaEventChoiceRequest) -> str:
         "state": context.state.model_dump(mode="json"),
         "top_risk_ids": [risk.id for risk in context.top_risks],
         "event_id": context.current_event_id,
+        "event_choices": [
+            choice.model_dump(mode="json") for choice in context.event_choices
+        ],
     }
     return "\n".join(
         [

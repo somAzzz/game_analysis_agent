@@ -81,18 +81,29 @@ max num batched tokens: auto
 
 原始 reasoning 不写入 playthrough、不进入下一周上下文，也不参与判分；审计只保留是否存在、字符数和 SHA-256。这样可以观测 thinking 是否发生，又不会把私有推理当成游戏动作或改变后续测试。
 
-每周决策会看到全部可观察历史：历周状态前后快照、实际动作、事件选项和结果，再看到本周当前状态。完整历史能保留跨周策略、失败恢复和路径依赖；只给当前状态会把 persona 降成无记忆贪心策略。提示顺序固定为：
+每周决策会看到全部可观察历史：历周状态前后快照、实际动作、事件选项和结果，再看到本周当前状态。完整历史能保留跨周策略、失败恢复和路径依赖；只给当前状态会把 persona 降成无记忆贪心策略。
+
+本地 chat template 序列化前的逻辑顺序固定为：
 
 ```text
 稳定 system 指令
-稳定合法 action/choice catalog + 输出 schema
-persona + 追加式历史
-动态 memory summary + 当前状态/风险/事件
+稳定全局规则 + PlayerDecision/event 输出 schema
+persona strategy
+不可变、只追加的历周 history
+当前 memory summary + week/state/risks/event
+本周 max_action_slots + 当前合法 action/choice 完整对象
+本轮任务
 ```
 
-稳定前缀和追加式历史使 vLLM Automatic Prefix Caching 能复用前缀 prefill；它只优化 prefill，不扩大 context，也不缩短 decode。
+APC 比较 chat template 产生的最终 token 前缀；message 数量本身不是命中条件，但 role 和 message 边界也会产生 token。vLLM 的 block key 同时依赖当前 token 块及其父前缀，因此前面第一次变化以后，后面即使重新出现相同 JSON 也不能越过分叉点复用。把固定 schema 放在最前面，使所有 persona 先共享规则；把 history 放在每周重算的 summary/state 之前，使同一 persona 的下一周能复用先前不可变的历史 token。
+
+`available_actions` 和 `event_choices` 必须是本轮实际合法、可观察的完整对象，并故意放在动态后缀。不能为了制造更长缓存前缀而改成全局 action catalog：全局 catalog 可能暴露未解锁 action、requirements 或未来路线，改变 persona 的长期规划和 risk awareness，导致新的 playthrough 与既有 evidence contract 不再可比。这个布局只改变序列位置，不增加或删减模型可观察事实；服务端合法 id 校验仍以同一个 `WeekContext` 为准。
 
 项目固定到 vLLM 0.26.0，并显式使用 `--mamba-cache-mode align --prefix-match-unit 16`。细粒度 match unit 允许命中物理 hybrid cache block 内的共享前缀，缓解旧版本短前缀因大块对齐而完全不命中的问题。GDN/Mamba APC 在上游仍标记为 experimental，因此它只是经过监控的 prefill 优化，不是 correctness 或容量前提；APC 开关不得改变合法选择或测试结果。
+
+评估这项布局时不能只看 APC hit ratio。固定内容变长会机械性提高 cached-token 占比；验收必须在相同请求顺序下同时比较 prompt tokens、未缓存 prefill、TTFT、prefill/E2E latency、KV eviction、JSON repair/fallback 和 persona 选择。命中率提升没有预设的 30%–50% 保证。
+
+事件选择采用同一原则：固定 event 输出规则在前，persona/history 居中，当前 event choices 放在最后。事件 prompt 较短，所以它的优化优先级低于每周 action decision。
 
 MTP 默认关闭。现有本地证据中，5,700 次成功调用消耗 11,109,541 input tokens、335,195 output tokens，且最终输出是短 JSON，因此常规 campaign 优先减少重复 prefill。只有长输出专项基准才应设置 `LLM_ENABLE_MTP=1`，并先完成 APC/MTP 分离 A/B、结构化输出一致性检查和持续负载测试。
 
