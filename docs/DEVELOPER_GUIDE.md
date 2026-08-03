@@ -149,8 +149,8 @@ Reports and dashboard
 
 The default local LLM backend is an OpenAI-compatible vLLM server. The Docker
 Compose stack is configured for NVIDIA's Qwen3.6 27B NVFP4 checkpoint with
-ModelOpt quantization, Qwen3 reasoning parsing, and optional MTP speculative
-decoding. You can also point the client at SGLang or DeepSeek-compatible
+ModelOpt quantization, Qwen3 reasoning parsing, fine-grained hybrid APC, and
+opt-in MTP speculative decoding. You can also point the client at SGLang or DeepSeek-compatible
 endpoints.
 
 中文说明保留在 [README.zh-CN.md](../README.zh-CN.md).
@@ -816,7 +816,7 @@ not licensing.
   mixed endings are part of the review standard, and the test matrix reflects
   that.
 - The default vLLM context length is configured by `LLM_MAX_MODEL_LEN`
-  (`32768` by default). Do not reduce it only to make tests faster if the goal
+  (`65536` by default, with four continuously batched sequences). Do not reduce it only to make tests faster if the goal
   is realistic LLM playtesting.
 - Generated reports, frontend build output, caches, and local dependencies are
   intentionally ignored by git.

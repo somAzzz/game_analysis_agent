@@ -4,23 +4,23 @@
 # Replay, Godot tools, the legacy CLI, and NVIDIA local inference.
 #
 # Notes (mirrored from fintext_llm/docker-compose.yml for consistency):
-#   * vLLM v0.25.0 is the latest stable image with NVFP4 + MTP support
-#     validated against Qwen3.6. vLLM_BIND_PORT defaults to 8000 so
-#     this stack does not collide with fintext_llm on 30000.
+#   * vLLM v0.26.0 adds fine-grained hybrid prefix-cache matching for
+#     Qwen3.6. vLLM_BIND_PORT defaults to 8000 so this stack does not
+#     collide with fintext_llm on 30000.
 #   * NVFP4 requires Blackwell (sm_100 / sm_120). Qwen3.6 ships with
-#     MTP weights; the speculative config is enabled by default and
-#     can be disabled with LLM_ENABLE_MTP=0.
+#     MTP weights, but this prefill-heavy persona workload defaults to
+#     APC-only. MTP remains an explicit opt-in with LLM_ENABLE_MTP=1.
 #   * The agent service does NOT need GPU access — the vLLM endpoint
 #     is plain HTTP. It also does not need the GPU driver / CUDA
 #     stack; it's a normal slim Python image.
 
 services:
   vllm:
-    # Pinned 2026-07-XX: v0.25.0 is the latest stable tag with NVFP4 + MTP
-    # validated against Qwen3.6 27B NVFP4. Bump quarterly. See fintext_llm
-    # for the same pin rationale.
-    image: vllm/vllm-openai:v0.25.0
-    # v0.25.0 image keeps ENTRYPOINT=["vllm","serve"] — a plain
+    # Pinned 2026-07-31: v0.26.0 contains fine-grained prefix matching for
+    # aligned attention/Mamba hybrid caches. Hybrid APC remains experimental,
+    # so it is an optimization only and must not affect correctness gates.
+    image: vllm/vllm-openai:v0.26.0
+    # The image keeps ENTRYPOINT=["vllm","serve"] — a plain
     # ``command`` would prepend ``vllm serve``, which then misreads
     # the next positional argument. Empty entrypoint lets the shell
     # script below run as-is. Verify after upgrade; if upstream changes
@@ -42,8 +42,13 @@ services:
       - CUDA_DEVICE_ORDER=PCI_BUS_ID
       - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
       - LLM_MODEL=${LLM_MODEL:-nvidia/Qwen3.6-27B-NVFP4}
-      - LLM_MAX_MODEL_LEN=${LLM_MAX_MODEL_LEN:-32768}
-      - LLM_ENABLE_MTP=${LLM_ENABLE_MTP:-1}
+      - LLM_MAX_MODEL_LEN=${LLM_MAX_MODEL_LEN:-65536}
+      - LLM_MAX_NUM_SEQS=${LLM_MAX_NUM_SEQS:-4}
+      - LLM_MAX_NUM_BATCHED_TOKENS=${LLM_MAX_NUM_BATCHED_TOKENS:-}
+      - LLM_ENABLE_PREFIX_CACHING=${LLM_ENABLE_PREFIX_CACHING:-1}
+      - LLM_MAMBA_CACHE_MODE=${LLM_MAMBA_CACHE_MODE:-align}
+      - LLM_PREFIX_MATCH_UNIT=${LLM_PREFIX_MATCH_UNIT:-16}
+      - LLM_ENABLE_MTP=${LLM_ENABLE_MTP:-0}
       - LLM_GPU_MEMORY_UTILIZATION=${LLM_GPU_MEMORY_UTILIZATION:-0.9}
       - LLM_SERVED_MODEL_NAME=${LLM_SERVED_MODEL_NAME:-qwen3.6-27b-nvfp4}
       - LLM_API_KEY=${VLLM_API_KEY:-local-dev-token}
@@ -58,10 +63,9 @@ services:
               capabilities: [gpu]
     # Default model is NVIDIA's official NVFP4 quant
     # (``nvidia/Qwen3.6-27B-NVFP4``). Override with LLM_MODEL.
-    # MTP speculative decoding is on by default — Qwen3.6 ships
-    # with MTP weights; set ``LLM_ENABLE_MTP=0`` in .env to disable
-    # it for checkpoints that lack MTP tensors (the
-    # ``--speculative-config`` flag will error out otherwise).
+    # APC is on by default with 16-token matching inside the larger physical
+    # hybrid-cache blocks. MTP is intentionally off: enable it only for a
+    # bounded long-output benchmark after correctness and soak gates pass.
     #
     # The sh wrapper does shell-side substitution so the JSON for
     # --speculative-config can be emitted literally. We avoid YAML
@@ -72,8 +76,16 @@ services:
       - -c
       - >-
         MODEL="$${LLM_MODEL:-nvidia/Qwen3.6-27B-NVFP4}";
-        ARGS="$${MODEL} --host 0.0.0.0 --port 8000 --api-key $${LLM_API_KEY:-local-dev-token} --served-model-name $${LLM_SERVED_MODEL_NAME:-qwen3.6-27b-nvfp4} --trust-remote-code --quantization modelopt --reasoning-parser qwen3 --generation-config vllm --dtype bfloat16 --gpu-memory-utilization $${LLM_GPU_MEMORY_UTILIZATION:-0.9} --max-model-len $${LLM_MAX_MODEL_LEN:-32768}";
-        if [ "$${LLM_ENABLE_MTP:-1}" = "1" ]; then
+        ARGS="$${MODEL} --host 0.0.0.0 --port 8000 --api-key $${LLM_API_KEY:-local-dev-token} --served-model-name $${LLM_SERVED_MODEL_NAME:-qwen3.6-27b-nvfp4} --trust-remote-code --quantization modelopt --reasoning-parser qwen3 --generation-config vllm --dtype bfloat16 --gpu-memory-utilization $${LLM_GPU_MEMORY_UTILIZATION:-0.9} --max-model-len $${LLM_MAX_MODEL_LEN:-65536} --max-num-seqs $${LLM_MAX_NUM_SEQS:-4} --language-model-only";
+        if [ -n "$${LLM_MAX_NUM_BATCHED_TOKENS:-}" ]; then
+        ARGS="$${ARGS} --max-num-batched-tokens $${LLM_MAX_NUM_BATCHED_TOKENS}";
+        fi;
+        if [ "$${LLM_ENABLE_PREFIX_CACHING:-1}" = "1" ]; then
+        ARGS="$${ARGS} --enable-prefix-caching --mamba-cache-mode $${LLM_MAMBA_CACHE_MODE:-align} --prefix-match-unit $${LLM_PREFIX_MATCH_UNIT:-16}";
+        else
+        ARGS="$${ARGS} --no-enable-prefix-caching";
+        fi;
+        if [ "$${LLM_ENABLE_MTP:-0}" = "1" ]; then
         ARGS="$${ARGS} --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":3}";
         fi;
         exec vllm serve $${ARGS}
@@ -173,6 +185,9 @@ services:
       # overridable per-call via ``docker compose run -e``.
       - VLLM_BASE_URL=${VLLM_BASE_URL:-http://vllm:8000/v1}
       - VLLM_API_KEY=${VLLM_API_KEY:-local-dev-token}
+      - PERSONA_ENABLE_THINKING=${PERSONA_ENABLE_THINKING:-1}
+      - PERSONA_DECISION_MAX_TOKENS=${PERSONA_DECISION_MAX_TOKENS:-2048}
+      - PERSONA_EVENT_MAX_TOKENS=${PERSONA_EVENT_MAX_TOKENS:-768}
       - GAME_PROJECT_PATH=${GAME_PROJECT_PATH:-/app/demo/study-in-germany}
     volumes:
       # Reports are persisted back onto the host for inspection.

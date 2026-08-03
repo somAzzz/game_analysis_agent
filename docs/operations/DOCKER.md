@@ -142,8 +142,13 @@ All knobs live in `.env`:
 | Env var | Purpose | Default |
 |---|---|---|
 | `LLM_MODEL` | HF repo id or local path served by vLLM | `nvidia/Qwen3.6-27B-NVFP4` |
-| `LLM_MAX_MODEL_LEN` | Context length passed to vLLM | `32768` |
-| `LLM_ENABLE_MTP` | Qwen3.6 ships with MTP weights; keep `1`, set `0` only for checkpoints without them | `1` |
+| `LLM_MAX_MODEL_LEN` | Operational prompt + output context limit | `65536` |
+| `LLM_MAX_NUM_SEQS` | Maximum continuously batched sequences per scheduler iteration | `4` |
+| `LLM_MAX_NUM_BATCHED_TOKENS` | Optional tokens processed per scheduler iteration; blank uses vLLM tuning | (empty) |
+| `LLM_ENABLE_PREFIX_CACHING` | Reuse exact shared prefixes during prefill | `1` |
+| `LLM_MAMBA_CACHE_MODE` | Hybrid GDN/Mamba cache coordination mode | `align` |
+| `LLM_PREFIX_MATCH_UNIT` | Fine-grained hybrid prefix match boundary in tokens | `16` |
+| `LLM_ENABLE_MTP` | Opt in to three-token MTP speculative decoding for bounded long-output tests | `0` |
 | `HF_TOKEN` | Auth to gated HuggingFace repos | (empty) |
 | `VLLM_BIND_PORT` | Host port the container binds to | `8000` |
 | `CUDA_VISIBLE_DEVICES` | GPU index (or `all`) | `0` |
@@ -153,9 +158,10 @@ All knobs live in `.env`:
 
 ## 9. Version pinning
 
-`vllm/vllm-openai:v0.25.0` is the latest stable tag (as of 2026-07-13)
-with NVFP4 + MTP validated against Qwen3.6 27B NVFP4. Bump quarterly;
-see fintext_llm for the same pinning rationale.
+`vllm/vllm-openai:v0.26.0` is pinned as of 2026-07-31. It adds fine-grained
+prefix-cache hits for aligned attention/Mamba hybrid models. Hybrid APC is
+still experimental: treat it only as a prefill optimization, never as a
+correctness or context-capacity guarantee.
 
 ## 10. Troubleshooting
 
@@ -168,8 +174,13 @@ if you wire it through). For Qwen3.6 27B NVFP4, 24-32 GB of VRAM is
 the recommended floor.
 
 **`--speculative-config` complains about missing MTP weights** —
-your checkpoint is Qwen3.5 or earlier; set `LLM_ENABLE_MTP=0` in
-`.env`.
+disable the opt-in with `LLM_ENABLE_MTP=0`. The project default is already
+APC-only.
+
+**Need to isolate APC or MTP behavior** — keep all other flags fixed and set
+exactly one of `LLM_ENABLE_PREFIX_CACHING=1` or `LLM_ENABLE_MTP=1`. Re-run
+the same serialized requests and compare validity plus latency; never infer a
+game result from whether a prefix-cache hit occurred.
 
 **`HF_TOKEN` not set on a gated repo** — fix the env var, then
 `docker compose restart vllm`. The token is forwarded only for

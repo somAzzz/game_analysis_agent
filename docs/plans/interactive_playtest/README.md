@@ -46,7 +46,7 @@
 
 ## 3. 上下文长度原则
 
-当前 vLLM 以 `--max-model-len 32768` 启动。这个窗口不应为了测试方便被缩短。
+当前 vLLM 默认以 `--max-model-len 65536 --max-num-seqs 4`、APC on、MTP off 启动。Hybrid APC 使用 `align` mode 和 16-token match unit；它是 prefill 优化，不是模型 262K 原生上限、容量保证或 TP/PP/DP 模型并行度。
 
 `AGENT_MAX_TOKENS` 是输出 token 上限，不是输入 context 上限。若发生 context overflow，应优先压缩无效输入，例如全量 anomalies/raw logs，而不是降低模型可见的关键上下文。
 
