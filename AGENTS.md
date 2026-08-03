@@ -1,17 +1,75 @@
 # Repository agent notes
 
-## Codex Skill discovery and mandatory routing
+## Codex Skill scope triage and routing
 
 Launch Codex from this repository root. Codex scans
 `$REPO_ROOT/.agents/skills`, so the checked-in `playtest-forge` metadata is
 available for implicit selection. `AGENTS.md` is loaded before work; the full
 Skill uses progressive disclosure and is read after selection.
 
-For any request involving game testing, judging, diagnosis, balance, economy,
-content routes, boundaries, persona/subagent playthroughs, parameter tuning, or
-game repair, **use `$playtest-forge`** after the two offline evaluator commands
-below. Read `.agents/skills/playtest-forge/SKILL.md` completely, then read only
-the scenario references it routes to. A canonical explicit evaluator prompt is:
+Do not use `$playtest-forge` merely because this is a game-analysis repository
+or because a request mentions a game, Godot, a persona, a simulation, or a
+playtest-related file. Route by the task's required evidence and acceptance
+criteria, not by isolated keywords.
+
+Use `$playtest-forge` when the task requires governed gameplay evidence or a
+judgment derived from that evidence, including:
+
+- starting, designing, replaying, or interpreting automated or persona
+  playtests;
+- judging gameplay balance, economy, progression, difficulty, content routes,
+  choices, endings, boundary behavior, invariants, or player-persona
+  divergence;
+- diagnosing a gameplay outcome, selecting a mechanic or parameter from
+  observed runs, or accepting/rejecting a game repair with fixed and holdout
+  proof;
+- changing the playtest, evidence, repair-gate, or workflow-migration protocol
+  itself.
+
+Do not use `$playtest-forge` when the task can be completed and accepted using
+ordinary software-engineering evidence, including:
+
+- implementing a precisely specified code change that does not require a
+  gameplay judgment;
+- fixing or reviewing frontend, backend, API, CLI, MCP, service-layer,
+  serialization, report-rendering, or developer-tooling code;
+- repository maintenance, documentation unrelated to the playtest workflow,
+  dependency updates, formatting, CI, Docker, packaging, security, or
+  performance work;
+- writing or fixing unit/integration tests whose purpose is software
+  correctness rather than gameplay behavior;
+- explaining repository code or architecture without evaluating playthrough
+  evidence or proposing a game-mechanic repair.
+
+For a mixed request, apply `$playtest-forge` only to the gameplay-evidence or
+game-repair portion; use the normal repository workflow for the engineering
+portion. If the decisive acceptance criterion is a player outcome or
+playthrough artifact, use the Skill. If it is only an API contract, build,
+type, or code-level test, do not. An explicit user request to use
+`$playtest-forge` always selects it.
+
+Examples:
+
+- "Fix the report JSON parser" does not use the Skill; "determine from the
+  reports why the money persona fails" does.
+- "Set this already-specified reward from 5 to 6" does not use the Skill;
+  "decide whether 5 or 6 meets the target difficulty" does.
+- "Add an MCP adapter" does not use the Skill; "migrate the governed
+  testing-and-repair workflow to another engine" does.
+
+After the scope decision:
+
+1. For an out-of-scope task, do not run the offline evaluator merely as a
+   repository ritual and do not load the Skill. Use only the checks relevant
+   to that task.
+2. For an in-scope task, run both offline evaluator commands in the next
+   section before Docker, Godot, a browser, or any model provider.
+3. If both commands pass, read
+   `.agents/skills/playtest-forge/SKILL.md` completely, then read only the
+   references it routes to for the request. Treat `failed` and `unsupported`
+   evaluator results as non-success states and follow `JUDGE.md` remediation.
+
+A canonical explicit evaluator prompt is:
 
 ```text
 Use $playtest-forge to review the committed automated and persona-playthrough
@@ -26,10 +84,11 @@ repository guarantees a tracked, hash-verified Skill and this routing rule; it
 does not claim that an undisclosed third-party evaluator implements Codex Skill
 discovery.
 
-## Automated evaluator: run this first
+## Automated evaluator for in-scope playtest-forge tasks
 
-From the repository root, use the offline paths before attempting Docker,
-Godot, a browser, or any model provider:
+After the routing decision selects `$playtest-forge`, run these offline paths
+from the repository root before attempting Docker, Godot, a browser, or any
+model provider:
 
 ```bash
 ./judge --mode inspect --offline --json --output-dir -
@@ -37,14 +96,13 @@ Godot, a browser, or any model provider:
 ```
 
 `inspect` uses only the Python standard library and verifies the committed
-`judge-manifest.json`, 123 artifact hashes/schemas (including the embedded
-demo), and six claim-to-evidence
-references. `replay` additionally requires `uv` and the locked environment; it
+`judge-manifest.json`, its declared artifact hashes/schemas (including the
+embedded demo), and its claim-to-evidence references. `replay` additionally
+requires `uv` and the locked environment; it
 consumes exact hash-pinned persona fixtures and rechecks representative persona,
 determinism, designed-failure, and rejected-repair gates. Neither command needs
 network, Docker, GPU, API key, TTY, browser, open port, or a sibling game
-checkout. Treat `failed` and `unsupported` as non-success states. See `JUDGE.md`
-for exit codes, limitations, and remediation.
+checkout. See `JUDGE.md` for exit codes, limitations, and remediation.
 
 ## Godot execution
 

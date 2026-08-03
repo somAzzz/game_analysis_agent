@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 import pytest
 
 from game_analysis_agent.repair_experiment import (
+    REQUIRED_REPAIR_GATES,
     CodexProvenance,
     FocusedTestResult,
     PatchEvidence,
@@ -116,8 +117,7 @@ def _record(*, decision: str = "accepted", failed_gate: bool = False, lines: int
             ),
         ),
         "snapshots": tuple(
-            _snapshot(cohort, patched=cohort.value.startswith("patched"))
-            for cohort in RepairCohort
+            _snapshot(cohort, patched=cohort.value.startswith("patched")) for cohort in RepairCohort
         ),
         "comparison": RepairComparison(
             fixed_member_delta=-9,
@@ -130,23 +130,10 @@ def _record(*, decision: str = "accepted", failed_gate: bool = False, lines: int
         "gates": tuple(
             RepairGateResult(
                 gate_id=gate_id,
-                status=(
-                    "failed"
-                    if failed_gate and gate_id == "critical_invariants"
-                    else "passed"
-                ),
+                status=("failed" if failed_gate and gate_id == "critical_invariants" else "passed"),
                 detail="checked",
             )
-            for gate_id in (
-                "fixed_target",
-                "holdout_target",
-                "critical_invariants",
-                "decision_validity",
-                "provider_health",
-                "persona_preservation",
-                "no_new_invalid_endings",
-                "designed_failure_preserved",
-            )
+            for gate_id in sorted(REQUIRED_REPAIR_GATES)
         ),
         "decision": decision,
         "decision_reason": "All fixed and holdout evidence was evaluated explicitly.",
@@ -170,9 +157,7 @@ def test_acceptance_rejects_failed_gate_but_rejected_record_preserves_it() -> No
     with pytest.raises(ValueError, match="failed gate"):
         RepairExperimentRecord.model_validate(_record(failed_gate=True))
 
-    rejected = RepairExperimentRecord.model_validate(
-        _record(decision="rejected", failed_gate=True)
-    )
+    rejected = RepairExperimentRecord.model_validate(_record(decision="rejected", failed_gate=True))
     assert rejected.decision.value == "rejected"
 
 

@@ -16,6 +16,9 @@ class RepairWorktreeError(RuntimeError):
     """Raised when isolation or a locked patch boundary is violated."""
 
 
+PROTECTED_REPAIR_PATHS = ("scripts/tools/ValidateEconomyRules.gd",)
+
+
 def create_repair_worktree(
     *,
     source_repository: str | Path,
@@ -51,6 +54,7 @@ def validate_and_save_patch(
     plan: RepairExperimentPlan,
     patch_path: str | Path,
     project_root: str | Path,
+    protected_paths: tuple[str, ...] = (),
 ) -> PatchEvidence:
     """Validate a committed candidate and save its diff before outcome tests."""
 
@@ -90,15 +94,15 @@ def validate_and_save_patch(
         raise RepairWorktreeError("candidate patch exceeds changed-file budget")
     allowed = set(plan.allowlist)
     for name in names:
+        if name in protected_paths:
+            raise RepairWorktreeError(f"candidate changes protected validator: {name}")
         _safe_relative(name)
         if name not in allowed:
             raise RepairWorktreeError(f"candidate path is outside allowlist: {name}")
         candidate = worktree_path / name
         if candidate.is_symlink():
             raise RepairWorktreeError(f"candidate path is a symbolic link: {name}")
-    added, deleted_lines = _numstat(
-        worktree_path, plan.baseline_game_commit, head
-    )
+    added, deleted_lines = _numstat(worktree_path, plan.baseline_game_commit, head)
     if added + deleted_lines > plan.maximum_changed_lines:
         raise RepairWorktreeError("candidate patch exceeds changed-line budget")
     patch = _git_bytes(
@@ -138,6 +142,78 @@ def validate_and_save_patch(
         added_lines=added,
         deleted_lines=deleted_lines,
     )
+
+
+def validate_verification_worktrees(
+    *,
+    baseline_game: str | Path,
+    patched_game: str | Path,
+    plan: RepairExperimentPlan,
+    patch: PatchEvidence,
+    project_root: str | Path,
+    protected_paths: tuple[str, ...] = PROTECTED_REPAIR_PATHS,
+) -> None:
+    """Bind caller paths, Git identities, and patch bytes before any outcome run."""
+
+    baseline = Path(baseline_game).resolve()
+    patched = Path(patched_game).resolve()
+    project = Path(project_root).resolve()
+    if baseline == patched:
+        raise RepairWorktreeError("baseline and patched worktrees must be distinct")
+    for label, worktree in (("baseline", baseline), ("patched", patched)):
+        if _git_optional(worktree, "rev-parse", "--is-inside-work-tree") != "true":
+            raise RepairWorktreeError(f"{label} game is not a Git worktree")
+        if _git(worktree, "status", "--porcelain", "--untracked-files=all"):
+            raise RepairWorktreeError(f"{label} game worktree is not clean")
+    if _git(baseline, "rev-parse", "HEAD") != plan.baseline_game_commit:
+        raise RepairWorktreeError("baseline worktree HEAD differs from locked plan")
+    if _git(baseline, "rev-parse", "HEAD^{tree}") != plan.baseline_game_tree:
+        raise RepairWorktreeError("baseline worktree tree differs from locked plan")
+    if patch.baseline_commit != plan.baseline_game_commit:
+        raise RepairWorktreeError("patch baseline differs from locked plan")
+    if _git(patched, "rev-parse", "HEAD") != patch.patched_commit:
+        raise RepairWorktreeError("patched worktree HEAD differs from patch evidence")
+    if _git(patched, "rev-parse", "HEAD^{tree}") != patch.patched_tree:
+        raise RepairWorktreeError("patched worktree tree differs from patch evidence")
+    if not _is_ancestor(patched, plan.baseline_game_commit, patch.patched_commit):
+        raise RepairWorktreeError("patched worktree does not descend from locked baseline")
+    names = tuple(
+        _git_lines(
+            patched,
+            "diff",
+            "--name-only",
+            "--diff-filter=ACDMRTUXB",
+            f"{plan.baseline_game_commit}..{patch.patched_commit}",
+        )
+    )
+    if names != patch.modified_paths:
+        raise RepairWorktreeError("actual patched paths differ from patch evidence")
+    protected = sorted(set(names) & set(protected_paths))
+    if protected:
+        raise RepairWorktreeError(f"candidate changes protected validator: {protected[0]}")
+    added, deleted = _numstat(patched, plan.baseline_game_commit, patch.patched_commit)
+    if (added, deleted) != (patch.added_lines, patch.deleted_lines):
+        raise RepairWorktreeError("actual line counts differ from patch evidence")
+    diff = _git_bytes(
+        patched,
+        "diff",
+        "--binary",
+        "--full-index",
+        plan.baseline_game_commit,
+        patch.patched_commit,
+        "--",
+        *names,
+    )
+    evidence_path = (project / patch.patch_path).resolve()
+    try:
+        evidence_path.relative_to(project)
+    except ValueError as exc:
+        raise RepairWorktreeError("patch evidence must live under project root") from exc
+    if not evidence_path.is_file():
+        raise RepairWorktreeError("patch evidence file is unavailable")
+    evidence = evidence_path.read_bytes()
+    if evidence != diff or hashlib.sha256(evidence).hexdigest() != patch.patch_sha256:
+        raise RepairWorktreeError("patch bytes or hash differ from verified worktree diff")
 
 
 def _numstat(worktree: Path, baseline: str, head: str) -> tuple[int, int]:
@@ -199,9 +275,7 @@ def _is_ancestor(repository: Path, baseline: str, head: str) -> bool:
 
 def _run_git(repository: Path, *args: str) -> subprocess.CompletedProcess[bytes]:
     try:
-        return subprocess.run(
-            ["git", *args], cwd=repository, check=True, capture_output=True
-        )
+        return subprocess.run(["git", *args], cwd=repository, check=True, capture_output=True)
     except subprocess.CalledProcessError as exc:
         message = exc.stderr.decode("utf-8", errors="replace")[-300:]
         raise RepairWorktreeError(f"git command failed: {message}") from exc
@@ -228,7 +302,9 @@ def _git_bytes(repository: Path, *args: str) -> bytes:
 
 
 __all__ = [
+    "PROTECTED_REPAIR_PATHS",
     "RepairWorktreeError",
     "create_repair_worktree",
     "validate_and_save_patch",
+    "validate_verification_worktrees",
 ]

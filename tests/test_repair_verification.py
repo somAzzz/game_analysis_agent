@@ -6,7 +6,10 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
-from game_analysis_agent.design_contract import DesignIntentContract
+import pytest
+
+from game_analysis_agent.build_week_campaign import FrozenRepairTarget
+from game_analysis_agent.design_contract import DesignIntentContract, load_design_contract
 from game_analysis_agent.repair_experiment import (
     CodexProvenance,
     FocusedTestResult,
@@ -15,7 +18,13 @@ from game_analysis_agent.repair_experiment import (
     RepairExperimentPlan,
     RepairMetricSnapshot,
 )
-from game_analysis_agent.repair_verification import build_repair_record
+from game_analysis_agent.repair_verification import (
+    RepairVerificationError,
+    build_repair_record,
+    compare_and_gate_repair,
+    load_repair_balance_thresholds,
+    validate_plan_against_design,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -61,8 +70,34 @@ def _plan() -> RepairExperimentPlan:
     )
 
 
+def _passing_balance_metrics() -> dict[str, float]:
+    return {
+        "maximum_single_ending_rate": 0.25,
+        "minimum_distinct_endings": 5.0,
+        "maximum_action_pick_share": 0.2,
+        "maximum_recovery_group_rate_per_run": 2.0,
+        "maximum_escape_group_rate_per_run": 1.0,
+        "minimum_study_group_rate_per_run": 1.0,
+        "minimum_work_group_rate_per_run": 0.5,
+        "minimum_persona_route_distance": 0.2,
+        "minimum_designed_failure_types": 2.0,
+        "maximum_single_designed_failure_rate": 0.25,
+    }
+
+
+def _target_counts(members: int) -> dict[str, int]:
+    personas = ("newbie", "study", "money", "social", "visa", "slacker")
+    quotient, remainder = divmod(members, len(personas))
+    return {
+        persona: quotient + int(index < remainder)
+        for index, persona in enumerate(personas)
+        if quotient + int(index < remainder)
+    }
+
+
 def _snapshot(cohort: RepairCohort, members: int) -> RepairMetricSnapshot:
     patched = cohort.value.startswith("patched")
+    target_counts = _target_counts(members)
     return RepairMetricSnapshot(
         cohort=cohort,
         game_commit=("e" if patched else "c") * 40,
@@ -70,7 +105,8 @@ def _snapshot(cohort: RepairCohort, members: int) -> RepairMetricSnapshot:
         cells=18,
         weeks=342,
         target_members=members,
-        target_personas=6 if members else 0,
+        target_personas=len(target_counts),
+        target_members_by_persona=target_counts,
         mean_final_money=100 if patched else 0,
         mean_max_stress=85 if patched else 100,
         valid_rate=1,
@@ -78,8 +114,23 @@ def _snapshot(cohort: RepairCohort, members: int) -> RepairMetricSnapshot:
         provider_error_rate=0,
         persona_alignment_rate=0.5,
         critical_invariants={"pipeline_stalled": 0},
-        designed_failure_endings=("cashflow_collapse",),
-        ending_counts={"cashflow_collapse": 18},
+        designed_failure_endings=("cashflow_collapse", "burnout_pause"),
+        ending_counts={
+            "cashflow_collapse": 3,
+            "burnout_pause": 3,
+            "stable_start": 4,
+            "social_connector": 4,
+            "work_warrior": 4,
+        },
+        ending_counts_by_persona={
+            "newbie": {"stable_start": 3},
+            "study": {"stable_start": 3},
+            "money": {"work_warrior": 3},
+            "social": {"social_connector": 3},
+            "visa": {"burnout_pause": 3},
+            "slacker": {"cashflow_collapse": 3},
+        },
+        balance_metrics=_passing_balance_metrics(),
         artifact_path=f"reports/{cohort.value}.json",
         artifact_sha256="f" * 64,
     )
@@ -116,6 +167,7 @@ def _record(holdout_members: int):
             _snapshot(RepairCohort.PATCHED_HOLDOUT, holdout_members),
         ),
         design=_design(),
+        balance_thresholds=load_repair_balance_thresholds(ROOT / "config/gates.yaml"),
         codex=CodexProvenance(
             task_reference="task", feedback_session_id="session", model="gpt-5.6"
         ),
@@ -137,6 +189,89 @@ def test_holdout_overfit_is_preserved_as_rejected_experiment() -> None:
 
     assert record.decision.value == "rejected"
     assert any(
-        item.gate_id == "holdout_target" and item.status.value == "failed"
-        for item in record.gates
+        item.gate_id == "holdout_target" and item.status.value == "failed" for item in record.gates
+    )
+
+
+def test_plan_validation_rejects_weakened_thresholds_and_seed_cohorts() -> None:
+    plan = RepairExperimentPlan.model_validate_json(
+        (ROOT / "config/build_week_2026_repair_plan.json").read_text(encoding="utf-8")
+    )
+    design = load_design_contract(ROOT / plan.design_contract_path, project_root=ROOT)
+    target = FrozenRepairTarget.model_validate_json(
+        (ROOT / plan.target_path).read_text(encoding="utf-8")
+    )
+
+    validate_plan_against_design(plan=plan, design=design, target=target, project_root=ROOT)
+
+    weakened = plan.model_copy(
+        update={
+            "thresholds": plan.thresholds.model_copy(
+                update={"minimum_holdout_relative_reduction": 0.0}
+            )
+        }
+    )
+    with pytest.raises(RepairVerificationError, match="thresholds"):
+        validate_plan_against_design(plan=weakened, design=design, target=target, project_root=ROOT)
+
+    changed_seeds = plan.model_copy(update={"holdout_seeds": (7, 8, 9)})
+    with pytest.raises(RepairVerificationError, match="seed cohorts"):
+        validate_plan_against_design(
+            plan=changed_seeds, design=design, target=target, project_root=ROOT
+        )
+
+
+def test_balance_gate_rejects_dominant_ending_regression() -> None:
+    record = _record(12)
+    snapshots = tuple(
+        snapshot.model_copy(
+            update={
+                "balance_metrics": {
+                    **snapshot.balance_metrics,
+                    "maximum_single_ending_rate": 0.9,
+                }
+            }
+        )
+        if snapshot.cohort.value.startswith("patched")
+        else snapshot
+        for snapshot in record.snapshots
+    )
+
+    _, gates = compare_and_gate_repair(
+        plan=record.plan,
+        snapshots=snapshots,
+        design=_design(),
+        balance_thresholds=load_repair_balance_thresholds(ROOT / "config/gates.yaml"),
+    )
+
+    assert any(
+        gate.gate_id == "balance_quality" and gate.status.value == "failed" for gate in gates
+    )
+
+
+def test_cross_persona_gate_rejects_improvement_concentrated_in_one_intent() -> None:
+    record = _record(12)
+    narrow_counts = {"study": 3, "money": 3, "social": 3, "visa": 3}
+    snapshots = []
+    for snapshot in record.snapshots:
+        if snapshot.cohort.value.startswith("patched"):
+            payload = snapshot.model_dump(mode="python")
+            payload.update(
+                target_members=12,
+                target_personas=4,
+                target_members_by_persona=narrow_counts,
+            )
+            snapshot = RepairMetricSnapshot.model_validate(payload)
+        snapshots.append(snapshot)
+
+    _, gates = compare_and_gate_repair(
+        plan=record.plan,
+        snapshots=tuple(snapshots),
+        design=_design(),
+        balance_thresholds=load_repair_balance_thresholds(ROOT / "config/gates.yaml"),
+    )
+
+    assert any(
+        gate.gate_id == "non_failure_persona_improvement" and gate.status.value == "failed"
+        for gate in gates
     )

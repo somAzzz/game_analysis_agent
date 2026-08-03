@@ -17,7 +17,7 @@ from .campaign_contract import CampaignCitation
 
 REPAIR_PLAN_SCHEMA = "repair-experiment-plan-v1"
 REPAIR_RECORD_SCHEMA = "repair-experiment-record-v1"
-REQUIRED_REPAIR_GATES = frozenset(
+LEGACY_REQUIRED_REPAIR_GATES = frozenset(
     {
         "fixed_target",
         "holdout_target",
@@ -29,6 +29,10 @@ REQUIRED_REPAIR_GATES = frozenset(
         "designed_failure_preserved",
     }
 )
+REQUIRED_REPAIR_GATES = LEGACY_REQUIRED_REPAIR_GATES | {
+    "non_failure_persona_improvement",
+    "balance_quality",
+}
 
 
 class RepairDecision(StrEnum):
@@ -136,14 +140,13 @@ class RepairMetricSnapshot(BaseModel):
 
     cohort: RepairCohort
     game_commit: str = Field(pattern=r"^[0-9a-f]{40}$")
-    decision_policy: Literal["fixture-authoring-policy-v1"] = (
-        "fixture-authoring-policy-v1"
-    )
+    decision_policy: Literal["fixture-authoring-policy-v1"] = "fixture-authoring-policy-v1"
     seeds: tuple[int, ...] = Field(min_length=1)
     cells: int = Field(ge=1)
     weeks: int = Field(ge=1)
     target_members: int = Field(ge=0)
     target_personas: int = Field(ge=0)
+    target_members_by_persona: dict[str, int] = Field(default_factory=dict)
     mean_final_money: float | None
     mean_max_stress: float | None
     valid_rate: float = Field(ge=0, le=1)
@@ -153,6 +156,8 @@ class RepairMetricSnapshot(BaseModel):
     critical_invariants: dict[str, int]
     designed_failure_endings: tuple[str, ...]
     ending_counts: dict[str, int]
+    ending_counts_by_persona: dict[str, dict[str, int]] = Field(default_factory=dict)
+    balance_metrics: dict[str, float] = Field(default_factory=dict)
     artifact_path: str
     artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -161,6 +166,19 @@ class RepairMetricSnapshot(BaseModel):
         _safe_paths((self.artifact_path,))
         if self.target_members > self.cells or self.target_personas > 6:
             raise ValueError("repair target counts exceed cohort size")
+        if self.target_members_by_persona and (
+            sum(self.target_members_by_persona.values()) != self.target_members
+        ):
+            raise ValueError("persona target counts differ from target members")
+        if self.ending_counts_by_persona and (
+            sum(
+                count
+                for endings in self.ending_counts_by_persona.values()
+                for count in endings.values()
+            )
+            != self.cells
+        ):
+            raise ValueError("persona ending counts differ from cohort cells")
         return self
 
 
@@ -244,14 +262,11 @@ class RepairExperimentRecord(BaseModel):
         ):
             raise ValueError("repair snapshot seeds differ from locked cohorts")
         if (
-            by_cohort[RepairCohort.BASELINE_FIXED].game_commit
-            != self.plan.baseline_game_commit
+            by_cohort[RepairCohort.BASELINE_FIXED].game_commit != self.plan.baseline_game_commit
             or by_cohort[RepairCohort.BASELINE_HOLDOUT].game_commit
             != self.plan.baseline_game_commit
-            or by_cohort[RepairCohort.PATCHED_FIXED].game_commit
-            != self.patch.patched_commit
-            or by_cohort[RepairCohort.PATCHED_HOLDOUT].game_commit
-            != self.patch.patched_commit
+            or by_cohort[RepairCohort.PATCHED_FIXED].game_commit != self.patch.patched_commit
+            or by_cohort[RepairCohort.PATCHED_HOLDOUT].game_commit != self.patch.patched_commit
         ):
             raise ValueError("repair snapshot game commits differ from plan/patch")
         self._validate_comparison(by_cohort)
@@ -259,9 +274,7 @@ class RepairExperimentRecord(BaseModel):
             self._require_acceptance(by_cohort)
         return self
 
-    def _validate_comparison(
-        self, by_cohort: dict[RepairCohort, RepairMetricSnapshot]
-    ) -> None:
+    def _validate_comparison(self, by_cohort: dict[RepairCohort, RepairMetricSnapshot]) -> None:
         baseline_fixed = by_cohort[RepairCohort.BASELINE_FIXED]
         patched_fixed = by_cohort[RepairCohort.PATCHED_FIXED]
         baseline_holdout = by_cohort[RepairCohort.BASELINE_HOLDOUT]
@@ -270,9 +283,7 @@ class RepairExperimentRecord(BaseModel):
             patched_fixed.target_members - baseline_fixed.target_members,
             _reduction(baseline_fixed.target_members, patched_fixed.target_members),
             patched_holdout.target_members - baseline_holdout.target_members,
-            _reduction(
-                baseline_holdout.target_members, patched_holdout.target_members
-            ),
+            _reduction(baseline_holdout.target_members, patched_holdout.target_members),
             _delta(
                 baseline_fixed.persona_alignment_rate,
                 patched_fixed.persona_alignment_rate,
@@ -293,9 +304,7 @@ class RepairExperimentRecord(BaseModel):
         if observed != expected:
             raise ValueError("repair comparison does not recompute from snapshots")
 
-    def _require_acceptance(
-        self, by_cohort: dict[RepairCohort, RepairMetricSnapshot]
-    ) -> None:
+    def _require_acceptance(self, by_cohort: dict[RepairCohort, RepairMetricSnapshot]) -> None:
         gate_ids = {item.gate_id for item in self.gates}
         if gate_ids != REQUIRED_REPAIR_GATES or len(self.gates) != len(gate_ids):
             raise ValueError("accepted repair lacks the exact required gate set")
@@ -317,8 +326,7 @@ class RepairExperimentRecord(BaseModel):
             self.comparison.holdout_persona_alignment_delta,
         )
         if any(
-            value is None
-            or value < -thresholds.maximum_persona_alignment_decline
+            value is None or value < -thresholds.maximum_persona_alignment_decline
             for value in alignment_deltas
         ):
             raise ValueError("accepted repair exceeds persona alignment decline")
@@ -336,9 +344,7 @@ class RepairExperimentRecord(BaseModel):
                 raise ValueError("accepted repair exceeds provider error threshold")
 
 
-def write_repair_record_atomic(
-    path: str | Path, record: RepairExperimentRecord
-) -> Path:
+def write_repair_record_atomic(path: str | Path, record: RepairExperimentRecord) -> Path:
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     handle, temporary = tempfile.mkstemp(
@@ -369,9 +375,7 @@ def _safe_paths(values: tuple[str, ...]) -> None:
 
 def _canonical_sha256(payload: object) -> str:
     return hashlib.sha256(
-        json.dumps(
-            payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        ).encode()
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
 
 
@@ -391,6 +395,7 @@ __all__ = [
     "CodexProvenance",
     "FocusedTestResult",
     "GateStatus",
+    "LEGACY_REQUIRED_REPAIR_GATES",
     "PatchEvidence",
     "REQUIRED_REPAIR_GATES",
     "REPAIR_PLAN_SCHEMA",

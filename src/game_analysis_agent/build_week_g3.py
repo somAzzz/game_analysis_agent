@@ -14,15 +14,22 @@ from typing import Any
 from .build_week_campaign import FrozenRepairTarget
 from .campaign_bundle import PublicPersonaRun
 from .campaign_contract import canonical_sha256
-from .design_contract import DesignIntentContract
+from .design_contract import DesignIntentContract, load_design_contract
 from .repair_bundle import verify_public_repair_bundle
 from .repair_experiment import (
+    LEGACY_REQUIRED_REPAIR_GATES,
     REQUIRED_REPAIR_GATES,
     GateStatus,
     RepairCohort,
     RepairDecision,
     RepairExperimentRecord,
 )
+from .repair_verification import (
+    compare_and_gate_repair,
+    load_repair_balance_thresholds,
+    validate_plan_against_design,
+)
+from .repair_worktree import PROTECTED_REPAIR_PATHS
 
 G3_SCHEMA = "build-week-g3-review-v1"
 _PLACEHOLDER = re.compile(r"(?i)(?:pending|unknown|todo|replace[-_ ]?me)")
@@ -67,7 +74,7 @@ def review_g3(
     _capture(
         checks,
         "four_cohort_decision_proof",
-        lambda: _decision_evidence(experiment, target, design),
+        lambda: _decision_evidence(experiment, target, design, project),
     )
     _capture(
         checks,
@@ -101,8 +108,7 @@ def review_g3(
         "independent_findings": {
             "codex_owned_hypothesis_patch_and_judgment": True,
             "mechanism_matches_diff": not any(
-                item["id"] == "diff_budget_and_mechanism"
-                and item["status"] == "failed"
+                item["id"] == "diff_budget_and_mechanism" and item["status"] == "failed"
                 for item in checks
             ),
             "holdout_direction": (
@@ -111,9 +117,7 @@ def review_g3(
                 else "not_confirmed_and_rejected"
             ),
             "rejection_recorded_honestly": record.decision == RepairDecision.REJECTED,
-            "designed_failure_preserved": _gate_passed(
-                record, "designed_failure_preserved"
-            ),
+            "designed_failure_preserved": _gate_passed(record, "designed_failure_preserved"),
             "release_followup": (
                 "Final demo must present a clear useful outcome; this rejected "
                 "experiment proves the safety boundary and is not a repair-success claim."
@@ -217,9 +221,14 @@ def _citation_evidence(experiment: Path, campaign: Path) -> dict[str, Any]:
 
 def _diff_evidence(experiment: Path, design_path: Path) -> dict[str, Any]:
     record = _read_record(experiment)
-    design = DesignIntentContract.model_validate_json(
-        design_path.read_text(encoding="utf-8")
+    design = DesignIntentContract.model_validate_json(design_path.read_text(encoding="utf-8"))
+    gate_ids = {item.gate_id for item in record.gates}
+    legacy_rejected = (
+        record.decision == RepairDecision.REJECTED and gate_ids == LEGACY_REQUIRED_REPAIR_GATES
     )
+    protected_changes = sorted(set(record.patch.modified_paths) & set(PROTECTED_REPAIR_PATHS))
+    if protected_changes and not legacy_rejected:
+        raise G3ReviewError(f"patch changes protected focused validator: {protected_changes}")
     patch = (experiment / record.patch.patch_path).read_text(encoding="utf-8")
     paths = tuple(
         match.group(1) for match in re.finditer(r"^diff --git a/(.+?) b/.+$", patch, re.M)
@@ -265,9 +274,7 @@ def _diff_evidence(experiment: Path, design_path: Path) -> dict[str, Any]:
 
 def _non_weakening_evidence(experiment: Path, design_path: Path) -> dict[str, Any]:
     record = _read_record(experiment)
-    design = DesignIntentContract.model_validate_json(
-        design_path.read_text(encoding="utf-8")
-    )
+    design = DesignIntentContract.model_validate_json(design_path.read_text(encoding="utf-8"))
     forbidden = tuple(design.change_budget.forbidden_paths)
     weakened_paths = [
         path
@@ -301,31 +308,50 @@ def _non_weakening_evidence(experiment: Path, design_path: Path) -> dict[str, An
 
 
 def _decision_evidence(
-    experiment: Path, target_path: Path, design_path: Path
+    experiment: Path, target_path: Path, design_path: Path, project: Path
 ) -> dict[str, Any]:
     record = _read_record(experiment)
     target = FrozenRepairTarget.model_validate_json(target_path.read_text(encoding="utf-8"))
-    if hashlib.sha256(target_path.read_bytes()).hexdigest() != record.plan.target_sha256:
-        raise G3ReviewError("repair plan target hash is stale")
-    if record.plan.selected_cluster_id != target.selected_cluster_id:
-        raise G3ReviewError("repair plan target differs from frozen target")
-    if hashlib.sha256(design_path.read_bytes()).hexdigest() != record.plan.design_contract_sha256:
-        raise G3ReviewError("repair plan design-contract hash is stale")
-    by_cohort = {item.cohort: item for item in record.snapshots}
-    failed_gates = sorted(
-        item.gate_id for item in record.gates if item.status == GateStatus.FAILED
+    design = load_design_contract(design_path, project_root=project)
+    validate_plan_against_design(
+        plan=record.plan,
+        design=design,
+        target=target,
+        project_root=project,
     )
+    by_cohort = {item.cohort: item for item in record.snapshots}
+    failed_gates = sorted(item.gate_id for item in record.gates if item.status == GateStatus.FAILED)
     gate_ids = {item.gate_id for item in record.gates}
-    if gate_ids != REQUIRED_REPAIR_GATES:
-        raise G3ReviewError("repair record lacks the exact review gate set")
+    legacy_rejected = (
+        record.decision == RepairDecision.REJECTED and gate_ids == LEGACY_REQUIRED_REPAIR_GATES
+    )
+    if record.decision == RepairDecision.ACCEPTED and gate_ids != REQUIRED_REPAIR_GATES:
+        raise G3ReviewError("accepted repair lacks the strengthened gate set")
+    if record.decision == RepairDecision.REJECTED and not (
+        legacy_rejected or gate_ids == REQUIRED_REPAIR_GATES
+    ):
+        raise G3ReviewError("rejected repair has an unknown gate set")
     if record.decision == RepairDecision.REJECTED and not failed_gates:
         raise G3ReviewError("rejected repair has no failed evidence gate")
     if record.decision == RepairDecision.ACCEPTED and failed_gates:
         raise G3ReviewError("accepted repair contains failed evidence gates")
+    if gate_ids == REQUIRED_REPAIR_GATES:
+        thresholds = load_repair_balance_thresholds(project / "config/gates.yaml")
+        expected_comparison, expected_gates = compare_and_gate_repair(
+            plan=record.plan,
+            snapshots=record.snapshots,
+            design=design,
+            balance_thresholds=thresholds,
+        )
+        observed = tuple((item.gate_id, item.status) for item in record.gates)
+        expected = tuple((item.gate_id, item.status) for item in expected_gates)
+        if record.comparison != expected_comparison or observed != expected:
+            raise G3ReviewError("repair decision gates do not recompute from evidence")
     return {
         "cohorts": sorted(item.value for item in by_cohort),
         "fixed_seeds": list(record.plan.fixed_seeds),
         "holdout_seeds": list(record.plan.holdout_seeds),
+        "gate_policy": "legacy-rejected" if legacy_rejected else "strengthened",
         "fixed_target_members": {
             "baseline": by_cohort[RepairCohort.BASELINE_FIXED].target_members,
             "patched": by_cohort[RepairCohort.PATCHED_FIXED].target_members,
@@ -378,8 +404,7 @@ def _read_record(bundle: Path) -> RepairExperimentRecord:
 
 def _gate_passed(record: RepairExperimentRecord, gate_id: str) -> bool:
     return any(
-        item.gate_id == gate_id and item.status == GateStatus.PASSED
-        for item in record.gates
+        item.gate_id == gate_id and item.status == GateStatus.PASSED for item in record.gates
     )
 
 
@@ -387,7 +412,9 @@ def _command_evidence(project: Path, command: list[str]) -> dict[str, Any]:
     result = subprocess.run(command, cwd=project, text=True, capture_output=True)
     output = (result.stdout + result.stderr).strip()
     if result.returncode != 0:
-        raise G3ReviewError(f"command failed ({result.returncode}): {' '.join(command)}\n{output[-1200:]}")
+        raise G3ReviewError(
+            f"command failed ({result.returncode}): {' '.join(command)}\n{output[-1200:]}"
+        )
     return {"command": command, "exit_code": 0, "tail": output[-1200:]}
 
 
@@ -395,13 +422,9 @@ def _capture(
     checks: list[dict[str, Any]], check_id: str, operation: Callable[[], dict[str, Any]]
 ) -> None:
     try:
-        checks.append(
-            {"id": check_id, "status": "passed", "evidence": operation(), "error": ""}
-        )
+        checks.append({"id": check_id, "status": "passed", "evidence": operation(), "error": ""})
     except Exception as exc:  # noqa: BLE001 - review must report every failed check
-        checks.append(
-            {"id": check_id, "status": "failed", "evidence": {}, "error": str(exc)}
-        )
+        checks.append({"id": check_id, "status": "failed", "evidence": {}, "error": str(exc)})
 
 
 def _git(project: Path, *args: str) -> str:

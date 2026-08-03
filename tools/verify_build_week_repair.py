@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
+from game_analysis_agent.build_week_campaign import FrozenRepairTarget  # noqa: E402
 from game_analysis_agent.design_contract import load_design_contract  # noqa: E402
 from game_analysis_agent.repair_experiment import (  # noqa: E402
     CodexProvenance,
@@ -27,8 +28,11 @@ from game_analysis_agent.repair_experiment import (  # noqa: E402
 )
 from game_analysis_agent.repair_verification import (  # noqa: E402
     build_repair_record,
+    load_repair_balance_thresholds,
     run_repair_cohort,
+    validate_plan_against_design,
 )
+from game_analysis_agent.repair_worktree import validate_verification_worktrees  # noqa: E402
 from game_analysis_agent.settings import Settings  # noqa: E402
 
 
@@ -49,11 +53,21 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     plan = RepairExperimentPlan.model_validate_json(args.plan.read_text(encoding="utf-8"))
-    patch = PatchEvidence.model_validate_json(
-        args.patch_evidence.read_text(encoding="utf-8")
-    )
+    patch = PatchEvidence.model_validate_json(args.patch_evidence.read_text(encoding="utf-8"))
     design = load_design_contract(
         ROOT / "config/build_week_2026_design_contract.json", project_root=ROOT
+    )
+    target = FrozenRepairTarget.model_validate_json(
+        (ROOT / plan.target_path).read_text(encoding="utf-8")
+    )
+    validate_plan_against_design(plan=plan, design=design, target=target, project_root=ROOT)
+    balance_thresholds = load_repair_balance_thresholds(ROOT / "config/gates.yaml")
+    validate_verification_worktrees(
+        baseline_game=args.baseline_game,
+        patched_game=args.patched_game,
+        plan=plan,
+        patch=patch,
+        project_root=ROOT,
     )
     output = args.output_dir.resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -106,6 +120,7 @@ def main(argv: list[str] | None = None) -> int:
         focused_tests=focused,
         snapshots=tuple(snapshots),
         design=design,
+        balance_thresholds=balance_thresholds,
         codex=CodexProvenance(
             task_reference=args.task_reference,
             feedback_session_id=args.feedback_session_id,
@@ -136,9 +151,7 @@ def main(argv: list[str] | None = None) -> int:
     return 0 if record.decision.value == "accepted" else 1
 
 
-def _run_focused_test(
-    patched_game: Path, settings: Settings, output: Path
-) -> FocusedTestResult:
+def _run_focused_test(patched_game: Path, settings: Settings, output: Path) -> FocusedTestResult:
     command = (
         settings.godot_bin,
         "--headless",
@@ -148,9 +161,7 @@ def _run_focused_test(
         "res://scripts/tools/ValidateEconomyRules.gd",
     )
     started = time.perf_counter()
-    completed = subprocess.run(
-        command, check=False, capture_output=True, text=True, timeout=300
-    )
+    completed = subprocess.run(command, check=False, capture_output=True, text=True, timeout=300)
     duration = time.perf_counter() - started
     text = (completed.stdout + completed.stderr).replace(str(Path.home()), "<home>")
     log = output / "focused-test.log"
@@ -178,8 +189,7 @@ def _summary(record) -> str:  # noqa: ANN001
         "",
     ]
     lines.extend(
-        f"- {item.gate_id}: **{item.status.value}** — {item.detail}"
-        for item in record.gates
+        f"- {item.gate_id}: **{item.status.value}** — {item.detail}" for item in record.gates
     )
     return "\n".join(lines) + "\n"
 

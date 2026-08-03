@@ -14,6 +14,7 @@ sys.path.insert(0, str(SRC))
 
 from game_analysis_agent.repair_experiment import RepairExperimentPlan  # noqa: E402
 from game_analysis_agent.repair_worktree import (  # noqa: E402
+    PROTECTED_REPAIR_PATHS,
     RepairWorktreeError,
     create_repair_worktree,
     validate_and_save_patch,
@@ -48,19 +49,16 @@ def main(argv: list[str] | None = None) -> int:
             )
             payload = {"status": "created", "worktree": str(path)}
         else:
-            plan = RepairExperimentPlan.model_validate_json(
-                args.plan.read_text(encoding="utf-8")
-            )
+            plan = RepairExperimentPlan.model_validate_json(args.plan.read_text(encoding="utf-8"))
             evidence = validate_and_save_patch(
                 worktree=args.worktree,
                 plan=plan,
                 patch_path=args.patch,
                 project_root=ROOT,
+                protected_paths=PROTECTED_REPAIR_PATHS,
             )
             args.evidence.parent.mkdir(parents=True, exist_ok=True)
-            args.evidence.write_text(
-                evidence.model_dump_json(indent=2) + "\n", encoding="utf-8"
-            )
+            args.evidence.write_text(evidence.model_dump_json(indent=2) + "\n", encoding="utf-8")
             payload = {"status": "passed", "patch": evidence.model_dump(mode="json")}
     except (OSError, ValueError, RepairWorktreeError) as exc:
         print(f"repair worktree error: {exc}", file=sys.stderr)

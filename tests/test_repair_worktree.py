@@ -10,9 +10,11 @@ import pytest
 
 from game_analysis_agent.repair_experiment import RepairExperimentPlan
 from game_analysis_agent.repair_worktree import (
+    PROTECTED_REPAIR_PATHS,
     RepairWorktreeError,
     create_repair_worktree,
     validate_and_save_patch,
+    validate_verification_worktrees,
 )
 
 
@@ -25,6 +27,9 @@ def _git(path: Path, *args: str) -> str:
 def _repository(tmp_path: Path) -> tuple[Path, str]:
     repository = tmp_path / "game"
     repository.mkdir()
+    validator = repository / PROTECTED_REPAIR_PATHS[0]
+    validator.parent.mkdir(parents=True)
+    validator.write_text("extends SceneTree\n", encoding="utf-8")
     _git(repository, "init")
     _git(repository, "config", "user.email", "test@example.invalid")
     _git(repository, "config", "user.name", "Test")
@@ -149,9 +154,7 @@ def test_patch_rejects_seed_specific_branch(tmp_path: Path) -> None:
         branch="codex/seed-test",
     )
     source = worktree / "scripts/simulation/EconomyRules.gd"
-    source.write_text(
-        "const COST = 100\nif seed == 1042:\n\tpass\n", encoding="utf-8"
-    )
+    source.write_text("const COST = 100\nif seed == 1042:\n\tpass\n", encoding="utf-8")
     _git(worktree, "add", ".")
     _git(worktree, "commit", "-m", "seed branch")
 
@@ -160,5 +163,80 @@ def test_patch_rejects_seed_specific_branch(tmp_path: Path) -> None:
             worktree=worktree,
             plan=_plan(baseline, tree),
             patch_path="reports/patch.diff",
+            project_root=tmp_path,
+        )
+
+
+def test_patch_rejects_changes_to_protected_focused_validator(tmp_path: Path) -> None:
+    repository, baseline = _repository(tmp_path)
+    tree = _git(repository, "rev-parse", "HEAD^{tree}")
+    worktree = create_repair_worktree(
+        source_repository=repository,
+        destination=tmp_path / "candidate",
+        baseline_commit=baseline,
+        branch="codex/protected-test",
+    )
+    validator = worktree / PROTECTED_REPAIR_PATHS[0]
+    validator.write_text("extends SceneTree\nfunc _init(): quit(0)\n", encoding="utf-8")
+    _git(worktree, "add", ".")
+    _git(worktree, "commit", "-m", "weaken validator")
+    plan = _plan(baseline, tree).model_copy(update={"allowlist": PROTECTED_REPAIR_PATHS})
+
+    with pytest.raises(RepairWorktreeError, match="protected validator"):
+        validate_and_save_patch(
+            worktree=worktree,
+            plan=plan,
+            patch_path="reports/protected.diff",
+            project_root=tmp_path,
+            protected_paths=PROTECTED_REPAIR_PATHS,
+        )
+
+
+def test_verification_binds_real_worktrees_tree_and_patch_bytes(tmp_path: Path) -> None:
+    repository, baseline = _repository(tmp_path)
+    tree = _git(repository, "rev-parse", "HEAD^{tree}")
+    plan = _plan(baseline, tree)
+    worktree = create_repair_worktree(
+        source_repository=repository,
+        destination=tmp_path / "candidate",
+        baseline_commit=baseline,
+        branch="codex/binding-test",
+    )
+    source = worktree / "scripts/simulation/EconomyRules.gd"
+    source.write_text("const COST = 90\n", encoding="utf-8")
+    _git(worktree, "add", ".")
+    _git(worktree, "commit", "-m", "bounded repair")
+    evidence = validate_and_save_patch(
+        worktree=worktree,
+        plan=plan,
+        patch_path="reports/binding.diff",
+        project_root=tmp_path,
+    )
+
+    validate_verification_worktrees(
+        baseline_game=repository,
+        patched_game=worktree,
+        plan=plan,
+        patch=evidence,
+        project_root=tmp_path,
+    )
+
+    wrong_tree = evidence.model_copy(update={"patched_tree": "f" * 40})
+    with pytest.raises(RepairWorktreeError, match="tree differs"):
+        validate_verification_worktrees(
+            baseline_game=repository,
+            patched_game=worktree,
+            plan=plan,
+            patch=wrong_tree,
+            project_root=tmp_path,
+        )
+
+    (tmp_path / evidence.patch_path).write_text("tampered\n", encoding="utf-8")
+    with pytest.raises(RepairWorktreeError, match="bytes or hash"):
+        validate_verification_worktrees(
+            baseline_game=repository,
+            patched_game=worktree,
+            plan=plan,
+            patch=evidence,
             project_root=tmp_path,
         )
