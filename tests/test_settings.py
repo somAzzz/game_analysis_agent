@@ -32,6 +32,9 @@ def _clear_env() -> None:
         "AGENT_TEMPERATURE",
         "AGENT_MAX_TOKENS",
         "TOOL_MAX_ROUNDS",
+        "PERSONA_ENABLE_THINKING",
+        "PERSONA_DECISION_MAX_TOKENS",
+        "PERSONA_EVENT_MAX_TOKENS",
         "GODOT_BIN",
         "GAME_PROJECT_PATH",
         "SIM_RUNS",
@@ -53,6 +56,9 @@ class TestDefaults:
         assert s.base_url().startswith("http://localhost:")
         assert s.model() == s.vllm_model
         assert s.model() == "qwen3.6-27b-nvfp4"
+        assert s.persona_enable_thinking is True
+        assert s.persona_decision_max_tokens == 2048
+        assert s.persona_event_max_tokens == 768
 
     def test_default_sim_difficulty_is_normal(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _clear_env()
@@ -68,11 +74,23 @@ class TestDefaults:
         s = Settings()
         assert s.provider() == "vllm"
 
-
-class TestSelectors:
-    def test_vllm_uses_shared_served_model_name(
+    def test_persona_reasoning_settings_are_overridable(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
+        _clear_env()
+        monkeypatch.setenv("PERSONA_ENABLE_THINKING", "false")
+        monkeypatch.setenv("PERSONA_DECISION_MAX_TOKENS", "1536")
+        monkeypatch.setenv("PERSONA_EVENT_MAX_TOKENS", "512")
+
+        settings = Settings()
+
+        assert settings.persona_enable_thinking is False
+        assert settings.persona_decision_max_tokens == 1536
+        assert settings.persona_event_max_tokens == 512
+
+
+class TestSelectors:
+    def test_vllm_uses_shared_served_model_name(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _clear_env()
         monkeypatch.setenv("LLM_SERVED_MODEL_NAME", "local-model-alias")
 
@@ -88,9 +106,7 @@ class TestSelectors:
         assert s.model() == s.deepseek_model
         assert s.deepseek_configured() is True
 
-    def test_deepseek_rejects_placeholder_key(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_deepseek_rejects_placeholder_key(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _clear_env()
         monkeypatch.setenv("LLM_PROVIDER", "deepseek")
         monkeypatch.setenv("DEEPSEEK_API_KEY", "REPLACE_ME")

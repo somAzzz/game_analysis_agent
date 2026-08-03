@@ -56,11 +56,18 @@ class _FakeLLM:
         step_name,
         temperature=None,
         max_tokens=None,
+        enable_thinking=None,
     ):  # noqa: ANN001
         content = self.contents.pop(0) if self.contents else ""
         call = _fake_llm_call(content)
         call.step_name = step_name
-        self.requests.append({"messages": messages, "max_tokens": max_tokens})
+        self.requests.append(
+            {
+                "messages": messages,
+                "max_tokens": max_tokens,
+                "enable_thinking": enable_thinking,
+            }
+        )
         self.calls.append(call)
         return content, call
 
@@ -283,6 +290,11 @@ def test_play_through_runs_explicit_weekly_loop(tmp_path) -> None:
     assert rows[0]["chosen_actions"] == ["study_library"]
     assert rows[1]["chosen_actions"] == ["sleep_recover"]
     assert rows[0]["persona_calls"][0]["metadata"]["provider"] == "vllm"
+    assert len(rows[4]["week_context"]["memory"]["history"]) == 4
+    assert rows[4]["week_context"]["memory"]["history"][0]["actions"] == ["study_library"]
+    assert rows[4]["week_context"]["memory"]["history"][0]["state_before"]
+    assert rows[4]["week_context"]["memory"]["history"][0]["state_after"]
+    assert "reasoning" not in json.dumps(rows[4]["week_context"]["memory"])
 
 
 def test_play_through_terminates_when_probe_finishes(tmp_path) -> None:
@@ -456,7 +468,8 @@ def test_event_choice_uses_compact_dedicated_prompt() -> None:
     assert validation.valid is True
     assert calls[0].step_name == "week-3-event"
     request = agent.llm.requests[0]  # type: ignore[attr-defined]
-    assert request["max_tokens"] == 192
+    assert request["max_tokens"] == 768
+    assert request["enable_thinking"] is True
     assert "WeekContext JSON" not in request["messages"][1]["content"]
     assert len(request["messages"][1]["content"]) < len(agent._build_user_prompt(context))
 

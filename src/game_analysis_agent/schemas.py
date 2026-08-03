@@ -55,6 +55,10 @@ class LLMCall(BaseModel):
     model: str
     prompt_text: str = ""
     response_text: str = ""
+    reasoning_present: bool = False
+    reasoning_chars: int = Field(default=0, ge=0)
+    reasoning_sha256: str = Field(default="", pattern=r"^$|^[0-9a-f]{64}$")
+    finish_reason: str = ""
     prompt_tokens: int | None = None
     completion_tokens: int | None = None
     total_tokens: int | None = None
@@ -262,8 +266,11 @@ class WeekMemory(BaseModel):
     week: int
     actions: list[str] = Field(default_factory=list)
     event: str = ""
+    event_choice_id: str = ""
     rationale: str = ""
     delta: dict[str, int] = Field(default_factory=dict)
+    state_before: dict[str, Any] = Field(default_factory=dict)
+    state_after: dict[str, Any] = Field(default_factory=dict)
 
 
 class PlayMemory(BaseModel):
@@ -278,6 +285,7 @@ class PlayMemory(BaseModel):
     unresolved_risks: list[str] = Field(default_factory=list)
     important_flags: dict[str, bool] = Field(default_factory=dict)
     repeated_actions: dict[str, int] = Field(default_factory=dict)
+    history: list[WeekMemory] = Field(default_factory=list, max_length=52)
     last_5_weeks: list[WeekMemory] = Field(default_factory=list)
     mistakes: list[str] = Field(default_factory=list)
     successful_patterns: list[str] = Field(default_factory=list)

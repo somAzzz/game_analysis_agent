@@ -3,9 +3,8 @@
 Pattern borrowed from ``fintext_llm/src/llm/client.py``. Differences:
 
 * Three providers are supported (``vllm`` / ``sglang`` / ``deepseek``),
-  selected via ``Settings.llm_provider``. Local Qwen backends attach
-  ``extra_body.chat_template_kwargs.enable_thinking=False`` so reasoning
-  models do not pollute the chat transcript with thinking text.
+  selected via ``Settings.llm_provider``. Local Qwen thinking is controlled
+  per request; reasoning metadata is audited separately from final content.
 * The audit row is :class:`game_analysis_agent.schemas.LLMCall` (Pydantic),
   pushed through a sink that downstream consumers can swap.
 
@@ -16,6 +15,7 @@ during the migration.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 import urllib.error
@@ -99,15 +99,20 @@ class LocalLLMClient:
 
     # --- core chat -------------------------------------------------------
 
-    def _extra_body(self) -> dict[str, Any] | None:
+    def _extra_body(self, *, enable_thinking: bool | None = None) -> dict[str, Any] | None:
         """Return provider-specific request kwargs.
 
-        Locally served Qwen reasoning models otherwise prepend a long thinking
-        transcript by default, which is undesirable for tool-calling /
-        structured-output flows.
+        Callers must opt in explicitly. This keeps non-persona structured and
+        tool-calling flows on their historical non-thinking behavior.
         """
         if self.provider in {"vllm", "sglang"}:
-            return {"chat_template_kwargs": {"enable_thinking": False}}
+            return {
+                "chat_template_kwargs": {
+                    "enable_thinking": bool(enable_thinking)
+                    if enable_thinking is not None
+                    else False
+                }
+            }
         return None
 
     def validate_model_available(self) -> list[str]:
@@ -117,8 +122,7 @@ class LocalLLMClient:
             response = self.client.models.list()
         except Exception as exc:
             raise LLMPreflightError(
-                f"Could not query models from {self.base_url}: "
-                f"{type(exc).__name__}: {exc}"
+                f"Could not query models from {self.base_url}: {type(exc).__name__}: {exc}"
             ) from exc
         data = getattr(response, "data", None)
         available = sorted(
@@ -144,13 +148,14 @@ class LocalLLMClient:
         step_name: str,
         max_tokens: int | None = None,
         temperature: float | None = None,
+        enable_thinking: bool | None = None,
         emit_call: bool = True,
     ) -> tuple[str, LLMCall]:
         started = _now_utc()
         call_id = f"llm-{uuid.uuid4().hex[:12]}"
         prompt_text = messages[-1]["content"] if messages else ""
         request_kwargs: dict[str, Any] = {}
-        extra = self._extra_body()
+        extra = self._extra_body(enable_thinking=enable_thinking)
         if extra:
             request_kwargs["extra_body"] = extra
         try:
@@ -158,7 +163,9 @@ class LocalLLMClient:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                temperature=temperature if temperature is not None else self.settings.agent_temperature,
+                temperature=temperature
+                if temperature is not None
+                else self.settings.agent_temperature,
                 max_tokens=max_tokens if max_tokens is not None else self.settings.agent_max_tokens,
                 **request_kwargs,
             )
@@ -183,7 +190,15 @@ class LocalLLMClient:
             raise LLMRequestError(call) from exc
 
         try:
-            content = response.choices[0].message.content or ""
+            choice = response.choices[0]
+            message = choice.message
+            content = message.content or ""
+            reasoning = str(
+                getattr(message, "reasoning", None)
+                or getattr(message, "reasoning_content", None)
+                or ""
+            )
+            finish_reason = str(getattr(choice, "finish_reason", None) or "")
         except (AttributeError, IndexError, TypeError) as exc:
             raise RuntimeError(f"Unexpected LLM response: {response!r}") from exc
         usage = getattr(response, "usage", None)
@@ -199,6 +214,12 @@ class LocalLLMClient:
             model=self.model,
             prompt_text=prompt_text,
             response_text=content,
+            reasoning_present=bool(reasoning),
+            reasoning_chars=len(reasoning),
+            reasoning_sha256=(
+                hashlib.sha256(reasoning.encode("utf-8")).hexdigest() if reasoning else ""
+            ),
+            finish_reason=finish_reason,
             prompt_tokens=prompt_tokens,
             completion_tokens=completion_tokens,
             total_tokens=total_tokens,
@@ -221,6 +242,7 @@ class LocalLLMClient:
         step_name: str = "complete",
         max_tokens: int | None = None,
         temperature: float | None = None,
+        enable_thinking: bool | None = None,
     ) -> str:
         """One-shot chat completion that returns the raw response string."""
         messages: list[dict[str, str]] = []
@@ -233,6 +255,7 @@ class LocalLLMClient:
             step_name=step_name,
             max_tokens=max_tokens,
             temperature=temperature,
+            enable_thinking=enable_thinking,
         )
         return content
 
@@ -244,6 +267,7 @@ class LocalLLMClient:
         step_name: str = "chat",
         max_tokens: int | None = None,
         temperature: float | None = None,
+        enable_thinking: bool | None = None,
     ) -> tuple[str, LLMCall]:
         """Chat with an already-built message list; returns ``(text, audit)``."""
         return self._chat(
@@ -252,6 +276,7 @@ class LocalLLMClient:
             step_name=step_name,
             max_tokens=max_tokens,
             temperature=temperature,
+            enable_thinking=enable_thinking,
         )
 
 

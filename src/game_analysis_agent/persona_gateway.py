@@ -89,6 +89,11 @@ class PersonaCallMetadata(BaseModel):
     parse_status: PersonaParseStatus = PersonaParseStatus.NOT_APPLICABLE
     refusal: str = Field(default="", max_length=500)
     usage: PersonaUsage = Field(default_factory=PersonaUsage)
+    reasoning_enabled: bool = False
+    reasoning_attempts: int = Field(default=0, ge=0)
+    reasoning_chars: int = Field(default=0, ge=0)
+    reasoning_sha256: list[str] = Field(default_factory=list, max_length=4)
+    final_content_chars: int = Field(default=0, ge=0)
 
 
 class PersonaDecisionRequest(BaseModel):
@@ -221,9 +226,7 @@ class PersonaDecisionGateway(Protocol):
 
     def decide(self, request: PersonaDecisionRequest) -> PersonaDecisionResult: ...
 
-    def choose_event(
-        self, request: PersonaEventChoiceRequest
-    ) -> PersonaEventChoiceResult: ...
+    def choose_event(self, request: PersonaEventChoiceRequest) -> PersonaEventChoiceResult: ...
 
 
 def context_state_hash(context: WeekContext) -> str:
@@ -233,9 +236,7 @@ def context_state_hash(context: WeekContext) -> str:
     return _json_sha256(payload)
 
 
-def validate_player_decision(
-    decision: PlayerDecision, context: WeekContext
-) -> list[str]:
+def validate_player_decision(decision: PlayerDecision, context: WeekContext) -> list[str]:
     """Apply the one legal-action/event-choice policy shared by all providers."""
 
     errors: list[str] = []

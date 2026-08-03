@@ -57,6 +57,40 @@ def test_complete_returns_text_and_emits_audit() -> None:
     assert audit_rows[0].prompt_text == "hi"
 
 
+def test_persona_thinking_keeps_reasoning_out_of_final_content() -> None:
+    response = SimpleNamespace(
+        choices=[
+            SimpleNamespace(
+                message=SimpleNamespace(
+                    content='{"actions":["study"]}', reasoning="private analysis"
+                ),
+                finish_reason="stop",
+            )
+        ],
+        usage=SimpleNamespace(prompt_tokens=10, completion_tokens=20, total_tokens=30),
+    )
+    completions = _FakeCompletions(response)
+    sdk = MagicMock()
+    sdk.chat.completions.create = completions.create
+    client = LocalLLMClient(_settings(), provider="vllm", model="m")
+    client.client = sdk
+
+    content, audit = client.chat(
+        [{"role": "user", "content": "choose"}],
+        agent="interactive_player",
+        enable_thinking=True,
+    )
+
+    assert content == '{"actions":["study"]}'
+    assert audit.response_text == content
+    assert audit.reasoning_present is True
+    assert audit.reasoning_chars == len("private analysis")
+    assert len(audit.reasoning_sha256) == 64
+    assert audit.finish_reason == "stop"
+    extra = completions.calls[0]["extra_body"]
+    assert extra["chat_template_kwargs"]["enable_thinking"] is True
+
+
 def test_sglang_provider_attaches_thinking_disable() -> None:
     response = SimpleNamespace(
         choices=[SimpleNamespace(message=SimpleNamespace(content=""))],
@@ -130,9 +164,7 @@ def test_chat_returns_audit_row() -> None:
 
 def test_validate_model_available_accepts_exact_served_id() -> None:
     sdk = MagicMock()
-    sdk.models.list.return_value = SimpleNamespace(
-        data=[SimpleNamespace(id="qwen3.6-27b-nvfp4")]
-    )
+    sdk.models.list.return_value = SimpleNamespace(data=[SimpleNamespace(id="qwen3.6-27b-nvfp4")])
     client = LocalLLMClient(_settings(), model="qwen3.6-27b-nvfp4")
     client.client = sdk
 
@@ -141,9 +173,7 @@ def test_validate_model_available_accepts_exact_served_id() -> None:
 
 def test_validate_model_available_lists_actual_ids_on_mismatch() -> None:
     sdk = MagicMock()
-    sdk.models.list.return_value = SimpleNamespace(
-        data=[SimpleNamespace(id="qwen3.6-27b-nvfp4")]
-    )
+    sdk.models.list.return_value = SimpleNamespace(data=[SimpleNamespace(id="qwen3.6-27b-nvfp4")])
     client = LocalLLMClient(_settings(), model="wrong-model")
     client.client = sdk
 

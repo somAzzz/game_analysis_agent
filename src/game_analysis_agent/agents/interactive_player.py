@@ -126,7 +126,7 @@ class InteractivePlayerAgent(Agent):
     name = "interactive_player"
     default_output_files = ("playthrough_summary.md",)
     default_temperature = 0.3
-    decision_max_tokens = 768
+    decision_max_tokens = 2048
 
     def __init__(
         self,
@@ -1186,12 +1186,22 @@ def _update_memory(memory: PlayMemory, step: PlaythroughStep) -> PlayMemory:
     repeated = dict(memory.repeated_actions)
     for action_id in step.chosen_actions:
         repeated[action_id] = repeated.get(action_id, 0) + 1
+    before_payload = step.state_before.get("state", step.state_before)
+    before_payload = before_payload if isinstance(before_payload, dict) else {}
+    after_payload = step.state_after if isinstance(step.state_after, dict) else {}
     week_memory = WeekMemory(
         week=step.week,
         actions=step.chosen_actions,
         event=step.triggered_event_id,
+        event_choice_id=step.event_choice_id,
         rationale=str(step.decision.get("strategic_goal", "")),
         delta=step.delta,
+        state_before=_state_summary(before_payload, week=step.week).model_dump(
+            mode="json", exclude_none=True
+        ),
+        state_after=_state_summary(after_payload, week=step.week).model_dump(
+            mode="json", exclude_none=True
+        ),
     )
     state = step.state_after or {}
     flags = state.get("flags") if isinstance(state.get("flags"), dict) else {}
@@ -1206,6 +1216,7 @@ def _update_memory(memory: PlayMemory, step: PlaythroughStep) -> PlayMemory:
         update={
             "important_flags": {str(key): bool(value) for key, value in flags.items()},
             "repeated_actions": repeated,
+            "history": [*memory.history, week_memory][-52:],
             "unresolved_risks": unresolved[-8:],
             "last_5_weeks": [*memory.last_5_weeks, week_memory][-5:],
         }

@@ -45,9 +45,13 @@ class _LocalLLM:
         self.contents = list(contents)
         self.settings = Settings()
         self.calls = 0
+        self.thinking_flags: list[bool | None] = []
+        self.messages: list[list[dict[str, str]]] = []
 
-    def chat(self, messages, *, agent, step_name, max_tokens, temperature):  # noqa: ANN001
-        del messages, max_tokens, temperature
+    def chat(self, messages, *, agent, step_name, max_tokens, temperature, enable_thinking=None):  # noqa: ANN001
+        del max_tokens, temperature
+        self.messages.append(messages)
+        self.thinking_flags.append(enable_thinking)
         self.calls += 1
         content = self.contents.pop(0)
         return content, LLMCall(
@@ -58,6 +62,10 @@ class _LocalLLM:
             model=self.model,
             prompt_text="",
             response_text=content,
+            reasoning_present=bool(enable_thinking),
+            reasoning_chars=32 if enable_thinking else 0,
+            reasoning_sha256="a" * 64 if enable_thinking else "",
+            finish_reason="stop",
             prompt_tokens=10,
             completion_tokens=5,
             total_tokens=15,
@@ -190,6 +198,43 @@ def test_replay_openai_and_local_share_identical_interactive_semantics() -> None
         agent._persona_call_records[0]["metadata"]["provider"]  # noqa: SLF001
         for agent in agents
     ] == ["replay", "openai", "vllm"]
+
+
+def test_local_persona_messages_keep_catalog_prefix_stable_across_weeks() -> None:
+    llm = _LocalLLM([_decision().model_dump_json(), _decision().model_dump_json()])
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+    first = _context()
+    second = first.model_copy(
+        update={"state": first.state.model_copy(update={"week": 2, "money": 200})}
+    )
+
+    gateway.decide(PersonaDecisionRequest.from_context(first, request_id="newbie-42-w1"))
+    gateway.decide(PersonaDecisionRequest.from_context(second, request_id="newbie-42-w2"))
+
+    assert len(llm.messages[0]) == 3
+    assert llm.messages[0][:2] == llm.messages[1][:2]
+    assert llm.messages[0][2] != llm.messages[1][2]
+    assert "available_actions" in llm.messages[0][1]["content"]
+    assert "history" in llm.messages[0][2]["content"]
+
+
+def test_local_reasoning_is_never_parsed_as_the_final_choice() -> None:
+    llm = _LocalLLM(["", _decision().model_dump_json()])
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+
+    result = gateway.decide(
+        PersonaDecisionRequest.from_context(_context(), request_id="newbie-42-w1-reasoning-only")
+    )
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert result.decision is not None
+    assert result.decision.actions == ["budget_call"]
+    assert result.metadata.parse_status.value == "repaired"
+    assert result.metadata.reasoning_enabled is True
+    assert result.metadata.reasoning_attempts == 1
+    assert result.metadata.reasoning_chars == 32
+    assert result.metadata.reasoning_sha256 == ["a" * 64]
+    assert llm.thinking_flags == [True, False]
 
 
 def test_local_unknown_action_fails_after_one_shared_repair() -> None:
