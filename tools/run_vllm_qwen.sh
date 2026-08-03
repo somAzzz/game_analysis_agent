@@ -12,6 +12,7 @@ ENABLE_PREFIX_CACHING="${LLM_ENABLE_PREFIX_CACHING:-1}"
 MAMBA_CACHE_MODE="${LLM_MAMBA_CACHE_MODE:-align}"
 PREFIX_MATCH_UNIT="${LLM_PREFIX_MATCH_UNIT:-16}"
 ENABLE_MTP="${LLM_ENABLE_MTP:-0}"
+MTP_NUM_SPECULATIVE_TOKENS="${LLM_MTP_NUM_SPECULATIVE_TOKENS:-3}"
 
 args=(
   serve "$MODEL_ID"
@@ -40,7 +41,7 @@ else
 fi
 
 if [[ "$ENABLE_MTP" == "1" ]]; then
-  args+=(--speculative-config '{"method":"mtp","num_speculative_tokens":3}')
+  args+=(--speculative-config "{\"method\":\"mtp\",\"num_speculative_tokens\":$MTP_NUM_SPECULATIVE_TOKENS}")
 fi
 
 exec vllm "${args[@]}"

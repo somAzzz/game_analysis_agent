@@ -39,6 +39,10 @@ def test_vllm_defaults_to_v026_hybrid_apc_without_mtp() -> None:
     assert "LLM_MAMBA_CACHE_MODE=${LLM_MAMBA_CACHE_MODE:-align}" in environment
     assert "LLM_PREFIX_MATCH_UNIT=${LLM_PREFIX_MATCH_UNIT:-16}" in environment
     assert "LLM_ENABLE_MTP=${LLM_ENABLE_MTP:-0}" in environment
+    assert (
+        "LLM_MTP_NUM_SPECULATIVE_TOKENS=${LLM_MTP_NUM_SPECULATIVE_TOKENS:-3}" in environment
+    )
+    assert 'num_speculative_tokens\\":$${LLM_MTP_NUM_SPECULATIVE_TOKENS:-3}' in command
     assert "--max-model-len " in command
     assert "$${LLM_MAX_MODEL_LEN:-65536}" in command
     assert "--max-num-seqs $${LLM_MAX_NUM_SEQS:-4}" in command
@@ -54,6 +58,7 @@ def test_host_vllm_script_uses_the_same_apc_only_defaults() -> None:
     assert 'MAMBA_CACHE_MODE="${LLM_MAMBA_CACHE_MODE:-align}"' in script
     assert 'PREFIX_MATCH_UNIT="${LLM_PREFIX_MATCH_UNIT:-16}"' in script
     assert 'ENABLE_MTP="${LLM_ENABLE_MTP:-0}"' in script
+    assert 'MTP_NUM_SPECULATIVE_TOKENS="${LLM_MTP_NUM_SPECULATIVE_TOKENS:-3}"' in script
     assert "--enable-prefix-caching" in script
     assert "--mamba-cache-mode" in script
     assert "--prefix-match-unit" in script
