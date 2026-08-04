@@ -48,11 +48,28 @@ class _LocalLLM:
         self.calls = 0
         self.thinking_flags: list[bool | None] = []
         self.messages: list[list[dict[str, str]]] = []
+        self.request_options: list[dict[str, object]] = []
 
-    def chat(self, messages, *, agent, step_name, max_tokens, temperature, enable_thinking=None):  # noqa: ANN001
-        del max_tokens, temperature
+    def chat(
+        self,
+        messages,
+        *,
+        agent,
+        step_name,
+        max_tokens,
+        temperature,
+        enable_thinking=None,
+        structured_outputs=None,
+    ):  # noqa: ANN001
         self.messages.append(messages)
         self.thinking_flags.append(enable_thinking)
+        self.request_options.append(
+            {
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "structured_outputs": structured_outputs,
+            }
+        )
         self.calls += 1
         content = self.contents.pop(0)
         return content, LLMCall(
@@ -182,9 +199,7 @@ def test_replay_openai_and_local_share_identical_interactive_semantics() -> None
             ]
         ),
     )
-    local_llm = _LocalLLM(
-        [_decision().model_dump_json(), '{"event_choice_id":"rent_pressure.ask_extension"}']
-    )
+    local_llm = _LocalLLM([_decision().model_dump_json(), "rent_pressure.ask_extension"])
     local = LocalChatPersonaGateway(local_llm)  # type: ignore[arg-type]
 
     agents = [_agent(item) for item in (replay, openai, local)]
@@ -257,8 +272,8 @@ def test_local_persona_trace_records_exact_request_without_response_content() ->
 def test_local_event_messages_keep_rules_prefix_stable_when_choices_change() -> None:
     llm = _LocalLLM(
         [
-            '{"event_choice_id":"rent_pressure.ask_extension"}',
-            '{"event_choice_id":"rent_pressure.pay_now"}',
+            "rent_pressure.ask_extension",
+            "rent_pressure.pay_now",
         ]
     )
     gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
@@ -281,10 +296,38 @@ def test_local_event_messages_keep_rules_prefix_stable_when_choices_change() -> 
     stable_prefix = llm.messages[0][1]["content"]
     dynamic_prompt = llm.messages[0][2]["content"]
     assert "event_choices" not in stable_prefix
-    assert '"event_choice_id"' in stable_prefix
+    assert "event_choice_id" in stable_prefix
     assert dynamic_prompt.index('"history"') < dynamic_prompt.index('"event_choices"')
     assert "rent_pressure.ask_extension" in dynamic_prompt
     assert "rent_pressure.ask_extension" not in llm.messages[1][2]["content"]
+    assert llm.thinking_flags == [False, False]
+    assert llm.request_options[0] == {
+        "max_tokens": 64,
+        "temperature": 0.0,
+        "structured_outputs": {"choice": ["rent_pressure.pay_now", "rent_pressure.ask_extension"]},
+    }
+    assert llm.request_options[1]["structured_outputs"] == {"choice": ["rent_pressure.pay_now"]}
+
+
+def test_local_event_repair_keeps_the_same_choice_constraint() -> None:
+    llm = _LocalLLM(["not-a-legal-choice", "rent_pressure.pay_now"])
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+    result = gateway.choose_event(
+        PersonaEventChoiceRequest.from_context(
+            _context(),
+            request_id="newbie-42-w1-event-repair",
+            selected_actions=["budget_call"],
+        )
+    )
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert result.choice is not None
+    assert result.choice.event_choice_id == "rent_pressure.pay_now"
+    assert result.metadata.parse_status.value == "repaired"
+    assert llm.thinking_flags == [False, False]
+    expected = {"choice": ["rent_pressure.pay_now", "rent_pressure.ask_extension"]}
+    assert llm.request_options[0]["structured_outputs"] == expected
+    assert llm.request_options[1]["structured_outputs"] == expected
 
 
 def test_local_reasoning_is_never_parsed_as_the_final_choice() -> None:

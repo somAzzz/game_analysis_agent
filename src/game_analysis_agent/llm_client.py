@@ -45,6 +45,14 @@ class LLMRequestError(RuntimeError):
         super().__init__(call.error or "LLM request failed")
 
 
+def completion_token_limit_kwargs(provider: str, max_tokens: int) -> dict[str, int]:
+    """Map the internal output budget to each provider's HTTP API field."""
+
+    if provider == "vllm":
+        return {"max_completion_tokens": max_tokens}
+    return {"max_tokens": max_tokens}
+
+
 def _no_sink(_call: LLMCall) -> None:
     """Default no-op sink used when no caller-supplied sink is provided."""
 
@@ -99,21 +107,27 @@ class LocalLLMClient:
 
     # --- core chat -------------------------------------------------------
 
-    def _extra_body(self, *, enable_thinking: bool | None = None) -> dict[str, Any] | None:
+    def _extra_body(
+        self,
+        *,
+        enable_thinking: bool | None = None,
+        structured_outputs: dict[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
         """Return provider-specific request kwargs.
 
         Callers must opt in explicitly. This keeps non-persona structured and
         tool-calling flows on their historical non-thinking behavior.
         """
+        body: dict[str, Any] = {}
         if self.provider in {"vllm", "sglang"}:
-            return {
-                "chat_template_kwargs": {
-                    "enable_thinking": bool(enable_thinking)
-                    if enable_thinking is not None
-                    else False
-                }
+            body["chat_template_kwargs"] = {
+                "enable_thinking": bool(enable_thinking) if enable_thinking is not None else False
             }
-        return None
+        if structured_outputs is not None:
+            if self.provider != "vllm":
+                raise ValueError("structured_outputs is currently supported only by vllm")
+            body["structured_outputs"] = structured_outputs
+        return body or None
 
     def validate_model_available(self) -> list[str]:
         """Fail closed unless the configured model is exposed by the endpoint."""
@@ -149,15 +163,21 @@ class LocalLLMClient:
         max_tokens: int | None = None,
         temperature: float | None = None,
         enable_thinking: bool | None = None,
+        structured_outputs: dict[str, Any] | None = None,
         emit_call: bool = True,
     ) -> tuple[str, LLMCall]:
         started = _now_utc()
         call_id = f"llm-{uuid.uuid4().hex[:12]}"
         prompt_text = messages[-1]["content"] if messages else ""
         request_kwargs: dict[str, Any] = {}
-        extra = self._extra_body(enable_thinking=enable_thinking)
+        extra = self._extra_body(
+            enable_thinking=enable_thinking,
+            structured_outputs=structured_outputs,
+        )
         if extra:
             request_kwargs["extra_body"] = extra
+        token_budget = max_tokens if max_tokens is not None else self.settings.agent_max_tokens
+        request_kwargs.update(completion_token_limit_kwargs(self.provider, token_budget))
         try:
             t0 = time.perf_counter()
             response = self.client.chat.completions.create(
@@ -166,7 +186,6 @@ class LocalLLMClient:
                 temperature=temperature
                 if temperature is not None
                 else self.settings.agent_temperature,
-                max_tokens=max_tokens if max_tokens is not None else self.settings.agent_max_tokens,
                 **request_kwargs,
             )
             latency_ms = int((time.perf_counter() - t0) * 1000)
@@ -243,6 +262,7 @@ class LocalLLMClient:
         max_tokens: int | None = None,
         temperature: float | None = None,
         enable_thinking: bool | None = None,
+        structured_outputs: dict[str, Any] | None = None,
     ) -> str:
         """One-shot chat completion that returns the raw response string."""
         messages: list[dict[str, str]] = []
@@ -256,6 +276,7 @@ class LocalLLMClient:
             max_tokens=max_tokens,
             temperature=temperature,
             enable_thinking=enable_thinking,
+            structured_outputs=structured_outputs,
         )
         return content
 
@@ -268,6 +289,7 @@ class LocalLLMClient:
         max_tokens: int | None = None,
         temperature: float | None = None,
         enable_thinking: bool | None = None,
+        structured_outputs: dict[str, Any] | None = None,
     ) -> tuple[str, LLMCall]:
         """Chat with an already-built message list; returns ``(text, audit)``."""
         return self._chat(
@@ -277,6 +299,7 @@ class LocalLLMClient:
             max_tokens=max_tokens,
             temperature=temperature,
             enable_thinking=enable_thinking,
+            structured_outputs=structured_outputs,
         )
 
 
@@ -297,6 +320,7 @@ class LLMConfig:
     model: str
     temperature: float = 0.2
     max_tokens: int = 4096
+    provider: str = "vllm"
 
     def __init__(
         self,
@@ -305,12 +329,14 @@ class LLMConfig:
         model: str,
         temperature: float = 0.2,
         max_tokens: int = 4096,
+        provider: str = "vllm",
     ) -> None:
         self.base_url = base_url
         self.api_key = api_key
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.provider = provider
 
     @classmethod
     def from_env(cls) -> LLMConfig:
@@ -321,6 +347,7 @@ class LLMConfig:
             model=s.model(),
             temperature=s.agent_temperature,
             max_tokens=s.agent_max_tokens,
+            provider=s.provider(),
         )
 
 
@@ -335,15 +362,15 @@ class LegacyLocalLLMClient:
         self.config = config
 
     def chat(self, system_prompt: str, user_prompt: str) -> str:
-        payload = {
+        payload: dict[str, Any] = {
             "model": self.config.model,
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
             "temperature": self.config.temperature,
-            "max_tokens": self.config.max_tokens,
         }
+        payload.update(completion_token_limit_kwargs(self.config.provider, self.config.max_tokens))
         body = json.dumps(payload).encode("utf-8")
         request = urllib.request.Request(
             f"{self.config.base_url.rstrip('/')}/chat/completions",
@@ -379,4 +406,5 @@ __all__ = [
     "LocalLLMClient",
     "NoOpSink",
     "_no_sink",
+    "completion_token_limit_kwargs",
 ]

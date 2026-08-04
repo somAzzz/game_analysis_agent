@@ -55,6 +55,9 @@ def test_complete_returns_text_and_emits_audit() -> None:
     assert text == "hello"
     assert len(audit_rows) == 1
     assert audit_rows[0].prompt_text == "hi"
+    request = sdk.chat.completions.create.call_args.kwargs
+    assert request["max_completion_tokens"] == client.settings.agent_max_tokens
+    assert "max_tokens" not in request
 
 
 def test_persona_thinking_keeps_reasoning_out_of_final_content() -> None:
@@ -78,7 +81,9 @@ def test_persona_thinking_keeps_reasoning_out_of_final_content() -> None:
     content, audit = client.chat(
         [{"role": "user", "content": "choose"}],
         agent="interactive_player",
+        max_tokens=64,
         enable_thinking=True,
+        structured_outputs={"choice": ["a", "b"]},
     )
 
     assert content == '{"actions":["study"]}'
@@ -89,6 +94,9 @@ def test_persona_thinking_keeps_reasoning_out_of_final_content() -> None:
     assert audit.finish_reason == "stop"
     extra = completions.calls[0]["extra_body"]
     assert extra["chat_template_kwargs"]["enable_thinking"] is True
+    assert extra["structured_outputs"] == {"choice": ["a", "b"]}
+    assert completions.calls[0]["max_completion_tokens"] == 64
+    assert "max_tokens" not in completions.calls[0]
 
 
 def test_sglang_provider_attaches_thinking_disable() -> None:
@@ -113,6 +121,9 @@ def test_sglang_provider_attaches_thinking_disable() -> None:
     extra = completions.calls[0].get("extra_body", {})
     assert extra.get("chat_template_kwargs", {}).get("enable_thinking") is False
 
+    assert completions.calls[0]["max_tokens"] == client.settings.agent_max_tokens
+    assert "max_completion_tokens" not in completions.calls[0]
+
 
 def test_deepseek_provider_does_not_attach_thinking_disable() -> None:
     response = SimpleNamespace(
@@ -134,6 +145,9 @@ def test_deepseek_provider_does_not_attach_thinking_disable() -> None:
     client.complete("hi", system="sys", agent="x")
     assert completions.calls, "expected at least one chat completion"
     assert "extra_body" not in completions.calls[0]
+
+    assert completions.calls[0]["max_tokens"] == client.settings.agent_max_tokens
+    assert "max_completion_tokens" not in completions.calls[0]
 
 
 def test_chat_returns_audit_row() -> None:

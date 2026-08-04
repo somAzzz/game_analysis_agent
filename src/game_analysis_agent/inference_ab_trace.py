@@ -18,20 +18,21 @@ class JsonlPersonaTraceSink:
         self._lock = threading.Lock()
 
     def __call__(self, record: dict[str, Any]) -> None:
+        extra_body = {
+            "chat_template_kwargs": {
+                "enable_thinking": bool(record["enable_thinking"]),
+            }
+        }
+        if record.get("structured_outputs") is not None:
+            extra_body["structured_outputs"] = record["structured_outputs"]
         request = {
             "model": record["model"],
             "messages": record["messages"],
             "temperature": record["temperature"],
-            "max_tokens": record["max_tokens"],
-            "extra_body": {
-                "chat_template_kwargs": {
-                    "enable_thinking": bool(record["enable_thinking"]),
-                }
-            },
+            "max_completion_tokens": record["max_tokens"],
+            "extra_body": extra_body,
         }
-        canonical = json.dumps(
-            request, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        )
+        canonical = json.dumps(request, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
         payload = {
             **record,
             "request": request,

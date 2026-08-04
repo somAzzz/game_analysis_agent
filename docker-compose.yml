@@ -188,7 +188,7 @@ services:
       - VLLM_API_KEY=${VLLM_API_KEY:-local-dev-token}
       - PERSONA_ENABLE_THINKING=${PERSONA_ENABLE_THINKING:-1}
       - PERSONA_DECISION_MAX_TOKENS=${PERSONA_DECISION_MAX_TOKENS:-2048}
-      - PERSONA_EVENT_MAX_TOKENS=${PERSONA_EVENT_MAX_TOKENS:-768}
+      - PERSONA_EVENT_MAX_TOKENS=${PERSONA_EVENT_MAX_TOKENS:-64}
       - GAME_PROJECT_PATH=${GAME_PROJECT_PATH:-/app/demo/study-in-germany}
     volumes:
       # Reports are persisted back onto the host for inspection.

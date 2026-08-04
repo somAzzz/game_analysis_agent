@@ -24,6 +24,7 @@ def test_jsonl_trace_sink_hashes_canonical_request(tmp_path) -> None:  # noqa: A
         "temperature": 0.3,
         "max_tokens": 32,
         "enable_thinking": True,
+        "structured_outputs": {"choice": ["a", "b"]},
     }
 
     sink(record)
@@ -32,10 +33,9 @@ def test_jsonl_trace_sink_hashes_canonical_request(tmp_path) -> None:  # noqa: A
         payload["request"], ensure_ascii=False, sort_keys=True, separators=(",", ":")
     )
 
-    assert payload["request_sha256"] == hashlib.sha256(
-        canonical.encode("utf-8")
-    ).hexdigest()
+    assert payload["request_sha256"] == hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     assert payload["request"]["messages"] == record["messages"]
-    assert payload["request"]["extra_body"]["chat_template_kwargs"] == {
-        "enable_thinking": True
-    }
+    assert payload["request"]["max_completion_tokens"] == 32
+    assert "max_tokens" not in payload["request"]
+    assert payload["request"]["extra_body"]["chat_template_kwargs"] == {"enable_thinking": True}
+    assert payload["request"]["extra_body"]["structured_outputs"] == {"choice": ["a", "b"]}

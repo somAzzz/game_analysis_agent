@@ -57,6 +57,7 @@ class _FakeLLM:
         temperature=None,
         max_tokens=None,
         enable_thinking=None,
+        structured_outputs=None,
     ):  # noqa: ANN001
         content = self.contents.pop(0) if self.contents else ""
         call = _fake_llm_call(content)
@@ -66,6 +67,8 @@ class _FakeLLM:
                 "messages": messages,
                 "max_tokens": max_tokens,
                 "enable_thinking": enable_thinking,
+                "temperature": temperature,
+                "structured_outputs": structured_outputs,
             }
         )
         self.calls.append(call)
@@ -429,7 +432,7 @@ def test_play_through_reusing_report_dir_replaces_old_trace(tmp_path) -> None:
 def test_event_choice_uses_compact_dedicated_prompt() -> None:
     probe = _FakeProbe()
     agent = _build_agent(
-        [json.dumps({"event_choice_id": "rent_warning.pay_now"})],
+        ["rent_warning.pay_now"],
         probe,
     )
     context = build_week_context(
@@ -468,10 +471,25 @@ def test_event_choice_uses_compact_dedicated_prompt() -> None:
     assert validation.valid is True
     assert calls[0].step_name == "week-3-event"
     request = agent.llm.requests[0]  # type: ignore[attr-defined]
-    assert request["max_tokens"] == 768
-    assert request["enable_thinking"] is True
+    assert request["max_tokens"] == 64
+    assert request["enable_thinking"] is False
+    assert request["temperature"] == 0.0
+    assert request["structured_outputs"] == {
+        "choice": ["rent_warning.pay_now", "rent_warning.delay"]
+    }
     assert "WeekContext JSON" not in request["messages"][1]["content"]
     assert len(request["messages"][1]["content"]) < len(agent._build_user_prompt(context))
+    single_context = context.model_copy(update={"event_choices": [context.event_choices[0]]})
+    single_agent = _build_agent([], probe)
+    single_choice, single_validation, single_calls = single_agent._decide_event_choice(
+        week=3,
+        context_pack=single_context,
+        selected_actions=["study_library"],
+    )
+    assert single_choice == "rent_warning.pay_now"
+    assert single_validation.valid is True
+    assert single_calls == []
+    assert single_agent.llm.requests == []  # type: ignore[attr-defined]
 
 
 def test_play_through_emits_progress_events(tmp_path) -> None:

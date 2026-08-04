@@ -84,6 +84,15 @@ def _usage_dict(usage: Any) -> dict[str, int | None]:
     }
 
 
+def _vllm_request(request: dict[str, Any]) -> dict[str, Any]:
+    """Migrate legacy frozen traces without changing their verified payload hash."""
+
+    migrated = dict(request)
+    if "max_completion_tokens" not in migrated and "max_tokens" in migrated:
+        migrated["max_completion_tokens"] = migrated.pop("max_tokens")
+    return migrated
+
+
 def _replay_one(
     client: OpenAI,
     trace: dict[str, Any],
@@ -94,7 +103,7 @@ def _replay_one(
 ) -> dict[str, Any]:
     started = time.perf_counter()
     try:
-        response = client.chat.completions.create(**trace["request"])
+        response = client.chat.completions.create(**_vllm_request(trace["request"]))
         latency_ms = (time.perf_counter() - started) * 1000
         choice = response.choices[0]
         content = str(choice.message.content or "")
@@ -281,7 +290,7 @@ def _diagnostic_one(
             model=endpoint.model,
             messages=messages,
             temperature=0.0,
-            max_tokens=output_target,
+            max_completion_tokens=output_target,
             stream=True,
             stream_options={"include_usage": True},
             extra_body={
@@ -309,9 +318,7 @@ def _diagnostic_one(
         completed = time.perf_counter()
         usage_values = _usage_dict(usage)
         completion_tokens = int(usage_values["completion_tokens"] or 0)
-        ttft_ms = (
-            (first_token_s - started) * 1000 if first_token_s is not None else math.nan
-        )
+        ttft_ms = (first_token_s - started) * 1000 if first_token_s is not None else math.nan
         e2e_ms = (completed - started) * 1000
         tpot_ms = (
             (e2e_ms - ttft_ms) / max(1, completion_tokens - 1)
@@ -477,4 +484,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

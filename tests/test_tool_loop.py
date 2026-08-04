@@ -28,11 +28,7 @@ def _tool_call(name: str, arguments: dict | str = "{}") -> SimpleNamespace:
 
 def _response(content: str, tool_calls=None) -> SimpleNamespace:
     return SimpleNamespace(
-        choices=[
-            SimpleNamespace(
-                message=SimpleNamespace(content=content, tool_calls=tool_calls)
-            )
-        ],
+        choices=[SimpleNamespace(message=SimpleNamespace(content=content, tool_calls=tool_calls))],
         usage=SimpleNamespace(prompt_tokens=1, completion_tokens=2, total_tokens=3),
     )
 
@@ -66,6 +62,32 @@ def test_executes_registered_tool_and_finishes() -> None:
     assert len(audit) == 2
     assert len(events) == 1
     assert events[0].tool_name == "lookup"
+    for call in sdk.chat.completions.create.call_args_list:
+        assert call.kwargs["max_completion_tokens"] == 256
+        assert "max_tokens" not in call.kwargs
+
+
+def test_non_vllm_tool_loop_keeps_provider_compatible_max_tokens() -> None:
+    sdk = MagicMock()
+    sdk.chat.completions.create.return_value = _response("done", None)
+    loop = OpenAICompatibleToolLoop(
+        client=sdk,
+        model="remote",
+        provider="deepseek",
+        temperature=0.1,
+        max_tokens=128,
+    )
+
+    text, _audit, _events = loop.complete(
+        "finish",
+        tools=[{"type": "function", "function": {"name": "noop"}}],
+        tool_map={"noop": lambda: {}},
+    )
+
+    assert text == "done"
+    request = sdk.chat.completions.create.call_args.kwargs
+    assert request["max_tokens"] == 128
+    assert "max_completion_tokens" not in request
 
 
 def test_no_tools_emits_validation_error() -> None:

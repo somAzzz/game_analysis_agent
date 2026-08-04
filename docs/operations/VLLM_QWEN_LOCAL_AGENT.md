@@ -74,12 +74,23 @@ max num batched tokens: auto
 
 ## 5. Thinking、最终选择和历史边界
 
-本地 Qwen persona 的第一次决策调用开启 thinking；`reasoning` 与 `message.content` 分开读取。系统只对最终 `content` 做 JSON 提取、Pydantic 校验和合法 id 校验。若模型只产生 reasoning、没有最终 JSON，会执行唯一一次有界 repair，并在 repair 中关闭 thinking。默认预算为：
+本地 Qwen 的每周 action decision 第一次调用开启 thinking；`reasoning` 与 `message.content` 分开读取。系统只对最终 `content` 做 JSON 提取、Pydantic 校验和合法 id 校验。若模型只产生 reasoning、没有最终 JSON，会执行唯一一次有界 repair，并在 repair 中关闭 thinking。
 
 - 每周动作决策：2048 output tokens（包含 reasoning 与最终 JSON）
-- 事件选择：768 output tokens（包含 reasoning 与最终 JSON）
+- 事件选择：64 output tokens（thinking 关闭，最终内容是裸合法 ID）
 
-原始 reasoning 不写入 playthrough、不进入下一周上下文，也不参与判分；审计只保留是否存在、字符数和 SHA-256。这样可以观测 thinking 是否发生，又不会把私有推理当成游戏动作或改变后续测试。
+event-choice 是受限分类而不是自由生成。vLLM 0.26.0 请求使用：
+
+```json
+{
+  "chat_template_kwargs": {"enable_thinking": false},
+  "structured_outputs": {"choice": ["legal.choice_01", "legal.choice_02"]}
+}
+```
+
+响应 `message.content` 必须精确等于一个合法 ID，应用层再包装成 `{"event_choice_id":"..."}`。只有一个合法选项时 agent 直接选择，不发出 LLM 请求；若第一轮仍出现协议异常，唯一一次 repair 继续使用同一个 choice 约束，不退回自由 JSON。旧的 `guided_choice` 和 `guided_decoding_backend` 参数不适用于本项目固定的 vLLM 0.26.0。
+
+原始 decision reasoning 不写入 playthrough、不进入下一周上下文，也不参与判分；审计只保留是否存在、字符数和 SHA-256。这样可以观测 thinking 是否发生，又不会把私有推理当成游戏动作或改变后续测试。
 
 每周决策会看到全部可观察历史：历周状态前后快照、实际动作、事件选项和结果，再看到本周当前状态。完整历史能保留跨周策略、失败恢复和路径依赖；只给当前状态会把 persona 降成无记忆贪心策略。
 
@@ -87,7 +98,7 @@ max num batched tokens: auto
 
 ```text
 稳定 system 指令
-稳定全局规则 + PlayerDecision/event 输出 schema
+稳定全局规则 + PlayerDecision/event 输出 contract
 persona strategy
 不可变、只追加的历周 history
 当前 memory summary + week/state/risks/event
@@ -101,11 +112,11 @@ APC 比较 chat template 产生的最终 token 前缀；message 数量本身不�
 
 项目固定到 vLLM 0.26.0，并显式使用 `--mamba-cache-mode align --prefix-match-unit 16`。细粒度 match unit 允许命中物理 hybrid cache block 内的共享前缀，缓解旧版本短前缀因大块对齐而完全不命中的问题。GDN/Mamba APC 在上游仍标记为 experimental，因此它只是经过监控的 prefill 优化，不是 correctness 或容量前提；APC 开关不得改变合法选择或测试结果。
 
-评估这项布局时不能只看 APC hit ratio。固定内容变长会机械性提高 cached-token 占比；验收必须在相同请求顺序下同时比较 prompt tokens、未缓存 prefill、TTFT、prefill/E2E latency、KV eviction、JSON repair/fallback 和 persona 选择。命中率提升没有预设的 30%–50% 保证。
+评估这项布局时不能只看 APC hit ratio。固定内容变长会机械性提高 cached-token 占比；验收必须在相同请求顺序下同时比较 prompt tokens、未缓存 prefill、TTFT、prefill/E2E latency、KV eviction、structured-output repair/fallback 和 persona 选择。命中率提升没有预设的 30%–50% 保证。
 
-事件选择采用同一原则：固定 event 输出规则在前，persona/history 居中，当前 event choices 放在最后。事件 prompt 较短，所以它的优化优先级低于每周 action decision。
+事件选择采用同一前缀原则：固定 event 输出规则在前，persona/history 居中，当前 event choices 放在最后。choice 约束只限制输出空间，不删减模型看到的选项文本、effects、状态、风险或历史，因此不会改变 evidence contract。事件 prompt 较短，所以 APC 优化优先级低于每周 action decision。
 
-MTP 默认关闭。现有本地证据中，5,700 次成功调用消耗 11,109,541 input tokens、335,195 output tokens，且最终输出是短 JSON，因此常规 campaign 优先减少重复 prefill。只有长输出专项基准才应设置 `LLM_ENABLE_MTP=1`，并先完成 APC/MTP 分离 A/B、结构化输出一致性检查和持续负载测试。
+MTP 默认关闭。现有本地证据中，5,700 次成功调用消耗 11,109,541 input tokens、335,195 output tokens，且最终输出较短，因此常规 campaign 优先减少重复 prefill。只有长输出专项基准才应设置 `LLM_ENABLE_MTP=1`，并先完成 APC/MTP 分离 A/B、结构化输出一致性检查和持续负载测试。
 
 ## 6. NVFP4 注意事项
 
@@ -117,6 +128,8 @@ MTP 默认关闭。现有本地证据中，5,700 次成功调用消耗 11,109,54
 
 请求：
 
+vLLM 0.26.0 的出站 Chat Completions 请求统一使用 `max_completion_tokens`，避免继续触发已弃用的 `max_tokens`。项目内部的预算配置名（例如 `AGENT_MAX_TOKENS`）保持不变；DeepSeek/SGLang 兼容路径仍按各自接口发送 `max_tokens`。
+
 ```json
 {
   "model": "${MODEL_ID}",
@@ -125,7 +138,7 @@ MTP 默认关闭。现有本地证据中，5,700 次成功调用消耗 11,109,54
     {"role": "user", "content": "..."}
   ],
   "temperature": 0.2,
-  "max_tokens": 4096
+  "max_completion_tokens": 4096
 }
 ```
 

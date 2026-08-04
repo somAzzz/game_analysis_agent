@@ -105,7 +105,7 @@ class Settings:
         default_factory=lambda: _env_int("PERSONA_DECISION_MAX_TOKENS", 2048)
     )
     persona_event_max_tokens: int = field(
-        default_factory=lambda: _env_int("PERSONA_EVENT_MAX_TOKENS", 768)
+        default_factory=lambda: _env_int("PERSONA_EVENT_MAX_TOKENS", 64)
     )
 
     # ---- Godot CLI + target game project -------------------------------

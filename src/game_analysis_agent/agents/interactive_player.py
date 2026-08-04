@@ -530,6 +530,18 @@ class InteractivePlayerAgent(Agent):
     ) -> tuple[str, DecisionValidation, list[LLMCall]]:
         if self.cancellation_check is not None and self.cancellation_check():
             raise RuntimeError(f"Playthrough cancelled during week {week} event")
+        valid_choices = [choice.choice_id for choice in context_pack.event_choices]
+        if len(valid_choices) == 1:
+            return valid_choices[0], DecisionValidation(valid=True), []
+        if not valid_choices:
+            return (
+                "",
+                DecisionValidation(
+                    valid=False,
+                    errors=["event-choice phase has no legal choices"],
+                ),
+                [],
+            )
         call_start = len(self._gateway_llm_calls)
         request = PersonaEventChoiceRequest.from_context(
             context_pack,
@@ -549,7 +561,6 @@ class InteractivePlayerAgent(Agent):
                 list(calls),
             )
         errors = [_persona_error_text(result.error)]
-        valid_choices = [choice.choice_id for choice in context_pack.event_choices]
         fallback = valid_choices[0] if valid_choices else ""
         return (
             fallback,

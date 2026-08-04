@@ -76,8 +76,9 @@ class LocalChatPersonaGateway:
         self.event_max_tokens = _token_budget(
             event_max_tokens
             if event_max_tokens is not None
-            else getattr(settings, "persona_event_max_tokens", 768),
+            else getattr(settings, "persona_event_max_tokens", 64),
             field="event_max_tokens",
+            minimum=16,
         )
         self.enable_thinking = (
             bool(enable_thinking)
@@ -166,7 +167,8 @@ class LocalChatPersonaGateway:
 
     def choose_event(self, request: PersonaEventChoiceRequest) -> PersonaEventChoiceResult:
         week = _request_week(request.request_id, request.context.state.week)
-        errors = ["structured output missing"]
+        legal_choice_ids = [choice.choice_id for choice in request.context.event_choices]
+        errors = ["event choice missing"]
         saw_model = False
         metadata: PersonaCallMetadata | None = None
         for attempt in (1, 2):
@@ -175,15 +177,19 @@ class LocalChatPersonaGateway:
             )
             content, call_metadata, failure = self._chat(
                 system=(
-                    "Think privately about the observable event tradeoff. Keep reasoning "
-                    "separate; final content must select one legal event_choice_id as JSON."
+                    "Select exactly one legal event_choice_id for this persona. "
+                    "Return only that id, with no JSON, markdown, or explanation."
                 ),
                 prefix=_event_prefix(),
                 prompt=prompt,
                 step_name=(f"week-{week}-event" if attempt == 1 else f"week-{week}-event-repair-1"),
                 max_tokens=self.event_max_tokens,
+                temperature=0.0,
+                structured_outputs=(
+                    {"choice": legal_choice_ids} if self.provider == PersonaProvider.VLLM else None
+                ),
                 attempt=attempt,
-                enable_thinking=self._thinking_for_attempt(attempt),
+                enable_thinking=False,
                 trace_context={
                     "request_id": request.request_id,
                     "request_fingerprint": request.fingerprint(),
@@ -201,20 +207,16 @@ class LocalChatPersonaGateway:
                     metadata=metadata,
                     error=failure,
                 )
-            parsed = _extract_json_object(content)
-            if parsed is None:
-                errors = [
-                    "final structured output missing after reasoning"
-                    if call_metadata.reasoning_attempts
-                    else "structured output missing"
-                ]
+            choice_id = _extract_event_choice_id(content)
+            if not choice_id:
+                errors = ["event choice missing"]
                 continue
             saw_model = True
             payload = {
                 "week": request.context.state.week,
                 "persona": request.context.persona,
                 "event_id": request.context.current_event_id,
-                "event_choice_id": parsed.get("event_choice_id", ""),
+                "event_choice_id": choice_id,
             }
             try:
                 choice = PersonaEventChoice.model_validate(payload)
@@ -251,8 +253,11 @@ class LocalChatPersonaGateway:
         attempt: int,
         enable_thinking: bool,
         trace_context: dict[str, Any],
+        temperature: float | None = None,
+        structured_outputs: dict[str, Any] | None = None,
     ) -> tuple[str, PersonaCallMetadata, PersonaProviderError | None]:
         started = time.perf_counter()
+        request_temperature = self.temperature if temperature is None else temperature
         try:
             messages = _messages(system=system, prefix=prefix, prompt=prompt)
             if self._trace_sink is not None:
@@ -264,9 +269,10 @@ class LocalChatPersonaGateway:
                         "step_name": step_name,
                         "model": self.model,
                         "messages": messages,
-                        "temperature": self.temperature,
+                        "temperature": request_temperature,
                         "max_tokens": max_tokens,
                         "enable_thinking": enable_thinking,
+                        "structured_outputs": structured_outputs,
                     }
                 )
             content, call = self.llm.chat(
@@ -274,8 +280,9 @@ class LocalChatPersonaGateway:
                 agent="interactive_player",
                 step_name=step_name,
                 max_tokens=max_tokens,
-                temperature=self.temperature,
+                temperature=request_temperature,
                 enable_thinking=enable_thinking,
+                structured_outputs=structured_outputs,
             )
         except LLMRequestError as exc:
             self._emit(exc.call)
@@ -424,8 +431,8 @@ def _decision_repair_prompt(request: PersonaDecisionRequest, errors: list[str]) 
 def _event_prefix() -> str:
     return "\n".join(
         [
-            "Choose exactly one event_choice_id from the legal choices.",
-            'Final content must be compact JSON: {"event_choice_id":"..."}.',
+            "Choose exactly one event_choice_id from the legal choices below.",
+            "Final content must be exactly that id, with no JSON or explanation.",
         ]
     )
 
@@ -441,15 +448,13 @@ def _event_prompt(request: PersonaEventChoiceRequest) -> str:
         "state": context.state.model_dump(mode="json"),
         "top_risk_ids": [risk.id for risk in context.top_risks],
         "event_id": context.current_event_id,
-        "event_choices": [
-            choice.model_dump(mode="json") for choice in context.event_choices
-        ],
+        "event_choices": [choice.model_dump(mode="json") for choice in context.event_choices],
     }
     return "\n".join(
         [
-            "Think privately about the observable history and current event tradeoff.",
+            "Select the legal choice that best follows the persona and observable context.",
             json.dumps(dynamic, ensure_ascii=False, separators=(",", ":")),
-            "Return only the final JSON object specified in the stable prefix.",
+            "Return only the exact event_choice_id specified in the stable prefix.",
         ]
     )
 
@@ -459,8 +464,18 @@ def _event_repair_prompt(request: PersonaEventChoiceRequest, errors: list[str]) 
         _event_prompt(request)
         + "\nPrevious errors: "
         + json.dumps(errors, ensure_ascii=False)
-        + ". Return one valid id as JSON only."
+        + ". Return exactly one legal event_choice_id and nothing else."
     )
+
+
+def _extract_event_choice_id(content: str) -> str:
+    text = content.strip()
+    if not text:
+        return ""
+    parsed = _extract_json_object(text)
+    if parsed is not None:
+        return str(parsed.get("event_choice_id") or "").strip()
+    return text
 
 
 def _extract_json_object(content: str) -> dict[str, Any] | None:
@@ -579,9 +594,9 @@ def _accumulate_metadata(
     )
 
 
-def _token_budget(value: int, *, field: str) -> int:
-    if value < 128 or value > 4096:
-        raise ValueError(f"{field} must be between 128 and 4096")
+def _token_budget(value: int, *, field: str, minimum: int = 128) -> int:
+    if value < minimum or value > 4096:
+        raise ValueError(f"{field} must be between {minimum} and 4096")
     return value
 
 

@@ -58,7 +58,7 @@ class TestDefaults:
         assert s.model() == "qwen3.6-27b-nvfp4"
         assert s.persona_enable_thinking is True
         assert s.persona_decision_max_tokens == 2048
-        assert s.persona_event_max_tokens == 768
+        assert s.persona_event_max_tokens == 64
 
     def test_default_sim_difficulty_is_normal(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _clear_env()
