@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from .inference_ab_trace import JsonlPersonaTraceSink
 from .llm_client import LocalLLMClient
 from .local_persona_gateway import LocalChatPersonaGateway
 from .openai_persona_gateway import OpenAIResponsesPersonaGateway
@@ -62,7 +64,15 @@ def build_persona_gateway(
             raise PersonaRuntimeConfigurationError(
                 f"persona provider {provider.value} does not match local client {actual or '(unset)'}"
             )
-        gateway = LocalChatPersonaGateway(local_llm)
+        trace_sink = None
+        if trace_path := os.environ.get("PERSONA_TRACE_PATH", "").strip():
+            relative_trace = Path(trace_path)
+            if relative_trace.is_absolute() or ".." in relative_trace.parts:
+                raise PersonaRuntimeConfigurationError(
+                    "PERSONA_TRACE_PATH must be a safe project-relative path"
+                )
+            trace_sink = JsonlPersonaTraceSink(Path(project_root) / relative_trace)
+        gateway = LocalChatPersonaGateway(local_llm, trace_sink=trace_sink)
     return BuiltPersonaGateway(
         selection=selection,
         gateway=GovernedPersonaGateway(

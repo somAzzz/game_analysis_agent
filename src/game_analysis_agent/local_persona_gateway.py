@@ -31,6 +31,7 @@ from .persona_runtime import redact_sensitive_text
 from .schemas import LLMCall, PlayerDecision
 
 AuditSink = Callable[[LLMCall], None]
+TraceSink = Callable[[dict[str, Any]], None]
 
 
 class LocalChatPersonaGateway:
@@ -45,6 +46,7 @@ class LocalChatPersonaGateway:
         event_max_tokens: int | None = None,
         temperature: float = 0.3,
         enable_thinking: bool | None = None,
+        trace_sink: TraceSink | None = None,
     ) -> None:
         provider_name = getattr(llm, "provider", None) or llm.settings.provider()
         try:
@@ -84,6 +86,7 @@ class LocalChatPersonaGateway:
         )
         self.temperature = temperature
         self._audit_sink = audit_sink
+        self._trace_sink = trace_sink
 
     def set_audit_sink(self, sink: AuditSink | None) -> None:
         self._audit_sink = sink
@@ -111,6 +114,14 @@ class LocalChatPersonaGateway:
                 max_tokens=self.decision_max_tokens,
                 attempt=attempt,
                 enable_thinking=self._thinking_for_attempt(attempt),
+                trace_context={
+                    "request_id": request.request_id,
+                    "request_fingerprint": request.fingerprint(),
+                    "persona": request.context.persona,
+                    "seed": request.context.seed,
+                    "week": week,
+                    "phase": "decision",
+                },
             )
             metadata = _accumulate_metadata(metadata, call_metadata)
             if failure is not None:
@@ -173,6 +184,14 @@ class LocalChatPersonaGateway:
                 max_tokens=self.event_max_tokens,
                 attempt=attempt,
                 enable_thinking=self._thinking_for_attempt(attempt),
+                trace_context={
+                    "request_id": request.request_id,
+                    "request_fingerprint": request.fingerprint(),
+                    "persona": request.context.persona,
+                    "seed": request.context.seed,
+                    "week": week,
+                    "phase": "event_choice",
+                },
             )
             metadata = _accumulate_metadata(metadata, call_metadata)
             if failure is not None:
@@ -231,11 +250,27 @@ class LocalChatPersonaGateway:
         max_tokens: int,
         attempt: int,
         enable_thinking: bool,
+        trace_context: dict[str, Any],
     ) -> tuple[str, PersonaCallMetadata, PersonaProviderError | None]:
         started = time.perf_counter()
         try:
+            messages = _messages(system=system, prefix=prefix, prompt=prompt)
+            if self._trace_sink is not None:
+                self._trace_sink(
+                    {
+                        "schema_version": "persona-chat-trace-v1",
+                        **trace_context,
+                        "attempt": attempt,
+                        "step_name": step_name,
+                        "model": self.model,
+                        "messages": messages,
+                        "temperature": self.temperature,
+                        "max_tokens": max_tokens,
+                        "enable_thinking": enable_thinking,
+                    }
+                )
             content, call = self.llm.chat(
-                _messages(system=system, prefix=prefix, prompt=prompt),
+                messages,
                 agent="interactive_player",
                 step_name=step_name,
                 max_tokens=max_tokens,

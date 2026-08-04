@@ -233,6 +233,27 @@ def test_local_persona_messages_keep_rules_prefix_stable_when_legal_actions_chan
     assert '"rest_at_home"' in llm.messages[1][2]["content"]
 
 
+def test_local_persona_trace_records_exact_request_without_response_content() -> None:
+    llm = _LocalLLM([_decision().model_dump_json()])
+    traces: list[dict[str, object]] = []
+    gateway = LocalChatPersonaGateway(llm, trace_sink=traces.append)  # type: ignore[arg-type]
+
+    result = gateway.decide(
+        PersonaDecisionRequest.from_context(_context(), request_id="newbie-42-w1-trace")
+    )
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert len(traces) == 1
+    trace = traces[0]
+    assert trace["schema_version"] == "persona-chat-trace-v1"
+    assert trace["request_id"] == "newbie-42-w1-trace"
+    assert trace["phase"] == "decision"
+    assert trace["attempt"] == 1
+    assert trace["messages"] == llm.messages[0]
+    assert trace["enable_thinking"] is True
+    assert "response_text" not in trace
+
+
 def test_local_event_messages_keep_rules_prefix_stable_when_choices_change() -> None:
     llm = _LocalLLM(
         [
