@@ -186,7 +186,9 @@ class LocalChatPersonaGateway:
                 max_tokens=self.event_max_tokens,
                 temperature=0.0,
                 structured_outputs=(
-                    {"choice": legal_choice_ids} if self.provider == PersonaProvider.VLLM else None
+                    {"choice": legal_choice_ids}
+                    if self.provider in {PersonaProvider.VLLM, PersonaProvider.SGLANG}
+                    else None
                 ),
                 attempt=attempt,
                 enable_thinking=False,

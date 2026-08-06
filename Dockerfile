@@ -1,19 +1,18 @@
 # Base image for the game-analysis-agent (Python 3.12, slim).
-# Only the runtime libs we need; no GPU driver required here — the vLLM
-# container carries the GPU driver / CUDA stack separately and exposes
-# its OpenAI-compatible HTTP endpoint on `vllm:8000`.
+# Only the runtime libs we need; no GPU driver required here — the inference
+# container carries the GPU driver / CUDA stack separately and exposes an
+# OpenAI-compatible HTTP endpoint.
 FROM python:3.12-slim-bookworm
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
-    # The agent talks to vLLM via http://vllm:8000/v1 by default;
-    # both paths below default to that so `docker compose run agent`
-    # "just works" without exporting extra env. Override per call via
-    # `docker compose run -e VLLM_BASE_URL=... agent`.
-    VLLM_BASE_URL=http://vllm:8000/v1 \
-    VLLM_API_KEY=local-dev-token \
+    # Compose routes the default local backend through service DNS.
+    LLM_PROVIDER=sglang \
+    SGLANG_BASE_URL=http://sglang:30000/v1 \
+    SGLANG_API_KEY=local-dev-token \
+    SGLANG_MODEL=qwen3.6-27b-nvfp4 \
     LLM_SERVED_MODEL_NAME=qwen3.6-27b-nvfp4 \
     GAME_PROJECT_PATH=/app/demo/study-in-germany
 

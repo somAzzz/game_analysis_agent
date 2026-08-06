@@ -292,7 +292,7 @@ def test_play_through_runs_explicit_weekly_loop(tmp_path) -> None:
     assert rows[0]["run_id"] == tmp_path.name
     assert rows[0]["chosen_actions"] == ["study_library"]
     assert rows[1]["chosen_actions"] == ["sleep_recover"]
-    assert rows[0]["persona_calls"][0]["metadata"]["provider"] == "vllm"
+    assert rows[0]["persona_calls"][0]["metadata"]["provider"] == "sglang"
     assert len(rows[4]["week_context"]["memory"]["history"]) == 4
     assert rows[4]["week_context"]["memory"]["history"][0]["actions"] == ["study_library"]
     assert rows[4]["week_context"]["memory"]["history"][0]["state_before"]

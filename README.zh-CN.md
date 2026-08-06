@@ -129,10 +129,10 @@ uv run pytest -q -ra
 uv run ruff check .
 ```
 
-3. 启动本地 vLLM 服务（如果你用的是 `deepseek` 则可跳过）：
+3. 启动默认的本地 SGLang 服务（如果你用的是 `deepseek` 则可跳过）：
 
 ```bash
-MODEL_ID=/path/to/qwen3.6-nvfp4 ./tools/run_vllm_qwen.sh
+MODEL_ID=/path/to/qwen3.6-nvfp4 ./tools/run_sglang_qwen.sh
 ```
 
 4. 一键跑通整个流水线（模拟/分析 → 导出 → 全验证 → LLM QA → 质量门禁）：
@@ -278,7 +278,7 @@ uv run python tools/prepare_embedded_demo.py \
   --output reports/docker-game-runtime --replace --json
 export GAME_PROJECT_PATH="$PWD/reports/docker-game-runtime"
 export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
-docker compose --profile game-tools --profile local-nvidia up -d godot vllm
+docker compose --profile game-tools --profile local-nvidia up -d godot sglang
 "$GODOT_BIN" --version
 
 uv run python tools/run_gameplay_agent.py interactive-probe \
@@ -295,7 +295,7 @@ wrapper 会优先复用 compose 中常驻的 `godot` 服务；服务未启动时
 先做不调用 LLM 的游戏契约预检，便于区分 Godot 和模型问题：
 
 ```bash
-docker compose --profile local-nvidia --profile game-tools up -d vllm godot
+docker compose --profile local-nvidia --profile game-tools up -d sglang godot
 docker compose ps
 
 uv run python tools/run_gameplay_agent.py interactive-probe \
@@ -450,7 +450,8 @@ tools/
   run_agent.py                  — 单个 agent CLI
   run_balance_sim.sh            — 包装 study-in-germany 的 RunSimulation.gd
   run_gameplay_agent.py         — 一站式 orchestration CLI
-  run_vllm_qwen.sh
+  run_sglang_qwen.sh            — 默认 SGLang + Qwen3.6 启动脚本
+  run_vllm_qwen.sh              — vLLM fallback 启动脚本
 ```
 
 ## 项目文档

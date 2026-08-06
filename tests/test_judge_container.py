@@ -58,7 +58,8 @@ def test_compose_default_is_cpu_dashboard_and_nvidia_is_opt_in() -> None:
         "tools/run_judge_api.py",
     ]
     assert "OPENAI_API_KEY=${OPENAI_API_KEY:-}" in services["dashboard"]["environment"]
-    assert services["vllm"]["profiles"] == ["local-nvidia"]
+    assert services["sglang"]["profiles"] == ["local-nvidia", "local-sglang"]
+    assert services["vllm"]["profiles"] == ["local-vllm"]
     assert services["godot"]["profiles"] == ["game-tools"]
     assert "GAME_PROJECT_PATH=${GAME_PROJECT_PATH:-/app/demo/study-in-germany}" in services[
         "agent"

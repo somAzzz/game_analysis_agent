@@ -48,13 +48,13 @@ def _clear_env() -> None:
 
 
 class TestDefaults:
-    def test_default_provider_is_vllm(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_default_provider_is_sglang(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _clear_env()
         s = Settings()
-        assert s.llm_provider == "vllm"
-        assert s.provider() == "vllm"
+        assert s.llm_provider == "sglang"
+        assert s.provider() == "sglang"
         assert s.base_url().startswith("http://localhost:")
-        assert s.model() == s.vllm_model
+        assert s.model() == s.sglang_model
         assert s.model() == "qwen3.6-27b-nvfp4"
         assert s.persona_enable_thinking is True
         assert s.persona_decision_max_tokens == 2048
@@ -68,11 +68,11 @@ class TestDefaults:
         assert s.sim_runs == 100
         assert s.sim_weeks == 20
 
-    def test_unknown_provider_falls_back_to_vllm(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_unknown_provider_falls_back_to_sglang(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _clear_env()
         os.environ["LLM_PROVIDER"] = "oss-117"
         s = Settings()
-        assert s.provider() == "vllm"
+        assert s.provider() == "sglang"
 
     def test_persona_reasoning_settings_are_overridable(
         self, monkeypatch: pytest.MonkeyPatch

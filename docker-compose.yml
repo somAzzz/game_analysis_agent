@@ -3,18 +3,91 @@
 # Default startup is the CPU-only static dashboard. Optional profiles provide
 # Replay, Godot tools, the legacy CLI, and NVIDIA local inference.
 #
-# Notes (mirrored from fintext_llm/docker-compose.yml for consistency):
-#   * vLLM v0.26.0 adds fine-grained hybrid prefix-cache matching for
-#     Qwen3.6. vLLM_BIND_PORT defaults to 8000 so this stack does not
-#     collide with fintext_llm on 30000.
-#   * NVFP4 requires Blackwell (sm_100 / sm_120). Qwen3.6 ships with
-#     MTP weights, but this prefill-heavy persona workload defaults to
-#     APC-only. MTP remains an explicit opt-in with LLM_ENABLE_MTP=1.
-#   * The agent service does NOT need GPU access — the vLLM endpoint
+# Notes:
+#   * SGLang v0.5.16 is the primary Qwen3.6 backend. Its hybrid Mamba
+#     radix-cache path supports branching-point caching and MTP together.
+#   * vLLM v0.26.0 remains available as the APC-only baseline/fallback.
+#   * NVFP4 requires Blackwell (sm_100 / sm_120). Both engines expose the
+#     same stable served model name so evidence records stay comparable.
+#   * The agent service does NOT need GPU access — the inference endpoint
 #     is plain HTTP. It also does not need the GPU driver / CUDA
 #     stack; it's a normal slim Python image.
 
 services:
+  sglang:
+    # Pinned 2026-07-25. v0.5.16 supports Qwen3.6, ModelOpt FP4, the
+    # extra_buffer Mamba radix-cache strategy, and MTP/NEXTN decoding.
+    image: lmsysorg/sglang:v0.5.16-cu130-runtime
+    entrypoint: ["sh", "-c"]
+    ports:
+      - "${SGLANG_BIND_PORT:-30000}:30000"
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    environment:
+      - HF_TOKEN=${HF_TOKEN:-}
+      - HF_HUB_ENABLE_HF_TRANSFER=${HF_HUB_ENABLE_HF_TRANSFER:-0}
+      - CUDA_DEVICE_ORDER=PCI_BUS_ID
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+      - LLM_MODEL=${LLM_MODEL:-nvidia/Qwen3.6-27B-NVFP4}
+      - LLM_MAX_MODEL_LEN=${LLM_MAX_MODEL_LEN:-65536}
+      - LLM_MAX_NUM_SEQS=${LLM_MAX_NUM_SEQS:-4}
+      - LLM_SERVED_MODEL_NAME=${LLM_SERVED_MODEL_NAME:-qwen3.6-27b-nvfp4}
+      - SGLANG_API_KEY=${SGLANG_API_KEY:-local-dev-token}
+      - SGLANG_MEM_FRACTION_STATIC=${SGLANG_MEM_FRACTION_STATIC:-0.80}
+      - SGLANG_MAMBA_CACHE_STRATEGY=${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer}
+      - SGLANG_PAGE_SIZE=${SGLANG_PAGE_SIZE:-64}
+      - SGLANG_ENABLE_MTP=${SGLANG_ENABLE_MTP:-1}
+      - SGLANG_SPEC_NUM_STEPS=${SGLANG_SPEC_NUM_STEPS:-3}
+      - SGLANG_SPEC_TOPK=${SGLANG_SPEC_TOPK:-1}
+      - SGLANG_SPEC_NUM_DRAFT_TOKENS=${SGLANG_SPEC_NUM_DRAFT_TOKENS:-4}
+    ipc: host
+    shm_size: '32gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command:
+      - >-
+        set -eu;
+        set -- sglang serve
+        --model-path "$${LLM_MODEL:-nvidia/Qwen3.6-27B-NVFP4}"
+        --host 0.0.0.0
+        --port 30000
+        --api-key "$${SGLANG_API_KEY:-local-dev-token}"
+        --served-model-name "$${LLM_SERVED_MODEL_NAME:-qwen3.6-27b-nvfp4}"
+        --trust-remote-code
+        --quantization modelopt_fp4
+        --dtype bfloat16
+        --reasoning-parser qwen3
+        --tool-call-parser qwen3_coder
+        --sampling-defaults model
+        --context-length "$${LLM_MAX_MODEL_LEN:-65536}"
+        --max-running-requests "$${LLM_MAX_NUM_SEQS:-4}"
+        --mem-fraction-static "$${SGLANG_MEM_FRACTION_STATIC:-0.80}"
+        --mamba-radix-cache-strategy "$${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer}"
+        --page-size "$${SGLANG_PAGE_SIZE:-64}";
+        if [ "$${SGLANG_ENABLE_MTP:-1}" = "1" ]; then
+        set -- "$$@"
+        --speculative-algorithm NEXTN
+        --speculative-num-steps "$${SGLANG_SPEC_NUM_STEPS:-3}"
+        --speculative-eagle-topk "$${SGLANG_SPEC_TOPK:-1}"
+        --speculative-num-draft-tokens "$${SGLANG_SPEC_NUM_DRAFT_TOKENS:-4}";
+        fi;
+        exec "$$@"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os, urllib.request, sys; req=urllib.request.Request('http://127.0.0.1:30000/v1/models', headers={'Authorization': 'Bearer ' + os.environ.get('SGLANG_API_KEY', 'local-dev-token')}); sys.exit(0 if urllib.request.urlopen(req, timeout=5).status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 600s
+    restart: unless-stopped
+    profiles:
+      - local-nvidia
+      - local-sglang
+
   vllm:
     # Pinned 2026-07-31: v0.26.0 contains fine-grained prefix matching for
     # aligned attention/Mamba hybrid caches. Hybrid APC remains experimental,
@@ -98,7 +171,7 @@ services:
       start_period: 600s
     restart: unless-stopped
     profiles:
-      - local-nvidia
+      - local-vllm
 
   godot:
     # Long-running tool sidecar. scripts/godot-docker-wrapper uses
@@ -180,11 +253,13 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      # The agent inside the container reaches vLLM through the
-      # compose-network DNS name ``vllm`` on port 8000. The host-side
-      # ``VLLM_BASE_URL`` from .env (e.g. http://localhost:8000/v1) is
-      # overridable per-call via ``docker compose run -e``.
-      - VLLM_BASE_URL=${VLLM_BASE_URL:-http://vllm:8000/v1}
+      # Keep host URLs (localhost) separate from compose-network URLs.
+      # The latter must use service DNS names from inside this container.
+      - LLM_PROVIDER=${LLM_PROVIDER:-sglang}
+      - SGLANG_BASE_URL=${AGENT_SGLANG_BASE_URL:-http://sglang:30000/v1}
+      - SGLANG_API_KEY=${SGLANG_API_KEY:-local-dev-token}
+      - SGLANG_MODEL=${SGLANG_MODEL:-qwen3.6-27b-nvfp4}
+      - VLLM_BASE_URL=${AGENT_VLLM_BASE_URL:-http://vllm:8000/v1}
       - VLLM_API_KEY=${VLLM_API_KEY:-local-dev-token}
       - PERSONA_ENABLE_THINKING=${PERSONA_ENABLE_THINKING:-1}
       - PERSONA_DECISION_MAX_TOKENS=${PERSONA_DECISION_MAX_TOKENS:-2048}
@@ -200,4 +275,5 @@ services:
 
 # A bare ``docker compose up`` starts only the CPU dashboard. Use profile
 # ``judge`` for offline Replay, ``game-tools`` for Godot, ``cli`` for the legacy
-# agent, and ``local-nvidia`` only on a compatible NVIDIA host.
+# agent, ``local-nvidia``/``local-sglang`` for the primary SGLang backend, and
+# ``local-vllm`` for the retained baseline.

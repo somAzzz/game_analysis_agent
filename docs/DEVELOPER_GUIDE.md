@@ -147,11 +147,11 @@ Reports and dashboard
   └─ React + React Flow dashboard
 ```
 
-The default local LLM backend is an OpenAI-compatible vLLM server. The Docker
+The default local LLM backend is an OpenAI-compatible SGLang server. The Docker
 Compose stack is configured for NVIDIA's Qwen3.6 27B NVFP4 checkpoint with
-ModelOpt quantization, Qwen3 reasoning parsing, fine-grained hybrid APC, and
-opt-in MTP speculative decoding. You can also point the client at SGLang or DeepSeek-compatible
-endpoints.
+ModelOpt FP4, Qwen3 reasoning/tool parsing, hybrid Mamba Radix caching, and
+native MTP/NEXTN speculative decoding. vLLM remains the local baseline/fallback;
+DeepSeek remains a cloud-compatible option.
 
 中文说明保留在 [README.zh-CN.md](../README.zh-CN.md).
 
@@ -233,9 +233,10 @@ are withheld.
 Edit `.env` for an OpenAI-compatible local endpoint:
 
 ```bash
-LLM_PROVIDER=vllm
-VLLM_BASE_URL=http://localhost:8000/v1
-VLLM_API_KEY=local-dev-token
+LLM_PROVIDER=sglang
+SGLANG_BASE_URL=http://localhost:30000/v1
+SGLANG_API_KEY=local-dev-token
+SGLANG_MODEL=qwen3.6-27b-nvfp4
 LLM_MODEL=nvidia/Qwen3.6-27B-NVFP4
 LLM_SERVED_MODEL_NAME=qwen3.6-27b-nvfp4
 ```
@@ -281,16 +282,16 @@ uv run python tools/run_gameplay_agent.py all --runs 20 --policy balanced
 QA agents, and quality gates in that order. Use `--skip-qa` when a live model
 endpoint is unavailable; deterministic validation and gates still run.
 
-## Quick Start: Docker + vLLM
+## Quick Start: Docker + SGLang
 
-Start the local vLLM service and persistent Godot sidecar:
+Start the primary local SGLang service and persistent Godot sidecar:
 
 ```bash
 cp .env.example .env
 # Edit .env: HF_TOKEN, GAME_PROJECT_PATH, CUDA_VISIBLE_DEVICES, etc.
-docker compose pull vllm
-docker compose --profile local-nvidia --profile game-tools up -d vllm godot
-docker compose logs -f vllm
+docker compose pull sglang
+docker compose --profile local-nvidia --profile game-tools up -d sglang godot
+docker compose logs -f sglang
 docker compose ps
 ```
 
@@ -307,8 +308,8 @@ The opt-in `agent` container is for pure-Python analysis and QA of existing
 reports. It intentionally cannot execute commands in the Godot sidecar.
 
 See [docs/operations/DOCKER.md](../docs/operations/DOCKER.md) and
-[docs/operations/VLLM_QWEN_LOCAL_AGENT.md](../docs/operations/VLLM_QWEN_LOCAL_AGENT.md) for deployment
-details.
+[docs/operations/SGLANG_QWEN_LOCAL_AGENT.md](../docs/operations/SGLANG_QWEN_LOCAL_AGENT.md)
+for deployment details. The vLLM fallback remains documented separately.
 
 For the future MCP surface, follow the
 [service-first MCP migration plan](../docs/architecture/MCP_MIGRATION_PLAN.md). The existing
@@ -543,7 +544,7 @@ user, so reports are not root-owned:
 ```bash
 export GAME_PROJECT_PATH=/home/bo/projects/python/study-in-germany
 export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
-docker compose --profile game-tools --profile local-nvidia up -d godot vllm
+docker compose --profile game-tools --profile local-nvidia up -d godot sglang
 "$GODOT_BIN" --version
 
 uv run python tools/run_gameplay_agent.py interactive-probe \
@@ -562,7 +563,7 @@ real Godot project advances. First verify the producer-native game contract
 without contacting the model:
 
 ```bash
-docker compose --profile local-nvidia --profile game-tools up -d vllm godot
+docker compose --profile local-nvidia --profile game-tools up -d sglang godot
 docker compose ps
 
 uv run python tools/run_gameplay_agent.py interactive-probe \
@@ -768,6 +769,7 @@ tools/
   run_agent.py
   run_balance_sim.sh
   run_gameplay_agent.py
+  run_sglang_qwen.sh
   run_vllm_qwen.sh
 
 tests/

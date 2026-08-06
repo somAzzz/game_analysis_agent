@@ -493,7 +493,7 @@ server、scope 和审计。
 Service Layer 和 STDIO MCP 第一版不需要修改现有 Compose：
 
 ```bash
-docker compose up -d vllm godot
+docker compose --profile local-nvidia --profile game-tools up -d sglang godot
 ```
 
 MCP Server 在宿主机运行，通过 wrapper 复用 Godot sidecar。

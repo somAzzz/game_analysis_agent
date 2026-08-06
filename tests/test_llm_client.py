@@ -99,7 +99,7 @@ def test_persona_thinking_keeps_reasoning_out_of_final_content() -> None:
     assert "max_tokens" not in completions.calls[0]
 
 
-def test_sglang_provider_attaches_thinking_disable() -> None:
+def test_sglang_provider_attaches_thinking_disable_and_maps_choices_to_regex() -> None:
     response = SimpleNamespace(
         choices=[SimpleNamespace(message=SimpleNamespace(content=""))],
         usage=None,
@@ -116,13 +116,37 @@ def test_sglang_provider_attaches_thinking_disable() -> None:
         model="m",
     )
     client.client = sdk
-    client.complete("hi", system="sys", agent="x")
+    client.complete(
+        "hi",
+        system="sys",
+        agent="x",
+        structured_outputs={"choice": ["rent.pay_now", "rent.delay+"]},
+    )
     assert completions.calls, "expected at least one chat completion"
     extra = completions.calls[0].get("extra_body", {})
     assert extra.get("chat_template_kwargs", {}).get("enable_thinking") is False
+    assert extra["regex"] == r"(?:rent\.pay_now|rent\.delay\+)"
 
     assert completions.calls[0]["max_tokens"] == client.settings.agent_max_tokens
     assert "max_completion_tokens" not in completions.calls[0]
+
+
+def test_sglang_rejects_unmapped_structured_output_shapes() -> None:
+    client = LocalLLMClient(
+        _settings(),
+        provider="sglang",
+        base_url="http://localhost:1234/v1",
+        api_key="k",
+        model="m",
+    )
+
+    with pytest.raises(ValueError, match="non-empty string choice list"):
+        client.complete(
+            "hi",
+            system="sys",
+            agent="x",
+            structured_outputs={"json_schema": {}},
+        )
 
 
 def test_deepseek_provider_does_not_attach_thinking_disable() -> None:

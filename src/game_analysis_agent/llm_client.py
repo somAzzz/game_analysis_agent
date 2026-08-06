@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import time
 import urllib.error
 import urllib.request
@@ -124,9 +125,24 @@ class LocalLLMClient:
                 "enable_thinking": bool(enable_thinking) if enable_thinking is not None else False
             }
         if structured_outputs is not None:
-            if self.provider != "vllm":
-                raise ValueError("structured_outputs is currently supported only by vllm")
-            body["structured_outputs"] = structured_outputs
+            if self.provider == "vllm":
+                body["structured_outputs"] = structured_outputs
+            elif self.provider == "sglang":
+                choices = structured_outputs.get("choice")
+                if (
+                    set(structured_outputs) != {"choice"}
+                    or not isinstance(choices, list)
+                    or not choices
+                    or not all(isinstance(choice, str) and choice for choice in choices)
+                ):
+                    raise ValueError(
+                        "SGLang structured_outputs requires a non-empty string choice list"
+                    )
+                body["regex"] = "(?:" + "|".join(re.escape(choice) for choice in choices) + ")"
+            else:
+                raise ValueError(
+                    f"structured_outputs is not supported by provider {self.provider!r}"
+                )
         return body or None
 
     def validate_model_available(self) -> list[str]:
@@ -320,7 +336,7 @@ class LLMConfig:
     model: str
     temperature: float = 0.2
     max_tokens: int = 4096
-    provider: str = "vllm"
+    provider: str = "sglang"
 
     def __init__(
         self,
@@ -329,7 +345,7 @@ class LLMConfig:
         model: str,
         temperature: float = 0.2,
         max_tokens: int = 4096,
-        provider: str = "vllm",
+        provider: str = "sglang",
     ) -> None:
         self.base_url = base_url
         self.api_key = api_key
@@ -390,7 +406,7 @@ class LegacyLocalLLMClient:
         except urllib.error.URLError as exc:
             raise RuntimeError(
                 f"Cannot reach LLM endpoint {self.config.base_url}. "
-                "Start it with tools/run_vllm_qwen.sh or update VLLM_BASE_URL."
+                "Start the selected local backend or update its base URL."
             ) from exc
         try:
             return data["choices"][0]["message"]["content"]

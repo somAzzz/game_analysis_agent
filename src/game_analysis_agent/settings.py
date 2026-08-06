@@ -69,9 +69,9 @@ class Settings:
     """Runtime configuration for game_analysis_agent components."""
 
     # ---- LLM provider selection ----------------------------------------
-    llm_provider: str = field(default_factory=lambda: _env("LLM_PROVIDER", "vllm"))
+    llm_provider: str = field(default_factory=lambda: _env("LLM_PROVIDER", "sglang"))
 
-    # ---- Local vLLM (default local backend) ----------------------------
+    # ---- Local vLLM (retained baseline/fallback) -----------------------
     vllm_base_url: str = field(
         default_factory=lambda: _env("VLLM_BASE_URL", "http://localhost:8000/v1")
     )
@@ -80,12 +80,18 @@ class Settings:
         default_factory=lambda: _env("LLM_SERVED_MODEL_NAME", "qwen3.6-27b-nvfp4")
     )
 
-    # ---- Local SGLang (alternative) ------------------------------------
+    # ---- Local SGLang (default local backend) --------------------------
     sglang_base_url: str = field(
         default_factory=lambda: _env("SGLANG_BASE_URL", "http://localhost:30000/v1")
     )
-    sglang_api_key: str = field(default_factory=lambda: _env("SGLANG_API_KEY", "dummy"))
-    sglang_model: str = field(default_factory=lambda: _env("SGLANG_MODEL", "Qwen/Qwen3.6-35B-A3B"))
+    sglang_api_key: str = field(
+        default_factory=lambda: _env("SGLANG_API_KEY", "local-dev-token")
+    )
+    sglang_model: str = field(
+        default_factory=lambda: _env(
+            "SGLANG_MODEL", _env("LLM_SERVED_MODEL_NAME", "qwen3.6-27b-nvfp4")
+        )
+    )
 
     # ---- DeepSeek (cloud fallback) -------------------------------------
     deepseek_base_url: str = field(
@@ -126,8 +132,8 @@ class Settings:
 
     # ---- Derived selectors ---------------------------------------------
     def provider(self) -> str:
-        """Return the normalized provider name; defaults to ``vllm``."""
-        return self.llm_provider if self.llm_provider in _SUPPORTED_PROVIDERS else "vllm"
+        """Return the normalized provider name; defaults to ``sglang``."""
+        return self.llm_provider if self.llm_provider in _SUPPORTED_PROVIDERS else "sglang"
 
     def base_url(self) -> str:
         """Return the OpenAI-compatible endpoint for the active provider."""

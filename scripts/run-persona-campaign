@@ -25,10 +25,10 @@ case "${1:-}" in
     echo "usage: scripts/run-persona-campaign PROVIDER [OPTIONS]"
     echo "providers: openai, vllm, sglang, deepseek"
     cd "$ROOT"
-    exec uv run python tools/run_persona_campaign.py --provider vllm --help
+    exec uv run python tools/run_persona_campaign.py --provider sglang --help
     ;;
 esac
-PROVIDER=${1:-vllm}
+PROVIDER=${1:-sglang}
 if [ "$#" -gt 0 ]; then
   shift
 fi
