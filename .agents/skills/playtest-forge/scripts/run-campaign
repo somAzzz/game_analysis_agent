@@ -9,7 +9,7 @@ case "$provider" in
     ;;
   replay)
     shift
-    exec uv run python tools/run_build_week_campaign.py "$@"
+    exec uv run python tools/build_week/run_build_week_campaign.py "$@"
     ;;
   *)
     echo "provider must be replay, vllm, sglang, openai, or deepseek" >&2

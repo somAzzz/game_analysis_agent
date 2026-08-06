@@ -113,27 +113,27 @@ Orchestration checks:
 
 ```bash
 # Strictly parse and enumerate all 140 cells without Godot/LLM execution.
-uv run python tools/run_gameplay_agent.py matrix --dry-run --jobs 4
+uv run python tools/gameplay/run_gameplay_agent.py matrix --dry-run --jobs 4
 
 # Run the same fixed-seed matrix into isolated before/after output roots.
-uv run python tools/run_gameplay_agent.py matrix \
+uv run python tools/gameplay/run_gameplay_agent.py matrix \
   --out reports/matrix/before --jobs 4
 # Apply the code change under test; keep config/matrix.yaml unchanged.
-uv run python tools/run_gameplay_agent.py matrix \
+uv run python tools/gameplay/run_gameplay_agent.py matrix \
   --out reports/matrix/after --jobs 4
 
 # Fail closed unless both executions contain strictly pairable evidence.
-uv run python tools/run_gameplay_agent.py compare-matrix \
+uv run python tools/gameplay/run_gameplay_agent.py compare-matrix \
   --before reports/matrix/before \
   --after reports/matrix/after \
   --out reports/compare/matrix
 
 # Run all Godot validators with fresh route/demo prerequisites.
-uv run python tools/run_gameplay_agent.py validate \
+uv run python tools/gameplay/run_gameplay_agent.py validate \
   --report-dir reports/validation/<run_id>
 
 # Re-evaluate a recorded Agent trace without an external call.
-uv run python tools/run_gameplay_agent.py eval \
+uv run python tools/gameplay/run_gameplay_agent.py eval \
   --report-dir reports/play/<run_id>
 ```
 
@@ -141,7 +141,7 @@ Real contract smoke:
 
 ```bash
 GAME_PROJECT_PATH=/path/to/study-in-germany \
-  uv run pytest tests/test_game_contract.py -m game_contract -q -ra
+  uv run pytest tests/gameplay/test_game_contract.py -m game_contract -q -ra
 ```
 
 The 2026-07-13 local producer run used the checksum-verified official Godot

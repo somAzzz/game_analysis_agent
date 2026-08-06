@@ -32,13 +32,13 @@ states or a complete counterfactual branch graph.
 ## Rebuild and verify
 
 ```bash
-uv run python tools/build_playthrough_views.py \
+uv run python tools/dashboard/build_playthrough_views.py \
   --source-root examples/build_week_2026/playthrough-v1/source \
   --campaign-manifest examples/build_week_2026/playthrough-v1/source/reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/campaign_manifest.json \
   --failure-clusters examples/build_week_2026/playthrough-v1/source/public/failure_clusters.json \
   --public-gate examples/build_week_2026/playthrough-v1/source/public/gate_report.json \
   --output examples/build_week_2026/playthrough-v1
 
-uv run python tools/verify_playthrough_views.py
-uv run pytest -q tests/test_playthrough_view.py
+uv run python tools/dashboard/verify_playthrough_views.py
+uv run pytest -q tests/dashboard/test_playthrough_view.py
 ```

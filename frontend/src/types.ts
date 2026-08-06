@@ -1,6 +1,6 @@
 /**
  * TypeScript mirrors of the JSON shapes produced by
- * ``tools/emit_manifest.py``. Keep these in sync if the Python side
+ * ``tools/dashboard/emit_manifest.py``. Keep these in sync if the Python side
  * evolves; the React app will refuse to render against stale shapes
  * because it uses ``fetch + JSON.parse`` and prop-types at runtime.
  */

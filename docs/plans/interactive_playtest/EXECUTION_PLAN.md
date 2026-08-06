@@ -68,7 +68,7 @@ godot --headless --path /home/bo/projects/python/study-in-germany \
 交付：
 
 ```bash
-python tools/run_gameplay_agent.py play \
+python tools/gameplay/run_gameplay_agent.py play \
   --report-dir reports/play/v03-money \
   --weeks 20 \
   --persona money \

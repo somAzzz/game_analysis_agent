@@ -36,7 +36,7 @@ npm run build
 To run only the committed contract fixtures:
 
 ```bash
-uv run pytest tests/test_game_contract.py -m "not game_contract"
+uv run pytest tests/gameplay/test_game_contract.py -m "not game_contract"
 ```
 
 Prepare the exact-pinned embedded demo into a writable runtime before a real
@@ -44,11 +44,11 @@ producer smoke. The canonical embedded tree is never used as a writable Godot
 project:
 
 ```bash
-uv run python tools/prepare_embedded_demo.py \
+uv run python tools/build_week/prepare_embedded_demo.py \
   --output reports/contract-game-runtime --replace --json
 export GAME_PROJECT_PATH="$PWD/reports/contract-game-runtime"
 export GODOT_BIN=godot4
-uv run pytest tests/test_game_contract.py -m game_contract -ra
+uv run pytest tests/gameplay/test_game_contract.py -m game_contract -ra
 ```
 
 An external checkout may still be supplied as a developer override, but it is
@@ -60,7 +60,7 @@ Individual artifacts can be checked without pytest:
 uv run python -m game_analysis_agent.contracts trace reports/raw_runs.jsonl
 uv run python -m game_analysis_agent.contracts validator_report \
   reports/content_validation.json --require-clean
-uv run python tools/run_gameplay_agent.py interactive-probe \
+uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
   --report-dir reports/interactive/smoke
 ```
 

@@ -25,7 +25,7 @@ class BoundaryProberAgent(Agent):
         boundary_text = (
             self._render_boundary_runs(boundary_runs_path)
             if boundary_runs_path.exists()
-            else "(no boundary_runs.jsonl — please run `tools/run_gameplay_agent.py probe` first)"
+            else "(no boundary_runs.jsonl — please run `tools/gameplay/run_gameplay_agent.py probe` first)"
         )
 
         files = list(DEFAULT_REPORT_FILES) + list(self.extra_files) + ["boundary_runs.jsonl"]

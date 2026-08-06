@@ -59,7 +59,7 @@ jobs:
         env:
           GAME_PROJECT_PATH: ${{ runner.temp }}/game_analysis_agent/project
         run: >-
-          uv run python tools/run_gameplay_agent.py matrix
+          uv run python tools/gameplay/run_gameplay_agent.py matrix
           --dry-run --jobs 4 --out /tmp/game-analysis-matrix-plan
 
       - name: Run Ruff
@@ -127,9 +127,9 @@ jobs:
       - name: Record native offline delivery
         run: |
           mkdir -p reports/platform-ci
-          python3 tools/judge_doctor.py --mode inspect --json > reports/platform-ci/doctor-inspect.json
-          uv run python tools/judge_doctor.py --mode replay --json > reports/platform-ci/doctor-replay.json
-          uv run python tools/judge_doctor.py --mode dashboard-native --json > reports/platform-ci/doctor-dashboard-native.json
+          python3 tools/judge/judge_doctor.py --mode inspect --json > reports/platform-ci/doctor-inspect.json
+          uv run python tools/judge/judge_doctor.py --mode replay --json > reports/platform-ci/doctor-replay.json
+          uv run python tools/judge/judge_doctor.py --mode dashboard-native --json > reports/platform-ci/doctor-dashboard-native.json
           ./judge --mode inspect --offline --json --output-dir - > reports/platform-ci/judge-inspect.json
           ./judge --mode replay --offline --json --output-dir - > reports/platform-ci/judge-replay.json
 
@@ -152,7 +152,7 @@ jobs:
             --publish 127.0.0.1:18080:8080 --read-only --tmpfs /tmp:size=16m \
             --cap-drop ALL --security-opt no-new-privileges \
             --entrypoint /app/.venv/bin/python playtest-forge-judge:ci \
-            tools/run_judge_api.py --host 0.0.0.0 --port 8080 --frontend /app/frontend/dist
+            tools/judge/run_judge_api.py --host 0.0.0.0 --port 8080 --frontend /app/frontend/dist
           for attempt in $(seq 1 20); do
             if curl --fail --silent http://127.0.0.1:18080/api/provider-status \
               > reports/platform-ci/provider-status.json; then
@@ -165,7 +165,7 @@ jobs:
 
       - name: Validate Linux amd64 evidence packet
         run: >-
-          uv run python tools/record_platform_evidence.py
+          uv run python tools/platform/record_platform_evidence.py
           --mode linux-amd64
           --artifact-dir reports/platform-ci
           --output reports/platform-ci/evidence.json
@@ -226,7 +226,7 @@ jobs:
         run: |
           owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
           export JUDGE_IMAGE_REF="ghcr.io/$owner/playtest-forge-judge"
-          tools/build_judge_image.sh
+          tools/judge/build_judge_image.sh
 
       - name: Export digest reference
         id: metadata
@@ -326,7 +326,7 @@ jobs:
 
       - name: Verify and prepare the embedded game demo
         run: >-
-          uv run python tools/prepare_embedded_demo.py
+          uv run python tools/build_week/prepare_embedded_demo.py
           --output "$GAME_PROJECT_PATH" --json
         working-directory: game-analysis-agent
 
@@ -353,7 +353,7 @@ jobs:
       - name: Generate and analyze a fresh deterministic trace
         working-directory: game-analysis-agent
         run: |
-          uv run python tools/run_gameplay_agent.py sim \
+          uv run python tools/gameplay/run_gameplay_agent.py sim \
             --run-id ci-smoke --runs 12 --policy balanced \
             --difficulty normal --seed 4242 \
             --scenario default_first_semester --weeks 20
@@ -361,14 +361,14 @@ jobs:
       - name: Export catalogs and run every Godot validator with fresh inputs
         working-directory: game-analysis-agent
         run: |
-          uv run python tools/run_gameplay_agent.py export \
+          uv run python tools/gameplay/run_gameplay_agent.py export \
             --report-dir reports/balance/ci-smoke
           set +e
-          uv run python tools/run_gameplay_agent.py validate \
+          uv run python tools/gameplay/run_gameplay_agent.py validate \
             --report-dir reports/balance/ci-smoke
           validate_exit_code=$?
           set -e
-          uv run python tools/verify_expected_demo_findings.py \
+          uv run python tools/build_week/verify_expected_demo_findings.py \
             --report-dir reports/balance/ci-smoke \
             --validate-exit-code "$validate_exit_code" \
             --output reports/expected-demo-findings.json
@@ -377,7 +377,7 @@ jobs:
         if: always()
         working-directory: game-analysis-agent
         run: |
-          uv run python tools/run_gameplay_agent.py gates \
+          uv run python tools/gameplay/run_gameplay_agent.py gates \
             --report-dir reports/balance/ci-smoke \
             --gates config/ci_gates.yaml
 
@@ -385,7 +385,7 @@ jobs:
         if: always()
         working-directory: game-analysis-agent
         run: |
-          uv run python tools/run_gameplay_agent.py interactive-probe \
+          uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
             --run-id ci-interactive-smoke \
             --seed 4242 --difficulty normal \
             --scenario default_first_semester \
@@ -399,14 +399,14 @@ jobs:
           GAME_CONTRACT_ACTION_CATALOG: ${{ github.workspace }}/game-analysis-agent/reports/balance/ci-smoke/action_catalog.json
           GAME_CONTRACT_VALIDATOR: ${{ github.workspace }}/game-analysis-agent/reports/balance/ci-smoke/content_validation.json
           GAME_CONTRACT_INTERACTIVE_PROBE: ${{ github.workspace }}/game-analysis-agent/reports/interactive/ci-smoke/interactive_probe.json
-        run: uv run pytest tests/test_game_contract.py -m game_contract -q -ra
+        run: uv run pytest tests/gameplay/test_game_contract.py -m game_contract -q -ra
         working-directory: game-analysis-agent
 
       - name: Validate pinned Linux Godot evidence packet
         if: always()
         run: |
           mkdir -p reports/platform-ci
-          uv run python tools/record_platform_evidence.py \
+          uv run python tools/platform/record_platform_evidence.py \
             --mode linux-godot --artifact-dir reports \
             --output reports/platform-ci/linux-godot-evidence.json
         working-directory: game-analysis-agent

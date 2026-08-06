@@ -118,7 +118,7 @@ For a single-origin local evaluator build:
 cd frontend
 npm run build:public
 cd ..
-uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080
+uv run python tools/judge/run_judge_api.py --host 127.0.0.1 --port 8080
 ```
 
 Open `http://127.0.0.1:8080/`. The Judge API's interactive browser campaign is

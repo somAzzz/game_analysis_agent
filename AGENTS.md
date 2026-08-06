@@ -7,6 +7,13 @@ Launch Codex from this repository root. Codex scans
 available for implicit selection. `AGENTS.md` is loaded before work; the full
 Skill uses progressive disclosure and is read after selection.
 
+For in-scope `$playtest-forge` work, the two offline evaluator entry points are:
+
+```bash
+./judge --mode inspect --offline --json --output-dir -
+./judge --mode replay --offline --json --output-dir -
+```
+
 Do not use `$playtest-forge` merely because this is a game-analysis repository
 or because a request mentions a game, Godot, a persona, a simulation, or a
 playtest-related file. Route by the task's required evidence and acceptance
@@ -111,7 +118,7 @@ Godot tests unavailable, check Docker. This machine has used the cached image
 `barichello/godot-ci:4.4` through the repository wrapper:
 
 ```bash
-uv run python tools/prepare_embedded_demo.py \
+uv run python tools/build_week/prepare_embedded_demo.py \
   --output reports/local-game-runtime --replace --json
 export GAME_PROJECT_PATH="$PWD/reports/local-game-runtime"
 export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
@@ -149,7 +156,7 @@ Before implementing any MCP wrapper, read
 3. Complete the service-layer acceptance gates and regressions.
 4. Only then add the MCP adapter.
 
-Do not register `tools/run_gameplay_agent.py` `cmd_*` functions as MCP
+Do not register `tools/gameplay/run_gameplay_agent.py` `cmd_*` functions as MCP
 tools, construct `argparse.Namespace` inside MCP code, or duplicate
 Godot/contract/report logic in an MCP package. CLI and MCP must share the same
 typed request/result services.

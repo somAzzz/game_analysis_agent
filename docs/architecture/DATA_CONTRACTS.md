@@ -354,8 +354,8 @@ provider、model、prompt/response 文本、token 统计与耗时。用于从前
 
 ### report_index.json
 
-位于 `reports/report_index.json`，由 `tools/run_gameplay_agent.py index` 或
-`tools/build_dashboard.py all` 生成。前端列表页应优先读取该文件，再根据其中的
+位于 `reports/report_index.json`，由 `tools/gameplay/run_gameplay_agent.py index` 或
+`tools/dashboard/build_dashboard.py all` 生成。前端列表页应优先读取该文件，再根据其中的
 `manifest` 字段打开对应 `report_manifest.json`。
 
 ## 8. 测试门禁与覆盖率（v0.2）
@@ -384,7 +384,7 @@ provider、model、prompt/response 文本、token 统计与耗时。用于从前
 
 ### gate_report.json
 
-`python tools/run_gameplay_agent.py gates --report-dir <dir>` 会读取
+`python tools/gameplay/run_gameplay_agent.py gates --report-dir <dir>` 会读取
 `config/gates.yaml` 并写：
 
 ```json

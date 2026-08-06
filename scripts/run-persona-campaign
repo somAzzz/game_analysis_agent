@@ -25,7 +25,7 @@ case "${1:-}" in
     echo "usage: scripts/run-persona-campaign PROVIDER [OPTIONS]"
     echo "providers: openai, vllm, sglang, deepseek"
     cd "$ROOT"
-    exec uv run python tools/run_persona_campaign.py --provider sglang --help
+    exec uv run python tools/persona/run_persona_campaign.py --provider sglang --help
     ;;
 esac
 PROVIDER=${1:-sglang}
@@ -49,7 +49,7 @@ if [ -z "${GAME_PROJECT_PATH:-}" ]; then
   gaa_prepare_embedded=1
 fi
 if [ "$gaa_prepare_embedded" -eq 1 ]; then
-  uv run python "$ROOT/tools/prepare_embedded_demo.py" \
+  uv run python "$ROOT/tools/build_week/prepare_embedded_demo.py" \
     --output "$GAME_PROJECT_PATH" --replace --json
 elif [ ! -f "$GAME_PROJECT_PATH/project.godot" ]; then
   echo "GAME_PROJECT_PATH does not contain project.godot" >&2
@@ -57,7 +57,7 @@ elif [ ! -f "$GAME_PROJECT_PATH/project.godot" ]; then
 fi
 
 cd "$ROOT"
-exec uv run python tools/run_persona_campaign.py \
+exec uv run python tools/persona/run_persona_campaign.py \
   --provider "$PROVIDER" \
   --game-root "$GAME_PROJECT_PATH" \
   "$@"

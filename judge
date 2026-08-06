@@ -52,7 +52,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--timeout-seconds", type=float, default=120.0)
     parser.add_argument(
         "--replay-worker",
-        default="tools/judge_replay.py",
+        default="tools/judge/judge_replay.py",
         help="reviewed repository-relative worker (used by failure-injection tests)",
     )
     return parser
@@ -124,7 +124,7 @@ def inspect_manifest(manifest_path: Path, *, started: float) -> dict[str, Any]:
         raise InspectError(
             "manifest_artifacts_invalid",
             "manifest must list at least one artifact",
-            "Regenerate the manifest with tools/build_judge_manifest.py.",
+            "Regenerate the manifest with tools/judge/build_judge_manifest.py.",
         )
     if not isinstance(claims, list) or not claims:
         raise InspectError(
@@ -301,7 +301,7 @@ def run_replay(
                 limitations=limitations,
                 error_code="replay_worker_unsafe",
                 error="Replay worker must be a reviewed repository-relative file",
-                remediation="Use the default tools/judge_replay.py worker.",
+                remediation="Use the default tools/judge/judge_replay.py worker.",
             ),
             EXIT_FAILED,
         )

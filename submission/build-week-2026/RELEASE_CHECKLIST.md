@@ -15,7 +15,7 @@ time-saved, independent-review, current-image, or current cross-platform claims.
   no time-saved claim.
 - [x] Mark the unrun non-builder clean-room study `not_claimed`; publish no
   independent-review claim.
-- [x] Update and pass `tools/review_build_week_g4.py` while keeping every
+- [x] Update and pass `tools/build_week/review_build_week_g4.py` while keeping every
   claimed capability fail-closed.
 - [x] Replace the YouTube placeholder in the Devpost draft.
 - [x] Record the public 2:55 video and verify signed-out access, audio, duration,
@@ -34,7 +34,7 @@ Machine-readable records are complete or explicitly `not_claimed`, without estim
 Final local gate (expected: `passed`):
 
 ```bash
-uv run python tools/review_build_week_g5.py --json
+uv run python tools/build_week/review_build_week_g5.py --json
 ```
 
 Never add token/cost/time-saved, platform-support, live-provider, or repair-

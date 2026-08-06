@@ -1,6 +1,6 @@
-"""Pure analytics functions extracted from ``tools/analyze_balance.py``.
+"""Pure analytics functions extracted from ``tools/gameplay/analyze_balance.py``.
 
-The CLI shell still lives in ``tools/analyze_balance.py``; this module
+The CLI shell still lives in ``tools/gameplay/analyze_balance.py``; this module
 holds the deterministic statistics so they can be unit-tested without
 subprocess overhead and reused by other agents (notably
 ``src/game_analysis_agent/agents/value_reviewer.py``).

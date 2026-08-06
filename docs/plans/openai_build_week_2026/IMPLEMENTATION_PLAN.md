@@ -155,7 +155,7 @@ The current state is not yet judge-ready:
 - The React application is currently a static report viewer and has no Judge
   API for starting or monitoring campaigns.
 - The provider registry does not yet include OpenAI.
-- `tools/run_gameplay_agent.py` is 1,651 lines and the interactive player is
+- `tools/gameplay/run_gameplay_agent.py` is 1,651 lines and the interactive player is
   1,379 lines; a rushed MCP wrapper would amplify existing coupling.
 - No repository Skill currently exposes the competition workflow.
 - No single command currently performs campaign, diagnosis, isolated repair,

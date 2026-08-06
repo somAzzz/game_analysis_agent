@@ -4,7 +4,7 @@ import path from "node:path";
 
 // Vite serves the SPA from /.
 // During development we expect a `public/manifest.json` next to this config;
-// the Python pipeline (tools/emit_manifest.py --out frontend/public/manifest.json)
+// the Python pipeline (tools/dashboard/emit_manifest.py --out frontend/public/manifest.json)
 // writes one. Per-issue manifests live under public/browse/... and the Vite
 // dev server streams them as static files.
 export default defineConfig({

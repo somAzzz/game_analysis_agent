@@ -32,11 +32,11 @@ demo 是只读基线，Godot 仅运行经过校验的可写副本。详见
 ```text
 study-in-germany/RunSimulation.gd
 -> reports/balance/<run_id>/raw_runs.jsonl
--> tools/analyze_balance.py
+-> tools/gameplay/analyze_balance.py
 -> summary.json / csv / anomaly_report.md
--> tools/run_gameplay_agent.py analyze
+-> tools/gameplay/run_gameplay_agent.py analyze
 -> anomalies.jsonl / bugs.jsonl / bugs_summary.md / value_report.json
--> tools/run_gameplay_agent.py qa
+-> tools/gameplay/run_gameplay_agent.py qa
 -> agent_diagnosis.md / tuning_proposal.md
 -> bug_diagnosis.md / boundary_report.md / value_review.md
 -> content_issues.md / event_graph_report.md

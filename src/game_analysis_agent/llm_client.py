@@ -9,7 +9,7 @@ Pattern borrowed from ``fintext_llm/src/llm/client.py``. Differences:
   pushed through a sink that downstream consumers can swap.
 
 The legacy :class:`LocalLLMClient` is kept around as a thin wrapper so
-existing callers (``tools/run_agent.py`` etc.) continue to compile
+existing callers (``tools/gameplay/run_agent.py`` etc.) continue to compile
 during the migration.
 """
 

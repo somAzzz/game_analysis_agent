@@ -2,4 +2,4 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-exec uv run python "$ROOT/tools/install_build_week_toolchain.py" "$@"
+exec uv run python "$ROOT/tools/build_week/install_build_week_toolchain.py" "$@"

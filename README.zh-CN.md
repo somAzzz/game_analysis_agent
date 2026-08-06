@@ -132,13 +132,13 @@ uv run ruff check .
 3. 启动默认的本地 SGLang 服务（如果你用的是 `deepseek` 则可跳过）：
 
 ```bash
-MODEL_ID=/path/to/qwen3.6-nvfp4 ./tools/run_sglang_qwen.sh
+MODEL_ID=/path/to/qwen3.6-nvfp4 ./tools/llm_runtime/run_sglang_qwen.sh
 ```
 
 4. 一键跑通整个流水线（模拟/分析 → 导出 → 全验证 → LLM QA → 质量门禁）：
 
 ```bash
-python3 tools/run_gameplay_agent.py all --runs 20 --policy balanced
+python3 tools/gameplay/run_gameplay_agent.py all --runs 20 --policy balanced
 ```
 
    这条命令会输出到：
@@ -172,52 +172,52 @@ python3 tools/run_gameplay_agent.py all --runs 20 --policy balanced
 
 ```bash
 # 仅模拟 + 分析（不调 LLM）
-python3 tools/run_gameplay_agent.py sim --runs 100 --policy random
-python3 tools/run_gameplay_agent.py analyze --report-dir reports/balance/baseline
+python3 tools/gameplay/run_gameplay_agent.py sim --runs 100 --policy random
+python3 tools/gameplay/run_gameplay_agent.py analyze --report-dir reports/balance/baseline
 
 # 边界探测（需要 Godot + GAME_PROJECT_PATH 指向 study-in-germany）
-python3 tools/run_gameplay_agent.py probe --extreme "zero_money,deep_debt,flag_chaos"
+python3 tools/gameplay/run_gameplay_agent.py probe --extreme "zero_money,deep_debt,flag_chaos"
 
 # 默认运行 content / json-content / economy / risk / route / demo 六个验证器。
 # route/demo 的前置输入默认重新生成；仅在明确需要时传 --reuse-inputs。
-python3 tools/run_gameplay_agent.py validate \
+python3 tools/gameplay/run_gameplay_agent.py validate \
   --report-dir reports/validation/<run_id>
 
 # 执行确定性质量门禁
-python3 tools/run_gameplay_agent.py gates \
+python3 tools/gameplay/run_gameplay_agent.py gates \
   --report-dir reports/balance/<run_id>
 
 # 让 LLM 当玩家试玩
-python3 tools/run_gameplay_agent.py play --report-dir reports/play/test --weeks 20
+python3 tools/gameplay/run_gameplay_agent.py play --report-dir reports/play/test --weeks 20
 
 # 离线评估已经记录的试玩，不调用 Godot 或 LLM
-python3 tools/run_gameplay_agent.py eval --report-dir reports/play/test
+python3 tools/gameplay/run_gameplay_agent.py eval --report-dir reports/play/test
 
 # 不调用 LLM，直接捕获游戏原生 RiskEvaluator 风险建议；缺失时失败
-python3 tools/run_gameplay_agent.py interactive-probe \
+python3 tools/gameplay/run_gameplay_agent.py interactive-probe \
   --report-dir reports/interactive/test
 
 # 先严格校验并枚举全部 140 个单元
-python3 tools/run_gameplay_agent.py matrix --dry-run --jobs 4
+python3 tools/gameplay/run_gameplay_agent.py matrix --dry-run --jobs 4
 
 # before/after 各自拥有隔离的 cell 报告目录，不会互相覆盖
-python3 tools/run_gameplay_agent.py matrix \
+python3 tools/gameplay/run_gameplay_agent.py matrix \
   --out reports/matrix/before --jobs 4
 # 应用待验证的代码改动，但保持 config/matrix.yaml 不变
-python3 tools/run_gameplay_agent.py matrix \
+python3 tools/gameplay/run_gameplay_agent.py matrix \
   --out reports/matrix/after --jobs 4
 # 中断后在同一个 --out 上续跑
-python3 tools/run_gameplay_agent.py matrix \
+python3 tools/gameplay/run_gameplay_agent.py matrix \
   --out reports/matrix/after --jobs 4 --resume
-python3 tools/run_gameplay_agent.py compare-matrix \
+python3 tools/gameplay/run_gameplay_agent.py compare-matrix \
   --before reports/matrix/before --after reports/matrix/after \
   --out reports/compare/matrix
 
 # 仅跑某个 agent（如果只想看一份诊断）
-python3 tools/run_agent.py balance reports/balance/baseline
+python3 tools/gameplay/run_agent.py balance reports/balance/baseline
 
 # Build an editorial-style HTML dashboard over all reports/
-python3 tools/build_dashboard.py all
+python3 tools/dashboard/build_dashboard.py all
 # → reports/index.html + reports/browse/<kind>/<id>/index.html
 # → reports/browse/decision_graph/<run>/<id>/index.html  (full decision graph
 #   with every game event plotted across three lanes; agent's path glowing)
@@ -225,7 +225,7 @@ python3 tools/build_dashboard.py all
 #   (data feed for the React frontend below)
 
 # Render the decision graph for one specific run on demand:
-python3 tools/build_dashboard.py decision-graph \
+python3 tools/dashboard/build_dashboard.py decision-graph \
   --report-dir reports/balance/<run>/ --run-id 0
 
 # React + React Flow frontend (alternative to the static HTML):
@@ -235,7 +235,7 @@ npm run test:coverage
 npm run dev          # http://localhost:5173
 npm run build        # → frontend/dist/   (static SPA, ready to serve)
 # Mirror the manifest into the Vite project for development:
-python3 tools/build_dashboard.py emit-frontend-manifest \
+python3 tools/dashboard/build_dashboard.py emit-frontend-manifest \
   --reports reports --frontend-public frontend/public
 ```
 
@@ -274,14 +274,14 @@ SHA-256、修改时间和 JSONL 行号索引外，`provenance` 还记录：
 容器中的绝对路径一致，并使用当前 UID/GID，避免生成 root 所有的报告：
 
 ```bash
-uv run python tools/prepare_embedded_demo.py \
+uv run python tools/build_week/prepare_embedded_demo.py \
   --output reports/docker-game-runtime --replace --json
 export GAME_PROJECT_PATH="$PWD/reports/docker-game-runtime"
 export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
 docker compose --profile game-tools --profile local-nvidia up -d godot sglang
 "$GODOT_BIN" --version
 
-uv run python tools/run_gameplay_agent.py interactive-probe \
+uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
   --report-dir reports/interactive/docker-smoke
 ```
 
@@ -298,14 +298,14 @@ wrapper 会优先复用 compose 中常驻的 `godot` 服务；服务未启动时
 docker compose --profile local-nvidia --profile game-tools up -d sglang godot
 docker compose ps
 
-uv run python tools/run_gameplay_agent.py interactive-probe \
+uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
   --report-dir reports/interactive/local-smoke
 ```
 
 然后运行 5 周 smoke test，并独立重验录制证据：
 
 ```bash
-uv run python tools/run_gameplay_agent.py play \
+uv run python tools/gameplay/run_gameplay_agent.py play \
   --report-dir reports/play/local-newbie-smoke \
   --persona newbie \
   --difficulty normal \
@@ -313,7 +313,7 @@ uv run python tools/run_gameplay_agent.py play \
   --seed 42 \
   --weeks 5
 
-uv run python tools/run_gameplay_agent.py eval \
+uv run python tools/gameplay/run_gameplay_agent.py eval \
   --report-dir reports/play/local-newbie-smoke
 
 uv run python -m json.tool \
@@ -339,16 +339,16 @@ uv run python -m json.tool \
 ```bash
 REPORT=reports/balance/local-real-42
 
-uv run python tools/run_gameplay_agent.py sim \
+uv run python tools/gameplay/run_gameplay_agent.py sim \
   --report-dir "$REPORT" --runs 200 --weeks 20 \
   --policy balanced --difficulty normal --seed 42
-uv run python tools/run_gameplay_agent.py export --report-dir "$REPORT"
-uv run python tools/run_gameplay_agent.py probe \
+uv run python tools/gameplay/run_gameplay_agent.py export --report-dir "$REPORT"
+uv run python tools/gameplay/run_gameplay_agent.py probe \
   --report-dir "$REPORT" --runs 30 --weeks 20 \
   --policy balanced --seed 42 \
   --extreme "zero_money,deep_debt,no_energy,flag_chaos"
-uv run python tools/run_gameplay_agent.py qa --report-dir "$REPORT"
-uv run python tools/run_gameplay_agent.py gates --report-dir "$REPORT"
+uv run python tools/gameplay/run_gameplay_agent.py qa --report-dir "$REPORT"
+uv run python tools/gameplay/run_gameplay_agent.py gates --report-dir "$REPORT"
 ```
 
 `play` 会生成 `playthrough.jsonl`、`playthrough_summary.md`、

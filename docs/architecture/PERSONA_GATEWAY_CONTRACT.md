@@ -18,7 +18,7 @@ payloads, UI state, and CLI namespaces stop at their adapters.
 | `InteractivePlayerAgent._decide_one_week` | `LocalLLMClient.chat` returning JSON text | `PersonaDecisionGateway.decide` returning `PlayerDecision` |
 | `InteractivePlayerAgent._decide_event_choice` | `LocalLLMClient.chat` returning `event_choice_id` JSON | `PersonaDecisionGateway.choose_event` returning `PersonaEventChoice` |
 | Non-interactive QA agents | `LocalLLMClient.chat` | Out of P1 gateway scope; retained for existing local analysis |
-| Legacy `tools/run_agent.py` fallback | `LegacyLocalLLMClient.chat` | Out of Judge/Persona path; retained only for compatibility |
+| Legacy `tools/gameplay/run_agent.py` fallback | `LegacyLocalLLMClient.chat` | Out of Judge/Persona path; retained only for compatibility |
 
 The narrow seam is the interactive player. P1 does not refactor general QA,
 CLI orchestration, Godot execution, or create an MCP adapter.

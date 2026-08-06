@@ -21,4 +21,4 @@ esac
 export GODOT_BIN
 
 cd "$ROOT"
-exec uv run python tools/run_judge_api.py --enable-agent-runs "$@"
+exec uv run python tools/judge/run_judge_api.py --enable-agent-runs "$@"

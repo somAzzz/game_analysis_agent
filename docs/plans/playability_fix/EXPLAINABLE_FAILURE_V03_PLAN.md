@@ -391,14 +391,14 @@ export GODOT_BIN=/tmp/godot-docker-wrapper
 export GAME_PROJECT_PATH=/home/bo/projects/python/study-in-germany
 
 uv run pytest tests -q
-uv run python tools/run_gameplay_agent.py validate --report-dir reports/validation/v03 --check economy --check risk
+uv run python tools/gameplay/run_gameplay_agent.py validate --report-dir reports/validation/v03 --check economy --check risk
 ```
 
 ### 小矩阵验证
 
 ```bash
 for policy in balanced study work admin social slacker; do
-  uv run python tools/run_gameplay_agent.py sim \
+  uv run python tools/gameplay/run_gameplay_agent.py sim \
     --run-id v03-${policy}-normal-r12 \
     --runs 12 --policy "$policy" --difficulty normal --weeks 20
 done
@@ -407,7 +407,7 @@ done
 ### 边界验证
 
 ```bash
-uv run python tools/run_gameplay_agent.py probe \
+uv run python tools/gameplay/run_gameplay_agent.py probe \
   --run-id v03-boundary-r3 \
   --runs 3 --policy balanced --weeks 12 \
   --extreme "zero_money,deep_debt,no_energy,all_negative,no_language,flag_chaos"
@@ -416,7 +416,7 @@ uv run python tools/run_gameplay_agent.py probe \
 ### LLM 游玩验证
 
 ```bash
-uv run python tools/run_gameplay_agent.py play \
+uv run python tools/gameplay/run_gameplay_agent.py play \
   --report-dir reports/play/v03-smoke-newbie \
   --weeks 20 --persona newbie --difficulty normal --scenario default_first_semester --seed 42
 ```

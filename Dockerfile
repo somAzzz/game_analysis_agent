@@ -53,4 +53,4 @@ ENTRYPOINT ["/usr/bin/tini", "--"]
 # Default to the orchestration CLI's help screen so `docker run` does
 # something useful; override per-call by appending subcommands:
 #   docker compose run agent sim --runs 100 --policy balanced
-CMD ["python", "tools/run_gameplay_agent.py", "--help"]
+CMD ["python", "tools/gameplay/run_gameplay_agent.py", "--help"]

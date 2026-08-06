@@ -111,7 +111,7 @@ uv venv .venv
 source .venv/bin/activate
 uv pip install -e ".[dev]"
 
-python3 tools/run_gameplay_agent.py all \
+python3 tools/gameplay/run_gameplay_agent.py all \
   --run-id demo-v02-smoke-balanced-r20 \
   --runs 20 \
   --policy balanced \
@@ -137,7 +137,7 @@ stat_underflow = 0
 ```bash
 for difficulty in normal realistic; do
   for policy in random balanced study money social visa slacker; do
-    python3 tools/run_gameplay_agent.py all \
+    python3 tools/gameplay/run_gameplay_agent.py all \
       --run-id demo-v02-${difficulty}-${policy}-r200 \
       --runs 200 \
       --policy $policy \
@@ -175,7 +175,7 @@ value_review.md
 ## 5. 第三层：边界探测
 
 ```bash
-python3 tools/run_gameplay_agent.py probe \
+python3 tools/gameplay/run_gameplay_agent.py probe \
   --run-id demo-v02-boundary-balanced-r30 \
   --runs 30 \
   --policy balanced \
@@ -396,7 +396,7 @@ ENDINGLE_DOMINANCE = 0.90
 ### A. Smoke Test
 
 ```bash
-python3 tools/run_gameplay_agent.py all \
+python3 tools/gameplay/run_gameplay_agent.py all \
   --run-id v02-smoke-balanced-r20 \
   --runs 20 \
   --policy balanced \
@@ -408,7 +408,7 @@ python3 tools/run_gameplay_agent.py all \
 
 ```bash
 for policy in random balanced study money social visa slacker; do
-  python3 tools/run_gameplay_agent.py all \
+  python3 tools/gameplay/run_gameplay_agent.py all \
     --run-id v02-normal-${policy}-r200 \
     --runs 200 \
     --policy $policy \
@@ -431,7 +431,7 @@ study / work / social / admin policy 结局分布明显不同
 
 ```bash
 for policy in balanced study money social visa slacker; do
-  python3 tools/run_gameplay_agent.py all \
+  python3 tools/gameplay/run_gameplay_agent.py all \
     --run-id v02-realistic-${policy}-r200 \
     --runs 200 \
     --policy $policy \
@@ -443,7 +443,7 @@ done
 ### D. Boundary Test
 
 ```bash
-python3 tools/run_gameplay_agent.py probe \
+python3 tools/gameplay/run_gameplay_agent.py probe \
   --run-id v02-boundary-r30 \
   --runs 30 \
   --policy balanced \
@@ -493,7 +493,7 @@ playthrough_summary.md 输出路线复盘
 新增参数：
 
 ```bash
-python3 tools/run_gameplay_agent.py play \
+python3 tools/gameplay/run_gameplay_agent.py play \
   --report-dir reports/play/v02-study-persona \
   --weeks 20 \
   --persona study \
@@ -553,7 +553,7 @@ anomaly detector 已经在用 `cost_money_exceeds_balance` 读 `week.get("action
 
 ### P1：新增版本对比报告
 
-`tools/compare_reports.py`。
+`tools/gameplay/compare_reports.py`。
 
 ### P1：Content QA 要按"选择结构"评分
 
@@ -658,17 +658,17 @@ design:
   - 新增 `parse_model_response_to_tool_calls(content, round_index=0)`，兼容 `{"tool": ...}` 单 tool 简写 + `{"tool_calls": [...]}` 数组两种 JSON。
   - `OpenAICompatibleToolLoop.chat()` 在 `not tool_calls` 分支先尝试 JSON fallback；如果拿到 JSON tool call 就当作 native tool_call 继续走 tool 循环；如果拿到 `{"final_answer": ...}` 就 return 提取后的纯文本而不是 raw JSON。
   - 现有 `_parse_json_choice` / `_json_choice_to_tool_call` 全部保留为 helper，新函数只复用。
-- **新增**: `tests/test_tool_loop.py` 加 5 个 case（单 tool shorthand / 数组形式 / final_answer / 纯文本 / 非法 JSON）。
-- **验证**: `pytest tests/test_tool_loop.py -v` → 11 passed（包含原 6 个 + 新 5 个）。
+- **新增**: `tests/gameplay/test_tool_loop.py` 加 5 个 case（单 tool shorthand / 数组形式 / final_answer / 纯文本 / 非法 JSON）。
+- **验证**: `pytest tests/gameplay/test_tool_loop.py -v` → 11 passed（包含原 6 个 + 新 5 个）。
 
 ### T03 + T04 — `AnomalyKind` 扩 + 游戏语义 anomaly 规则 ✅
 
 - **修改**: `src/game_analysis_agent/schemas.py` 的 `AnomalyKind` Literal 增加 10 个 kind（`crisis_success_ending` / `social_success_under_survival_crisis` / `academic_success_with_failed_courses` / `visa_success_without_registration` / `testdaf_pass_with_low_language` / `aps_pass_with_low_aps_knowledge` / `black_work_without_risk` / `hunger_ignored_too_long` / `stress_zero_lock` / `social_overflow_pattern`）。
 - **新增**: `src/game_analysis_agent/anomaly_semantics.py` 提供 `check_semantic_invariants(run, **thresholds)`，与 `action_group_keyword` heuristic 配套。
 - **接入**: `src/game_analysis_agent/anomaly_detector.py` 的 `detect_anomalies` 末尾追加 `anomalies.extend(check_semantic_invariants(run))`。
-- **新增**: `tests/test_anomaly_semantics.py` 12 个 case（每条规则 1 个 + 一个 clean run 不触发 + 一个集成到 `detect_anomalies` 的 case）。
+- **新增**: `tests/agents/test_anomaly_semantics.py` 12 个 case（每条规则 1 个 + 一个 clean run 不触发 + 一个集成到 `detect_anomalies` 的 case）。
 - **同步**: `DATA_CONTRACTS.md` §3 更新 `kind` 取值 + 增加 evidence 字段示例。
-- **验证**: `pytest tests/test_anomaly_semantics.py -v` → 12 passed。
+- **验证**: `pytest tests/agents/test_anomaly_semantics.py -v` → 12 passed。
 
 ### T05 — `interactive_player` 改为显式周循环 ✅
 
@@ -678,9 +678,9 @@ design:
   - `_parse_decision()` 支持：fenced JSON 块 / `{...}` 截取 / `parse_model_response_to_tool_calls` 兜底（沿用 T02 的 JSON fallback）/ 解析失败 → fallback 取 catalog 第一个 action。
   - `_render_summary()` 输出：Overview + Final State + Weekly Decisions table + Anomalies table。
   - 新增 `PERSONAS` 表（newbie / study / money / social / visa / slacker），persona block 拼到 system prompt。
-- **修改**: `tools/run_gameplay_agent.py::cmd_play` 透传 `--persona` / `--difficulty` / `--seed`；CLI 加上 `--persona {newbie,study,money,social,visa,slacker}`。
-- **新增**: `tests/test_interactive_player.py` 9 个 case（含 fake probe + JSON fallback 路径 + decision parser 单测 + 真实 InteractiveProbe 类型兼容）。
-- **验证**: `pytest tests/test_interactive_player.py -v` → 9 passed。
+- **修改**: `tools/gameplay/run_gameplay_agent.py::cmd_play` 透传 `--persona` / `--difficulty` / `--seed`；CLI 加上 `--persona {newbie,study,money,social,visa,slacker}`。
+- **新增**: `tests/playtest/test_interactive_player.py` 9 个 case（含 fake probe + JSON fallback 路径 + decision parser 单测 + 真实 InteractiveProbe 类型兼容）。
+- **验证**: `pytest tests/playtest/test_interactive_player.py -v` → 9 passed。
 
 ### T06 — `value_analyzer` 增加 4 类分析 ✅
 
@@ -692,33 +692,33 @@ design:
   - `analyze_route_metrics()` 合并以上 + `route_report.json` 输出。
 - **修改**: `analyze_and_write()` 现在同时写 `value_report.json` + `route_report.json`。
 - **修改**: `schemas.ValueFinding.scope` Literal 扩 4 个新 scope（`action_group` / `crisis_response` / `ending_contradiction` / `route`）。
-- **新增**: `tests/test_value_analyzer.py` 加 8 个 case（groups + crisis + contradictions + route + 子报告生成 + 集成）。
-- **验证**: `pytest tests/test_value_analyzer.py -v` → 14 passed（原 6 个 + 新 8 个）。
+- **新增**: `tests/agents/test_value_analyzer.py` 加 8 个 case（groups + crisis + contradictions + route + 子报告生成 + 集成）。
+- **验证**: `pytest tests/agents/test_value_analyzer.py -v` → 14 passed（原 6 个 + 新 8 个）。
 
-### T07 — `tools/compare_reports.py` ✅
+### T07 — `tools/gameplay/compare_reports.py` ✅
 
-- **新增**: `tools/compare_reports.py`：
+- **新增**: `tools/gameplay/compare_reports.py`：
   - CLI：`--before` / `--after` / `--out` / `--diff-json`。
   - 6 个维度对比：`ending_distribution.csv` / `action_pick_rates.csv` / `weekly_stats.csv` / `anomalies.jsonl` / `value_report.json` / `route_report.json`。
   - 输出：人类可读 `compare_summary.md`（按维度分段、各取 top Δ）+ 机器可读 `compare_diff.json`。
-- **新增**: `tests/test_compare_reports.py` 3 个 case（基本 diff + markdown 包含所有 section + 空目录不抛）。
-- **验证**: `pytest tests/test_compare_reports.py -v` → 3 passed。
+- **新增**: `tests/gameplay/test_compare_reports.py` 3 个 case（基本 diff + markdown 包含所有 section + 空目录不抛）。
+- **验证**: `pytest tests/gameplay/test_compare_reports.py -v` → 3 passed。
 
 ### T08 — `config/matrix.yaml` + `config/gates.yaml` ✅
 
 - **新增**: `config/matrix.yaml`（v0.2 测试矩阵：2 difficulty × 7 policy × 200 runs + boundary 30 × 8 extremes + 6 persona）。
 - **新增**: `config/gates.yaml`（critical_fail / balance / design 三段；critical_fail 把 T04 新增的 6 条游戏语义 kind 标 0 容忍）。
-- **新增**: `tests/test_config_yaml.py` 2 个 smoke case（保证两个 YAML 能被 `yaml.safe_load` 读，且关键字段在）。
-- **验证**: `pytest tests/test_config_yaml.py -v` → 2 passed。
+- **新增**: `tests/gameplay/test_config_yaml.py` 2 个 smoke case（保证两个 YAML 能被 `yaml.safe_load` 读，且关键字段在）。
+- **验证**: `pytest tests/gameplay/test_config_yaml.py -v` → 2 passed。
 
 ### 综合验证
 
 ```text
-$ pytest tests/ --ignore=tests/test_analyze_balance.py --no-header -q
+$ pytest tests/ --ignore=tests/gameplay/test_analyze_balance.py --no-header -q
 100 passed in 0.29s
 ```
 
-注：`tests/test_analyze_balance.py::test_analyze_balance_fixture` 在我的改动之前就已经失败（用 system `python3` 而非 venv 的 python，subprocess 拿不到 `python3-tools/analyze_balance.py` 路径解析），与本次改动无关，留给后续 CI 适配。
+注：`tests/gameplay/test_analyze_balance.py::test_analyze_balance_fixture` 在我的改动之前就已经失败（用 system `python3` 而非 venv 的 python，subprocess 拿不到 `python3-tools/gameplay/analyze_balance.py` 路径解析），与本次改动无关，留给后续 CI 适配。
 
 ### T09 — `event_graph` agent 输出"未触发原因" ✅
 
@@ -726,7 +726,7 @@ $ pytest tests/ --ignore=tests/test_analyze_balance.py --no-header -q
   - 新增 `build_untriggered_block(raw_runs, event_graph)`，统计 `weekly_log` 中的事件触发次数。
   - 对未触发事件输出 `## Untriggered Events`，包含 trigger JSON 和粗粒度 missing-reason hint。
 - **修改**: `prompts/event_graph_agent_user.md` 增加 `{{UNTRIGGERED_EVENTS}}`。
-- **新增**: `tests/test_agents_registry.py` 覆盖 prompt 注入和 trigger 计数。
+- **新增**: `tests/agents/test_agents_registry.py` 覆盖 prompt 注入和 trigger 计数。
 
 ### T10 — `content_qa` agent 按"选择结构"评分 ✅
 
@@ -734,14 +734,14 @@ $ pytest tests/ --ignore=tests/test_analyze_balance.py --no-header -q
   - 新增 `score_choice_structure(event_graph)`，检测 `duplicate_choice_text` / `all_choices_positive` / `missing_failure_cost` / `choice_effects_too_similar`。
   - 把确定性 findings 渲染为 `## Choice Structure Findings` 后再交给 LLM。
 - **修改**: `prompts/content_qa_agent_user.md` 增加 `{{CHOICE_STRUCTURE_FINDINGS}}`。
-- **新增**: `tests/test_agents_registry.py` 覆盖 prompt 注入和 missing-cost 评分。
+- **新增**: `tests/agents/test_agents_registry.py` 覆盖 prompt 注入和 missing-cost 评分。
 
 ### 语义阈值修正 ✅
 
 - **修改**: `src/game_analysis_agent/anomaly_semantics.py`
   - `hunger_ignored_too_long` 从硬编码 `hunger >= 90` 改为使用评审定义的 `survival_hunger` 默认阈值 `85`。
   - evidence / message 记录实际 threshold。
-- **新增**: `tests/test_anomaly_semantics.py` 覆盖连续 6 周 `hunger=86` 触发。
+- **新增**: `tests/agents/test_anomaly_semantics.py` 覆盖连续 6 周 `hunger=86` 触发。
 
 ### 综合验证
 
@@ -756,7 +756,7 @@ $ uv run pytest tests/ -q
 
 ### T13 — Editorial HTML dashboard ✅
 
-- **新增**: `tools/build_dashboard.py` —— 单文件 Python CLI，无第三方依赖。
+- **新增**: `tools/dashboard/build_dashboard.py` —— 单文件 Python CLI，无第三方依赖。
 - **aesthetic**: 编辑部 / 数据新闻学风格（Pudding / FiveThirtyEight / NYT Graphics 一类）。Fraunces（display）+ Newsreader（body）+ IBM Plex Mono（kicker / 数据 / numerics）。配色：paper cream `#F4EFE6` + ink `#1F1B16` + terracotta `#C8553D` + forest `#3B5F4E`。
 - **核心设定**：把每一个 report 目录当作 *杂志的一期* —— 有封面、masthead、署名、版面编号、byline、deck（导言）、drop cap、pull quote、anomaly marginalia（页边注脚）。
 - **front page** (`reports/index.html`)：masthead（vol/issue/date 三段式）+ banner（巨型 Fraunces title + 副标题）+ KPI strip（4 个并列数字栏）+ Issue Shelf（24 张本期目录卡片）+ Colophon（版权页）。
@@ -769,11 +769,11 @@ $ uv run pytest tests/ -q
   - 卡片加 `fade-in d0..d3` 错开渐显。
   - GATE report 用红/绿横幅直显。
 - **零依赖**：自写 markdown 子集渲染（headings / paragraph / list / blockquote / code fence / table / inline bold-italic-code），inline CSS，inline SVG。
-- **测试**: `tests/test_build_dashboard.py` 9 个 case（markdown 各元素 + front page + issue page + 聚合器）。
-- **验证**: `pytest tests/test_build_dashboard.py -v` → 9 passed；全量 `pytest tests/`（除 pre-existing broken test）→ 123 passed。
+- **测试**: `tests/dashboard/test_build_dashboard.py` 9 个 case（markdown 各元素 + front page + issue page + 聚合器）。
+- **验证**: `pytest tests/dashboard/test_build_dashboard.py -v` → 9 passed；全量 `pytest tests/`（除 pre-existing broken test）→ 123 passed。
 - **使用**:
   ```bash
-  python3 tools/build_dashboard.py --reports reports
+  python3 tools/dashboard/build_dashboard.py --reports reports
   # → reports/index.html + reports/browse/<kind>/<id>/index.html
   #   open in browser via file://
   ```
@@ -781,16 +781,16 @@ $ uv run pytest tests/ -q
 
 ### Decision-graph view (T13.5) ✅
 
-- **新增**: `tools/build_dashboard.py` 增加 `decision-graph` 子命令 + 一整套渲染函数（`_compute_graph_layout` / `_decision_graph_payload` / `_decision_graph_svg` / `render_decision_graph_page`）。
+- **新增**: `tools/dashboard/build_dashboard.py` 增加 `decision-graph` 子命令 + 一整套渲染函数（`_compute_graph_layout` / `_decision_graph_payload` / `_decision_graph_svg` / `render_decision_graph_page`）。
 - **核心设计**：把所有 128 个 game event 在 SVG 画布上铺开，3 条横向 lane 按 `event_type`（fixed / conditional / random），X 轴 = 触发周。被 agent 触发的事件节点用 terracotta 描边 + 黑色填充凸显，连成一条发光的 path polyline（CSS `stroke-dashoffset` 动画）。
 - **choice 高亮**：每个被触发的事件节点里叠一个 wedge 扇形（按 4 等份划分），扇形位置代表该 event 4 个 choice 中 agent 选的那个（1/2/3/4）。Hover 节点 → tooltip 显示 event title + choice text + 关键 effects；点击节点 / 点击 timeline 一格 → 同步高亮，下方 panel 显示该周的 choice + effects + selected_actions + after_state。
 - **interactivity**：底部 timeline 横轴有 slider（0..20）+ Play / Pause / Reset 按钮 —— Play 会自动一周一周推进画布高亮，模拟"实时回放 agent 的决策过程"。
 - **触发数量**：128 events total（62 random + 38 conditional + 8 fixed），balanced policy 在 default_first_semester 下触发了 20 个节点（每 week 一个），全在 fixed / conditional lane，random lane 因为触发条件不满足保持空。
 - **接入**：每个 balance issue 页面的 tab rail 增加 "↗ Decision Graph" 链接，独立 URL `reports/browse/decision_graph/<run>/<run_id>/index.html`，可通过 CLI `decision-graph --report-dir ... --run-id N` 单跑一份。
-- **测试**：`tests/test_build_dashboard.py` 增加 5 个 case（layout lane 分离 / wedge SVG / 空 wedge 处理 / payload 抽取 choice / page 渲染关键 section）→ 14 passed。
-- **验证**：全量 `pytest tests/` → 128 passed；`python tools/build_dashboard.py all` → 写出 front page + 54 issue pages + 4 decision-graph pages。
+- **测试**：`tests/dashboard/test_build_dashboard.py` 增加 5 个 case（layout lane 分离 / wedge SVG / 空 wedge 处理 / payload 抽取 choice / page 渲染关键 section）→ 14 passed。
+- **验证**：全量 `pytest tests/` → 128 passed；`python tools/dashboard/build_dashboard.py all` → 写出 front page + 54 issue pages + 4 decision-graph pages。
   ```bash
-  python3 tools/build_dashboard.py all
+  python3 tools/dashboard/build_dashboard.py all
   # → reports/index.html
   # → reports/browse/balance/<run>/index.html          (per-issue page)
   # → reports/browse/decision_graph/<run>/<id>/...   (interactive decision graph)
@@ -798,7 +798,7 @@ $ uv run pytest tests/ -q
 
 ### Decision-graph adaptive layer ✅
 
-- **修改**: `tools/build_dashboard.py` 重写，让 graph 生成器**自适应上游 schema 变化**（这是用户对 graph 可自动更新迭代的明确要求）。
+- **修改**: `tools/dashboard/build_dashboard.py` 重写，让 graph 生成器**自适应上游 schema 变化**（这是用户对 graph 可自动更新迭代的明确要求）。
 - **5 条适应轴线**：
   1. **Lanes 自动派生**：`_compute_graph_layout` 不再用硬编码的 `{"fixed": 110, "conditional": 250, "random": 390}`。`_lane_for_event(ev)` 从 `event_type` / `type` / `kind` 字段取 lane name，缺失则归入 `uncategorised`，unknown 类型自动新开 lane。
   2. **Lane y 自动计算**：根据 lane 数量平均分摊 plot 高度，新增第 4 / 5 条 lane 时画布自动长高。
@@ -808,7 +808,7 @@ $ uv run pytest tests/ -q
 - **Diagnostics 落地**：每个决策图页面 + 每个对应 `_diagnostics.json`（pages/browse/decision_graph/<run>/<id>/_diagnostics.json），记录：实际发现的 event_type 列表、data-driven lane order、观察到的 max_week、triggered 但 event_graph.json 里没有的事件 ID（schema drift 信号）、payload diagnostics 备注列表。同时页面里有一个可折叠的 `<details>` 块，把备注渲染在画布下方。
 - **Play reports 也被自动发现**：`cmd_all` 现在扫 balance *和* play 两个目录，只要有 `raw_runs.jsonl + event_graph.json` 就自动产出决策图页。
 - **画布自动横向延展**：若 `weekly_log` 里 week > 声明的 `max_weeks`（异常路径），payload 自动把 `max_week` 抬高到观察值，让图能完整画出 path。
-- **测试**：`tests/test_build_dashboard.py` 新增 12 个自适应 case：
+- **测试**：`tests/dashboard/test_build_dashboard.py` 新增 12 个自适应 case：
   - `test_layout_adapts_to_new_event_types`（新 lane 类型被吸收）
   - `test_layout_orders_lanes_by_frequency`（多事件 lane 排前面）
   - `test_layout_height_scales_with_lane_count`（高度自适应）
@@ -822,13 +822,13 @@ $ uv run pytest tests/ -q
   - `test_payload_handles_explicit_choice_index_field`（直接 emit choice_index）
   - `test_diagnostics_json_written`（`_diagnostics.json` 落地）
   - `test_layout_max_week_widens_to_observed`（异常延展）
-- **验证**: `pytest tests/ --ignore=tests/test_analyze_balance.py -q` → **145 passed** (从 128 + 17)；`python tools/build_dashboard.py all` → 71 pages emitted (54 issue + 13 play decision_graph 等等自适应扩展)。
+- **验证**: `pytest tests/ --ignore=tests/gameplay/test_analyze_balance.py -q` → **145 passed** (从 128 + 17)；`python tools/dashboard/build_dashboard.py all` → 71 pages emitted (54 issue + 13 play decision_graph 等等自适应扩展)。
 - **未来扩展零代码改动示例**：
   - 加个 `event_type: "meta"` 到 EventData → 自动出现 "META" lane
   - 把 `trigger.week` 改名为 `trigger.fire_week` → 自动适配
   - 把 `event_choice_id` 改成 `eid/c1` 格式 → wedge 自动定位
   - 给 choice 加 `label` 字段代替 `text` → 自动拿到
-  - 任意新增 / 删除事件 / 调整次数 → 重新 `python tools/build_dashboard.py all`，graph 自动重新铺。
+  - 任意新增 / 删除事件 / 调整次数 → 重新 `python tools/dashboard/build_dashboard.py all`，graph 自动重新铺。
 
 ### React + React Flow frontend ✅
 
@@ -838,9 +838,9 @@ $ uv run pytest tests/ -q
   - `/issue/:kind/:id` → `IssuePage.tsx`（cover + ending grid + 4 个 sparkline + value findings + anomaly marginalia + 7 个 agent markdown column 用 react-markdown 渲染 + drop cap）
   - `/decision-graph/:runId` → `DecisionGraphPage.tsx`（React Flow 画布 + 自定义 EventNode + BackgroundEventNode 节点 + dagre 自动布局 + 选择 / 拖动 / MiniMap / 自动播放 timeline）
 - **Python 后端 → React 前端 的数据线**：
-  - 新增 `tools/emit_manifest.py`：扫描 `reports/`，写出 `reports/manifest.json`（顶层 index）+ `reports/browse/<kind>/<id>/manifest.json`（per-issue 完整 payload，含 weekly_series / anomalies / value_findings / 8 个 agent_markdown body）+ `reports/browse/decision_graph/<run>/<id>/manifest.json`（含 raw run + 完整 event_graph）。
-  - `tools/build_dashboard.py` 新增 `cmd_emit_frontend_manifest` 子命令，可把 manifest 镜像到 `frontend/public/` 供 Vite dev server 静态服务。
-  - 跑一次 `python tools/build_dashboard.py all` 会自动跑 manifest emitter + 镜像到 frontend/public/，前端下次 dev / build 永远拿到最新数据。
+  - 新增 `tools/dashboard/emit_manifest.py`：扫描 `reports/`，写出 `reports/manifest.json`（顶层 index）+ `reports/browse/<kind>/<id>/manifest.json`（per-issue 完整 payload，含 weekly_series / anomalies / value_findings / 8 个 agent_markdown body）+ `reports/browse/decision_graph/<run>/<id>/manifest.json`（含 raw run + 完整 event_graph）。
+  - `tools/dashboard/build_dashboard.py` 新增 `cmd_emit_frontend_manifest` 子命令，可把 manifest 镜像到 `frontend/public/` 供 Vite dev server 静态服务。
+  - 跑一次 `python tools/dashboard/build_dashboard.py all` 会自动跑 manifest emitter + 镜像到 frontend/public/，前端下次 dev / build 永远拿到最新数据。
 - **TypeScript 自适应层**：`frontend/src/lib/layout.ts` 是 Python `_compute_graph_layout` + `_decision_graph_payload` 的 TypeScript 端口，保持五条自适应轴线一致（lanes 由 event_type 派生、lane y 自动延展、trigger week 兼容 6 种字段名、choice index 兼容 7 种正则、choice text/effects 多字段名）。React 端不需要 Python 重算，可纯客户端渲染自适应 graph。
 - **Editorial 风格保留**：同一套 CSS variables (`--paper #F4EFE6` / `--accent #C8553D` / `--ink #1F1B16` 等)、同一套字体 (Fraunces / Newsreader / IBM Plex Mono)。`/decision-graph/...` 的 React Flow 自定义节点用了 React 端的 `.event-node` 类，跟静态 SVG 版视觉一致（圆形 80px / triggered 时 96px / 黑色 + terracotta 描边 / hover 放大）。
 - **交互功能**：
@@ -849,8 +849,8 @@ $ uv run pytest tests/ -q
   - Slider 0..maxWeek → scrub path，<= currentWeek 的节点 + 边自动 highlight。
   - Play / Pause / Reset 按钮 → 700ms 间隔自动推进 slider。
   - MiniMap + Controls + Background dots → 标准 React Flow 体验。
-- **Tests**：`tests/test_frontend_build.py` 3 个 case（Vite build 成功、dist/manifest.json 存在、Python manifest 解析有效）。`tests/test_emit_manifest.py` 4 个 case（顶层 + per-issue + decision-graph + 容错）。
-- **验证**：`pytest tests/ --ignore=tests/test_analyze_balance.py -q` → **155 passed**（Python 152 + frontend 3）。`cd frontend && npm run build` → 580KB JS / 32KB CSS，dist/index.html 干净输出。
+- **Tests**：`tests/dashboard/test_frontend_build.py` 3 个 case（Vite build 成功、dist/manifest.json 存在、Python manifest 解析有效）。`tests/reports/test_emit_manifest.py` 4 个 case（顶层 + per-issue + decision-graph + 容错）。
+- **验证**：`pytest tests/ --ignore=tests/gameplay/test_analyze_balance.py -q` → **155 passed**（Python 152 + frontend 3）。`cd frontend && npm run build` → 580KB JS / 32KB CSS，dist/index.html 干净输出。
 - **目录结构**：
   ```
   frontend/
@@ -879,10 +879,10 @@ $ uv run pytest tests/ -q
 - **使用**:
   ```bash
   # 1. 生成报告（已有）
-  python tools/run_gameplay_agent.py all --runs 200
+  python tools/gameplay/run_gameplay_agent.py all --runs 200
   
   # 2. 一条命令同时构建静态 HTML 和 manifest
-  python tools/build_dashboard.py all
+  python tools/dashboard/build_dashboard.py all
   
   # 3. 启动 React SPA
   cd frontend && npm install && npm run dev   # http://localhost:5173

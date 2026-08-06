@@ -22,7 +22,7 @@ export VLLM_API_KEY=local-dev-token
 ## 3. 启动服务
 
 ```bash
-MODEL_ID=nvidia/Qwen3.6-27B-NVFP4 ./tools/run_vllm_qwen.sh
+MODEL_ID=nvidia/Qwen3.6-27B-NVFP4 ./tools/llm_runtime/run_vllm_qwen.sh
 ```
 
 脚本默认参数：

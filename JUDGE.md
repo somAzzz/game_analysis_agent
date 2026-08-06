@@ -18,9 +18,9 @@ checks.
 Preflight one intended mode without exposing secrets:
 
 ```bash
-/usr/bin/python3 tools/judge_doctor.py --mode inspect --json
-uv run python tools/judge_doctor.py --mode dashboard-native --json
-uv run python tools/judge_doctor.py --mode dashboard-container --json
+/usr/bin/python3 tools/judge/judge_doctor.py --mode inspect --json
+uv run python tools/judge/judge_doctor.py --mode dashboard-native --json
+uv run python tools/judge/judge_doctor.py --mode dashboard-container --json
 ```
 
 The doctor distinguishes native and container dashboards and returns exit 10
@@ -171,7 +171,7 @@ Build and start the same-origin UI/API locally:
 
 ```bash
 cd frontend && npm run build:public && cd ..
-uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080
+uv run python tools/judge/run_judge_api.py --host 127.0.0.1 --port 8080
 ```
 
 To enable the bounded live OpenAI persona campaign, keep the key in the server
@@ -180,7 +180,7 @@ environment and opt in explicitly:
 ```bash
 . .tools/build-week/env.sh
 export OPENAI_API_KEY=... # server process only; never enter this in the browser
-uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080 --enable-live-openai
+uv run python tools/judge/run_judge_api.py --host 127.0.0.1 --port 8080 --enable-live-openai
 ```
 
 The API limits a request to three personas, three seeds, and five weeks. It

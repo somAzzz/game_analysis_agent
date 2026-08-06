@@ -31,7 +31,7 @@ multi-architecture source is `Dockerfile.judge`; its official Python base is
 pinned by image-index digest and does not force an amd64 platform on Apple
 Silicon.
 
-The image is not claimed as published until `tools/build_judge_image.sh` has
+The image is not claimed as published until `tools/judge/build_judge_image.sh` has
 produced registry metadata for both `linux/amd64` and `linux/arm64`.
 
 ## 3. Optional local game and model setup
@@ -75,14 +75,14 @@ Run gameplay commands from the host and point `GODOT_BIN` at the wrapper. It
 reuses the compose sidecar and reaches SGLang through the published host port:
 
 ```bash
-uv run python tools/prepare_embedded_demo.py \
+uv run python tools/build_week/prepare_embedded_demo.py \
   --output reports/docker-game-runtime --replace --json
 export GAME_PROJECT_PATH="$PWD/reports/docker-game-runtime"
 export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
 
-uv run python tools/run_gameplay_agent.py interactive-probe \
+uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
   --report-dir reports/interactive/compose-smoke
-uv run python tools/run_gameplay_agent.py play \
+uv run python tools/gameplay/run_gameplay_agent.py play \
   --report-dir reports/play/compose-live
 ```
 
@@ -107,7 +107,7 @@ The pipeline still runs natively if you have the Python deps installed
 and the selected OpenAI-compatible server reachable at its configured base URL:
 
 ```bash
-python3 tools/run_gameplay_agent.py all --runs 100 --policy balanced
+python3 tools/gameplay/run_gameplay_agent.py all --runs 100 --policy balanced
 ```
 
 The Docker setup keeps both external runtimes available while the Python CLI

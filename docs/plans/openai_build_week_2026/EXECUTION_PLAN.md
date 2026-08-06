@@ -305,7 +305,7 @@ severity, commands checked, missing evidence, and pass/fail recommendation.
 
 **Focused verification**
 
-- **Existing:** `uv run pytest tests/test_game_contract.py -m game_contract -q -ra`.
+- **Existing:** `uv run pytest tests/gameplay/test_game_contract.py -m game_contract -q -ra`.
 - **Existing:** run `scripts/godot-docker-wrapper --version` when Docker is
   available, otherwise run the pinned native Godot 4.4 executable.
 - Confirm the packaged path works without `/home/bo/...` or a sibling checkout.
@@ -361,10 +361,10 @@ Record skipped tests and unavailable tools; a skip is not a pass.
 **Existing command family**
 
 ```bash
-uv run python tools/run_gameplay_agent.py sim <pinned arguments>
-uv run python tools/run_gameplay_agent.py export --report-dir <baseline>
-uv run python tools/run_gameplay_agent.py validate --report-dir <baseline>
-uv run python tools/run_gameplay_agent.py gates --report-dir <baseline>
+uv run python tools/gameplay/run_gameplay_agent.py sim <pinned arguments>
+uv run python tools/gameplay/run_gameplay_agent.py export --report-dir <baseline>
+uv run python tools/gameplay/run_gameplay_agent.py validate --report-dir <baseline>
+uv run python tools/gameplay/run_gameplay_agent.py gates --report-dir <baseline>
 ```
 
 Exact arguments and outputs must be copied into G0, not represented by the
@@ -927,7 +927,7 @@ claims. The submission-asset reviewer passes the draft while returning
 or authorize P5 release claims.
 
 **Fail-closed G5 tooling (2026-07-16): implemented.**
-`tools/review_build_week_g5.py --json` now verifies G0-G4, the claim ledger,
+`tools/build_week/review_build_week_g5.py --json` now verifies G0-G4, the claim ledger,
 release URLs, manual comparison, independent clean-room review, video checks,
 published image digest, license, privacy status, and tracked-file secret scan.
 The committed templates contain `not_run`/`blocked` states, and the reviewer

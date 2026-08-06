@@ -142,7 +142,7 @@ Owner：DE + QA + PD
 Owner：RE + DE
 
 ```bash
-uv run python tools/prepare_embedded_demo.py \
+uv run python tools/build_week/prepare_embedded_demo.py \
   --output reports/local-game-runtime --replace --json
 export GAME_PROJECT_PATH="$PWD/reports/local-game-runtime"
 export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
@@ -214,7 +214,7 @@ examples/build_week_2026/playthrough-v1/
 
 展示实际游戏数据，不做游戏内容脱敏；仍排除 secret、host path 和 provider 私有 trace。
 
-结果：`tools/build_playthrough_views.py` 生成 18 个 cell view、342 个 actual node、324 条 actual edge、1,336 个 legal event choice 和六 Persona 的实测 action-tag rate。
+结果：`tools/dashboard/build_playthrough_views.py` 生成 18 个 cell view、342 个 actual node、324 条 actual edge、1,336 个 legal event choice 和六 Persona 的实测 action-tag rate。
 
 ### `PF-05` — 路径证据 gate（passed）
 
@@ -231,7 +231,7 @@ Owner：QA + Playtest Forge
 - Persona 三个 seed 不串线；
 - Replay 绝不标为 live。
 
-结果：`uv run python tools/verify_playthrough_views.py` 通过；`tests/test_playthrough_view.py` 覆盖完整 evidence、代表性路径和 raw trace 篡改拒绝。
+结果：`uv run python tools/dashboard/verify_playthrough_views.py` 通过；`tests/dashboard/test_playthrough_view.py` 覆盖完整 evidence、代表性路径和 raw trace 篡改拒绝。
 
 ### `PF-06` — 前端实现准入（data passed，design approval pending）
 

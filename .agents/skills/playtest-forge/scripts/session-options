@@ -2,4 +2,4 @@
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../../../.." && pwd)
 cd "$ROOT"
-exec uv run python tools/describe_playtest_session.py "$@"
+exec uv run python tools/judge/describe_playtest_session.py "$@"

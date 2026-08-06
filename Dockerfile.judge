@@ -38,7 +38,7 @@ COPY frontend/src/lib/api.ts frontend/src/lib/eventLocalization.ts ./frontend/sr
 COPY frontend/src/pages/JudgePage.tsx ./frontend/src/pages/
 COPY frontend/src/types.ts ./frontend/src/
 COPY frontend/tests/App.test.tsx frontend/tests/api.test.ts frontend/tests/eventLocalization.test.ts ./frontend/tests/
-COPY tests/test_event_localization.py tests/test_experiment_registry.py tests/test_judge_inspect.py ./tests/
+COPY tests/gameplay/test_event_localization.py tests/build_week/test_experiment_registry.py tests/judge/test_judge_inspect.py ./tests/
 
 RUN useradd --create-home --uid 10001 judge \
  && chown -R judge:judge /app

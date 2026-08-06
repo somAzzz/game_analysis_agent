@@ -333,7 +333,7 @@ the repository evidence and local build are the source of truth.
 
 ```bash
 cd frontend && npm run build:public && cd ..
-uv run python tools/run_judge_api.py \
+uv run python tools/judge/run_judge_api.py \
   --host 127.0.0.1 \
   --port 8080 \
   --frontend frontend/dist

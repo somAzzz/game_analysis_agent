@@ -3,4 +3,4 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../../../.." && pwd)
 cd "$ROOT"
 export PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
-exec uv run python tools/preflight_build_week_repair.py "$@"
+exec uv run python tools/repair/preflight_build_week_repair.py "$@"

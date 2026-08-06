@@ -208,7 +208,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.judge
-    entrypoint: ["/app/.venv/bin/python", "tools/run_judge_api.py"]
+    entrypoint: ["/app/.venv/bin/python", "tools/judge/run_judge_api.py"]
     command: ["--host", "0.0.0.0", "--port", "8080", "--frontend", "/app/frontend/dist"]
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
@@ -271,7 +271,7 @@ services:
     profiles:
       - cli
     # No long-running process — the CLI exits when it finishes.
-    command: ["python", "tools/run_gameplay_agent.py", "--help"]
+    command: ["python", "tools/gameplay/run_gameplay_agent.py", "--help"]
 
 # A bare ``docker compose up`` starts only the CPU dashboard. Use profile
 # ``judge`` for offline Replay, ``game-tools`` for Godot, ``cli`` for the legacy

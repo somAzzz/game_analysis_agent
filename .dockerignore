@@ -22,9 +22,15 @@ dist/
 tests/
 !tests/
 tests/*
-!tests/test_event_localization.py
-!tests/test_experiment_registry.py
-!tests/test_judge_inspect.py
+!tests/gameplay/
+tests/gameplay/*
+!tests/gameplay/test_event_localization.py
+!tests/build_week/
+tests/build_week/*
+!tests/build_week/test_experiment_registry.py
+!tests/judge/
+tests/judge/*
+!tests/judge/test_judge_inspect.py
 
 # Local config + secrets
 .env

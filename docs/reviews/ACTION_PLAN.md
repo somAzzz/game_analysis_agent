@@ -21,18 +21,18 @@ scope: 评审任务 T01–T13 拆解与状态
 | ID | 优先级 | 任务 | 涉及文件 | 依赖 |
 | --- | --- | --- | --- | --- |
 | T01 | P0 | 跑 v0.2 smoke test，确认端到端流水线 | 仅命令 | — |
-| T02 | P0 | 给 `tool_loop` 接入 JSON fallback | `src/game_analysis_agent/tool_loop.py`, `tests/test_tool_loop.py` | — |
+| T02 | P0 | 给 `tool_loop` 接入 JSON fallback | `src/game_analysis_agent/tool_loop.py`, `tests/gameplay/test_tool_loop.py` | — |
 | T03 | P0 | 在 `schemas.AnomalyKind` 增补游戏语义 kind | `src/game_analysis_agent/schemas.py` | — |
-| T04 | P0 | `anomaly_detector` 加游戏语义规则 | `src/game_analysis_agent/anomaly_detector.py`, `tests/test_anomaly_detector.py`, `tests/fixtures/anomaly_runs.jsonl` | T03 |
-| T05 | P0 | `interactive_player` 改为显式周循环 | `src/game_analysis_agent/agents/interactive_player.py`, `tools/run_gameplay_agent.py`, `prompts/player_user.md`, `tests/test_runner.py` | T02 |
-| T06 | P0 | `value_analyzer` 加 action group / crisis / ending contradiction / route separation | `src/game_analysis_agent/value_analyzer.py`, `tests/test_value_analyzer.py` | T03 |
-| T07 | P0 | 新增 `tools/compare_reports.py` | `tools/compare_reports.py` | T04, T06 |
+| T04 | P0 | `anomaly_detector` 加游戏语义规则 | `src/game_analysis_agent/anomaly_detector.py`, `tests/agents/test_anomaly_detector.py`, `tests/fixtures/anomaly_runs.jsonl` | T03 |
+| T05 | P0 | `interactive_player` 改为显式周循环 | `src/game_analysis_agent/agents/interactive_player.py`, `tools/gameplay/run_gameplay_agent.py`, `prompts/player_user.md`, `tests/gameplay/test_runner.py` | T02 |
+| T06 | P0 | `value_analyzer` 加 action group / crisis / ending contradiction / route separation | `src/game_analysis_agent/value_analyzer.py`, `tests/agents/test_value_analyzer.py` | T03 |
+| T07 | P0 | 新增 `tools/gameplay/compare_reports.py` | `tools/gameplay/compare_reports.py` | T04, T06 |
 | T08 | P1 | `config/matrix.yaml` + `config/gates.yaml` | `config/matrix.yaml`, `config/gates.yaml` | — |
 | T09 | P1 | `event_graph` agent 输出"未触发原因" | `src/game_analysis_agent/agents/event_graph.py`, `prompts/event_graph_agent_user.md` | — |
 | T10 | P1 | `content_qa` agent 按"选择结构"评分 | `src/game_analysis_agent/agents/content_qa.py`, `prompts/content_qa_agent_user.md` | — |
-| T11 | P1 | `play` CLI 支持 `--persona` / `--difficulty` / `--seed` | `tools/run_gameplay_agent.py` | T05 |
+| T11 | P1 | `play` CLI 支持 `--persona` / `--difficulty` / `--seed` | `tools/gameplay/run_gameplay_agent.py` | T05 |
 | T12 | P2 | 跑全量矩阵（balance + boundary）记录到 reports/ | 命令 | T01, T04, T06 |
-| T13 | P2 | HTML dashboard | `tools/build_dashboard.py` | T07 |
+| T13 | P2 | HTML dashboard | `tools/dashboard/build_dashboard.py` | T07 |
 
 ---
 
@@ -48,7 +48,7 @@ scope: 评审任务 T01–T13 拆解与状态
 4. 跑：
 
    ```bash
-   python3 tools/run_gameplay_agent.py all \
+   python3 tools/gameplay/run_gameplay_agent.py all \
      --run-id v02-smoke-balanced-r20 \
      --runs 20 --policy balanced --difficulty normal --weeks 20
    ```
@@ -77,13 +77,13 @@ scope: 评审任务 T01–T13 拆解与状态
 
 ### 实现位置
 - `src/game_analysis_agent/tool_loop.py`：新增 `parse_model_response_to_tool_calls`；修改 `chat()` 的 early return。
-- `tests/test_tool_loop.py`：加 3 个 case：
+- `tests/gameplay/test_tool_loop.py`：加 3 个 case：
   1. 仅有 `{"tool": "foo", "arguments": {...}}` → 走 JSON fallback。
   2. 仅有 `{"tool_calls": [{"name": "foo", "arguments": {...}}]}` → 走 JSON fallback（兼容部分模型只写 `tool_calls`）。
   3. 仅有 `{"final_answer": "..."}` → 当成 final，return content。
 
 ### 验证
-- `pytest tests/test_tool_loop.py -v` 全绿。
+- `pytest tests/gameplay/test_tool_loop.py -v` 全绿。
 - 现有 `test_executes_registered_tool_and_finishes` 等不破坏。
 
 ---
@@ -166,11 +166,11 @@ scope: 评审任务 T01–T13 拆解与状态
 - 新文件 `src/game_analysis_agent/anomaly_semantics.py`。
 - `src/game_analysis_agent/anomaly_detector.py`：`detect_anomalies` 末尾加一行 `anomalies.extend(_semantic.check_semantic_invariants(run))`。
 - `tests/fixtures/anomaly_runs.jsonl`：加 2 条分别触发 `crisis_success_ending` 和 `social_success_under_survival_crisis` 的 run。
-- `tests/test_anomaly_detector.py`：加 6 个 case 覆盖新增 kind（每个 case 一条 fixture run）。
+- `tests/agents/test_anomaly_detector.py`：加 6 个 case 覆盖新增 kind（每个 case 一条 fixture run）。
 - `DATA_CONTRACTS.md` §3 更新 `kind` 列表 + 增加每个新 kind 的 evidence 字段示例。
 
 ### 验证
-- `pytest tests/test_anomaly_detector.py -v` 全绿。
+- `pytest tests/agents/test_anomaly_detector.py -v` 全绿。
 - `pytest tests/` 全部绿。
 - 手工检查：用 `tests/fixtures/anomaly_runs.jsonl` 跑 `python -m game_analysis_agent.anomaly_detector`，确认 10 条新 kind 都出现。
 
@@ -216,15 +216,15 @@ return result, paths
 
 ### 实现位置
 - `src/game_analysis_agent/agents/interactive_player.py`：重写 `play_through()`；新增 `_decide_one_week` / `_append_step_jsonl` / `_write_summary`。
-- `tools/run_gameplay_agent.py::cmd_play`：保留现有签名；允许 `--persona study|money|social|visa|slacker|newbie`、`--difficulty`、`--seed`。
+- `tools/gameplay/run_gameplay_agent.py::cmd_play`：保留现有签名；允许 `--persona study|money|social|visa|slacker|newbie`、`--difficulty`、`--seed`。
 - `prompts/player_user.md`：增加变量说明。
-- `tests/test_runner.py` 或新增 `tests/test_interactive_player.py`：用 mock LLM client 验证 5 周内：
+- `tests/gameplay/test_runner.py` 或新增 `tests/playtest/test_interactive_player.py`：用 mock LLM client 验证 5 周内：
   1. 调了 5 次 `decide_one_week`。
   2. `playthrough.jsonl` 有 5 行 + 1 行 finish。
   3. `playthrough_summary.md` 含 5 个 step summary。
 
 ### 验证
-- `pytest tests/test_interactive_player.py -v` 全绿。
+- `pytest tests/playtest/test_interactive_player.py -v` 全绿。
 - 现有 `test_runner.py` 不破坏。
 
 ---
@@ -291,16 +291,16 @@ return result, paths
 ### 实现位置
 - `src/game_analysis_agent/value_analyzer.py`：新增 `analyze_routes()` / `analyze_crisis_response()` / `analyze_ending_contradictions()` / `analyze_action_groups()`。
 - `analyze_and_write()` 顺带写 `route_report.json`。
-- `tests/test_value_analyzer.py`：为每个新分析器加 1-2 个 case。
+- `tests/agents/test_value_analyzer.py`：为每个新分析器加 1-2 个 case。
 - `tests/fixtures/`：扩一个 `anomaly_runs.jsonl` 的小样本，验证 crisis response 触发。
 
 ### 验证
-- `pytest tests/test_value_analyzer.py -v` 全绿。
+- `pytest tests/agents/test_value_analyzer.py -v` 全绿。
 - 现有 `test_value_analyzer.py` 的 5 个 case 继续通过。
 
 ---
 
-## T07. `tools/compare_reports.py`（P0）
+## T07. `tools/gameplay/compare_reports.py`（P0）
 
 ### 目标
 解决评审第 11 节：单一 run 报告无法说明改动是否真的有用。`compare_reports.py` 把 before / after 两个 report dir 横向 diff。
@@ -309,7 +309,7 @@ return result, paths
 - CLI：
 
   ```bash
-  python3 tools/compare_reports.py \
+  python3 tools/gameplay/compare_reports.py \
     --before reports/balance/v01-normal-balanced-r200 \
     --after  reports/balance/v02-normal-balanced-r200 \
     --out    reports/compare/v01-v02-balanced.md
@@ -329,12 +329,12 @@ return result, paths
 - 复用：`analytics.py` 已经会写 4 个 CSV，compare 工具只读不写。
 
 ### 实现位置
-- 新文件 `tools/compare_reports.py`。
+- 新文件 `tools/gameplay/compare_reports.py`。
 - 复用 `game_analysis_agent.analytics.load_runs()`。
-- `tests/test_compare_reports.py`：在 `tests/fixtures/` 加 `before/` `after/` 两个 mini report dir，跑 `compare_reports.compare_reports(before, after, out_dir)`，断言 markdown 包含至少 5 个数值差行。
+- `tests/gameplay/test_compare_reports.py`：在 `tests/fixtures/` 加 `before/` `after/` 两个 mini report dir，跑 `compare_reports.compare_reports(before, after, out_dir)`，断言 markdown 包含至少 5 个数值差行。
 
 ### 验证
-- `pytest tests/test_compare_reports.py -v` 全绿。
+- `pytest tests/gameplay/test_compare_reports.py -v` 全绿。
 - 手工验证：用 `reports/balance/v02-smoke-balanced-r20` 自比一次，输出能正常生成。
 
 ---
@@ -381,7 +381,7 @@ return result, paths
     min_key_event_tradeoff_score: 0.7
   ```
 
-- 在 `tools/run_gameplay_agent.py` 不强制读；先用 `pytest` 验证 YAML 可被 `yaml.safe_load` 解析。后续可让 `qa` 子命令打印 gates，但本期不动 CLI 行为。
+- 在 `tools/gameplay/run_gameplay_agent.py` 不强制读；先用 `pytest` 验证 YAML 可被 `yaml.safe_load` 解析。后续可让 `qa` 子命令打印 gates，但本期不动 CLI 行为。
 
 ### 验证
 - `python -c "import yaml; yaml.safe_load(open('config/matrix.yaml'))"` 不抛错。
@@ -403,10 +403,10 @@ return result, paths
 ### 实现位置
 - `src/game_analysis_agent/agents/event_graph.py`：新增 `build_untriggered_block(raw_runs, event_graph)`。
 - `prompts/event_graph_agent_user.md`：增加 `{{UNTRIGGERED_EVENTS}}` 占位（替换 `{{REPORT_BUNDLE}}` 之前的 `{{UNTRIGGERED_EVENTS}}`）。
-- `tests/test_agents_registry.py`：加 1 个 case，断言 `event_graph_report.md` 含 `untriggered_events` 段。
+- `tests/agents/test_agents_registry.py`：加 1 个 case，断言 `event_graph_report.md` 含 `untriggered_events` 段。
 
 ### 验证
-- `pytest tests/test_agents_registry.py -v` 全绿。
+- `pytest tests/agents/test_agents_registry.py -v` 全绿。
 
 ---
 
@@ -427,10 +427,10 @@ return result, paths
 ### 实现位置
 - `src/game_analysis_agent/agents/content_qa.py`：新增 `score_choice_structure(event_graph) -> list[Finding]`。
 - `prompts/content_qa_agent_user.md`：增加 `{{CHOICE_STRUCTURE_FINDINGS}}` 占位。
-- `tests/test_agents_registry.py`：加 1 个 case，断言 `content_issues.md` 含 `choice_structure` 段。
+- `tests/agents/test_agents_registry.py`：加 1 个 case，断言 `content_issues.md` 含 `choice_structure` 段。
 
 ### 验证
-- `pytest tests/test_agents_registry.py -v` 全绿。
+- `pytest tests/agents/test_agents_registry.py -v` 全绿。
 
 ---
 
@@ -440,12 +440,12 @@ return result, paths
 让 `play` 子命令能选 persona，并固定 seed 复现 T05 改造后的 LLM 试玩器。
 
 ### 实现
-- `tools/run_gameplay_agent.py::build_parser` 的 `play_p` 增加 3 个 argument。
+- `tools/gameplay/run_gameplay_agent.py::build_parser` 的 `play_p` 增加 3 个 argument。
 - `cmd_play()` 把 `persona` 透传给 `InteractivePlayerAgent.play_through()` 的 `context`。
 - `prompts/player_user.md` 增加 `{{PERSONA}}` 模板变量。
 
 ### 验证
-- `python tools/run_gameplay_agent.py play --help` 能看到新 flag。
+- `python tools/gameplay/run_gameplay_agent.py play --help` 能看到新 flag。
 
 ---
 
@@ -458,16 +458,16 @@ return result, paths
    ```bash
    for d in normal realistic; do
      for p in random balanced study money social visa slacker; do
-       python3 tools/run_gameplay_agent.py all \
+       python3 tools/gameplay/run_gameplay_agent.py all \
          --run-id v02-${d}-${p}-r200 --runs 200 --policy $p --difficulty $d --weeks 20
      done
    done
-   python3 tools/run_gameplay_agent.py probe \
+   python3 tools/gameplay/run_gameplay_agent.py probe \
      --run-id v02-boundary-r30 --runs 30 --policy balanced --weeks 20 \
      --extreme zero_money,deep_debt,no_energy,all_negative,no_language,flag_chaos,week_zero,already_registered
    ```
 
-3. 跑 `python3 tools/compare_reports.py --before <v01> --after <v02> --out ...`（如果 v01 报告还在）。
+3. 跑 `python3 tools/gameplay/compare_reports.py --before <v01> --after <v02> --out ...`（如果 v01 报告还在）。
 
 ### 验证
 - 每个 run dir 的 `bugs.jsonl` 至少 1 条新 kind。
@@ -482,7 +482,7 @@ return result, paths
 评审第 14 节 P2：把 `reports/balance/<run>/` 集中到一个 `index.html`，便于人眼看。
 
 ### 设计
-- `tools/build_dashboard.py`：扫 `reports/balance/*/` 用 `summary.json` / 4 个 CSV 渲染：
+- `tools/dashboard/build_dashboard.py`：扫 `reports/balance/*/` 用 `summary.json` / 4 个 CSV 渲染：
   - 结局饼图（SVG 内联）
   - 每周属性均值曲线（4 条：stress / hunger / money / academic_progress）
   - top 10 actions
@@ -490,11 +490,11 @@ return result, paths
 - 不引入额外依赖，SVG 全部手写。
 
 ### 实现位置
-- 新文件 `tools/build_dashboard.py`。
+- 新文件 `tools/dashboard/build_dashboard.py`。
 - `tests/`：加 1 个 case 验证生成的文件存在且长度 > 1KB。
 
 ### 验证
-- `python tools/build_dashboard.py --reports reports/balance --out reports/index.html` 成功，文件可被浏览器打开。
+- `python tools/dashboard/build_dashboard.py --reports reports/balance --out reports/index.html` 成功，文件可被浏览器打开。
 
 ---
 

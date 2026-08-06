@@ -15,6 +15,7 @@ Deployment and runtime docs for operators. All evergreen.
 8. [INFERENCE_AB_BENCHMARK.md](INFERENCE_AB_BENCHMARK.md) — APC-only versus MTP3-only benchmark and visualization plan
 9. [PERSONA_CAMPAIGN_RUNBOOK.md](PERSONA_CAMPAIGN_RUNBOOK.md) — 20-week local rehearsal, live OpenAI validation, retained UI evidence
 10. [GAME_CONTRACT_TESTING.md](GAME_CONTRACT_TESTING.md) — embedded-demo contract and real Godot smoke
+11. [REPORTS_FORMAT.md](REPORTS_FORMAT.md) — locked `reports/` layout, manifest schemas, validator, and cleanup workflow
 
 These docs describe how to run the agent against a real Godot project and
 how to keep the local inference stack reproducible. See [../README.md](../README.md)

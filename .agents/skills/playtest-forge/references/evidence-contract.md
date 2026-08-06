@@ -51,7 +51,7 @@ citing them:
 - `examples/build_week_2026/campaign-v1/gate_report.json`
 - `config/build_week_2026_target.json`
 
-Run `tools/review_build_week_g2.py --skip-commands` or `scripts/preflight`.
+Run `tools/build_week/review_build_week_g2.py --skip-commands` or `scripts/preflight`.
 The final current-project experiment contains `repair_experiment.json`,
 `repair_summary.md`, baseline/patched fixed and holdout snapshots,
 `comparison.json`, and `patch.diff`.

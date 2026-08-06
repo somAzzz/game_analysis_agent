@@ -31,7 +31,7 @@ for the evidence map, commands, exit codes, and limitations.
 
 To prepare the complete evaluator UI from locked dependencies, run
 `scripts/setup-evaluator`; use `EVALUATOR_OFFLINE=1 scripts/setup-evaluator`
-when dependency caches are already populated. `tools/judge_doctor.py` reports
+when dependency caches are already populated. `tools/judge/judge_doctor.py` reports
 whether a selected native, container, real-game, or live-OpenAI mode is ready
 without printing environment secrets.
 
@@ -97,7 +97,7 @@ canonical files, creates a writable runtime copy, and records the Agent probe
 overlay separately from game-source changes:
 
 ```bash
-uv run python tools/prepare_embedded_demo.py \
+uv run python tools/build_week/prepare_embedded_demo.py \
   --output reports/local-game-runtime --replace --json
 ```
 
@@ -165,7 +165,7 @@ for the exact competition scope.
 ## Current Status
 
 - Python package: `game-analysis-agent` (`pyproject.toml` version `0.2.0`).
-- Main orchestration CLI: `tools/run_gameplay_agent.py`.
+- Main orchestration CLI: `tools/gameplay/run_gameplay_agent.py`.
 - Analysis agents: `balance`, `content_qa`, `event_graph`, `bug_hunter`,
   `boundary_prober`, `value_reviewer`, and `interactive_player`.
 - Supported orchestration subcommands: `sim`, `analyze`, `probe`, `export`,
@@ -215,7 +215,7 @@ source .venv/bin/activate
 uv pip install -e ".[dev]"
 uv run pytest -q -ra
 uv run ruff check .
-uv run python tools/build_dashboard.py all --reports examples/sample_reports
+uv run python tools/dashboard/build_dashboard.py all --reports examples/sample_reports
 ```
 
 Open:
@@ -244,14 +244,14 @@ LLM_SERVED_MODEL_NAME=qwen3.6-27b-nvfp4
 Run LLM review agents against a report directory:
 
 ```bash
-uv run python tools/run_gameplay_agent.py qa \
+uv run python tools/gameplay/run_gameplay_agent.py qa \
   --report-dir examples/sample_reports/balance/sample_balance_report
 ```
 
 Or run only one agent:
 
 ```bash
-uv run python tools/run_agent.py balance \
+uv run python tools/gameplay/run_agent.py balance \
   examples/sample_reports/balance/sample_balance_report
 ```
 
@@ -260,7 +260,7 @@ uv run python tools/run_agent.py balance \
 Prepare the embedded target game and set the Godot CLI:
 
 ```bash
-uv run python tools/prepare_embedded_demo.py \
+uv run python tools/build_week/prepare_embedded_demo.py \
   --output reports/local-game-runtime --replace --json
 export GAME_PROJECT_PATH="$PWD/reports/local-game-runtime"
 export GODOT_BIN=godot4
@@ -269,13 +269,13 @@ export GODOT_BIN=godot4
 Run the main CLI help:
 
 ```bash
-uv run python tools/run_gameplay_agent.py --help
+uv run python tools/gameplay/run_gameplay_agent.py --help
 ```
 
 Run the simple end-to-end path:
 
 ```bash
-uv run python tools/run_gameplay_agent.py all --runs 20 --policy balanced
+uv run python tools/gameplay/run_gameplay_agent.py all --runs 20 --policy balanced
 ```
 
 `all` runs simulation/analysis, catalog export, all Godot validators, the LLM
@@ -299,7 +299,7 @@ Wait until both services are healthy. Run gameplay commands from the host so
 the repository wrapper can execute Godot inside the sidecar:
 
 ```bash
-uv run python tools/run_gameplay_agent.py play \
+uv run python tools/gameplay/run_gameplay_agent.py play \
   --report-dir reports/play/local-smoke \
   --persona newbie --weeks 5 --seed 42
 ```
@@ -320,34 +320,34 @@ CLI must be refactored onto typed services before any MCP wrapper is added.
 Run Monte Carlo simulation through the Godot project:
 
 ```bash
-uv run python tools/run_gameplay_agent.py sim --runs 100 --policy balanced
+uv run python tools/gameplay/run_gameplay_agent.py sim --runs 100 --policy balanced
 ```
 
 Analyze an existing `raw_runs.jsonl` report directory:
 
 ```bash
-uv run python tools/run_gameplay_agent.py analyze \
+uv run python tools/gameplay/run_gameplay_agent.py analyze \
   --report-dir reports/balance/<run_id>
 ```
 
 Run boundary probes:
 
 ```bash
-uv run python tools/run_gameplay_agent.py probe \
+uv run python tools/gameplay/run_gameplay_agent.py probe \
   --extreme "zero_money,deep_debt,flag_chaos"
 ```
 
 Export the game event/action/ending catalog:
 
 ```bash
-uv run python tools/run_gameplay_agent.py export
+uv run python tools/gameplay/run_gameplay_agent.py export
 ```
 
 Run all six Godot validators (`content`, `json-content`, `economy`, `risk`,
 `route`, and `demo`):
 
 ```bash
-uv run python tools/run_gameplay_agent.py validate \
+uv run python tools/gameplay/run_gameplay_agent.py validate \
   --report-dir reports/validation/<run_id>
 ```
 
@@ -358,34 +358,34 @@ inputs are reused only with the explicit `--reuse-inputs` option. Use repeated
 Evaluate quality gates:
 
 ```bash
-uv run python tools/run_gameplay_agent.py gates \
+uv run python tools/gameplay/run_gameplay_agent.py gates \
   --report-dir reports/balance/<run_id>
 ```
 
 Run LLM QA agents for a report:
 
 ```bash
-uv run python tools/run_gameplay_agent.py qa \
+uv run python tools/gameplay/run_gameplay_agent.py qa \
   --report-dir reports/balance/<run_id>
 ```
 
 Run only one LLM agent:
 
 ```bash
-uv run python tools/run_agent.py balance reports/balance/<run_id>
+uv run python tools/gameplay/run_agent.py balance reports/balance/<run_id>
 ```
 
 Drive the game with the interactive LLM player:
 
 ```bash
-uv run python tools/run_gameplay_agent.py play \
+uv run python tools/gameplay/run_gameplay_agent.py play \
   --report-dir reports/play/<run_id> --weeks 20
 ```
 
 Evaluate an already recorded playthrough without contacting Godot or an LLM:
 
 ```bash
-uv run python tools/run_gameplay_agent.py eval \
+uv run python tools/gameplay/run_gameplay_agent.py eval \
   --report-dir reports/play/<run_id>
 ```
 
@@ -398,7 +398,7 @@ uses a compatibility fallback whose source and reason remain in the trace.
 Capture the producer-native interactive snapshot without an LLM:
 
 ```bash
-uv run python tools/run_gameplay_agent.py interactive-probe \
+uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
   --report-dir reports/interactive/<run_id>
 ```
 
@@ -409,11 +409,11 @@ Plan or execute the strict test matrix:
 
 ```bash
 # Validate and enumerate the plan without running its cells.
-uv run python tools/run_gameplay_agent.py matrix --dry-run --jobs 4
+uv run python tools/gameplay/run_gameplay_agent.py matrix --dry-run --jobs 4
 
 # Execute cells concurrently; a later invocation can resume completed cells.
-uv run python tools/run_gameplay_agent.py matrix --jobs 4
-uv run python tools/run_gameplay_agent.py matrix --jobs 4 --resume
+uv run python tools/gameplay/run_gameplay_agent.py matrix --jobs 4
+uv run python tools/gameplay/run_gameplay_agent.py matrix --jobs 4 --resume
 ```
 
 The committed `config/matrix.yaml` expands to 140 stable cells: 126 simulation
@@ -429,14 +429,14 @@ owns isolated cell report directories, so the second execution cannot overwrite
 the first:
 
 ```bash
-uv run python tools/run_gameplay_agent.py matrix \
+uv run python tools/gameplay/run_gameplay_agent.py matrix \
   --out reports/matrix/before --jobs 4
 
 # Apply the code change under test; keep config/matrix.yaml unchanged.
-uv run python tools/run_gameplay_agent.py matrix \
+uv run python tools/gameplay/run_gameplay_agent.py matrix \
   --out reports/matrix/after --jobs 4
 
-uv run python tools/run_gameplay_agent.py compare-matrix \
+uv run python tools/gameplay/run_gameplay_agent.py compare-matrix \
   --before reports/matrix/before \
   --after reports/matrix/after \
   --out reports/compare/matrix
@@ -452,13 +452,13 @@ exactly what the per-cell diff and `matrix_compare_summary.json` record.
 Build the report index:
 
 ```bash
-uv run python tools/run_gameplay_agent.py index
+uv run python tools/gameplay/run_gameplay_agent.py index
 ```
 
 Run the simple end-to-end path:
 
 ```bash
-uv run python tools/run_gameplay_agent.py all --runs 20 --policy balanced
+uv run python tools/gameplay/run_gameplay_agent.py all --runs 20 --policy balanced
 ```
 
 ## Adapting to Another Game
@@ -547,7 +547,7 @@ export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
 docker compose --profile game-tools --profile local-nvidia up -d godot sglang
 "$GODOT_BIN" --version
 
-uv run python tools/run_gameplay_agent.py interactive-probe \
+uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
   --report-dir reports/interactive/docker-smoke
 ```
 
@@ -566,7 +566,7 @@ without contacting the model:
 docker compose --profile local-nvidia --profile game-tools up -d sglang godot
 docker compose ps
 
-uv run python tools/run_gameplay_agent.py interactive-probe \
+uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
   --report-dir reports/interactive/local-smoke
 ```
 
@@ -574,7 +574,7 @@ Then run a short LLM smoke test and independently evaluate the recorded
 evidence:
 
 ```bash
-uv run python tools/run_gameplay_agent.py play \
+uv run python tools/gameplay/run_gameplay_agent.py play \
   --report-dir reports/play/local-newbie-smoke \
   --persona newbie \
   --difficulty normal \
@@ -582,7 +582,7 @@ uv run python tools/run_gameplay_agent.py play \
   --seed 42 \
   --weeks 5
 
-uv run python tools/run_gameplay_agent.py eval \
+uv run python tools/gameplay/run_gameplay_agent.py eval \
   --report-dir reports/play/local-newbie-smoke
 
 uv run python -m json.tool \
@@ -605,16 +605,16 @@ one directory and then run `qa`:
 ```bash
 REPORT=reports/balance/local-real-42
 
-uv run python tools/run_gameplay_agent.py sim \
+uv run python tools/gameplay/run_gameplay_agent.py sim \
   --report-dir "$REPORT" --runs 200 --weeks 20 \
   --policy balanced --difficulty normal --seed 42
-uv run python tools/run_gameplay_agent.py export --report-dir "$REPORT"
-uv run python tools/run_gameplay_agent.py probe \
+uv run python tools/gameplay/run_gameplay_agent.py export --report-dir "$REPORT"
+uv run python tools/gameplay/run_gameplay_agent.py probe \
   --report-dir "$REPORT" --runs 30 --weeks 20 \
   --policy balanced --seed 42 \
   --extreme "zero_money,deep_debt,no_energy,flag_chaos"
-uv run python tools/run_gameplay_agent.py qa --report-dir "$REPORT"
-uv run python tools/run_gameplay_agent.py gates --report-dir "$REPORT"
+uv run python tools/gameplay/run_gameplay_agent.py qa --report-dir "$REPORT"
+uv run python tools/gameplay/run_gameplay_agent.py gates --report-dir "$REPORT"
 ```
 
 `play` writes `playthrough.jsonl`, `playthrough_summary.md`,
@@ -654,13 +654,13 @@ testing](../docs/operations/GAME_CONTRACT_TESTING.md).
 Build the static HTML dashboard and frontend manifests:
 
 ```bash
-uv run python tools/build_dashboard.py all
+uv run python tools/dashboard/build_dashboard.py all
 ```
 
 Build it from the committed sample reports:
 
 ```bash
-uv run python tools/build_dashboard.py all --reports examples/sample_reports
+uv run python tools/dashboard/build_dashboard.py all --reports examples/sample_reports
 ```
 
 This writes:
@@ -677,14 +677,14 @@ reports/browse/decision_graph/<issue_id>/<run_id>/manifest.json
 Render one decision graph:
 
 ```bash
-uv run python tools/build_dashboard.py decision-graph \
+uv run python tools/dashboard/build_dashboard.py decision-graph \
   --report-dir reports/balance/<run_id> --run-id 0
 ```
 
 Use the React + React Flow dashboard:
 
 ```bash
-uv run python tools/build_dashboard.py emit-frontend-manifest \
+uv run python tools/dashboard/build_dashboard.py emit-frontend-manifest \
   --reports reports --frontend-public frontend/public
 
 cd frontend

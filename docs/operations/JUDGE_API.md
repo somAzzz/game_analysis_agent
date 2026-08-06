@@ -11,7 +11,7 @@ from one origin:
 
 ```bash
 cd frontend && npm run build:public && cd ..
-uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080
+uv run python tools/judge/run_judge_api.py --host 127.0.0.1 --port 8080
 ```
 
 Or use the default CPU-only container:
@@ -23,8 +23,8 @@ docker compose up -d dashboard
 Before startup, inspect the exact delivery path:
 
 ```bash
-uv run python tools/judge_doctor.py --mode dashboard-native --json
-uv run python tools/judge_doctor.py --mode dashboard-container --json
+uv run python tools/judge/judge_doctor.py --mode dashboard-native --json
+uv run python tools/judge/judge_doctor.py --mode dashboard-container --json
 ```
 
 The doctor reports platform/architecture, source revision and dirty state,
@@ -42,7 +42,7 @@ restricted server-side variables before process startup:
 ```bash
 export OPENAI_API_KEY=...
 export OPENAI_PERSONA_MODEL=gpt-5.6-luna
-uv run python tools/run_judge_api.py --host 127.0.0.1 --port 8080 --enable-live-openai
+uv run python tools/judge/run_judge_api.py --host 127.0.0.1 --port 8080 --enable-live-openai
 ```
 
 The browser never sends, reads, stores, or receives the key. Requests containing
@@ -112,7 +112,7 @@ commit, patch SHA-256, modified paths, and an explicit not-merged disposition.
 The API/repository retains full source and evidence; the UI omits secrets, raw
 model content, and unbounded logs.
 
-`tools/build_judge_frontend_demo.py` regenerates the sanitized static fixture
+`tools/judge/build_judge_frontend_demo.py` regenerates the sanitized static fixture
 from the verified public repair bundle. `npm run prepare:public` copies it into
 the build beside the legacy report archive. If `/api/experiments/...` is
 unreachable, the UI loads that fixture, labels the page `Static evaluator

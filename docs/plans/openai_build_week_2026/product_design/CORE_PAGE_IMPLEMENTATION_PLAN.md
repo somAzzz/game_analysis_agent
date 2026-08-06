@@ -26,7 +26,7 @@ data_policy: exact embedded-demo and committed replay data; no game-data sanitiz
 ### 0.1 当前执行状态
 
 - Option 1 已通过 Review Lab 确认；Figma 不再属于当前设计或评审流程。
-- `PI-00` 的数据基础已完成：`tools/build_playthrough_views.py`、`tools/verify_playthrough_views.py`、18 个实际 cell view 和 hash manifest 已生成并通过测试。
+- `PI-00` 的数据基础已完成：`tools/dashboard/build_playthrough_views.py`、`tools/dashboard/verify_playthrough_views.py`、18 个实际 cell view 和 hash manifest 已生成并通过测试。
 - `JM-04` / `PI-04` 的六 Persona 角色方向和 idle/hover/selected/walk/detail 状态已进入正式 Judge Mission 与 Inspector 交互。
 - 正式实现位于 `frontend/src/components/competition/`、`frontend/src/pages/PlaythroughInspectorPage.tsx` 与 `frontend/src/styles/competition.css`。
 - 当前比赛演示固定使用已验证的代表性 `money-seed-42` cell；前端从 authoritative `playthrough-v1` JSON 导入事实，不在 JSX 中维护第二份数据真相。
@@ -37,7 +37,7 @@ data_policy: exact embedded-demo and committed replay data; no game-data sanitiz
 - Replay 必须显示为 `prerecorded` / `deterministic persona-policy fixture`，不能称为 recorded LLM 或 live OpenAI run。
 - Static 与 live 共用交互模型，但必须保留可见、持续的 truth label。
 - 所有 Campaign 数字、persona/seed、attractor week、gate、patch 和 cohort 比较都必须从生成的 typed public view 读取，不在 JSX 中手写第二份 truth。
-- 当前公开 Decision Graph 来自 `tools/build_public_demo.py::_mock_decision_graph()`，它是 illustrative stable-semester path，不能作为比赛 cashflow/stress attractor 的代表性回放。
+- 当前公开 Decision Graph 来自 `tools/dashboard/build_public_demo.py::_mock_decision_graph()`，它是 illustrative stable-semester path，不能作为比赛 cashflow/stress attractor 的代表性回放。
 - 新 Playthrough 必须联合 committed campaign artifacts、hash-pinned Replay fixture 和 `demo/study-in-germany` 的实际游戏内容生成，并绑定 `cell_id`、persona、seed、week、artifact path、line number、record/entry fingerprint 与实际 content source path。
 - `persona_runs.jsonl` 只有周级 state truth，不含 event/action/choice；这些行为不得从 state 猜测，必须从 `fixtures/persona_replay/build_week_2026_full_v1.json` 的 exact persona/seed/week entries 关联。
 - 事件名、事件正文、行动、选项、状态值、结果和 ending 使用仓库中的实际数据，不脱敏、不改写、不用“更戏剧化”的替代文案，也不再生成 sanitized game-data bundle。
@@ -53,7 +53,7 @@ data_policy: exact embedded-demo and committed replay data; no game-data sanitiz
 | `VD` | Visual/Interaction Designer | persona 资产、runner、motion、状态视觉 | `frontend/src/assets/playtest/`、视觉资产说明 |
 | `FE-J` | Judge Mission Frontend | Judge 页面、stage state、Campaign/Repair/Proof | `frontend/src/features/judge-mission/`、`JudgePage.tsx` |
 | `FE-P` | Playthrough Frontend | graph、playback reducer、controls、inspector | `frontend/src/features/playthrough/`、`DecisionGraphPage.tsx` |
-| `DE` | Data/Evidence Engineer | public view builder、schema、API projection、hash binding | `tools/build_judge_frontend_demo.py`、新 public view builder、共享 types 第一版 |
+| `DE` | Data/Evidence Engineer | public view builder、schema、API projection、hash binding | `tools/judge/build_judge_frontend_demo.py`、新 public view builder、共享 types 第一版 |
 | `QA` | QA/Accessibility | browser smoke、keyboard、visual evidence、regression | 新 browser tests、a11y tests、截图证据 |
 | `RE` | Release/Evidence Owner | claim ledger、Judge gates、video path、final truth audit | release checklist、review JSON、demo capture |
 

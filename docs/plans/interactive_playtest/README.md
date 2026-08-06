@@ -54,7 +54,7 @@ Prompt 先放固定规则/schema，再放 persona 和追加式 history，最后�
 
 ## 4. 验收标准
 
-- `python tools/run_gameplay_agent.py play --persona money --weeks 20` 能产出每周一行 `playthrough.jsonl`。
+- `python tools/gameplay/run_gameplay_agent.py play --persona money --weeks 20` 能产出每周一行 `playthrough.jsonl`。
 - 每周记录 `week_context`、`decision`、`validation`、`state_before`、`state_after`、`delta`。
 - 非法 action/choice 会触发 repair；repair 失败才 fallback。
 - `RunInteractiveProbe.gd` 输出包含 `before_state`、`after_state`、`available_actions`、`selected_action_ids`、`action_effects`、`event_choices`、`final_ending_id`。

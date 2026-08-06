@@ -27,7 +27,7 @@ On Apple Silicon, refresh all native macOS rows with one clean-worktree run:
 
 ```bash
 scripts/run-p4-macos
-uv run python tools/record_platform_evidence.py \
+uv run python tools/platform/record_platform_evidence.py \
   --mode macos \
   --artifact-dir reports/platform-acceptance/macos-native \
   --output docs/reviews/openai_build_week_2026/platform-evidence/macos-native.json \
@@ -54,7 +54,7 @@ manually dispatch the workflow, retain its URL, download
 `judge-linux-amd64-<run-id>`, then run this from the same tested revision:
 
 ```bash
-uv run python tools/record_platform_evidence.py \
+uv run python tools/platform/record_platform_evidence.py \
   --mode linux-amd64 \
   --artifact-dir /path/to/downloaded/reports/platform-ci \
   --output docs/reviews/openai_build_week_2026/platform-evidence/linux-amd64.json \
@@ -68,7 +68,7 @@ uses the verified embedded demo and needs no private-repository token. Retain
 the `game-contract-<run-id>` artifact and URL, then validate it:
 
 ```bash
-uv run python tools/record_platform_evidence.py \
+uv run python tools/platform/record_platform_evidence.py \
   --mode linux-godot \
   --artifact-dir /path/to/downloaded/game-contract \
   --output docs/reviews/openai_build_week_2026/platform-evidence/linux-godot.json \
@@ -100,7 +100,7 @@ Authenticate to the registry and publish both native manifests:
 ```bash
 export JUDGE_IMAGE_REF=ghcr.io/OWNER/playtest-forge-judge
 export JUDGE_IMAGE_TAG=build-week-2026
-tools/build_judge_image.sh
+tools/judge/build_judge_image.sh
 ```
 
 Commit the generated `judge-image-metadata.json`. It contains the registry
@@ -142,7 +142,7 @@ Each external evidence file must have the current
 `source_contract_sha256`. After importing all rows:
 
 ```bash
-uv run python tools/review_build_week_g4.py --json
+uv run python tools/build_week/review_build_week_g4.py --json
 git diff -- docs/reviews/openai_build_week_2026 judge-image-metadata.json
 ```
 

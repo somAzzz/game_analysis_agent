@@ -38,7 +38,7 @@ trap cleanup EXIT INT TERM
 docker run --detach --name "$name" --publish 127.0.0.1:18080:8080 \
   --read-only --tmpfs /tmp:size=16m --cap-drop ALL --security-opt no-new-privileges \
   --entrypoint /app/.venv/bin/python "$JUDGE_IMAGE_DIGEST_REF" \
-  tools/run_judge_api.py --host 0.0.0.0 --port 8080 --frontend /app/frontend/dist >/dev/null
+  tools/judge/run_judge_api.py --host 0.0.0.0 --port 8080 --frontend /app/frontend/dist >/dev/null
 for attempt in $(seq 1 20); do
   if curl --fail --silent http://127.0.0.1:18080/api/provider-status > "$OUTPUT/provider-status.json"; then
     break
@@ -48,6 +48,6 @@ done
 cleanup
 trap - EXIT INT TERM
 
-python3 tools/record_platform_evidence.py \
+python3 tools/platform/record_platform_evidence.py \
   --mode linux-arm64 --artifact-dir "$OUTPUT" --output "$EVIDENCE"
 echo "Linux arm64 P4 evidence: $EVIDENCE"

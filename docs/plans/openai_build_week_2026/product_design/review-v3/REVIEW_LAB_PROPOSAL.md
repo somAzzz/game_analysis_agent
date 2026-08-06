@@ -50,7 +50,7 @@ The prototype may read only the generated views under
 before every published capture:
 
 ```bash
-uv run python tools/verify_playthrough_views.py
+uv run python tools/dashboard/verify_playthrough_views.py
 ```
 
 Required truth label: `prerecorded-real-godot-replay`. The UI must state that

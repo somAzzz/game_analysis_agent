@@ -187,10 +187,10 @@
       "sha256": "6fab3b7b86b2f9be412e4b6b5e3afaa9c9e14a04a7292b6cffa6f5b431b01d41"
     },
     {
-      "bytes": 3160,
+      "bytes": 3171,
       "path": ".agents/skills/playtest-forge/references/evidence-contract.md",
       "role": "codex-skill-reference",
-      "sha256": "8e077f2456dcf0af38527664ca3edb002e6bd2a538a41abb6a32209b1473253d"
+      "sha256": "884e80c906fc035751e875cfe5bb574312dbc77f44e3a7f112a901ae0a4b63e3"
     },
     {
       "bytes": 2072,
@@ -253,10 +253,10 @@
       "sha256": "88b06dc47c6cae9b03795ae657fbb3a3f2ddd87a45fbcda1817dbd163b0e66c8"
     },
     {
-      "bytes": 150,
+      "bytes": 156,
       "path": ".agents/skills/playtest-forge/scripts/session-options",
       "role": "codex-skill-script",
-      "sha256": "dcecda4966ca4cbda9df40248adbd69222f598af22b50778c3d717f264c74233"
+      "sha256": "b84de3cd146f71ca84889252e683a7d4c528221f13fd4dde3b5b0cd172a16682"
     },
     {
       "bytes": 1575,
@@ -273,33 +273,33 @@
     },
     {
       "bytes": 4433,
-      "path": "tools/describe_playtest_session.py",
+      "path": "tools/judge/describe_playtest_session.py",
       "role": "codex-playtest-planner-cli",
-      "sha256": "e096983fc06f40991300ba664381858eee08913d0cd494c97ee09967319f4ef9"
+      "sha256": "5895a00877d04380f9c3486f84d528218ff9ad43465e08febd4222f25bb292cc"
     },
     {
-      "bytes": 209,
+      "bytes": 216,
       "path": ".agents/skills/playtest-forge/scripts/preflight",
       "role": "codex-skill-script",
-      "sha256": "d1b658c0c7aa97206cdeeb0a9480623daf78fd8b370f74c207943bda12505f33"
+      "sha256": "426822479cb4325c4570ba929ea8f4b7b4b28362e482d88f7defdc814ca8e125"
     },
     {
-      "bytes": 404,
+      "bytes": 415,
       "path": ".agents/skills/playtest-forge/scripts/run-campaign",
       "role": "codex-skill-script",
-      "sha256": "51ee5a80b08ce89547d3b47e45b85953f198dcbbfa463c36e40c0494288a10b2"
+      "sha256": "52866314bb936ef581caf400ef44af87eca0fc0cfd3cfc516bea988dffa590f7"
     },
     {
-      "bytes": 257,
+      "bytes": 271,
       "path": ".agents/skills/playtest-forge/scripts/verify-repair",
       "role": "codex-skill-script",
-      "sha256": "bd7f3284ac502cfdeb44a529a713bc12a73212c2a8ad9dcf7490ebf412453f0d"
+      "sha256": "16b2911b85df808d89f9dd379ebdccb1f3f4c27d7f07c473b92f28e23bee51c7"
     },
     {
       "bytes": 4004,
-      "path": "tools/verify_expected_demo_findings.py",
+      "path": "tools/build_week/verify_expected_demo_findings.py",
       "role": "expected-demo-findings-gate",
-      "sha256": "7eb5c64139c682ddf18eae828a8cd55444a3864f0588fcdb16b0ece8c3e0faf6"
+      "sha256": "f8d000671d02a0e698e4646eee65ad89138fc1a96d00431a34f7a1a20e6a7793"
     },
     {
       "bytes": 33,
@@ -836,10 +836,10 @@
       "sha256": "9d2e10cd5e979e69f736e3eeef438232b8086e6782c5cecb856afe16ed6e8d11"
     },
     {
-      "bytes": 1896,
+      "bytes": 1926,
       "path": "examples/build_week_2026/playthrough-v1/README.md",
       "role": "playthrough-guide",
-      "sha256": "b78da2fb634ac6fe523c432d494e2e74fe96bc579d24d42dd856a725b927e2df"
+      "sha256": "5f831a01b7c55be492ce0313d9f3f576447330da470ce36cbeb5214ce7c3f192"
     },
     {
       "bytes": 23023,
@@ -1001,9 +1001,9 @@
     },
     {
       "bytes": 2752,
-      "path": "tools/build_judge_frontend_demo.py",
+      "path": "tools/judge/build_judge_frontend_demo.py",
       "role": "deterministic-correctness-publisher",
-      "sha256": "c45c2fd8ebed9420bd72f72226d4069aa978868e67958bab8f95c4693fa13e6b"
+      "sha256": "bdf5956d6f7c7c734dd9dbbfb07d8b84e201b487d576fc841b0eb61e4ec463e9"
     },
     {
       "bytes": 7656,
@@ -1024,10 +1024,10 @@
       "sha256": "083e5cf6bcd702f558a21ea865d7c33920aa283f484da76af819a8170455f3b4"
     },
     {
-      "bytes": 16065,
+      "bytes": 16075,
       "path": "frontend/src/types.ts",
       "role": "deterministic-correctness-frontend",
-      "sha256": "97638df7f7d9fe10db30775a26a2fb3f40e22d7a8ae5f5994654fc424cdaad11"
+      "sha256": "9056cc6ab91edaddb1e9a14b287085eecfd0544a109bab2a2511b6a3c6f49f2a"
     },
     {
       "bytes": 33948,
@@ -1049,21 +1049,21 @@
     },
     {
       "bytes": 2929,
-      "path": "tests/test_event_localization.py",
+      "path": "tests/gameplay/test_event_localization.py",
       "role": "deterministic-correctness-test",
-      "sha256": "9a28192f8f3fb164374b1ed66b79ca50b627af747823b300516e971743ba15b4"
+      "sha256": "914550554a49146bd383299f449b443a65bca719e8912bea2679a28f1c97b7cb"
     },
     {
       "bytes": 5146,
-      "path": "tests/test_experiment_registry.py",
+      "path": "tests/build_week/test_experiment_registry.py",
       "role": "deterministic-correctness-test",
-      "sha256": "5ce9ff24cdf4ca525c3b5417a9ca34e0c85e91f05e45642aa4ff62cec95d8dab"
+      "sha256": "9c9bb5a16dda79fbae0fc12036fd4e840034f7f6de9602d73e205b87895414d2"
     },
     {
       "bytes": 5070,
-      "path": "tests/test_judge_inspect.py",
+      "path": "tests/judge/test_judge_inspect.py",
       "role": "deterministic-correctness-test",
-      "sha256": "1486b3d9e546c66e3623f33b4d63f2a50f692195ac6839efdded4bbfcbc4c756"
+      "sha256": "315f148b5c654b34844c250e36cb19d817a50122c8d9d53371f0fd74c699fcf6"
     },
     {
       "bytes": 18470,

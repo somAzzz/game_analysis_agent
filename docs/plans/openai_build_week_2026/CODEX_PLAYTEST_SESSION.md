@@ -135,7 +135,7 @@ persona preservation, designed-failure, and provider-health gates.
 
 - `src/game_analysis_agent/playtest_session.py`: validates frozen profiles and
   emits exact provider-preserving commands.
-- `tools/describe_playtest_session.py` and Skill `scripts/session-options`:
+- `tools/judge/describe_playtest_session.py` and Skill `scripts/session-options`:
   no-spend conversational menu adapter.
 - `src/game_analysis_agent/persona_campaign_service.py`: shared local/API
   campaign pipeline and thread-safe sanitized progress publisher.

@@ -120,7 +120,7 @@ risk suggestions, then records exact request fingerprints, state hashes,
 decisions, and event choices. It is never constructed by the Judge provider
 factory and its outputs are not final campaign evidence.
 
-`tools/author_build_week_replay.py` runs the pinned real Godot game for the
+`tools/build_week/author_build_week_replay.py` runs the pinned real Godot game for the
 frozen matrix, writes a repository-relative fixture plus SHA-256 manifest, and
 fails the entire authoring pass if any cell fails. The formal campaign is a
 second run through `RecordedPersonaGateway`; therefore `provider=replay` in the

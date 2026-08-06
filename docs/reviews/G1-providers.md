@@ -29,7 +29,7 @@ and can be run only when a restricted submission key is supplied explicitly.
 ```bash
 . .tools/build-week/env.sh
 export GAME_PROJECT_PATH="$PWD/reports/build-week-2026/game-source"
-uv run python tools/review_build_week_g1.py --json
+uv run python tools/build_week/review_build_week_g1.py --json
 ```
 
 The machine-readable result is written to the ignored evidence path
@@ -96,7 +96,7 @@ one stored-disabled structured request and never records response text or the
 key.
 
 ```bash
-OPENAI_API_KEY=... uv run python tools/review_build_week_g1.py --live-smoke --json
+OPENAI_API_KEY=... uv run python tools/build_week/review_build_week_g1.py --live-smoke --json
 ```
 
 This missing external credential does not weaken or block Replay, local mocks,

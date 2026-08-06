@@ -1,6 +1,6 @@
 /**
  * TypeScript port of the Python decision-graph layout + choice extraction
- * in ``tools/build_dashboard.py``. Mirrors the same five-axis adaptive
+ * in ``tools/dashboard/build_dashboard.py``. Mirrors the same five-axis adaptive
  * logic so the React Flow view stays in lockstep with the static SVG
  * view:
  *

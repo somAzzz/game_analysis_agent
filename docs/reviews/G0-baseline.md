@@ -39,14 +39,14 @@ scripts/setup-build-week-toolchain --json
 . .tools/build-week/env.sh
 export GAME_PROJECT_PATH="$PWD/reports/build-week-2026/game-source"
 
-uv run python tools/generate_build_week_baseline.py --replace
-uv run python tools/generate_build_week_baseline.py \
+uv run python tools/build_week/generate_build_week_baseline.py --replace
+uv run python tools/build_week/generate_build_week_baseline.py \
   --output "$PWD/reports/build-week-2026/baseline/repro-canonical-normal-seed-42" \
   --replace \
   --compare-to "$PWD/reports/build-week-2026/baseline/canonical-normal-seed-42" \
   --json
 
-uv run python tools/review_build_week_g0.py --json
+uv run python tools/build_week/review_build_week_g0.py --json
 ```
 
 The baseline generator expands the tracked declaration in

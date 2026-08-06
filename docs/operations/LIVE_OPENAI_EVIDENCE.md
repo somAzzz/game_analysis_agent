@@ -56,7 +56,7 @@ Do not publish:
 - screenshots of terminals or dashboards that expose any of the above.
 
 The committed platform evidence is produced by
-`tools/record_platform_evidence.py`. It rejects obvious key material, requires
+`tools/platform/record_platform_evidence.py`. It rejects obvious key material, requires
 `mode=live`, a GPT-5.6-family model, completed provider calls and response IDs,
 and an explicit `outputs_recorded=false`. It never relabels Replay as live.
 
@@ -64,8 +64,8 @@ Before staging any evidence, inspect it and run the repository secret gate:
 
 ```bash
 jq . reports/platform-live-openai/evidence.json
-uv run python tools/review_build_week_g1.py --json
-uv run python tools/review_build_week_g4.py --json
+uv run python tools/build_week/review_build_week_g1.py --json
+uv run python tools/build_week/review_build_week_g4.py --json
 ```
 
 Only copy/import the sanitized evidence record into

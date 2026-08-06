@@ -33,7 +33,7 @@ The first current-image Inspect failed because `Dockerfile.judge` did not copy
 the frontend implementation and test artifacts newly listed by
 `judge-manifest.json`. The Dockerfile now copies the exact manifest-required
 files, `.dockerignore` explicitly permits the three required Python tests, and
-`tests/test_judge_container.py` prevents regression. The rebuilt restricted
+`tests/judge/test_judge_container.py` prevents regression. The rebuilt restricted
 Inspect then passed.
 
 ## Publication boundary

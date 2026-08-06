@@ -21,7 +21,7 @@ scripts/setup-build-week-toolchain --json >/dev/null
 . .tools/build-week/env.sh
 if [ -z "${GAME_PROJECT_PATH:-}" ]; then
   GAME_PROJECT_PATH="$OUTPUT/game-runtime"
-  uv run python tools/prepare_embedded_demo.py \
+  uv run python tools/build_week/prepare_embedded_demo.py \
     --output "$GAME_PROJECT_PATH" --replace --json > "$OUTPUT/embedded-demo.json"
 fi
 export GAME_PROJECT_PATH
@@ -32,13 +32,13 @@ test -f "$GAME_PROJECT_PATH/project.godot" || {
 
 EVALUATOR_OFFLINE=1 scripts/setup-evaluator >/dev/null
 EVALUATOR_OFFLINE=1 scripts/setup-evaluator >/dev/null
-/usr/bin/python3 tools/judge_doctor.py --mode inspect --json > "$OUTPUT/doctor-inspect.json"
-uv run python tools/judge_doctor.py --mode dashboard-native --json > "$OUTPUT/doctor-dashboard-native.json"
-uv run python tools/judge_doctor.py --mode real-game --json > "$OUTPUT/doctor-real-game.json"
+/usr/bin/python3 tools/judge/judge_doctor.py --mode inspect --json > "$OUTPUT/doctor-inspect.json"
+uv run python tools/judge/judge_doctor.py --mode dashboard-native --json > "$OUTPUT/doctor-dashboard-native.json"
+uv run python tools/judge/judge_doctor.py --mode real-game --json > "$OUTPUT/doctor-real-game.json"
 ./judge --mode inspect --offline --json --output-dir - > "$OUTPUT/judge-inspect.json"
 ./judge --mode replay --offline --json --output-dir - > "$OUTPUT/judge-replay.json"
 
-uv run python tools/run_judge_api.py --port "$PORT" --frontend frontend/dist \
+uv run python tools/judge/run_judge_api.py --port "$PORT" --frontend frontend/dist \
   > "$OUTPUT/api.stdout" 2> "$OUTPUT/api.stderr" &
 server_pid=$!
 cleanup() { kill "$server_pid" >/dev/null 2>&1 || true; wait "$server_pid" >/dev/null 2>&1 || true; }
@@ -54,9 +54,9 @@ curl --fail --silent "http://127.0.0.1:$PORT/" > "$OUTPUT/root.html"
 cleanup
 trap - EXIT INT TERM
 
-uv run python tools/run_gameplay_agent.py sim \
+uv run python tools/gameplay/run_gameplay_agent.py sim \
   --run-id macos-p4 --runs 2 --policy balanced --difficulty normal --seed 4242 \
   --scenario default_first_semester --weeks 4 --report-dir "$OUTPUT/fresh-godot"
-uv run python tools/record_platform_evidence.py \
+uv run python tools/platform/record_platform_evidence.py \
   --mode macos --artifact-dir "$OUTPUT" --output "$EVIDENCE"
 echo "macOS P4 evidence: $EVIDENCE"
