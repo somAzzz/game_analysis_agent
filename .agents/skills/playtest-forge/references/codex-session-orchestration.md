@@ -64,6 +64,7 @@ The first user-facing menu must ask and wait for both answers:
    - `local-godot` — use a host Godot 4.4 executable;
    - `docker-godot` — use `scripts/godot-docker-wrapper`.
 2. LLM:
+   - `local-sglang` — fresh local SGLang persona decisions;
    - `openai-api` — live OpenAI persona decisions and possible API cost;
    - `local-vllm` — fresh local vLLM persona decisions;
    - `none` — deterministic automation and committed Replay, zero model calls.
@@ -86,9 +87,10 @@ scripts/godot-docker-wrapper --version
 Require the pinned Godot 4.4 family. Do not silently fall back to a host binary.
 
 For `openai-api`, check server-side `OPENAI_API_KEY` and model fields without
-printing their values. Do not call the API during readiness. For `local-vllm`,
-check the configured endpoint/model and generation-health readiness without
-starting a campaign. For `none`, perform no provider check.
+printing their values. Do not call the API during readiness. For
+`local-sglang` or `local-vllm`, check only the selected provider's configured
+endpoint/model and generation-health readiness without starting a campaign.
+For `none`, perform no provider check.
 
 A selected path that is unavailable is `unsupported`. Ask the user to choose a
 different path or remediate it; do not switch automatically.
@@ -116,7 +118,7 @@ state evidence; committed Replay only proves reproducibility. Neither is fresh
 persona-worker evidence, and a deterministic run is not automatically a live
 persona campaign in the viewer.
 
-#### OpenAI API or local vLLM
+#### OpenAI API, local SGLang, or local vLLM
 
 After the two initial choices are confirmed, present the frozen profiles:
 
@@ -151,6 +153,15 @@ Use the planner with all confirmed values. Examples:
   --godot-bin /resolved/godot4 \
   --llm-provider local-vllm \
   --profile six-strategy \
+  --json
+```
+
+```bash
+.agents/skills/playtest-forge/scripts/session-options \
+  --godot-runtime docker-godot \
+  --llm-provider local-sglang \
+  --profile one-strategy \
+  --persona newbie \
   --json
 ```
 

@@ -33,7 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     provider_group.add_argument(
         "--llm-provider",
-        choices=("openai-api", "local-vllm", "none"),
+        choices=("local-sglang", "local-vllm", "openai-api", "none"),
         help="primary interactive LLM choice",
     )
     parser.add_argument(
@@ -89,7 +89,7 @@ def main(argv: list[str] | None = None) -> int:
     provider = (
         provider_for_llm_choice(args.llm_provider)
         if args.llm_provider
-        else PersonaProvider(args.provider or "vllm")
+        else PersonaProvider(args.provider or "sglang")
     )
     assert provider is not None
     catalog = load_playtest_session_catalog(ROOT / "config/playtest_session_profiles.json")

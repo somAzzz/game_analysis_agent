@@ -13,9 +13,10 @@ from .persona_gateway import PersonaProvider
 
 PROFILE_SCHEMA = "playtest-session-profiles-v1"
 GodotRuntime = Literal["local-godot", "docker-godot"]
-LlmProviderChoice = Literal["openai-api", "local-vllm", "none"]
+LlmProviderChoice = Literal["local-sglang", "local-vllm", "openai-api", "none"]
 
 _LLM_PROVIDER_MAP: dict[LlmProviderChoice, PersonaProvider | None] = {
+    "local-sglang": PersonaProvider.SGLANG,
     "openai-api": PersonaProvider.OPENAI,
     "local-vllm": PersonaProvider.VLLM,
     "none": None,
@@ -51,14 +52,21 @@ def describe_session_choices() -> dict[str, object]:
                 "required": True,
                 "options": [
                     {
-                        "id": "openai-api",
-                        "label": "OpenAI API",
-                        "description": "Use the server-side OpenAI key; calls may incur cost.",
+                        "id": "local-sglang",
+                        "label": "Local SGLang",
+                        "description": (
+                            "Use the configured local OpenAI-compatible SGLang endpoint."
+                        ),
                     },
                     {
                         "id": "local-vllm",
                         "label": "Local vLLM",
                         "description": "Use the configured local OpenAI-compatible vLLM endpoint.",
+                    },
+                    {
+                        "id": "openai-api",
+                        "label": "OpenAI API",
+                        "description": "Use the server-side OpenAI key; calls may incur cost.",
                     },
                     {
                         "id": "none",
@@ -204,6 +212,8 @@ def describe_playtest_profiles(
         "llm_provider": (
             "openai-api"
             if provider == PersonaProvider.OPENAI
+            else "local-sglang"
+            if provider == PersonaProvider.SGLANG
             else "local-vllm"
             if provider == PersonaProvider.VLLM
             else provider.value

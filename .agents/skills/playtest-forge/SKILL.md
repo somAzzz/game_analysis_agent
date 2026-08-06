@@ -49,7 +49,7 @@ repository's interactive path:
 3. Make the first user-facing choice two required questions, before profile,
    persona, cost, or execution:
    - Godot runtime: `local-godot` or `docker-godot`;
-   - LLM: `openai-api`, `local-vllm`, or `none`.
+   - LLM: `local-sglang`, `local-vllm`, `openai-api`, or `none`.
    Do not infer either answer from installed tools, `.env`, or prior sessions.
 4. Probe only the selected paths. For local Godot, resolve the exact executable
    and require Godot 4.4. For Docker Godot, require Docker plus the repository
@@ -67,7 +67,8 @@ repository's interactive path:
    the persona only for `one-strategy`.
 7. Do not start a provider, spend API credit, or launch a campaign until Godot,
    LLM, profile, and any required persona are all confirmed. Recommend local
-   vLLM before OpenAI only as guidance; preserve the user's explicit choice.
+   SGLang first, then local vLLM before OpenAI, only as guidance; preserve the
+   user's explicit choice.
 8. After every required choice is frozen, start the governed Judge API with the
    selected `GODOT_BIN`, keep the existing Vite process running, ask the user to
    refresh the viewer, and execute the exact environment and command emitted by

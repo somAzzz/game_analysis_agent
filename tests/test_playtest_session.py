@@ -69,17 +69,22 @@ def test_profile_command_preserves_provider_and_every_matrix_axis() -> None:
 
 def test_local_and_api_profiles_share_the_same_campaign_shape() -> None:
     catalog = load_playtest_session_catalog(ROOT / "config/playtest_session_profiles.json")
-    local = describe_playtest_profiles(catalog, provider=PersonaProvider.VLLM)
+    sglang = describe_playtest_profiles(catalog, provider=PersonaProvider.SGLANG)
+    vllm = describe_playtest_profiles(catalog, provider=PersonaProvider.VLLM)
     api = describe_playtest_profiles(catalog, provider=PersonaProvider.OPENAI)
 
-    for local_profile, api_profile in zip(local["profiles"], api["profiles"], strict=True):
-        assert local_profile["id"] == api_profile["id"]
-        assert local_profile["personas"] == api_profile["personas"]
-        assert local_profile["seeds"] == api_profile["seeds"]
-        assert local_profile["environment"] == api_profile["environment"]
-        assert local_profile["command"][0] == api_profile["command"][0]
-        assert local_profile["command"][2:] == api_profile["command"][2:]
-        assert local_profile["command"][1] == "vllm"
+    for sglang_profile, vllm_profile, api_profile in zip(
+        sglang["profiles"], vllm["profiles"], api["profiles"], strict=True
+    ):
+        assert sglang_profile["id"] == vllm_profile["id"] == api_profile["id"]
+        assert sglang_profile["personas"] == vllm_profile["personas"] == api_profile["personas"]
+        assert sglang_profile["seeds"] == vllm_profile["seeds"] == api_profile["seeds"]
+        assert sglang_profile["environment"] == vllm_profile["environment"]
+        assert vllm_profile["environment"] == api_profile["environment"]
+        assert sglang_profile["command"][0] == api_profile["command"][0]
+        assert sglang_profile["command"][2:] == api_profile["command"][2:]
+        assert sglang_profile["command"][1] == "sglang"
+        assert vllm_profile["command"][1] == "vllm"
         assert api_profile["command"][1] == "openai"
 
 
@@ -93,14 +98,31 @@ def test_initial_choices_require_godot_and_llm_before_profile() -> None:
         "docker-godot",
     ]
     assert [option["id"] for option in questions["llm_provider"]["options"]] == [
-        "openai-api",
+        "local-sglang",
         "local-vllm",
+        "openai-api",
         "none",
     ]
     assert payload["rules"]["ask_before_profile"] is True
+    assert provider_for_llm_choice("local-sglang") == PersonaProvider.SGLANG
     assert provider_for_llm_choice("openai-api") == PersonaProvider.OPENAI
     assert provider_for_llm_choice("local-vllm") == PersonaProvider.VLLM
     assert provider_for_llm_choice("none") is None
+
+
+def test_sglang_choice_emits_sglang_campaign_and_truthful_menu_label() -> None:
+    catalog = load_playtest_session_catalog(ROOT / "config/playtest_session_profiles.json")
+    provider = provider_for_llm_choice("local-sglang")
+    assert provider is not None
+    payload = describe_playtest_profiles(
+        catalog,
+        provider=provider,
+        godot_runtime="docker-godot",
+    )
+
+    assert payload["llm_provider"] == "local-sglang"
+    assert payload["provider"] == "sglang"
+    assert all(profile["command"][1] == "sglang" for profile in payload["profiles"])
 
 
 def test_selected_godot_runtime_is_frozen_into_every_campaign_command() -> None:
