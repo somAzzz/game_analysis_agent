@@ -61,22 +61,26 @@ repository's interactive path:
    fresh persona evidence will be created, then ask for the automated test
    scope. Do not show persona campaign profiles or relabel Replay as live
    evidence.
-6. If the user selects an LLM, run `scripts/session-options` with the confirmed
-   `--godot-runtime` and `--llm-provider`. Offer the three frozen profiles in
-   recommended order, explain calls/cells/duration/eligibility/cost, and ask for
-   the persona only for `one-strategy`.
-7. Do not start a provider, spend API credit, or launch a campaign until Godot,
-   LLM, profile, and any required persona are all confirmed. Recommend local
+6. If the user selects local SGLang or vLLM, run `scripts/session-options` with
+   the confirmed `--godot-runtime` and `--llm-provider`, then ask for one frozen
+   generation profile: `thinking-4096` or `no-thinking-2048`. Do not combine
+   their environment values. API providers do not expose this local choice.
+7. Offer the three frozen campaign profiles in recommended order, explain
+   calls/cells/duration/eligibility/cost, and ask for the persona only for
+   `one-strategy`.
+8. Do not start a provider, spend API credit, or launch a campaign until Godot,
+   LLM, generation profile when local, campaign profile, and any required
+   persona are all confirmed. Recommend local
    SGLang first, then local vLLM before OpenAI, only as guidance; preserve the
    user's explicit choice.
-8. After every required choice is frozen, start the governed Judge API with the
+9. After every required choice is frozen, start the governed Judge API with the
    selected `GODOT_BIN`, keep the existing Vite process running, ask the user to
    refresh the viewer, and execute the exact environment and command emitted by
    `scripts/session-options`. Never let `.env` replace the selected runtime.
-9. Monitor the command and `frontend/public/live-playthrough/session.json`.
+10. Monitor the command and `frontend/public/live-playthrough/session.json`.
    Report meaningful progress at least once per minute. Treat this file as
    in-progress UI state, not completed evidence.
-10. On completion, verify the sanitized bundle and frontend view, state the
+11. On completion, verify the sanitized bundle and frontend view, state the
     selected Godot runtime, exact provider truth label, and repair eligibility.
     A one-strategy or one-seed result can validate the agent but cannot prove a
     repair. Never edit the game or begin repair automatically.

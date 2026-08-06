@@ -120,7 +120,16 @@ persona campaign in the viewer.
 
 #### OpenAI API, local SGLang, or local vLLM
 
-After the two initial choices are confirmed, present the frozen profiles:
+After the two initial choices are confirmed, local SGLang/vLLM sessions must
+choose exactly one generation profile before campaign execution:
+
+| Generation profile | Thinking | Decision max tokens | Purpose |
+| --- | ---: | ---: | --- |
+| `thinking-4096` | on | 4096 | Preserve extended reasoning as the quality candidate. |
+| `no-thinking-2048` | off | 2048 | Test direct structured decisions as the efficiency candidate. |
+
+Do not offer this local Qwen switch to API providers, and do not mix values
+from the two profiles. Then present the frozen campaign profiles:
 
 | Profile | Matrix | Worst-case calls | Operational cap | What it can prove |
 | --- | ---: | ---: | ---: | --- |
@@ -152,6 +161,7 @@ Use the planner with all confirmed values. Examples:
   --godot-runtime local-godot \
   --godot-bin /resolved/godot4 \
   --llm-provider local-vllm \
+  --generation-profile thinking-4096 \
   --profile six-strategy \
   --json
 ```
@@ -160,6 +170,7 @@ Use the planner with all confirmed values. Examples:
 .agents/skills/playtest-forge/scripts/session-options \
   --godot-runtime docker-godot \
   --llm-provider local-sglang \
+  --generation-profile no-thinking-2048 \
   --profile one-strategy \
   --persona newbie \
   --json

@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .campaign_contract import CampaignPersona
 from .persona_gateway import PersonaProvider
 
-PROFILE_SCHEMA = "playtest-session-profiles-v1"
+PROFILE_SCHEMA = "playtest-session-profiles-v2"
 GodotRuntime = Literal["local-godot", "docker-godot"]
 LlmProviderChoice = Literal["local-sglang", "local-vllm", "openai-api", "none"]
 
@@ -164,16 +164,38 @@ class PlaytestSessionProfile(BaseModel):
         return self.cell_count * self.max_weeks * 2
 
 
+class PersonaGenerationProfile(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: str = Field(pattern=r"^[a-z][a-z0-9-]+$")
+    label: str
+    description: str
+    enable_thinking: bool
+    decision_max_tokens: int = Field(ge=128, le=4096)
+
+    @property
+    def environment(self) -> dict[str, str]:
+        return {
+            "PERSONA_ENABLE_THINKING": "1" if self.enable_thinking else "0",
+            "PERSONA_DECISION_MAX_TOKENS": str(self.decision_max_tokens),
+        }
+
+
 class PlaytestSessionCatalog(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal[PROFILE_SCHEMA] = PROFILE_SCHEMA
+    generation_profiles: tuple[PersonaGenerationProfile, ...] = Field(min_length=2)
     profiles: tuple[PlaytestSessionProfile, ...] = Field(min_length=3)
 
     @model_validator(mode="after")
     def _unique_profiles(self) -> PlaytestSessionCatalog:
         if len({profile.id for profile in self.profiles}) != len(self.profiles):
             raise ValueError("playtest profile ids must be unique")
+        if len({profile.id for profile in self.generation_profiles}) != len(
+            self.generation_profiles
+        ):
+            raise ValueError("generation profile ids must be unique")
         return self
 
     def get(self, profile_id: str) -> PlaytestSessionProfile:
@@ -181,6 +203,12 @@ class PlaytestSessionCatalog(BaseModel):
             if profile.id == profile_id:
                 return profile
         raise ValueError(f"unknown playtest profile: {profile_id}")
+
+    def get_generation_profile(self, profile_id: str) -> PersonaGenerationProfile:
+        for profile in self.generation_profiles:
+            if profile.id == profile_id:
+                return profile
+        raise ValueError(f"unknown generation profile: {profile_id}")
 
 
 def load_playtest_session_catalog(path: str | Path) -> PlaytestSessionCatalog:
@@ -194,7 +222,11 @@ def describe_playtest_profiles(
     single_persona: CampaignPersona = CampaignPersona.NEWBIE,
     godot_runtime: GodotRuntime = "docker-godot",
     godot_bin: str | None = None,
+    generation_profile: PersonaGenerationProfile | None = None,
 ) -> dict[str, object]:
+    local_generation_provider = provider in {PersonaProvider.SGLANG, PersonaProvider.VLLM}
+    if generation_profile is not None and not local_generation_provider:
+        raise ValueError("generation profiles are only supported by local SGLang or vLLM")
     resolved_godot_bin = godot_bin or default_godot_bin(godot_runtime)
     profiles = [
         _describe_profile(
@@ -202,6 +234,7 @@ def describe_playtest_profiles(
             provider=provider,
             single_persona=single_persona,
             godot_bin=resolved_godot_bin,
+            generation_profile=generation_profile,
         )
         for profile in catalog.profiles
     ]
@@ -219,6 +252,17 @@ def describe_playtest_profiles(
             else provider.value
         ),
         "provider": provider.value,
+        "generation_profile_selection_required": (
+            local_generation_provider and generation_profile is None
+        ),
+        "generation_profile": (
+            generation_profile.model_dump(mode="json") if generation_profile else None
+        ),
+        "generation_profiles": (
+            [profile.model_dump(mode="json") for profile in catalog.generation_profiles]
+            if local_generation_provider
+            else []
+        ),
         "rules": {
             "default_duration": "20 weeks; game completion at state week 20 may use 19 decisions",
             "local_before_live": True,
@@ -238,6 +282,7 @@ def _describe_profile(
     provider: PersonaProvider,
     single_persona: CampaignPersona,
     godot_bin: str,
+    generation_profile: PersonaGenerationProfile | None,
 ) -> dict[str, object]:
     personas = (single_persona,) if profile.allow_persona_override else profile.personas
     cells = len(personas) * len(profile.seeds)
@@ -248,7 +293,16 @@ def _describe_profile(
         "PERSONA_MAX_CONCURRENCY": str(profile.concurrency),
         "PERSONA_MAX_CALLS": str(profile.max_calls),
     }
+    if generation_profile is not None:
+        environment.update(generation_profile.environment)
     command = ["scripts/run-persona-campaign", provider.value]
+    if generation_profile is not None:
+        command.extend(
+            (
+                "--campaign-id",
+                f"{provider.value}-{profile.id}-{generation_profile.id}",
+            )
+        )
     for persona in personas:
         command.extend(("--persona", persona.value))
     for seed in profile.seeds:
@@ -283,6 +337,7 @@ __all__ = [
     "PROFILE_SCHEMA",
     "GodotRuntime",
     "LlmProviderChoice",
+    "PersonaGenerationProfile",
     "PlaytestSessionCatalog",
     "PlaytestSessionProfile",
     "default_godot_bin",

@@ -116,6 +116,59 @@ def test_aggregation_recomputes_metrics_and_first_attractor_entry(tmp_path: Path
     assert attractor.representatives == attractor.members
 
 
+def test_aggregation_honors_risk_guided_persona_alignment(tmp_path: Path) -> None:
+    request = _request().model_copy(update={"max_weeks": 1})
+
+    def risk_guided_executor(cell, output_dir, context):  # noqa: ANN001, ANN202
+        del cell, context
+        row = {
+            "week": 1,
+            "state_after": {"money": 100, "stress": 40},
+            "chosen_actions": ["budget_call"],
+            "validation": {"valid": True, "fallback_used": False},
+            "persona_calls": [{"status": "completed"}],
+            "week_context": {
+                "persona_strategy": {
+                    "priorities": ["follow_top_risks"],
+                    "alignment_risk_guided": True,
+                },
+                "top_risks": [
+                    {"id": "money", "suggested_action_ids": ["budget_call"]}
+                ],
+                "available_actions": [
+                    {"id": "budget_call", "tags": ["life"], "risk_tags": []}
+                ],
+            },
+            "result": {"final_ending": "semester_complete"},
+        }
+        (output_dir / "playthrough.jsonl").write_text(
+            json.dumps(row, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        return CellExecutionOutcome(
+            state=CampaignCellState.COMPLETED,
+            stop_reason="week_limit",
+            completed_weeks=1,
+        )
+
+    results = (
+        CampaignRunner(
+            project_root=tmp_path,
+            request=request,
+            source=_source(),
+            executor=risk_guided_executor,
+        )
+        .run()
+        .results
+    )
+    rules = load_failure_rules(ROOT / "config/build_week_2026_failure_rules.json")
+
+    aggregate = aggregate_campaign(project_root=tmp_path, results=results, rules=rules)
+
+    assert aggregate.metrics.persona_alignment_rate == 1.0
+    assert all(cell.persona_alignment_rate == 1.0 for cell in aggregate.cells)
+
+
 def test_aggregation_is_byte_deterministic_for_same_rows(tmp_path: Path) -> None:
     rules = load_failure_rules(ROOT / "config/build_week_2026_failure_rules.json")
     results = _run(tmp_path)

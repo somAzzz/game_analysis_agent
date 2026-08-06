@@ -1,5 +1,21 @@
 {
-  "schema_version": "playtest-session-profiles-v1",
+  "schema_version": "playtest-session-profiles-v2",
+  "generation_profiles": [
+    {
+      "id": "thinking-4096",
+      "label": "Thinking · 4096",
+      "description": "Enable Qwen thinking and allow up to 4096 decision completion tokens.",
+      "enable_thinking": true,
+      "decision_max_tokens": 4096
+    },
+    {
+      "id": "no-thinking-2048",
+      "label": "No thinking · 2048",
+      "description": "Disable Qwen thinking and allow up to 2048 decision completion tokens.",
+      "enable_thinking": false,
+      "decision_max_tokens": 2048
+    }
+  ],
   "profiles": [
     {
       "id": "one-strategy",

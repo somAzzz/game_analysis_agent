@@ -361,16 +361,30 @@ def _alignment(row: dict[str, Any]) -> bool | None:
     tags = {str(item) for item in strategy.get("alignment_action_tags", []) if str(item)}
     ids = {str(item) for item in strategy.get("alignment_action_ids", []) if str(item)}
     priorities = {str(item) for item in strategy.get("priorities", []) if str(item)}
-    if not tags and not ids:
-        tags = priorities
-    if not tags and not ids:
+    risk_guided = strategy.get("alignment_risk_guided") is True
+    suggested_actions = {
+        str(action_id)
+        for risk in context.get("top_risks", [])
+        if isinstance(risk, dict)
+        for action_id in risk.get("suggested_action_ids", [])
+        if str(action_id)
+    }
+    legacy_priorities = priorities if not tags and not ids and not risk_guided else set()
+    if not tags and not ids and not legacy_priorities and not (
+        risk_guided and suggested_actions
+    ):
         return None
     action_tags = set()
     for action in actions:
         if isinstance(action, dict) and str(action.get("id")) in chosen:
             action_tags.update(str(item) for item in action.get("tags", []) if str(item))
             action_tags.update(str(item) for item in action.get("risk_tags", []) if str(item))
-    return bool(ids & chosen or tags & action_tags or tags & chosen)
+    return bool(
+        ids & chosen
+        or tags & action_tags
+        or legacy_priorities & (action_tags | chosen)
+        or (risk_guided and suggested_actions & chosen)
+    )
 
 
 def _matches_rule(

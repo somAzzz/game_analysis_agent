@@ -163,10 +163,10 @@
       "sha256": "0e0f57f8bf7b0b9188f7eac32f4cfaf5b4dc8aefe5ab8dfd1d368cd1816164cf"
     },
     {
-      "bytes": 8981,
+      "bytes": 9228,
       "path": ".agents/skills/playtest-forge/SKILL.md",
       "role": "codex-skill",
-      "sha256": "e59acbb707f2fd70923d536ccafbc2e8766c392720e32f38437084bb4cad2e24"
+      "sha256": "d7b4c1cf8426c66e6b123f46824861c7b0b91af89abbbf35195bdf7618ac00c4"
     },
     {
       "bytes": 308,
@@ -187,10 +187,10 @@
       "sha256": "6fab3b7b86b2f9be412e4b6b5e3afaa9c9e14a04a7292b6cffa6f5b431b01d41"
     },
     {
-      "bytes": 3171,
+      "bytes": 3249,
       "path": ".agents/skills/playtest-forge/references/evidence-contract.md",
       "role": "codex-skill-reference",
-      "sha256": "884e80c906fc035751e875cfe5bb574312dbc77f44e3a7f112a901ae0a4b63e3"
+      "sha256": "5670c68a2a2717c43e85b88013039cb04632cb145a3f260ef6dc3ab1095667fd"
     },
     {
       "bytes": 2072,
@@ -247,10 +247,10 @@
       "sha256": "c8cb5309d0658beefdbd3864b0931329420259f223aae6395a758f25c1c9c847"
     },
     {
-      "bytes": 9262,
+      "bytes": 9837,
       "path": ".agents/skills/playtest-forge/references/codex-session-orchestration.md",
       "role": "codex-skill-reference",
-      "sha256": "88b06dc47c6cae9b03795ae657fbb3a3f2ddd87a45fbcda1817dbd163b0e66c8"
+      "sha256": "2e20f5ec4024880c8486eb2e9a157da65c41288d09e2748b2005b2a745e427fd"
     },
     {
       "bytes": 156,
@@ -259,23 +259,23 @@
       "sha256": "b84de3cd146f71ca84889252e683a7d4c528221f13fd4dde3b5b0cd172a16682"
     },
     {
-      "bytes": 1575,
+      "bytes": 2086,
       "path": "config/playtest_session_profiles.json",
       "role": "codex-playtest-profiles",
-      "schema_version": "playtest-session-profiles-v1",
-      "sha256": "7f509bd88b195a97d94e6e752248bbd47bcab20984b3d06eacd26ea1381f824d"
+      "schema_version": "playtest-session-profiles-v2",
+      "sha256": "a48330a3abd939660c73a0f93db437e1d377f808ddb339ffcbda3c7f0445ac57"
     },
     {
-      "bytes": 10613,
+      "bytes": 12896,
       "path": "src/game_analysis_agent/playtest_session.py",
       "role": "codex-playtest-planner",
-      "sha256": "edaeb41eebb2a3380ca6f2c47e23f1c41c1ec8fe3766e9f4933d2933b1ed3088"
+      "sha256": "14520d2356e3ed9b8cf523131c2af41b4dae1ab22e69d1202779b0bfe7800343"
     },
     {
-      "bytes": 4433,
+      "bytes": 5780,
       "path": "tools/judge/describe_playtest_session.py",
       "role": "codex-playtest-planner-cli",
-      "sha256": "5895a00877d04380f9c3486f84d528218ff9ad43465e08febd4222f25bb292cc"
+      "sha256": "517df9f29ad508c30dd9ce59aa52ac2f22acf36816e0d3a41e4b73383f97e892"
     },
     {
       "bytes": 216,

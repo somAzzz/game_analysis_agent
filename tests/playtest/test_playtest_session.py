@@ -36,6 +36,10 @@ def test_committed_profiles_freeze_full_semester_order_and_budgets() -> None:
         "repair-evidence",
     ]
     profiles = {profile["id"]: profile for profile in payload["profiles"]}
+    assert [profile.id for profile in catalog.generation_profiles] == [
+        "thinking-4096",
+        "no-thinking-2048",
+    ]
     assert profiles["one-strategy"]["personas"] == ["study"]
     assert profiles["one-strategy"]["cell_count"] == 1
     assert profiles["one-strategy"]["worst_case_calls"] == 40
@@ -123,6 +127,40 @@ def test_sglang_choice_emits_sglang_campaign_and_truthful_menu_label() -> None:
     assert payload["llm_provider"] == "local-sglang"
     assert payload["provider"] == "sglang"
     assert all(profile["command"][1] == "sglang" for profile in payload["profiles"])
+    assert payload["generation_profile_selection_required"] is True
+    assert [profile["id"] for profile in payload["generation_profiles"]] == [
+        "thinking-4096",
+        "no-thinking-2048",
+    ]
+
+
+@pytest.mark.parametrize(
+    ("profile_id", "thinking", "max_tokens"),
+    [("thinking-4096", "1", "4096"), ("no-thinking-2048", "0", "2048")],
+)
+def test_selected_generation_profile_freezes_both_environment_values(
+    profile_id: str,
+    thinking: str,
+    max_tokens: str,
+) -> None:
+    catalog = load_playtest_session_catalog(ROOT / "config/playtest_session_profiles.json")
+    payload = describe_playtest_profiles(
+        catalog,
+        provider=PersonaProvider.SGLANG,
+        generation_profile=catalog.get_generation_profile(profile_id),
+    )
+
+    assert payload["generation_profile_selection_required"] is False
+    assert payload["generation_profile"]["id"] == profile_id
+    for profile in payload["profiles"]:
+        assert profile["command"][2:4] == [
+            "--campaign-id",
+            f"sglang-{profile['id']}-{profile_id}",
+        ]
+        assert profile["environment"]["PERSONA_ENABLE_THINKING"] == thinking
+        assert profile["environment"]["PERSONA_DECISION_MAX_TOKENS"] == max_tokens
+        assert f"PERSONA_ENABLE_THINKING={thinking}" in profile["shell_preview"]
+        assert f"PERSONA_DECISION_MAX_TOKENS={max_tokens}" in profile["shell_preview"]
 
 
 def test_selected_godot_runtime_is_frozen_into_every_campaign_command() -> None:
@@ -168,7 +206,23 @@ def test_profile_rejects_a_call_budget_below_worst_case() -> None:
     with pytest.raises(ValidationError, match="worst case"):
         PlaytestSessionCatalog.model_validate(
             {
-                "schema_version": "playtest-session-profiles-v1",
+                "schema_version": "playtest-session-profiles-v2",
+                "generation_profiles": [
+                    {
+                        "id": "thinking-4096",
+                        "label": "Thinking",
+                        "description": "Thinking profile",
+                        "enable_thinking": True,
+                        "decision_max_tokens": 4096,
+                    },
+                    {
+                        "id": "no-thinking-2048",
+                        "label": "No thinking",
+                        "description": "No-thinking profile",
+                        "enable_thinking": False,
+                        "decision_max_tokens": 2048,
+                    },
+                ],
                 "profiles": [
                     {
                         "id": f"profile-{index}",
@@ -259,3 +313,62 @@ def test_runtime_entrypoints_preserve_selected_local_or_docker_godot_over_dotenv
         str(tmp_path / selected_godot) if selected_godot.startswith("scripts/") else selected_godot
     )
     assert result.stdout.strip() == expected
+
+
+@pytest.mark.parametrize(
+    ("selected_thinking", "selected_tokens", "dotenv_thinking", "dotenv_tokens"),
+    [("1", "4096", "0", "2048"), ("0", "2048", "1", "4096")],
+)
+def test_campaign_entrypoint_preserves_selected_generation_profile_over_dotenv(
+    tmp_path: Path,
+    selected_thinking: str,
+    selected_tokens: str,
+    dotenv_thinking: str,
+    dotenv_tokens: str,
+) -> None:
+    scripts = tmp_path / "scripts"
+    scripts.mkdir()
+    entrypoint = scripts / "run-persona-campaign"
+    shutil.copyfile(ROOT / "scripts/run-persona-campaign", entrypoint)
+    entrypoint.chmod(0o755)
+
+    game = tmp_path / "game"
+    game.mkdir()
+    (game / "project.godot").write_text("[application]\n", encoding="utf-8")
+    (tmp_path / ".env").write_text(
+        "\n".join(
+            (
+                f"GAME_PROJECT_PATH='{game}'",
+                f"PERSONA_ENABLE_THINKING={dotenv_thinking}",
+                f"PERSONA_DECISION_MAX_TOKENS={dotenv_tokens}",
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    fake_uv = fake_bin / "uv"
+    fake_uv.write_text(
+        '#!/bin/sh\nprintf "%s,%s\\n" "$PERSONA_ENABLE_THINKING" '
+        '"$PERSONA_DECISION_MAX_TOKENS"\n',
+        encoding="utf-8",
+    )
+    fake_uv.chmod(0o755)
+
+    result = subprocess.run(
+        [str(entrypoint), "sglang", "--persona", "newbie"],
+        cwd=tmp_path,
+        env={
+            **os.environ,
+            "PERSONA_ENABLE_THINKING": selected_thinking,
+            "PERSONA_DECISION_MAX_TOKENS": selected_tokens,
+            "PATH": f"{fake_bin}{os.pathsep}{os.environ['PATH']}",
+        },
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.stdout.strip() == f"{selected_thinking},{selected_tokens}"

@@ -53,6 +53,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="strategy used by the one-strategy profile",
     )
     parser.add_argument("--profile", choices=("one-strategy", "six-strategy", "repair-evidence"))
+    parser.add_argument(
+        "--generation-profile",
+        help="local generation profile from config/playtest_session_profiles.json",
+    )
     parser.add_argument("--json", action="store_true")
     return parser
 
@@ -93,12 +97,36 @@ def main(argv: list[str] | None = None) -> int:
     )
     assert provider is not None
     catalog = load_playtest_session_catalog(ROOT / "config/playtest_session_profiles.json")
+    if args.generation_profile and provider not in {
+        PersonaProvider.SGLANG,
+        PersonaProvider.VLLM,
+    }:
+        build_parser().error(
+            "--generation-profile is only available for local SGLang or vLLM"
+        )
+    if (
+        args.profile
+        and provider in {PersonaProvider.SGLANG, PersonaProvider.VLLM}
+        and not args.generation_profile
+    ):
+        build_parser().error(
+            "--generation-profile is required for a selected local campaign profile"
+        )
+    try:
+        generation_profile = (
+            catalog.get_generation_profile(args.generation_profile)
+            if args.generation_profile
+            else None
+        )
+    except ValueError as exc:
+        build_parser().error(str(exc))
     payload = describe_playtest_profiles(
         catalog,
         provider=provider,
         single_persona=CampaignPersona(args.persona),
         godot_runtime=args.godot_runtime,
         godot_bin=args.godot_bin,
+        generation_profile=generation_profile,
     )
     if args.profile:
         payload["profiles"] = [
@@ -109,6 +137,12 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print(f"Godot: {payload['godot_runtime']} ({payload['godot_bin']})")
         print(f"LLM: {payload['llm_provider']} ({payload['provider']})")
+        if payload["generation_profile_selection_required"]:
+            print("Generation profile: choose one before execution")
+            for generation in payload["generation_profiles"]:
+                print(f"  {generation['id']}: {generation['description']}")
+        elif payload["generation_profile"]:
+            print(f"Generation profile: {payload['generation_profile']['id']}")
         for profile in payload["profiles"]:
             print(
                 f"\n{profile['id']}: {profile['label']}\n"

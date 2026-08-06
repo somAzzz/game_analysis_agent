@@ -7,6 +7,8 @@ gaa_persona_max_runs=${PERSONA_MAX_RUNS-}
 gaa_persona_max_weeks=${PERSONA_MAX_WEEKS-}
 gaa_persona_max_concurrency=${PERSONA_MAX_CONCURRENCY-}
 gaa_persona_max_calls=${PERSONA_MAX_CALLS-}
+gaa_persona_enable_thinking=${PERSONA_ENABLE_THINKING-}
+gaa_persona_decision_max_tokens=${PERSONA_DECISION_MAX_TOKENS-}
 if [ -f "$ROOT/.env" ]; then
   set -a
   # shellcheck disable=SC1091
@@ -18,7 +20,11 @@ fi
 [ -z "$gaa_persona_max_weeks" ] || PERSONA_MAX_WEEKS=$gaa_persona_max_weeks
 [ -z "$gaa_persona_max_concurrency" ] || PERSONA_MAX_CONCURRENCY=$gaa_persona_max_concurrency
 [ -z "$gaa_persona_max_calls" ] || PERSONA_MAX_CALLS=$gaa_persona_max_calls
+[ -z "$gaa_persona_enable_thinking" ] || PERSONA_ENABLE_THINKING=$gaa_persona_enable_thinking
+[ -z "$gaa_persona_decision_max_tokens" ] || \
+  PERSONA_DECISION_MAX_TOKENS=$gaa_persona_decision_max_tokens
 export PERSONA_MAX_RUNS PERSONA_MAX_WEEKS PERSONA_MAX_CONCURRENCY PERSONA_MAX_CALLS
+export PERSONA_ENABLE_THINKING PERSONA_DECISION_MAX_TOKENS
 
 case "${1:-}" in
   -h|--help)

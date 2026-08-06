@@ -8,6 +8,7 @@ Every campaign must record:
 - cell matrix and terminal completeness state;
 - per-step typed state, legal actions/choices, selected IDs, and outcomes;
 - provider/model or deterministic-policy provenance;
+- selected local generation profile and its frozen thinking/max-token values;
 - aggregate metrics, failure clusters, invariants, and gate results;
 - exact citations from repair-driving facts to fields or rows.
 
