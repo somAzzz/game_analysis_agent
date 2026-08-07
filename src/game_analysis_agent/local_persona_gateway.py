@@ -597,8 +597,8 @@ def _accumulate_metadata(
 
 
 def _token_budget(value: int, *, field: str, minimum: int = 128) -> int:
-    if value < minimum or value > 4096:
-        raise ValueError(f"{field} must be between {minimum} and 4096")
+    if value < minimum or value > 5120:
+        raise ValueError(f"{field} must be between {minimum} and 5120")
     return value
 
 

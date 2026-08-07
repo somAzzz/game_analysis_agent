@@ -2,11 +2,11 @@
   "schema_version": "playtest-session-profiles-v2",
   "generation_profiles": [
     {
-      "id": "thinking-4096",
-      "label": "Thinking · 4096",
-      "description": "Enable Qwen thinking and allow up to 4096 decision completion tokens.",
+      "id": "thinking-5120",
+      "label": "Thinking · 5120",
+      "description": "Enable Qwen thinking and allow up to 5120 decision completion tokens.",
       "enable_thinking": true,
-      "decision_max_tokens": 4096
+      "decision_max_tokens": 5120
     },
     {
       "id": "no-thinking-2048",

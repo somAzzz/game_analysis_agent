@@ -171,7 +171,7 @@ class PersonaGenerationProfile(BaseModel):
     label: str
     description: str
     enable_thinking: bool
-    decision_max_tokens: int = Field(ge=128, le=4096)
+    decision_max_tokens: int = Field(ge=128, le=5120)
 
     @property
     def environment(self) -> dict[str, str]:

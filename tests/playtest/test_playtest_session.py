@@ -37,7 +37,7 @@ def test_committed_profiles_freeze_full_semester_order_and_budgets() -> None:
     ]
     profiles = {profile["id"]: profile for profile in payload["profiles"]}
     assert [profile.id for profile in catalog.generation_profiles] == [
-        "thinking-4096",
+        "thinking-5120",
         "no-thinking-2048",
     ]
     assert profiles["one-strategy"]["personas"] == ["study"]
@@ -129,14 +129,14 @@ def test_sglang_choice_emits_sglang_campaign_and_truthful_menu_label() -> None:
     assert all(profile["command"][1] == "sglang" for profile in payload["profiles"])
     assert payload["generation_profile_selection_required"] is True
     assert [profile["id"] for profile in payload["generation_profiles"]] == [
-        "thinking-4096",
+        "thinking-5120",
         "no-thinking-2048",
     ]
 
 
 @pytest.mark.parametrize(
     ("profile_id", "thinking", "max_tokens"),
-    [("thinking-4096", "1", "4096"), ("no-thinking-2048", "0", "2048")],
+    [("thinking-5120", "1", "5120"), ("no-thinking-2048", "0", "2048")],
 )
 def test_selected_generation_profile_freezes_both_environment_values(
     profile_id: str,
@@ -209,11 +209,11 @@ def test_profile_rejects_a_call_budget_below_worst_case() -> None:
                 "schema_version": "playtest-session-profiles-v2",
                 "generation_profiles": [
                     {
-                        "id": "thinking-4096",
+                        "id": "thinking-5120",
                         "label": "Thinking",
                         "description": "Thinking profile",
                         "enable_thinking": True,
-                        "decision_max_tokens": 4096,
+                        "decision_max_tokens": 5120,
                     },
                     {
                         "id": "no-thinking-2048",
@@ -317,7 +317,7 @@ def test_runtime_entrypoints_preserve_selected_local_or_docker_godot_over_dotenv
 
 @pytest.mark.parametrize(
     ("selected_thinking", "selected_tokens", "dotenv_thinking", "dotenv_tokens"),
-    [("1", "4096", "0", "2048"), ("0", "2048", "1", "4096")],
+    [("1", "5120", "0", "2048"), ("0", "2048", "1", "5120")],
 )
 def test_campaign_entrypoint_preserves_selected_generation_profile_over_dotenv(
     tmp_path: Path,

@@ -63,7 +63,7 @@ repository's interactive path:
    evidence.
 6. If the user selects local SGLang or vLLM, run `scripts/session-options` with
    the confirmed `--godot-runtime` and `--llm-provider`, then ask for one frozen
-   generation profile: `thinking-4096` or `no-thinking-2048`. Do not combine
+   generation profile: `thinking-5120` or `no-thinking-2048`. Do not combine
    their environment values. API providers do not expose this local choice.
 7. Offer the three frozen campaign profiles in recommended order, explain
    calls/cells/duration/eligibility/cost, and ask for the persona only for

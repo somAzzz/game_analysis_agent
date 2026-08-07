@@ -125,7 +125,7 @@ choose exactly one generation profile before campaign execution:
 
 | Generation profile | Thinking | Decision max tokens | Purpose |
 | --- | ---: | ---: | --- |
-| `thinking-4096` | on | 4096 | Preserve extended reasoning as the quality candidate. |
+| `thinking-5120` | on | 5120 | Preserve extended reasoning as the quality candidate. |
 | `no-thinking-2048` | off | 2048 | Test direct structured decisions as the efficiency candidate. |
 
 Do not offer this local Qwen switch to API providers, and do not mix values
@@ -161,7 +161,7 @@ Use the planner with all confirmed values. Examples:
   --godot-runtime local-godot \
   --godot-bin /resolved/godot4 \
   --llm-provider local-vllm \
-  --generation-profile thinking-4096 \
+  --generation-profile thinking-5120 \
   --profile six-strategy \
   --json
 ```

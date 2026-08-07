@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 from game_analysis_agent.agents.interactive_player import InteractivePlayerAgent
 from game_analysis_agent.local_persona_gateway import LocalChatPersonaGateway
 from game_analysis_agent.openai_persona_gateway import OpenAIResponsesPersonaGateway
@@ -89,6 +91,21 @@ class _LocalLLM:
             total_tokens=15,
             latency_ms=1,
         )
+
+
+def test_local_persona_gateway_accepts_5120_decision_token_budget() -> None:
+    llm = _LocalLLM([])
+
+    gateway = LocalChatPersonaGateway(llm, decision_max_tokens=5120)  # type: ignore[arg-type]
+
+    assert gateway.decision_max_tokens == 5120
+
+
+def test_local_persona_gateway_rejects_decision_budget_above_5120() -> None:
+    llm = _LocalLLM([])
+
+    with pytest.raises(ValueError, match="between 128 and 5120"):
+        LocalChatPersonaGateway(llm, decision_max_tokens=5121)  # type: ignore[arg-type]
 
 
 def _context() -> WeekContext:
