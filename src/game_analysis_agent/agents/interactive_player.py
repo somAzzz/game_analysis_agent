@@ -672,12 +672,6 @@ def build_week_context(
     top_risks, risk_guidance = _resolve_risk_guidance(state_payload, state, max_weeks=max_weeks)
     raw_actions = action_catalog.get("actions") or []
     actions = [_action_brief(action) for action in raw_actions]
-    slot_aware = bool(raw_actions) and all(
-        isinstance(action, dict)
-        and type(action.get("cost_slots")) is int
-        and int(action["cost_slots"]) > 0
-        for action in raw_actions
-    )
     choices = [
         _event_choice_brief(choice, last_event_id, index)
         for index, choice in enumerate(event_choices)
@@ -689,7 +683,7 @@ def build_week_context(
         difficulty=difficulty,
         scenario=scenario,
         max_action_slots=4,
-        action_slot_policy="exact_cost_sum" if slot_aware else "at_most_count",
+        action_slot_policy="at_most_count",
         persona=persona,
         persona_strategy=persona_strategy,
         state=state,
