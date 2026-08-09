@@ -46,11 +46,11 @@ repository's interactive path:
    `http://127.0.0.1:5173/#/playthrough-inspector` before asking for runtime or
    provider. This read-only stage must not start the Judge API, select Godot, or
    call a model; provider-backed actions remain unavailable.
-3. Make the first user-facing choice two required questions, before profile,
-   persona, cost, or execution:
-   - Godot runtime: `local-godot` or `docker-godot`;
-   - LLM: `local-sglang`, `local-vllm`, `openai-api`, or `none`.
-   Do not infer either answer from installed tools, `.env`, or prior sessions.
+3. Unless the user overrides a value, freeze the checked-in defaults without
+   pausing: `docker-godot`, `local-sglang`, `thinking-5120`, and
+   `six-strategy` (all six personas, seed 42, 20 weeks). Announce the defaults
+   before probing or execution. Explicit user choices always win; never infer
+   an override from installed tools, `.env`, or prior sessions.
 4. Probe only the selected paths. For local Godot, resolve the exact executable
    and require Godot 4.4. For Docker Godot, require Docker plus the repository
    wrapper and verify its Godot 4.4 version. Check provider readiness by field
@@ -61,13 +61,12 @@ repository's interactive path:
    fresh persona evidence will be created, then ask for the automated test
    scope. Do not show persona campaign profiles or relabel Replay as live
    evidence.
-6. If the user selects local SGLang or vLLM, run `scripts/session-options` with
-   the confirmed `--godot-runtime` and `--llm-provider`, then ask for one frozen
-   generation profile: `thinking-5120` or `no-thinking-2048`. Do not combine
-   their environment values. API providers do not expose this local choice.
-7. Offer the three frozen campaign profiles in recommended order, explain
-   calls/cells/duration/eligibility/cost, and ask for the persona only for
-   `one-strategy`.
+6. For local SGLang or vLLM, use `thinking-5120` unless the user selects
+   `no-thinking-2048`. Do not combine their environment values. API providers
+   do not expose this local choice.
+7. Use `six-strategy` unless the user selects `one-strategy` or
+   `repair-evidence`. Explain calls/cells/duration/eligibility before execution,
+   and ask for a persona only when `one-strategy` was explicitly selected.
 8. Do not start a provider, spend API credit, or launch a campaign until Godot,
    LLM, generation profile when local, campaign profile, and any required
    persona are all confirmed. Recommend local

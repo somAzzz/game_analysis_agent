@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -36,6 +38,12 @@ def test_committed_profiles_freeze_full_semester_order_and_budgets() -> None:
         "repair-evidence",
     ]
     profiles = {profile["id"]: profile for profile in payload["profiles"]}
+    assert catalog.defaults.model_dump(mode="json") == {
+        "godot_runtime": "docker-godot",
+        "llm_provider": "local-sglang",
+        "generation_profile": "thinking-5120",
+        "campaign_profile": "six-strategy",
+    }
     assert [profile.id for profile in catalog.generation_profiles] == [
         "thinking-5120",
         "no-thinking-2048",
@@ -92,8 +100,9 @@ def test_local_and_api_profiles_share_the_same_campaign_shape() -> None:
         assert api_profile["command"][1] == "openai"
 
 
-def test_initial_choices_require_godot_and_llm_before_profile() -> None:
-    payload = describe_session_choices()
+def test_initial_choices_expose_frozen_defaults_and_allow_overrides() -> None:
+    catalog = load_playtest_session_catalog(ROOT / "config/playtest_session_profiles.json")
+    payload = describe_session_choices(catalog)
 
     assert payload["schema_version"] == "playtest-session-choices-v1"
     questions = {question["id"]: question for question in payload["questions"]}
@@ -107,11 +116,34 @@ def test_initial_choices_require_godot_and_llm_before_profile() -> None:
         "openai-api",
         "none",
     ]
-    assert payload["rules"]["ask_before_profile"] is True
+    assert payload["defaults"] == catalog.defaults.model_dump(mode="json")
+    assert payload["rules"]["ask_before_profile"] is False
+    assert payload["rules"]["apply_defaults_without_prompt"] is True
+    assert payload["rules"]["explicit_overrides_win"] is True
     assert provider_for_llm_choice("local-sglang") == PersonaProvider.SGLANG
     assert provider_for_llm_choice("openai-api") == PersonaProvider.OPENAI
     assert provider_for_llm_choice("local-vllm") == PersonaProvider.VLLM
     assert provider_for_llm_choice("none") is None
+
+
+def test_planner_cli_defaults_to_docker_sglang_thinking_six_strategy() -> None:
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "tools/judge/describe_playtest_session.py"), "--json"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    payload = json.loads(result.stdout)
+    assert payload["godot_runtime"] == "docker-godot"
+    assert payload["llm_provider"] == "local-sglang"
+    assert payload["generation_profile"]["id"] == "thinking-5120"
+    assert [profile["id"] for profile in payload["profiles"]] == ["six-strategy"]
+    profile = payload["profiles"][0]
+    assert profile["personas"] == ["newbie", "study", "money", "social", "visa", "slacker"]
+    assert profile["environment"]["GODOT_BIN"] == "scripts/godot-docker-wrapper"
+    assert profile["environment"]["PERSONA_DECISION_MAX_TOKENS"] == "5120"
 
 
 def test_sglang_choice_emits_sglang_campaign_and_truthful_menu_label() -> None:
@@ -206,7 +238,13 @@ def test_profile_rejects_a_call_budget_below_worst_case() -> None:
     with pytest.raises(ValidationError, match="worst case"):
         PlaytestSessionCatalog.model_validate(
             {
-                "schema_version": "playtest-session-profiles-v2",
+                "schema_version": "playtest-session-profiles-v3",
+                "defaults": {
+                    "godot_runtime": "docker-godot",
+                    "llm_provider": "local-sglang",
+                    "generation_profile": "thinking-5120",
+                    "campaign_profile": "profile-0",
+                },
                 "generation_profiles": [
                     {
                         "id": "thinking-5120",

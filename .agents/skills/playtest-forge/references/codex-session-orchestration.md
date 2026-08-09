@@ -56,21 +56,21 @@ the user chooses a runtime. Provider-backed actions remain unavailable until
 the governed API is connected. Starting this viewer must not probe Godot or
 call a model.
 
-### 2. Ask the two mandatory choices
+### 2. Apply defaults or explicit overrides
 
-The first user-facing menu must ask and wait for both answers:
+Use these checked-in defaults when the user asks to start testing without
+specifying alternatives:
 
-1. Godot runtime:
-   - `local-godot` — use a host Godot 4.4 executable;
-   - `docker-godot` — use `scripts/godot-docker-wrapper`.
-2. LLM:
-   - `local-sglang` — fresh local SGLang persona decisions;
-   - `openai-api` — live OpenAI persona decisions and possible API cost;
-   - `local-vllm` — fresh local vLLM persona decisions;
-   - `none` — deterministic automation and committed Replay, zero model calls.
+- Godot runtime: `docker-godot` via `scripts/godot-docker-wrapper`;
+- LLM: `local-sglang`;
+- generation: `thinking-5120`;
+- campaign: `six-strategy` with all six personas, seed 42, and 20 weeks.
 
-Do not preselect either answer because a binary, Docker daemon, endpoint, or key
-is present. Availability is readiness evidence, not user authorization.
+Announce these values and continue without pausing. Any explicit user choice
+overrides its default. `local-godot`, `local-vllm`, `openai-api`, `none`,
+`no-thinking-2048`, `one-strategy`, and `repair-evidence` remain available.
+Never infer an override because a binary, Docker daemon, endpoint, or key is
+present. Availability is readiness evidence, not user authorization.
 
 ### 3. Probe only the selected runtime and provider
 
@@ -120,8 +120,8 @@ persona campaign in the viewer.
 
 #### OpenAI API, local SGLang, or local vLLM
 
-After the two initial choices are confirmed, local SGLang/vLLM sessions must
-choose exactly one generation profile before campaign execution:
+Local SGLang/vLLM sessions must freeze exactly one generation profile before
+campaign execution. Default to `thinking-5120` unless the user overrides it:
 
 | Generation profile | Thinking | Decision max tokens | Purpose |
 | --- | ---: | ---: | --- |
@@ -129,7 +129,8 @@ choose exactly one generation profile before campaign execution:
 | `no-thinking-2048` | off | 2048 | Test direct structured decisions as the efficiency candidate. |
 
 Do not offer this local Qwen switch to API providers, and do not mix values
-from the two profiles. Then present the frozen campaign profiles:
+from the two profiles. Default to `six-strategy`; present alternatives when
+the user asks to change scope:
 
 | Profile | Matrix | Worst-case calls | Operational cap | What it can prove |
 | --- | ---: | ---: | ---: | --- |
@@ -140,12 +141,19 @@ from the two profiles. Then present the frozen campaign profiles:
 A complete 20-week request can end after 19 decisions when the resulting state
 is week 20. Say this before execution.
 
-Ask for the profile and, for `one-strategy`, the persona. The user has already
-selected the Godot runtime and LLM, so do not ask those questions again unless
-readiness failed or the user changes scope. Never infer permission to spend API
-credit from the presence of a key.
+Ask for a persona only when `one-strategy` is explicitly selected. Do not ask
+again for values already frozen by defaults or overrides unless readiness
+failed or the user changes scope. Never infer permission to spend API credit
+from the presence of a key.
 
 Use the planner with all confirmed values. Examples:
+
+```bash
+.agents/skills/playtest-forge/scripts/session-options --json
+```
+
+The no-argument command emits the default Docker Godot, local SGLang,
+`thinking-5120`, six-persona campaign.
 
 ```bash
 .agents/skills/playtest-forge/scripts/session-options \

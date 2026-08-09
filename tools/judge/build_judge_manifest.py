@@ -128,7 +128,7 @@ ARTIFACTS = {
     ),
     "config/playtest_session_profiles.json": (
         "codex-playtest-profiles",
-        "playtest-session-profiles-v2",
+        "playtest-session-profiles-v3",
     ),
     "src/game_analysis_agent/playtest_session.py": (
         "codex-playtest-planner",

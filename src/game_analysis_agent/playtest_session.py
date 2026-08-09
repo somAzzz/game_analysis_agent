@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .campaign_contract import CampaignPersona
 from .persona_gateway import PersonaProvider
 
-PROFILE_SCHEMA = "playtest-session-profiles-v2"
+PROFILE_SCHEMA = "playtest-session-profiles-v3"
 GodotRuntime = Literal["local-godot", "docker-godot"]
 LlmProviderChoice = Literal["local-sglang", "local-vllm", "openai-api", "none"]
 
@@ -23,8 +23,19 @@ _LLM_PROVIDER_MAP: dict[LlmProviderChoice, PersonaProvider | None] = {
 }
 
 
-def describe_session_choices() -> dict[str, object]:
-    """Return the two choices Codex must ask before presenting test profiles."""
+def describe_session_choices(catalog: PlaytestSessionCatalog | None = None) -> dict[str, object]:
+    """Return available choices and the frozen defaults used without an override."""
+
+    defaults = (
+        catalog.defaults.model_dump(mode="json")
+        if catalog is not None
+        else {
+            "godot_runtime": "docker-godot",
+            "llm_provider": "local-sglang",
+            "generation_profile": "thinking-5120",
+            "campaign_profile": "six-strategy",
+        }
+    )
 
     return {
         "schema_version": "playtest-session-choices-v1",
@@ -32,7 +43,8 @@ def describe_session_choices() -> dict[str, object]:
             {
                 "id": "godot_runtime",
                 "prompt": "Which Godot runtime should execute the game?",
-                "required": True,
+                "required": False,
+                "default": defaults["godot_runtime"],
                 "options": [
                     {
                         "id": "local-godot",
@@ -49,7 +61,8 @@ def describe_session_choices() -> dict[str, object]:
             {
                 "id": "llm_provider",
                 "prompt": "Which LLM should choose persona actions?",
-                "required": True,
+                "required": False,
+                "default": defaults["llm_provider"],
                 "options": [
                     {
                         "id": "local-sglang",
@@ -76,8 +89,11 @@ def describe_session_choices() -> dict[str, object]:
                 ],
             },
         ],
+        "defaults": defaults,
         "rules": {
-            "ask_before_profile": True,
+            "ask_before_profile": False,
+            "apply_defaults_without_prompt": True,
+            "explicit_overrides_win": True,
             "no_provider_call_during_selection": True,
             "no_llm_is_not_live_persona_evidence": True,
         },
@@ -181,10 +197,20 @@ class PersonaGenerationProfile(BaseModel):
         }
 
 
+class PlaytestSessionDefaults(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    godot_runtime: GodotRuntime = "docker-godot"
+    llm_provider: Literal["local-sglang", "local-vllm", "openai-api"] = "local-sglang"
+    generation_profile: str = Field(pattern=r"^[a-z][a-z0-9-]+$")
+    campaign_profile: str = Field(pattern=r"^[a-z][a-z0-9-]+$")
+
+
 class PlaytestSessionCatalog(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal[PROFILE_SCHEMA] = PROFILE_SCHEMA
+    defaults: PlaytestSessionDefaults
     generation_profiles: tuple[PersonaGenerationProfile, ...] = Field(min_length=2)
     profiles: tuple[PlaytestSessionProfile, ...] = Field(min_length=3)
 
@@ -196,6 +222,12 @@ class PlaytestSessionCatalog(BaseModel):
             self.generation_profiles
         ):
             raise ValueError("generation profile ids must be unique")
+        if self.defaults.generation_profile not in {
+            profile.id for profile in self.generation_profiles
+        }:
+            raise ValueError("default generation profile is not defined")
+        if self.defaults.campaign_profile not in {profile.id for profile in self.profiles}:
+            raise ValueError("default campaign profile is not defined")
         return self
 
     def get(self, profile_id: str) -> PlaytestSessionProfile:
@@ -339,6 +371,7 @@ __all__ = [
     "LlmProviderChoice",
     "PersonaGenerationProfile",
     "PlaytestSessionCatalog",
+    "PlaytestSessionDefaults",
     "PlaytestSessionProfile",
     "default_godot_bin",
     "describe_no_llm_session",

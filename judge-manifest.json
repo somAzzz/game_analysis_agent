@@ -163,10 +163,10 @@
       "sha256": "0e0f57f8bf7b0b9188f7eac32f4cfaf5b4dc8aefe5ab8dfd1d368cd1816164cf"
     },
     {
-      "bytes": 9228,
+      "bytes": 9210,
       "path": ".agents/skills/playtest-forge/SKILL.md",
       "role": "codex-skill",
-      "sha256": "fe109067a7658a656870f44077fe457bba75cb08182a6914020597ed4fa08974"
+      "sha256": "3be216409c7cee7dc1d76a9b4a759d0df355bf611628008251eac26cf9e9728d"
     },
     {
       "bytes": 308,
@@ -247,10 +247,10 @@
       "sha256": "c8cb5309d0658beefdbd3864b0931329420259f223aae6395a758f25c1c9c847"
     },
     {
-      "bytes": 9837,
+      "bytes": 10098,
       "path": ".agents/skills/playtest-forge/references/codex-session-orchestration.md",
       "role": "codex-skill-reference",
-      "sha256": "0af799c798c85331a8b01fac700948c4e2075cd6c02e0c842935cadf8e4151a0"
+      "sha256": "81cc32763775c3def984eb2257956c1a177e59c827edb7049af4be88e4ba5db8"
     },
     {
       "bytes": 156,
@@ -259,23 +259,23 @@
       "sha256": "b84de3cd146f71ca84889252e683a7d4c528221f13fd4dde3b5b0cd172a16682"
     },
     {
-      "bytes": 2086,
+      "bytes": 2262,
       "path": "config/playtest_session_profiles.json",
       "role": "codex-playtest-profiles",
-      "schema_version": "playtest-session-profiles-v2",
-      "sha256": "cbd2ffc67abee0f814567810acdf41058cfa036b9a6c13095e112a2be3935cd9"
+      "schema_version": "playtest-session-profiles-v3",
+      "sha256": "748c38c34e643d3263ce89f11d531d9e7a5c3980b73bde7ae49bdb6667314f96"
     },
     {
-      "bytes": 12896,
+      "bytes": 14301,
       "path": "src/game_analysis_agent/playtest_session.py",
       "role": "codex-playtest-planner",
-      "sha256": "4f8e46d669b9adbd53503dddef1613011098e1ff9b1dafee0e0d3859765f1393"
+      "sha256": "62e3bea1ca6ab86222454709814a256f25eabfcc447d9ea2e1a1b6da456813c5"
     },
     {
-      "bytes": 5780,
+      "bytes": 6030,
       "path": "tools/judge/describe_playtest_session.py",
       "role": "codex-playtest-planner-cli",
-      "sha256": "517df9f29ad508c30dd9ce59aa52ac2f22acf36816e0d3a41e4b73383f97e892"
+      "sha256": "fc102b3a84d498a8641a7566f3853fcf50feb78438baa2f0c533d9908ea85544"
     },
     {
       "bytes": 216,

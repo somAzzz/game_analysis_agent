@@ -63,8 +63,9 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    catalog = load_playtest_session_catalog(ROOT / "config/playtest_session_profiles.json")
     if args.choices_only:
-        payload = describe_session_choices()
+        payload = describe_session_choices(catalog)
         if args.json:
             print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
         else:
@@ -74,7 +75,10 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"  {option['id']}: {option['description']}")
         return 0
 
-    if args.llm_provider == "none":
+    selected_llm_provider = args.llm_provider or (
+        None if args.provider else catalog.defaults.llm_provider
+    )
+    if selected_llm_provider == "none":
         if args.profile:
             build_parser().error("--profile is unavailable when --llm-provider none")
         payload = describe_no_llm_session(
@@ -91,12 +95,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     provider = (
-        provider_for_llm_choice(args.llm_provider)
-        if args.llm_provider
+        provider_for_llm_choice(selected_llm_provider)
+        if selected_llm_provider
         else PersonaProvider(args.provider or "sglang")
     )
     assert provider is not None
-    catalog = load_playtest_session_catalog(ROOT / "config/playtest_session_profiles.json")
     if args.generation_profile and provider not in {
         PersonaProvider.SGLANG,
         PersonaProvider.VLLM,
@@ -104,18 +107,17 @@ def main(argv: list[str] | None = None) -> int:
         build_parser().error(
             "--generation-profile is only available for local SGLang or vLLM"
         )
+    selected_profile = args.profile or catalog.defaults.campaign_profile
+    selected_generation_profile = args.generation_profile
     if (
-        args.profile
+        selected_generation_profile is None
         and provider in {PersonaProvider.SGLANG, PersonaProvider.VLLM}
-        and not args.generation_profile
     ):
-        build_parser().error(
-            "--generation-profile is required for a selected local campaign profile"
-        )
+        selected_generation_profile = catalog.defaults.generation_profile
     try:
         generation_profile = (
-            catalog.get_generation_profile(args.generation_profile)
-            if args.generation_profile
+            catalog.get_generation_profile(selected_generation_profile)
+            if selected_generation_profile
             else None
         )
     except ValueError as exc:
@@ -128,10 +130,10 @@ def main(argv: list[str] | None = None) -> int:
         godot_bin=args.godot_bin,
         generation_profile=generation_profile,
     )
-    if args.profile:
-        payload["profiles"] = [
-            profile for profile in payload["profiles"] if profile["id"] == args.profile
-        ]
+    payload["defaults"] = catalog.defaults.model_dump(mode="json")
+    payload["profiles"] = [
+        profile for profile in payload["profiles"] if profile["id"] == selected_profile
+    ]
     if args.json:
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
     else:
