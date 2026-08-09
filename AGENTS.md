@@ -125,7 +125,8 @@ export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
 "$GODOT_BIN" --version
 ```
 
-`docker compose --profile game-tools up -d godot` starts the Godot tool
+`GODOT_DOCKER_MOUNT_ROOT="$(cd .. && pwd)" docker compose --profile game-tools up -d godot`
+starts the Godot tool
 sidecar. Add `--profile local-nvidia vllm` only when local NVIDIA inference is
 explicitly required. The wrapper first reuses the running Godot sidecar with
 `docker compose exec`; if it is not running, it falls back to a one-shot

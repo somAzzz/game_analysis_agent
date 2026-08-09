@@ -53,8 +53,10 @@ repository's interactive path:
    an override from installed tools, `.env`, or prior sessions.
 4. Probe only the selected paths. For local Godot, resolve the exact executable
    and require Godot 4.4. For Docker Godot, require Docker plus the repository
-   wrapper and verify its Godot 4.4 version. Check provider readiness by field
-   presence and health only; never print secrets or make a model call.
+   wrapper and verify its Godot 4.4 version. When starting the sidecar, set
+   `GODOT_DOCKER_MOUNT_ROOT` to the absolute parent of the repository. Check
+   provider readiness by field presence and health only; never print secrets
+   or make a model call.
 5. If the user selects `none`, keep the static viewer open and route to
    deterministic automation plus committed Replay. Read
    `references/automated-testing.md`, state that model calls are zero and no

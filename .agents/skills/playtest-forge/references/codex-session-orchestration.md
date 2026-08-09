@@ -81,10 +81,15 @@ fall back to Docker.
 For `docker-godot`, verify Docker, then run:
 
 ```bash
+export GODOT_DOCKER_MOUNT_ROOT="$(cd .. && pwd)"
+docker compose --profile game-tools up -d godot
 scripts/godot-docker-wrapper --version
 ```
 
-Require the pinned Godot 4.4 family. Do not silently fall back to a host binary.
+Require the pinned Godot 4.4 family. The mount root must be absolute so the
+sidecar can see isolated sibling worktrees. The wrapper may fall back to an
+equivalent one-shot Docker run when a running sidecar cannot see the current
+worktree; do not silently fall back to a host binary.
 
 For `openai-api`, check server-side `OPENAI_API_KEY` and model fields without
 printing their values. Do not call the API during readiness. For

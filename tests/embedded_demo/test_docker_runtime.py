@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import subprocess
 from pathlib import Path
 
 import yaml
@@ -103,7 +104,49 @@ def test_godot_wrapper_prefers_compose_and_preserves_current_user() -> None:
 
     assert os.access(wrapper, os.X_OK)
     assert "ps --quiet --status running" in text
+    assert 'docker exec "$running_id" test -d "$PWD"' in text
     assert "exec --no-TTY" in text
     assert '--user "$(id -u):$(id -g)"' in text
     assert "exec docker run --rm \\" in text
     assert '--volume "$PROJECTS_ROOT:$PROJECTS_ROOT"' in text
+
+
+def test_godot_wrapper_falls_back_when_sidecar_cannot_see_worktree(tmp_path: Path) -> None:
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    fake_docker = fake_bin / "docker"
+    fake_docker.write_text(
+        """#!/bin/sh
+if [ "$1" = "compose" ]; then
+  for gaa_arg in "$@"; do
+    if [ "$gaa_arg" = "ps" ]; then
+      printf '%s\\n' fake-sidecar
+      exit 0
+    fi
+  done
+  exit 90
+fi
+if [ "$1" = "exec" ]; then
+  exit 1
+fi
+if [ "$1" = "run" ]; then
+  printf '%s\\n' "$*"
+  exit 0
+fi
+exit 91
+""",
+        encoding="utf-8",
+    )
+    fake_docker.chmod(0o755)
+
+    result = subprocess.run(
+        [str(ROOT / "scripts/godot-docker-wrapper"), "--version"],
+        cwd=ROOT,
+        env={**os.environ, "PATH": f"{fake_bin}{os.pathsep}{os.environ['PATH']}"},
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.stdout.startswith("run --rm ")
+    assert f"--volume {ROOT.parent}:{ROOT.parent}" in result.stdout
