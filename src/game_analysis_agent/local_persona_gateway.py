@@ -122,6 +122,7 @@ class LocalChatPersonaGateway:
                 max_tokens=self.decision_max_tokens,
                 attempt=attempt,
                 enable_thinking=self._thinking_for_attempt(attempt),
+                temperature=0.0 if attempt == 2 else None,
                 trace_context={
                     "request_id": request.request_id,
                     "request_fingerprint": request.fingerprint(),
@@ -444,11 +445,36 @@ def _decision_prompt(request: PersonaDecisionRequest) -> str:
 
 
 def _decision_repair_prompt(request: PersonaDecisionRequest, errors: list[str]) -> str:
-    return (
-        _decision_prompt(request)
-        + "\nPrevious errors: "
-        + json.dumps(errors, ensure_ascii=False)
-        + ". Return one corrected JSON object only."
+    context = request.context
+    repair_context = {
+        "week": context.state.week,
+        "persona": context.persona,
+        "persona_strategy": context.persona_strategy,
+        "top_risks": [risk.model_dump(mode="json") for risk in context.top_risks],
+        "action_slot_policy": context.action_slot_policy,
+        "max_action_slots": context.max_action_slots,
+        "available_actions": [
+            {
+                "id": action.id,
+                "slots": action.cost.get("slots", 1),
+                "cooldown_group": action.cooldown_group,
+                "max_per_week": action.max_per_week,
+            }
+            for action in context.available_actions
+        ],
+        "errors": errors,
+    }
+    return "\n".join(
+        [
+            "Repair the rejected PlayerDecision using this compact authoritative context.",
+            "For at_most_count, 1 to max_action_slots actions are valid; unused slots are allowed.",
+            (
+                "Keep accepted_action_ids. Remove rejected_action_ids or replace each with a "
+                "different available id. Do not repeat a rejected combination."
+            ),
+            json.dumps(repair_context, ensure_ascii=False, separators=(",", ":")),
+            "Return one corrected PlayerDecision JSON object only.",
+        ]
     )
 
 
