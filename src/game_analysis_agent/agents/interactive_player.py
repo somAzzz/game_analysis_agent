@@ -1034,18 +1034,28 @@ def _authoritative_plan_error(preview: object) -> str:
     error_code = _safe_contract_token(
         preview.get("error_code") or validation.get("code") or "invalid_probe_contract"
     )
+    raw_proposed_ids = validation.get("proposed_action_ids")
+    proposed_ids = (
+        [_safe_contract_token(item) for item in raw_proposed_ids[:8]]
+        if isinstance(raw_proposed_ids, list)
+        else []
+    )
     raw_ids = validation.get("selected_action_ids")
     accepted_ids = (
         [_safe_contract_token(item) for item in raw_ids[:8]] if isinstance(raw_ids, list) else []
     )
+    rejected_ids = [action_id for action_id in proposed_ids if action_id not in accepted_ids]
     used_slots = validation.get("used_slots")
-    required_slots = validation.get("required_slots")
+    maximum_slots = validation.get("maximum_slots", validation.get("required_slots"))
     used_text = str(used_slots) if type(used_slots) is int else "unknown"
-    required_text = str(required_slots) if type(required_slots) is int else "unknown"
+    maximum_text = str(maximum_slots) if type(maximum_slots) is int else "unknown"
     return (
         f"Authoritative plan rejected: error_code={error_code}; "
+        f"proposed_action_ids={json.dumps(proposed_ids, ensure_ascii=False)}; "
         f"accepted_action_ids={json.dumps(accepted_ids, ensure_ascii=False)}; "
-        f"used_slots={used_text}; required_slots={required_text}"
+        f"rejected_action_ids={json.dumps(rejected_ids, ensure_ascii=False)}; "
+        f"used_slots={used_text}; maximum_slots={maximum_text}. "
+        "Keep accepted ids and remove or replace rejected ids with a different legal action."
     )
 
 
