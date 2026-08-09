@@ -32,7 +32,7 @@ def describe_session_choices(catalog: PlaytestSessionCatalog | None = None) -> d
         else {
             "godot_runtime": "docker-godot",
             "llm_provider": "local-sglang",
-            "generation_profile": "thinking-5120",
+            "generation_profile": "no-thinking-2048",
             "campaign_profile": "six-strategy",
         }
     )

@@ -56,7 +56,7 @@ class TestDefaults:
         assert s.base_url().startswith("http://localhost:")
         assert s.model() == s.sglang_model
         assert s.model() == "qwen3.6-27b-nvfp4"
-        assert s.persona_enable_thinking is True
+        assert s.persona_enable_thinking is False
         assert s.persona_decision_max_tokens == 2048
         assert s.persona_event_max_tokens == 64
 

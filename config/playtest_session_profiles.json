@@ -3,23 +3,23 @@
   "defaults": {
     "godot_runtime": "docker-godot",
     "llm_provider": "local-sglang",
-    "generation_profile": "thinking-5120",
+    "generation_profile": "no-thinking-2048",
     "campaign_profile": "six-strategy"
   },
   "generation_profiles": [
     {
-      "id": "thinking-5120",
-      "label": "Thinking · 5120",
-      "description": "Enable Qwen thinking and allow up to 5120 decision completion tokens.",
-      "enable_thinking": true,
-      "decision_max_tokens": 5120
-    },
-    {
       "id": "no-thinking-2048",
       "label": "No thinking · 2048",
-      "description": "Disable Qwen thinking and allow up to 2048 decision completion tokens.",
+      "description": "Default direct structured mode, selected by the paired unseen-seed quality gate.",
       "enable_thinking": false,
       "decision_max_tokens": 2048
+    },
+    {
+      "id": "thinking-5120",
+      "label": "Thinking · 5120",
+      "description": "Optional extended-reasoning diagnostic with up to 5120 decision completion tokens.",
+      "enable_thinking": true,
+      "decision_max_tokens": 5120
     }
   ],
   "profiles": [

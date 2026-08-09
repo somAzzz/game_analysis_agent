@@ -47,7 +47,7 @@ repository's interactive path:
    provider. This read-only stage must not start the Judge API, select Godot, or
    call a model; provider-backed actions remain unavailable.
 3. Unless the user overrides a value, freeze the checked-in defaults without
-   pausing: `docker-godot`, `local-sglang`, `thinking-5120`, and
+   pausing: `docker-godot`, `local-sglang`, `no-thinking-2048`, and
    `six-strategy` (all six personas, seed 42, 20 weeks). Announce the defaults
    before probing or execution. Explicit user choices always win; never infer
    an override from installed tools, `.env`, or prior sessions.
@@ -63,8 +63,8 @@ repository's interactive path:
    fresh persona evidence will be created, then ask for the automated test
    scope. Do not show persona campaign profiles or relabel Replay as live
    evidence.
-6. For local SGLang or vLLM, use `thinking-5120` unless the user selects
-   `no-thinking-2048`. Do not combine their environment values. API providers
+6. For local SGLang or vLLM, use `no-thinking-2048` unless the user selects
+   `thinking-5120`. Do not combine their environment values. API providers
    do not expose this local choice.
 7. Use `six-strategy` unless the user selects `one-strategy` or
    `repair-evidence`. Explain calls/cells/duration/eligibility before execution,

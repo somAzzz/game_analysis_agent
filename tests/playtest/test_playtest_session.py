@@ -41,12 +41,12 @@ def test_committed_profiles_freeze_full_semester_order_and_budgets() -> None:
     assert catalog.defaults.model_dump(mode="json") == {
         "godot_runtime": "docker-godot",
         "llm_provider": "local-sglang",
-        "generation_profile": "thinking-5120",
+        "generation_profile": "no-thinking-2048",
         "campaign_profile": "six-strategy",
     }
     assert [profile.id for profile in catalog.generation_profiles] == [
-        "thinking-5120",
         "no-thinking-2048",
+        "thinking-5120",
     ]
     assert profiles["one-strategy"]["personas"] == ["study"]
     assert profiles["one-strategy"]["cell_count"] == 1
@@ -126,7 +126,7 @@ def test_initial_choices_expose_frozen_defaults_and_allow_overrides() -> None:
     assert provider_for_llm_choice("none") is None
 
 
-def test_planner_cli_defaults_to_docker_sglang_thinking_six_strategy() -> None:
+def test_planner_cli_defaults_to_docker_sglang_no_thinking_six_strategy() -> None:
     result = subprocess.run(
         [sys.executable, str(ROOT / "tools/judge/describe_playtest_session.py"), "--json"],
         cwd=ROOT,
@@ -138,12 +138,13 @@ def test_planner_cli_defaults_to_docker_sglang_thinking_six_strategy() -> None:
     payload = json.loads(result.stdout)
     assert payload["godot_runtime"] == "docker-godot"
     assert payload["llm_provider"] == "local-sglang"
-    assert payload["generation_profile"]["id"] == "thinking-5120"
+    assert payload["generation_profile"]["id"] == "no-thinking-2048"
     assert [profile["id"] for profile in payload["profiles"]] == ["six-strategy"]
     profile = payload["profiles"][0]
     assert profile["personas"] == ["newbie", "study", "money", "social", "visa", "slacker"]
     assert profile["environment"]["GODOT_BIN"] == "scripts/godot-docker-wrapper"
-    assert profile["environment"]["PERSONA_DECISION_MAX_TOKENS"] == "5120"
+    assert profile["environment"]["PERSONA_ENABLE_THINKING"] == "0"
+    assert profile["environment"]["PERSONA_DECISION_MAX_TOKENS"] == "2048"
 
 
 def test_sglang_choice_emits_sglang_campaign_and_truthful_menu_label() -> None:
@@ -161,8 +162,8 @@ def test_sglang_choice_emits_sglang_campaign_and_truthful_menu_label() -> None:
     assert all(profile["command"][1] == "sglang" for profile in payload["profiles"])
     assert payload["generation_profile_selection_required"] is True
     assert [profile["id"] for profile in payload["generation_profiles"]] == [
-        "thinking-5120",
         "no-thinking-2048",
+        "thinking-5120",
     ]
 
 

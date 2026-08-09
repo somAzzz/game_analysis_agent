@@ -268,7 +268,11 @@ def test_local_persona_messages_keep_rules_prefix_stable_when_legal_actions_chan
 def test_local_persona_trace_records_exact_request_without_response_content() -> None:
     llm = _LocalLLM([_decision().model_dump_json()])
     traces: list[dict[str, object]] = []
-    gateway = LocalChatPersonaGateway(llm, trace_sink=traces.append)  # type: ignore[arg-type]
+    gateway = LocalChatPersonaGateway(  # type: ignore[arg-type]
+        llm,
+        enable_thinking=True,
+        trace_sink=traces.append,
+    )
 
     result = gateway.decide(
         PersonaDecisionRequest.from_context(_context(), request_id="newbie-42-w1-trace")
@@ -349,7 +353,7 @@ def test_local_event_repair_keeps_the_same_choice_constraint() -> None:
 
 def test_local_reasoning_is_never_parsed_as_the_final_choice() -> None:
     llm = _LocalLLM(["", _decision().model_dump_json()])
-    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+    gateway = LocalChatPersonaGateway(llm, enable_thinking=True)  # type: ignore[arg-type]
 
     result = gateway.decide(
         PersonaDecisionRequest.from_context(_context(), request_id="newbie-42-w1-reasoning-only")

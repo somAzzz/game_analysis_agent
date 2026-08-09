@@ -105,7 +105,7 @@ class Settings:
     agent_max_tokens: int = field(default_factory=lambda: _env_int("AGENT_MAX_TOKENS", 4096))
     tool_max_rounds: int = field(default_factory=lambda: _env_int("TOOL_MAX_ROUNDS", 8))
     persona_enable_thinking: bool = field(
-        default_factory=lambda: _env_bool("PERSONA_ENABLE_THINKING", True)
+        default_factory=lambda: _env_bool("PERSONA_ENABLE_THINKING", False)
     )
     persona_decision_max_tokens: int = field(
         default_factory=lambda: _env_int("PERSONA_DECISION_MAX_TOKENS", 2048)

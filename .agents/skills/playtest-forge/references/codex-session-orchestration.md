@@ -63,12 +63,12 @@ specifying alternatives:
 
 - Godot runtime: `docker-godot` via `scripts/godot-docker-wrapper`;
 - LLM: `local-sglang`;
-- generation: `thinking-5120`;
+- generation: `no-thinking-2048`;
 - campaign: `six-strategy` with all six personas, seed 42, and 20 weeks.
 
 Announce these values and continue without pausing. Any explicit user choice
 overrides its default. `local-godot`, `local-vllm`, `openai-api`, `none`,
-`no-thinking-2048`, `one-strategy`, and `repair-evidence` remain available.
+`thinking-5120`, `one-strategy`, and `repair-evidence` remain available.
 Never infer an override because a binary, Docker daemon, endpoint, or key is
 present. Availability is readiness evidence, not user authorization.
 
@@ -126,12 +126,12 @@ persona campaign in the viewer.
 #### OpenAI API, local SGLang, or local vLLM
 
 Local SGLang/vLLM sessions must freeze exactly one generation profile before
-campaign execution. Default to `thinking-5120` unless the user overrides it:
+campaign execution. Default to `no-thinking-2048` unless the user overrides it:
 
 | Generation profile | Thinking | Decision max tokens | Purpose |
 | --- | ---: | ---: | --- |
-| `thinking-5120` | on | 5120 | Preserve extended reasoning as the quality candidate. |
-| `no-thinking-2048` | off | 2048 | Test direct structured decisions as the efficiency candidate. |
+| `no-thinking-2048` | off | 2048 | Paired unseen-seed quality default for direct structured decisions. |
+| `thinking-5120` | on | 5120 | Optional extended-reasoning diagnostic and comparison profile. |
 
 Do not offer this local Qwen switch to API providers, and do not mix values
 from the two profiles. Default to `six-strategy`; present alternatives when
@@ -158,7 +158,7 @@ Use the planner with all confirmed values. Examples:
 ```
 
 The no-argument command emits the default Docker Godot, local SGLang,
-`thinking-5120`, six-persona campaign.
+`no-thinking-2048`, six-persona campaign.
 
 ```bash
 .agents/skills/playtest-forge/scripts/session-options \
