@@ -45,8 +45,10 @@ from game_analysis_agent.local_persona_gateway import LocalChatPersonaGateway
 from game_analysis_agent.persona_gateway import (
     PersonaDecisionGateway,
     PersonaDecisionRequest,
+    PersonaDecisionValidator,
     PersonaEventChoiceRequest,
     PersonaResultStatus,
+    validate_player_decision,
 )
 from game_analysis_agent.schemas import (
     ActionBrief,
@@ -173,6 +175,7 @@ class InteractivePlayerAgent(Agent):
         self.cancellation_check = cancellation_check
         self._gateway_llm_calls: list[LLMCall] = []
         self._persona_call_records: list[dict[str, Any]] = []
+        self._last_plan_preview: dict[str, Any] | None = None
         if persona_gateway is not None:
             self.persona_gateway = persona_gateway
         else:
@@ -266,6 +269,7 @@ class InteractivePlayerAgent(Agent):
         truncated = False
         self._gateway_llm_calls.clear()
         self._persona_call_records.clear()
+        self._last_plan_preview = None
 
         probe.seed = self.seed
         probe.difficulty = self.difficulty
@@ -321,7 +325,9 @@ class InteractivePlayerAgent(Agent):
                 )
 
             if hasattr(probe, "preview_step"):
-                preview = probe.preview_step(decision.actions)
+                preview = self._last_plan_preview
+                if preview is None:
+                    preview = probe.preview_step(decision.actions)
                 preview_choices = (
                     preview.get("event_choices", []) if isinstance(preview, dict) else []
                 )
@@ -476,7 +482,9 @@ class InteractivePlayerAgent(Agent):
             f"- seed: {self.seed}\n"
             "\n"
             "You must output JSON matching PlayerDecision. Use only action ids from "
-            "WeekContext.available_actions. Explain strategic_goal, risk_awareness, "
+            "WeekContext.available_actions and follow WeekContext.action_slot_policy; "
+            "exact_cost_sum means selected cost.slots must total max_action_slots. "
+            "Explain strategic_goal, risk_awareness, "
             "expected_tradeoff, and confidence every week.\n"
             "For interactive playtests, do not output hidden reasoning, markdown, "
             "or prose. Return exactly one compact JSON object and stop.\n"
@@ -490,13 +498,30 @@ class InteractivePlayerAgent(Agent):
         system_prompt: str,
         probe: InteractiveProbe,
     ) -> tuple[PlayerDecision, DecisionValidation, list[LLMCall]]:
-        del system_prompt, probe
+        del system_prompt
+        self._last_plan_preview = None
         call_start = len(self._gateway_llm_calls)
         request = PersonaDecisionRequest.from_context(
             context_pack,
             request_id=f"{self.persona}-{self.seed}-w{week}-decision",
         )
-        result = self.persona_gateway.decide(request)
+        validate_step = getattr(probe, "validate_step", None)
+        validator: PersonaDecisionValidator | None = None
+        if callable(validate_step):
+
+            def authoritative_validator(decision: PlayerDecision) -> list[str]:
+                preview = validate_step(decision.actions)
+                valid = isinstance(preview, dict) and preview.get("valid") is True
+                self._last_plan_preview = preview if valid else None
+                return [] if valid else [_authoritative_plan_error(preview)]
+
+            validator = authoritative_validator
+
+        result = (
+            self.persona_gateway.decide(request)
+            if validator is None
+            else self.persona_gateway.decide(request, validator=validator)
+        )
         self._record_persona_result("decision", result)
         calls = self._gateway_llm_calls[call_start:]
         if result.status == PersonaResultStatus.COMPLETED and result.decision is not None:
@@ -645,7 +670,14 @@ def build_week_context(
 ) -> WeekContext:
     state = _state_summary(state_payload.get("state") or {}, week=week)
     top_risks, risk_guidance = _resolve_risk_guidance(state_payload, state, max_weeks=max_weeks)
-    actions = [_action_brief(action) for action in (action_catalog.get("actions") or [])]
+    raw_actions = action_catalog.get("actions") or []
+    actions = [_action_brief(action) for action in raw_actions]
+    slot_aware = bool(raw_actions) and all(
+        isinstance(action, dict)
+        and type(action.get("cost_slots")) is int
+        and int(action["cost_slots"]) > 0
+        for action in raw_actions
+    )
     choices = [
         _event_choice_brief(choice, last_event_id, index)
         for index, choice in enumerate(event_choices)
@@ -657,6 +689,7 @@ def build_week_context(
         difficulty=difficulty,
         scenario=scenario,
         max_action_slots=4,
+        action_slot_policy="exact_cost_sum" if slot_aware else "at_most_count",
         persona=persona,
         persona_strategy=persona_strategy,
         state=state,
@@ -957,24 +990,7 @@ def _parse_player_decision(
 
 
 def _validate_decision(decision: PlayerDecision, context_pack: WeekContext) -> list[str]:
-    errors: list[str] = []
-    valid_actions = {action.id for action in context_pack.available_actions}
-    for action_id in decision.actions:
-        if action_id not in valid_actions:
-            errors.append(f"Unknown action_id: {action_id}")
-    if len(decision.actions) > context_pack.max_action_slots:
-        errors.append(f"Too many actions: {len(decision.actions)}")
-    if context_pack.event_choices and not decision.event_choice_id:
-        errors.append("Missing event_choice_id")
-    if context_pack.event_choices and decision.event_choice_id:
-        valid_choices = {choice.choice_id for choice in context_pack.event_choices}
-        if decision.event_choice_id not in valid_choices:
-            errors.append(f"Invalid event_choice_id: {decision.event_choice_id}")
-    if not decision.strategic_goal.strip():
-        errors.append("Missing strategic_goal")
-    if not decision.expected_tradeoff.strip():
-        errors.append("Missing expected_tradeoff")
-    return errors
+    return validate_player_decision(decision, context_pack)
 
 
 def _repair_prompt(context_pack: WeekContext, errors: list[str]) -> str:
@@ -1012,6 +1028,36 @@ def _fallback_decision(context_pack: WeekContext, errors: list[str]) -> PlayerDe
         expected_tradeoff="fallback keeps the playthrough reproducible",
         confidence=0.0,
     )
+
+
+def _authoritative_plan_error(preview: object) -> str:
+    """Render only bounded contract fields for the model's one repair prompt."""
+
+    if not isinstance(preview, dict):
+        return "Authoritative plan rejected: error_code=invalid_probe_contract"
+    validation = preview.get("plan_validation")
+    validation = validation if isinstance(validation, dict) else {}
+    error_code = _safe_contract_token(
+        preview.get("error_code") or validation.get("code") or "invalid_probe_contract"
+    )
+    raw_ids = validation.get("selected_action_ids")
+    accepted_ids = (
+        [_safe_contract_token(item) for item in raw_ids[:8]] if isinstance(raw_ids, list) else []
+    )
+    used_slots = validation.get("used_slots")
+    required_slots = validation.get("required_slots")
+    used_text = str(used_slots) if type(used_slots) is int else "unknown"
+    required_text = str(required_slots) if type(required_slots) is int else "unknown"
+    return (
+        f"Authoritative plan rejected: error_code={error_code}; "
+        f"accepted_action_ids={json.dumps(accepted_ids, ensure_ascii=False)}; "
+        f"used_slots={used_text}; required_slots={required_text}"
+    )
+
+
+def _safe_contract_token(value: object) -> str:
+    token = re.sub(r"[^A-Za-z0-9_.:-]+", "_", str(value)).strip("_")
+    return token[:80] or "unknown"
 
 
 def _persona_error_text(error: Any) -> str:

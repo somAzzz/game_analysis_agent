@@ -15,6 +15,7 @@ from .persona_gateway import (
     PersonaDecisionGateway,
     PersonaDecisionRequest,
     PersonaDecisionResult,
+    PersonaDecisionValidator,
     PersonaErrorCategory,
     PersonaEventChoiceRequest,
     PersonaEventChoiceResult,
@@ -209,8 +210,18 @@ class GovernedPersonaGateway:
     def validate_campaign(self, *, runs: int, weeks: int, concurrency: int) -> None:
         self.limits.validate_campaign(runs=runs, weeks=weeks, concurrency=concurrency)
 
-    def decide(self, request: PersonaDecisionRequest) -> PersonaDecisionResult:
-        result = self._run(lambda: self.gateway.decide(request))
+    def decide(
+        self,
+        request: PersonaDecisionRequest,
+        *,
+        validator: PersonaDecisionValidator | None = None,
+    ) -> PersonaDecisionResult:
+        operation = (
+            (lambda: self.gateway.decide(request))
+            if validator is None
+            else (lambda: self.gateway.decide(request, validator=validator))
+        )
+        result = self._run(operation, retry_limit=0 if validator is not None else None)
         if result is None:
             return PersonaDecisionResult(
                 status=PersonaResultStatus.CANCELLED,
@@ -252,6 +263,8 @@ class GovernedPersonaGateway:
     def _run(
         self,
         operation,
+        *,
+        retry_limit: int | None = None,
     ) -> PersonaDecisionResult | PersonaEventChoiceResult | bool | None:
         if self.cancellation.cancelled:
             return None
@@ -262,7 +275,8 @@ class GovernedPersonaGateway:
             total_attempts = 0
             total_latency_ms = 0
             total_usage = PersonaUsage(input_tokens=0, output_tokens=0, total_tokens=0)
-            for retry_index in range(self.limits.max_retries + 1):
+            effective_retry_limit = self.limits.max_retries if retry_limit is None else retry_limit
+            for retry_index in range(effective_retry_limit + 1):
                 if self.cancellation.cancelled:
                     return None
                 if not self._claim_call():
@@ -281,7 +295,7 @@ class GovernedPersonaGateway:
                     return result
                 if result.error is None or not result.error.retryable:
                     return result
-                if retry_index == self.limits.max_retries:
+                if retry_index == effective_retry_limit:
                     return result
                 backoff = self.limits.retry_backoff_s * (2**retry_index)
                 if self.cancellation.wait(backoff):

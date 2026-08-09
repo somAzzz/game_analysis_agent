@@ -11,11 +11,14 @@ from .persona_gateway import (
     PersonaCallMetadata,
     PersonaDecisionRequest,
     PersonaDecisionResult,
+    PersonaDecisionValidator,
+    PersonaErrorCategory,
     PersonaEventChoice,
     PersonaEventChoiceRequest,
     PersonaEventChoiceResult,
     PersonaParseStatus,
     PersonaProvider,
+    PersonaProviderError,
     PersonaProviderMode,
     PersonaResultStatus,
 )
@@ -43,7 +46,12 @@ class FixtureAuthoringGateway:
         self._lock = threading.Lock()
         self._entries: dict[str, dict] = {}
 
-    def decide(self, request: PersonaDecisionRequest) -> PersonaDecisionResult:
+    def decide(
+        self,
+        request: PersonaDecisionRequest,
+        *,
+        validator: PersonaDecisionValidator | None = None,
+    ) -> PersonaDecisionResult:
         actions = _select_actions(request)
         decision = PlayerDecision(
             week=request.context.state.week,
@@ -54,6 +62,20 @@ class FixtureAuthoringGateway:
             expected_tradeoff="deterministic fixture authoring choice",
             confidence=1.0,
         )
+        errors = validator(decision) if validator is not None else []
+        if errors:
+            metadata = self._metadata(request.request_id)
+            metadata.parse_status = PersonaParseStatus.FAILED
+            return PersonaDecisionResult(
+                status=PersonaResultStatus.FAILED,
+                request_fingerprint=request.fingerprint(),
+                metadata=metadata,
+                error=PersonaProviderError(
+                    category=PersonaErrorCategory.INVALID_DECISION,
+                    message=("; ".join(errors) or "authoritative decision rejected")[:500],
+                    retryable=False,
+                ),
+            )
         entry = {
             "entry_id": request.request_id,
             "kind": "decision",
@@ -72,9 +94,7 @@ class FixtureAuthoringGateway:
             metadata=self._metadata(request.request_id),
         )
 
-    def choose_event(
-        self, request: PersonaEventChoiceRequest
-    ) -> PersonaEventChoiceResult:
+    def choose_event(self, request: PersonaEventChoiceRequest) -> PersonaEventChoiceResult:
         choices = request.context.event_choices
         if not choices:
             raise ValueError("fixture authoring event request has no choices")

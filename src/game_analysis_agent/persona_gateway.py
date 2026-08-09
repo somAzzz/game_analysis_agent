@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Callable
 from enum import StrEnum
 from typing import Protocol, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .schemas import PlayerDecision, WeekContext
+
+PersonaDecisionValidator = Callable[[PlayerDecision], list[str]]
 
 
 class PersonaProvider(StrEnum):
@@ -224,7 +227,12 @@ class PersonaDecisionGateway(Protocol):
     provider: PersonaProvider
     mode: PersonaProviderMode
 
-    def decide(self, request: PersonaDecisionRequest) -> PersonaDecisionResult: ...
+    def decide(
+        self,
+        request: PersonaDecisionRequest,
+        *,
+        validator: PersonaDecisionValidator | None = None,
+    ) -> PersonaDecisionResult: ...
 
     def choose_event(self, request: PersonaEventChoiceRequest) -> PersonaEventChoiceResult: ...
 
@@ -240,12 +248,30 @@ def validate_player_decision(decision: PlayerDecision, context: WeekContext) -> 
     """Apply the one legal-action/event-choice policy shared by all providers."""
 
     errors: list[str] = []
-    valid_actions = {action.id for action in context.available_actions}
+    actions_by_id = {action.id: action for action in context.available_actions}
+    slot_total = 0
+    slot_total_known = True
     for action_id in decision.actions:
-        if action_id not in valid_actions:
+        action = actions_by_id.get(action_id)
+        if action is None:
             errors.append(f"Unknown action_id: {action_id}")
+            slot_total_known = False
+            continue
+        if context.action_slot_policy == "exact_cost_sum":
+            raw_slots = action.cost.get("slots")
+            if type(raw_slots) is not int or raw_slots <= 0:
+                errors.append(f"Invalid slot cost for action_id: {action_id}")
+                slot_total_known = False
+                continue
+            slot_total += raw_slots
     if len(decision.actions) > context.max_action_slots:
         errors.append(f"Too many actions: {len(decision.actions)}")
+    if (
+        context.action_slot_policy == "exact_cost_sum"
+        and slot_total_known
+        and slot_total != context.max_action_slots
+    ):
+        errors.append(f"Action slot total must equal {context.max_action_slots}: {slot_total}")
     if decision.week != context.state.week:
         errors.append(f"Decision week mismatch: {decision.week}")
     if decision.persona != context.persona:

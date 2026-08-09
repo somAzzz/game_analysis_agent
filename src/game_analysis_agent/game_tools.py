@@ -30,6 +30,10 @@ from game_analysis_agent.schemas import Anomaly
 from game_analysis_agent.settings import Settings, get_settings
 
 
+class InteractiveProbeStepError(RuntimeError):
+    """Raised when Godot explicitly rejects a proposed weekly step."""
+
+
 @dataclass
 class InteractiveProbe:
     """Persistent handle to one in-flight playthrough.
@@ -107,20 +111,21 @@ class InteractiveProbe:
             return {"error": "playthrough is already finished"}
         if not actions:
             return {"error": "actions list must not be empty"}
-        self.plan.append(
-            {
-                "week": self.current_week + 1,
-                "action_ids": list(actions),
-                "event_choice_id": event_choice_id,
-            }
-        )
+        plan_item = {
+            "week": self.current_week + 1,
+            "action_ids": list(actions),
+            "event_choice_id": event_choice_id,
+        }
+        candidate_plan = [*self.plan, plan_item]
         result = _run_one_step(
             self.settings,
-            self.plan,
+            candidate_plan,
             seed=self.seed,
             difficulty=self.difficulty,
             scenario=self.scenario,
         )
+        _require_valid_probe_step(result, week=self.current_week + 1)
+        self.plan.append(plan_item)
         self.current_week += 1
         self.state = result.get("current_state") or result.get("after_state") or self.state or {}
         self.last_event_id = result.get("triggered_event_id", "")
@@ -152,6 +157,12 @@ class InteractiveProbe:
 
     def preview_step(self, actions: list[str]) -> dict[str, Any]:
         """Preview this week's event choices without committing the week."""
+        result = self.validate_step(actions)
+        _require_valid_probe_step(result, week=self.current_week + 1)
+        return result
+
+    def validate_step(self, actions: list[str]) -> dict[str, Any]:
+        """Ask Godot to validate a weekly plan without mutating probe state."""
         if self.finished:
             return {"error": "playthrough is already finished"}
         if not actions:
@@ -353,6 +364,13 @@ def build_probe(settings: Settings | None = None) -> InteractiveProbe:
     return InteractiveProbe(settings=settings or get_settings(), plan=[])
 
 
+def _require_valid_probe_step(result: dict[str, Any], *, week: int) -> None:
+    if result.get("valid", True) is True:
+        return
+    error_code = str(result.get("error_code") or "invalid_probe_step")
+    raise InteractiveProbeStepError(f"RunInteractiveProbe rejected week {week}: {error_code}")
+
+
 def _maybe_run_export(settings: Settings) -> dict[str, Any]:
     """Run ExportEventGraph.gd and re-read."""
     out = _run_export(settings)
@@ -457,6 +475,7 @@ def _invoke_godot(
 
 __all__ = [
     "InteractiveProbe",
+    "InteractiveProbeStepError",
     "TOOL_DEFINITIONS",
     "Anomaly",
     "build_probe",

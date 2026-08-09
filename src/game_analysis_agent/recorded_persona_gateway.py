@@ -14,6 +14,7 @@ from .persona_gateway import (
     PersonaCallMetadata,
     PersonaDecisionRequest,
     PersonaDecisionResult,
+    PersonaDecisionValidator,
     PersonaErrorCategory,
     PersonaEventChoice,
     PersonaEventChoiceRequest,
@@ -85,13 +86,22 @@ class RecordedPersonaGateway:
             raise ReplayFixtureError(f"Replay manifest schema must be {MANIFEST_SCHEMA!r}")
         fixture = manifest.get("fixture")
         digest = manifest.get("sha256")
-        if not isinstance(fixture, str) or Path(fixture).is_absolute() or ".." in Path(fixture).parts:
+        if (
+            not isinstance(fixture, str)
+            or Path(fixture).is_absolute()
+            or ".." in Path(fixture).parts
+        ):
             raise ReplayFixtureError("Replay manifest fixture path is unsafe")
         if not isinstance(digest, str) or len(digest) != 64:
             raise ReplayFixtureError("Replay manifest sha256 is invalid")
         return cls(Path(project_root) / fixture, expected_sha256=digest)
 
-    def decide(self, request: PersonaDecisionRequest) -> PersonaDecisionResult:
+    def decide(
+        self,
+        request: PersonaDecisionRequest,
+        *,
+        validator: PersonaDecisionValidator | None = None,
+    ) -> PersonaDecisionResult:
         fingerprint = request.fingerprint()
         entry, error = self._take(fingerprint, kind="decision", request=request)
         metadata = self._metadata(entry)
@@ -111,6 +121,8 @@ class RecordedPersonaGateway:
                 f"recorded decision is malformed: {exc.__class__.__name__}",
             )
         errors = validate_player_decision(decision, request.context)
+        if not errors and validator is not None:
+            errors = validator(decision)
         if errors:
             return self._decision_failure(fingerprint, metadata, "; ".join(errors))
         return PersonaDecisionResult(
@@ -120,9 +132,7 @@ class RecordedPersonaGateway:
             metadata=metadata,
         )
 
-    def choose_event(
-        self, request: PersonaEventChoiceRequest
-    ) -> PersonaEventChoiceResult:
+    def choose_event(self, request: PersonaEventChoiceRequest) -> PersonaEventChoiceResult:
         fingerprint = request.fingerprint()
         entry, error = self._take(fingerprint, kind="event_choice", request=request)
         metadata = self._metadata(entry)

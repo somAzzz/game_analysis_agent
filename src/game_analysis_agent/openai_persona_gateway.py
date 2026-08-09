@@ -21,6 +21,7 @@ from .persona_gateway import (
     PersonaCallMetadata,
     PersonaDecisionRequest,
     PersonaDecisionResult,
+    PersonaDecisionValidator,
     PersonaErrorCategory,
     PersonaEventChoice,
     PersonaEventChoiceRequest,
@@ -73,13 +74,24 @@ class OpenAIResponsesPersonaGateway:
             max_retries=0,
         )
 
-    def decide(self, request: PersonaDecisionRequest) -> PersonaDecisionResult:
+    def decide(
+        self,
+        request: PersonaDecisionRequest,
+        *,
+        validator: PersonaDecisionValidator | None = None,
+    ) -> PersonaDecisionResult:
+        def validate_decision(decision: PlayerDecision) -> list[str]:
+            errors = validate_player_decision(decision, request.context)
+            if errors or validator is None:
+                return errors
+            return validator(decision)
+
         outcome = self._structured_request(
             schema=PlayerDecision,
             system=_decision_system_prompt(),
             initial_prompt=_decision_prompt(request),
             repair_prompt=lambda errors: _decision_repair_prompt(request, errors),
-            validate=lambda value: validate_player_decision(value, request.context),
+            validate=validate_decision,
         )
         if outcome.error is not None:
             return PersonaDecisionResult(

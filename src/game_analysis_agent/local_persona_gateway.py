@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import json
 import time
 from collections.abc import Callable
@@ -14,6 +15,7 @@ from .persona_gateway import (
     PersonaCallMetadata,
     PersonaDecisionRequest,
     PersonaDecisionResult,
+    PersonaDecisionValidator,
     PersonaErrorCategory,
     PersonaEventChoice,
     PersonaEventChoiceRequest,
@@ -92,7 +94,12 @@ class LocalChatPersonaGateway:
     def set_audit_sink(self, sink: AuditSink | None) -> None:
         self._audit_sink = sink
 
-    def decide(self, request: PersonaDecisionRequest) -> PersonaDecisionResult:
+    def decide(
+        self,
+        request: PersonaDecisionRequest,
+        *,
+        validator: PersonaDecisionValidator | None = None,
+    ) -> PersonaDecisionResult:
         week = _request_week(request.request_id, request.context.state.week)
         errors = ["structured output missing"]
         saw_model = False
@@ -149,6 +156,10 @@ class LocalChatPersonaGateway:
             errors = validate_player_decision(decision, request.context)
             if errors:
                 continue
+            if validator is not None:
+                errors = validator(decision)
+                if errors:
+                    continue
             metadata.parse_status = (
                 PersonaParseStatus.PARSED if attempt == 1 else PersonaParseStatus.REPAIRED
             )
@@ -277,15 +288,21 @@ class LocalChatPersonaGateway:
                         "structured_outputs": structured_outputs,
                     }
                 )
-            content, call = self.llm.chat(
-                messages,
-                agent="interactive_player",
-                step_name=step_name,
-                max_tokens=max_tokens,
-                temperature=request_temperature,
-                enable_thinking=enable_thinking,
-                structured_outputs=structured_outputs,
+            chat_kwargs: dict[str, Any] = {
+                "agent": "interactive_player",
+                "step_name": step_name,
+                "max_tokens": max_tokens,
+                "temperature": request_temperature,
+            }
+            parameters = inspect.signature(self.llm.chat).parameters
+            accepts_kwargs = any(
+                parameter.kind is inspect.Parameter.VAR_KEYWORD for parameter in parameters.values()
             )
+            if accepts_kwargs or "enable_thinking" in parameters:
+                chat_kwargs["enable_thinking"] = enable_thinking
+            if accepts_kwargs or "structured_outputs" in parameters:
+                chat_kwargs["structured_outputs"] = structured_outputs
+            content, call = self.llm.chat(messages, **chat_kwargs)
         except LLMRequestError as exc:
             self._emit(exc.call)
             return (
@@ -380,7 +397,11 @@ def _messages(*, system: str, prefix: str, prompt: str) -> list[dict[str, str]]:
 def _decision_prefix() -> str:
     return "\n".join(
         [
-            "Choose one or more legal action ids, up to max_action_slots.",
+            (
+                "Follow action_slot_policy. For exact_cost_sum, selected cost.slots "
+                "must total max_action_slots exactly; otherwise choose no more than "
+                "max_action_slots legal action ids."
+            ),
             (
                 "Final content must be compact JSON with exactly these fields: "
                 '{"strategic_goal":"short goal","actions":["legal_action_id"],'
@@ -407,6 +428,7 @@ def _decision_prompt(request: PersonaDecisionRequest) -> str:
         "top_risks": [risk.model_dump(mode="json") for risk in context.top_risks],
         "current_event_id": context.current_event_id,
         "max_action_slots": context.max_action_slots,
+        "action_slot_policy": context.action_slot_policy,
         "available_actions": [
             action.model_dump(mode="json") for action in context.available_actions
         ],

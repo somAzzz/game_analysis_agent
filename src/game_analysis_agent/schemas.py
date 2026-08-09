@@ -301,6 +301,7 @@ class WeekContext(BaseModel):
     difficulty: str
     scenario: str
     max_action_slots: int = 4
+    action_slot_policy: Literal["at_most_count", "exact_cost_sum"] = "at_most_count"
     persona: str
     persona_strategy: dict[str, Any] = Field(default_factory=dict)
     state: StateSummary
