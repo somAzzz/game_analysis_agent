@@ -266,6 +266,20 @@ def validate_player_decision(decision: PlayerDecision, context: WeekContext) -> 
             slot_total += raw_slots
     if len(decision.actions) > context.max_action_slots:
         errors.append(f"Too many actions: {len(decision.actions)}")
+    for index, request in enumerate(decision.growth_decisions):
+        if not _matches_playable_option(request, context.growth_options):
+            errors.append(f"Invalid growth_decisions[{index}]")
+    if decision.opportunity_disposition:
+        if decision.opportunity_disposition.get("action_id") in decision.actions:
+            errors.append("Opportunity disposition action must be unselected")
+        elif not _matches_playable_option(
+            decision.opportunity_disposition, context.disposition_options
+        ):
+            errors.append("Invalid opportunity_disposition")
+    if decision.term_maintenance and not _matches_playable_option(
+        decision.term_maintenance, context.term_maintenance_options
+    ):
+        errors.append("Invalid term_maintenance")
     if (
         context.action_slot_policy == "exact_cost_sum"
         and slot_total_known
@@ -287,6 +301,20 @@ def validate_player_decision(decision: PlayerDecision, context: WeekContext) -> 
     if not decision.expected_tradeoff.strip():
         errors.append("Missing expected_tradeoff")
     return errors
+
+
+def _matches_playable_option(request: dict[str, object], options: list[dict[str, object]]) -> bool:
+    identity_fields = ("kind", "mode", "action_id", "path_id", "node_id")
+    for option in options:
+        if option.get("playable", True) is not True:
+            continue
+        required_fields = [field for field in identity_fields if field in option]
+        if required_fields and all(
+            field in request and str(request[field]) == str(option[field])
+            for field in required_fields
+        ):
+            return True
+    return False
 
 
 def validate_event_choice(

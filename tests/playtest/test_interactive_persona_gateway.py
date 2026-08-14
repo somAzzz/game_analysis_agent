@@ -387,6 +387,21 @@ def test_local_unknown_action_fails_after_one_shared_repair() -> None:
     assert llm.calls == 2
 
 
+def test_local_explicit_empty_actions_are_intentional_idle() -> None:
+    payload = _decision().model_dump(mode="json")
+    payload["actions"] = []
+    llm = _LocalLLM([json.dumps(payload)])
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+
+    result = gateway.decide(
+        PersonaDecisionRequest.from_context(_context(), request_id="newbie-42-w1-idle")
+    )
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert result.decision is not None
+    assert result.decision.actions == []
+
+
 def test_local_normalizes_compact_model_variations_without_hiding_invalid_ids() -> None:
     llm = _LocalLLM(
         [

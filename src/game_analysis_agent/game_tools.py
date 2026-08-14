@@ -56,6 +56,13 @@ class InteractiveProbe:
     last_event_choices: list[dict[str, Any]] = field(default_factory=list)
     available_actions: list[dict[str, Any]] = field(default_factory=list)
     risk_guidance: dict[str, Any] | None = None
+    next_focus_id: str = ""
+    background_id: str = ""
+    active_focus_id: str = ""
+    focus_choices: list[dict[str, Any]] = field(default_factory=list)
+    growth_options: list[dict[str, Any]] = field(default_factory=list)
+    disposition_options: list[dict[str, Any]] = field(default_factory=list)
+    term_maintenance_options: list[dict[str, Any]] = field(default_factory=list)
     finished: bool = False
     final_ending: str | None = None
     history: list[dict[str, Any]] = field(default_factory=list)
@@ -73,7 +80,17 @@ class InteractiveProbe:
             "last_event_id": self.last_event_id,
             "final_ending": self.final_ending or "",
             "risk_guidance": self.risk_guidance,
+            "active_focus_id": self.active_focus_id,
+            "focus_choices": self.focus_choices,
+            "growth_options": self.growth_options,
+            "disposition_options": self.disposition_options,
+            "term_maintenance_options": self.term_maintenance_options,
         }
+
+    def configure_week_strategy(self, focus_id: str, background_id: str = "") -> None:
+        """Set the declared Focus for the next selection window."""
+        self.next_focus_id = str(focus_id or "")
+        self.background_id = str(background_id or "")
 
     def list_available_actions(self) -> dict[str, Any]:
         """Return currently legal actions for the active playthrough state."""
@@ -105,16 +122,21 @@ class InteractiveProbe:
         self,
         actions: list[str],
         event_choice_id: str = "",
+        growth_decisions: list[dict[str, Any]] | None = None,
+        opportunity_disposition: dict[str, Any] | None = None,
+        term_maintenance: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Submit a one-step plan to Godot and merge the result back in."""
         if self.finished:
             return {"error": "playthrough is already finished"}
-        if not actions:
-            return {"error": "actions list must not be empty"}
         plan_item = {
             "week": self.current_week + 1,
             "action_ids": list(actions),
             "event_choice_id": event_choice_id,
+            "focus_id": self.next_focus_id,
+            "growth_decisions": list(growth_decisions or []),
+            "opportunity_disposition": dict(opportunity_disposition or {}),
+            "term_maintenance": dict(term_maintenance or {}),
         }
         candidate_plan = [*self.plan, plan_item]
         result = _run_one_step(
@@ -123,16 +145,13 @@ class InteractiveProbe:
             seed=self.seed,
             difficulty=self.difficulty,
             scenario=self.scenario,
+            next_focus_id=self.next_focus_id,
+            background_id=self.background_id,
         )
         _require_valid_probe_step(result, week=self.current_week + 1)
         self.plan.append(plan_item)
         self.current_week += 1
-        self.state = result.get("current_state") or result.get("after_state") or self.state or {}
-        self.last_event_id = result.get("triggered_event_id", "")
-        self.last_event_choices = result.get("event_choices", []) or []
-        self.available_actions = result.get("next_available_actions", []) or []
-        guidance = result.get("risk_guidance")
-        self.risk_guidance = guidance if isinstance(guidance, dict) else None
+        self._merge_result(result)
         self.history.append(
             {
                 "week": self.current_week,
@@ -142,38 +161,69 @@ class InteractiveProbe:
                 "after_state": self.state,
             }
         )
-        if result.get("finished"):
-            self.finished = True
-            self.final_ending = result.get("final_ending_id", "unknown")
         return {
             "week": self.current_week,
             "state": self.state,
             "triggered_event_id": self.last_event_id,
             "event_choices": self.last_event_choices,
             "risk_guidance": self.risk_guidance,
+            "focus_id": result.get("focus_id") or result.get("active_focus_id") or "",
+            "growth_decisions": result.get("growth_decisions", []),
+            "action_offer": result.get("action_offer", {}),
+            "plan_submission": result.get("plan_submission", {}),
+            "idle_slot_effects": result.get("idle_slot_effects", {}),
+            "normalized_plan": result.get("normalized_plan", []),
+            "keyword_combo": result.get("keyword_combo", {}),
+            "opportunity_disposition": result.get("opportunity_disposition", {}),
+            "disposition_request": result.get("disposition_request", {}),
+            "disposition_submission": result.get("disposition_submission", {}),
+            "burden_resolution": result.get("burden_resolution", {}),
+            "action_resolution_records": result.get("action_resolution_records", []),
             "finished": self.finished,
             "final_ending": self.final_ending or "",
         }
 
-    def preview_step(self, actions: list[str]) -> dict[str, Any]:
+    def preview_step(
+        self,
+        actions: list[str],
+        event_choice_id: str = "",
+        growth_decisions: list[dict[str, Any]] | None = None,
+        opportunity_disposition: dict[str, Any] | None = None,
+        term_maintenance: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Preview this week's event choices without committing the week."""
-        result = self.validate_step(actions)
+        result = self.validate_step(
+            actions,
+            event_choice_id=event_choice_id,
+            growth_decisions=growth_decisions,
+            opportunity_disposition=opportunity_disposition,
+            term_maintenance=term_maintenance,
+        )
         _require_valid_probe_step(result, week=self.current_week + 1)
         return result
 
-    def validate_step(self, actions: list[str]) -> dict[str, Any]:
+    def validate_step(
+        self,
+        actions: list[str],
+        event_choice_id: str = "",
+        growth_decisions: list[dict[str, Any]] | None = None,
+        opportunity_disposition: dict[str, Any] | None = None,
+        term_maintenance: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Ask Godot to validate a weekly plan without mutating probe state."""
         if self.finished:
             return {"error": "playthrough is already finished"}
-        if not actions:
-            return {"error": "actions list must not be empty"}
         preview_plan = [
             *self.plan,
             {
                 "week": self.current_week + 1,
                 "action_ids": list(actions),
-                "event_choice_id": "",
+                "event_choice_id": event_choice_id,
                 "defer_event_choice": True,
+                "focus_id": self.next_focus_id,
+                "growth_decisions": list(growth_decisions or []),
+                "opportunity_disposition": dict(opportunity_disposition or {}),
+                "term_maintenance": dict(term_maintenance or {}),
             },
         ]
         return _run_one_step(
@@ -182,6 +232,8 @@ class InteractiveProbe:
             seed=self.seed,
             difficulty=self.difficulty,
             scenario=self.scenario,
+            next_focus_id=self.next_focus_id,
+            background_id=self.background_id,
         )
 
     def _refresh_snapshot(self) -> None:
@@ -192,9 +244,15 @@ class InteractiveProbe:
                 seed=self.seed,
                 difficulty=self.difficulty,
                 scenario=self.scenario,
+                next_focus_id=self.next_focus_id,
+                background_id=self.background_id,
+                prepare_next_week=True,
             )
         except FileNotFoundError:
             return
+        self._merge_result(result)
+
+    def _merge_result(self, result: dict[str, Any]) -> None:
         self.state = result.get("current_state") or result.get("after_state") or self.state or {}
         self.available_actions = (
             result.get("next_available_actions") or result.get("available_actions") or []
@@ -203,6 +261,14 @@ class InteractiveProbe:
         self.last_event_choices = result.get("event_choices", []) or self.last_event_choices
         guidance = result.get("risk_guidance")
         self.risk_guidance = guidance if isinstance(guidance, dict) else None
+        self.active_focus_id = str(result.get("active_focus_id") or result.get("focus_id") or "")
+        self.focus_choices = list(result.get("focus_choices") or [])
+        self.growth_options = list(result.get("growth_options") or [])
+        self.disposition_options = list(result.get("disposition_options") or [])
+        self.term_maintenance_options = list(result.get("term_maintenance_options") or [])
+        if result.get("finished"):
+            self.finished = True
+            self.final_ending = result.get("final_ending_id", "unknown")
 
     def finish(self) -> dict[str, Any]:
         if self.plan:
@@ -213,6 +279,8 @@ class InteractiveProbe:
                 seed=self.seed,
                 difficulty=self.difficulty,
                 scenario=self.scenario,
+                next_focus_id=self.next_focus_id,
+                background_id=self.background_id,
             )
             self.state = final.get("final_state") or final.get("after_state") or self.state or {}
             self.final_ending = final.get("final_ending_id") or self.final_ending or "unknown"
@@ -403,6 +471,9 @@ def _run_one_step(
     seed: int = 42,
     difficulty: str = "normal",
     scenario: str = "default_first_semester",
+    next_focus_id: str = "",
+    background_id: str = "",
+    prepare_next_week: bool = False,
 ) -> dict[str, Any]:
     plan_path = settings.game_project_path / "reports" / f"_plan_{uuid.uuid4().hex[:8]}.json"
     out_path = settings.game_project_path / "reports" / f"_trace_{uuid.uuid4().hex[:8]}.json"
@@ -414,6 +485,9 @@ def _run_one_step(
         "weeks": max((step["week"] for step in plan), default=0),
         "plan": plan,
         "force_finish": force_finish,
+        "next_focus_id": next_focus_id,
+        "background_id": background_id,
+        "prepare_next_week": prepare_next_week,
     }
     plan_path.parent.mkdir(parents=True, exist_ok=True)
     plan_path.write_text(json.dumps(plan_payload, ensure_ascii=False), encoding="utf-8")

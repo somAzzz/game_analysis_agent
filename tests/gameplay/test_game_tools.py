@@ -117,10 +117,30 @@ def test_build_tool_map_returns_callable_map(tmp_path: Path) -> None:
     }
 
 
-def test_step_rejects_empty_actions(tmp_path: Path) -> None:
+def test_step_accepts_empty_actions_as_intentional_idle(
+    tmp_path: Path, monkeypatch
+) -> None:
+    captured: dict[str, object] = {}
+
+    def fake_run_one_step(_settings, plan, **_kwargs):  # noqa: ANN001
+        captured["plan"] = plan
+        return {
+            "valid": True,
+            "current_state": {"week": 2, "money": 1000},
+            "next_available_actions": [],
+            "triggered_event_id": "",
+            "event_choices": [],
+            "finished": False,
+            "final_ending_id": "",
+        }
+
+    monkeypatch.setattr(game_tools, "_run_one_step", fake_run_one_step)
     probe = build_probe(_settings(tmp_path))
+
     out = probe.step([])
-    assert out.get("error")
+
+    assert out.get("error") is None
+    assert captured["plan"][0]["action_ids"] == []  # type: ignore[index]
 
 
 def test_finish_marks_finished_and_returns_unknown_when_no_plan(

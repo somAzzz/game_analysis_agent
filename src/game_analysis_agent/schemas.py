@@ -215,6 +215,9 @@ class ActionBrief(BaseModel):
     requirements: dict[str, Any] = Field(default_factory=dict)
     tags: list[str] = Field(default_factory=list)
     risk_tags: list[str] = Field(default_factory=list)
+    keywords: list[str] = Field(default_factory=list)
+    supply: dict[str, Any] = Field(default_factory=dict)
+    offer: dict[str, Any] = Field(default_factory=dict)
     cooldown_group: str | None = None
     max_per_week: int | None = None
 
@@ -308,6 +311,11 @@ class WeekContext(BaseModel):
     top_risks: list[RiskBrief] = Field(default_factory=list)
     risk_guidance: RiskGuidanceMetadata
     available_actions: list[ActionBrief] = Field(default_factory=list)
+    active_focus_id: str = ""
+    focus_choices: list[dict[str, Any]] = Field(default_factory=list)
+    growth_options: list[dict[str, Any]] = Field(default_factory=list)
+    disposition_options: list[dict[str, Any]] = Field(default_factory=list)
+    term_maintenance_options: list[dict[str, Any]] = Field(default_factory=list)
     current_event_id: str = ""
     event_choices: list[EventChoiceBrief] = Field(default_factory=list)
     memory: PlayMemory
@@ -321,7 +329,10 @@ class PlayerDecision(BaseModel):
     week: int
     persona: str
     strategic_goal: str = Field(default="", max_length=160)
-    actions: list[str] = Field(min_length=1, max_length=4)
+    actions: list[str] = Field(default_factory=list, max_length=4)
+    growth_decisions: list[dict[str, Any]] = Field(default_factory=list, max_length=4)
+    opportunity_disposition: dict[str, Any] = Field(default_factory=dict)
+    term_maintenance: dict[str, Any] = Field(default_factory=dict)
     event_choice_id: str = ""
     risk_awareness: list[str] = Field(default_factory=list, max_length=5)
     expected_tradeoff: str = Field(default="", max_length=240)

@@ -24,6 +24,7 @@ Outputs:
 
 from __future__ import annotations
 
+import inspect
 import json
 import re
 import time
@@ -290,8 +291,14 @@ class InteractivePlayerAgent(Agent):
                 }
             )
 
-            state_before = probe.get_state()
+            configure_week_strategy = getattr(probe, "configure_week_strategy", None)
+            if callable(configure_week_strategy):
+                configure_week_strategy(
+                    _focus_for_week(self.persona_strategy, week),
+                    str(self.persona_strategy.get("background", "")),
+                )
             catalog = probe.list_available_actions()
+            state_before = probe.get_state()
             context_pack = build_week_context(
                 week=week,
                 max_weeks=self.max_weeks,
@@ -317,17 +324,10 @@ class InteractivePlayerAgent(Agent):
             )
             llm_calls.extend(decision_calls)
 
-            if not decision.actions:
-                # Model failed to produce a usable action; fall back to a
-                # no-op safe pick to keep the loop alive.
-                decision.actions = (
-                    [available_action_ids[0]] if available_action_ids else ["rest_at_home"]
-                )
-
             if hasattr(probe, "preview_step"):
                 preview = self._last_plan_preview
                 if preview is None:
-                    preview = probe.preview_step(decision.actions)
+                    preview = _preview_probe_decision(probe, decision)
                 preview_choices = (
                     preview.get("event_choices", []) if isinstance(preview, dict) else []
                 )
@@ -363,10 +363,7 @@ class InteractivePlayerAgent(Agent):
                         fallback_used=validation.fallback_used or event_validation.fallback_used,
                     )
 
-            result = probe.step(
-                actions=decision.actions,
-                event_choice_id=decision.event_choice_id,
-            )
+            result = _submit_probe_decision(probe, decision)
 
             anomalies = [a.model_dump(mode="json") for a in probe.detect_anomalies()]
             state_after = result.get("state", {}) if isinstance(result, dict) else {}
@@ -484,6 +481,9 @@ class InteractivePlayerAgent(Agent):
             "You must output JSON matching PlayerDecision. Use only action ids from "
             "WeekContext.available_actions and follow WeekContext.action_slot_policy; "
             "exact_cost_sum means selected cost.slots must total max_action_slots. "
+            "For at_most_count, zero to four actions are legal; unused slots reduce pressure, "
+            "so never fill slots only for completeness. Use only playable weekly decision "
+            "options and leave their fields empty when no option is useful. "
             "Explain strategic_goal, risk_awareness, "
             "expected_tradeoff, and confidence every week.\n"
             "For interactive playtests, do not output hidden reasoning, markdown, "
@@ -510,7 +510,7 @@ class InteractivePlayerAgent(Agent):
         if callable(validate_step):
 
             def authoritative_validator(decision: PlayerDecision) -> list[str]:
-                preview = validate_step(decision.actions)
+                preview = _validate_probe_decision(probe, decision)
                 valid = isinstance(preview, dict) and preview.get("valid") is True
                 self._last_plan_preview = preview if valid else None
                 return [] if valid else [_authoritative_plan_error(preview)]
@@ -645,12 +645,59 @@ class InteractivePlayerAgent(Agent):
 
 
 def load_player_personas(project_root: Path) -> dict[str, dict[str, Any]]:
-    path = project_root / "config" / "player_personas.yaml"
+    live_path = project_root / "config" / "live_player_personas_v2.yaml"
+    path = live_path if live_path.exists() else project_root / "config" / "player_personas.yaml"
     if not path.exists():
         return {}
     payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     personas = payload.get("personas", {}) if isinstance(payload, dict) else {}
     return personas if isinstance(personas, dict) else {}
+
+
+def _focus_for_week(persona_strategy: dict[str, Any], week: int) -> str:
+    sequence = persona_strategy.get("focus_sequence", [])
+    if not isinstance(sequence, list) or not sequence:
+        return ""
+    window = max(0, (week - 1) // 4)
+    return str(sequence[window % len(sequence)])
+
+
+def _dict_rows(value: Any) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, dict)]
+
+
+def _probe_decision_kwargs(decision: PlayerDecision) -> dict[str, Any]:
+    return {
+        "actions": decision.actions,
+        "event_choice_id": decision.event_choice_id,
+        "growth_decisions": decision.growth_decisions,
+        "opportunity_disposition": decision.opportunity_disposition,
+        "term_maintenance": decision.term_maintenance,
+    }
+
+
+def _call_probe_method(method: Callable[..., dict[str, Any]], decision: PlayerDecision):
+    parameters = inspect.signature(method).parameters
+    kwargs = {
+        key: value
+        for key, value in _probe_decision_kwargs(decision).items()
+        if key in parameters
+    }
+    return method(**kwargs)
+
+
+def _validate_probe_decision(probe: Any, decision: PlayerDecision) -> dict[str, Any]:
+    return _call_probe_method(probe.validate_step, decision)
+
+
+def _preview_probe_decision(probe: Any, decision: PlayerDecision) -> dict[str, Any]:
+    return _call_probe_method(probe.preview_step, decision)
+
+
+def _submit_probe_decision(probe: Any, decision: PlayerDecision) -> dict[str, Any]:
+    return _call_probe_method(probe.step, decision)
 
 
 def build_week_context(
@@ -690,6 +737,13 @@ def build_week_context(
         top_risks=top_risks,
         risk_guidance=risk_guidance,
         available_actions=actions[:80],
+        active_focus_id=str(state_payload.get("active_focus_id", "")),
+        focus_choices=_dict_rows(state_payload.get("focus_choices"))[:8],
+        growth_options=_dict_rows(state_payload.get("growth_options"))[:80],
+        disposition_options=_dict_rows(state_payload.get("disposition_options"))[:80],
+        term_maintenance_options=_dict_rows(
+            state_payload.get("term_maintenance_options")
+        )[:80],
         current_event_id=last_event_id or "",
         event_choices=choices[:8],
         memory=memory,
@@ -739,6 +793,9 @@ def _action_brief(action: Any) -> ActionBrief:
         else {},
         tags=tags,
         risk_tags=[str(tag) for tag in action.get("risk_tags", []) or []],
+        keywords=[str(keyword) for keyword in action.get("keywords", []) or []],
+        supply=action.get("supply", {}) if isinstance(action.get("supply"), dict) else {},
+        offer=action.get("offer", {}) if isinstance(action.get("offer"), dict) else {},
         cooldown_group=str(action.get("cooldown_group", "")) or None,
         max_per_week=_optional_int(action.get("max_per_week")),
     )

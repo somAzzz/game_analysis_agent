@@ -404,8 +404,11 @@ def _decision_prefix() -> str:
                 "max_action_slots legal action ids."
             ),
             (
-                "Final content must be compact JSON with exactly these fields: "
+                "Unused action slots are legal and resolve as idle time. Final content must be "
+                "compact JSON with exactly these fields: "
                 '{"strategic_goal":"short goal","actions":["legal_action_id"],'
+                '"growth_decisions":[],"opportunity_disposition":{},'
+                '"term_maintenance":{},'
                 '"event_choice_id":"legal_choice_id","risk_awareness":["short risk"],'
                 '"expected_tradeoff":"short text","confidence":0.0}. '
                 "Confidence must be a number from 0 to 1."
@@ -433,6 +436,10 @@ def _decision_prompt(request: PersonaDecisionRequest) -> str:
         "available_actions": [
             action.model_dump(mode="json") for action in context.available_actions
         ],
+        "active_focus_id": context.active_focus_id,
+        "growth_options": context.growth_options,
+        "disposition_options": context.disposition_options,
+        "term_maintenance_options": context.term_maintenance_options,
         "event_choices": [choice.model_dump(mode="json") for choice in context.event_choices],
     }
     return "\n".join(
@@ -462,6 +469,9 @@ def _decision_repair_prompt(request: PersonaDecisionRequest, errors: list[str]) 
             }
             for action in context.available_actions
         ],
+        "growth_options": context.growth_options,
+        "disposition_options": context.disposition_options,
+        "term_maintenance_options": context.term_maintenance_options,
         "errors": errors,
     }
     return "\n".join(
@@ -566,6 +576,11 @@ def _normalize_decision(parsed: dict[str, Any], request: PersonaDecisionRequest)
         raw_actions = [] if raw_actions in (None, "") else [raw_actions]
     valid_action_ids = {action.id for action in context.available_actions}
     actions = [str(item).strip() for item in raw_actions if str(item).strip() in valid_action_ids]
+    if raw_actions and not actions:
+        # Preserve one invalid id so shared validation rejects it. An explicit
+        # empty list means intentional idle; unknown-only output must not be
+        # silently normalized into idle.
+        actions = [str(raw_actions[0]).strip()]
     risks = parsed.get("risk_awareness", [])
     if not isinstance(risks, list):
         risks = [] if risks in (None, "") else [risks]
@@ -580,11 +595,24 @@ def _normalize_decision(parsed: dict[str, Any], request: PersonaDecisionRequest)
     event_choice_id = parsed.get("event_choice_id", "")
     if isinstance(event_choice_id, list):
         event_choice_id = event_choice_id[0] if event_choice_id else ""
+    growth_decisions = parsed.get("growth_decisions", [])
+    if not isinstance(growth_decisions, list):
+        growth_decisions = []
+    growth_decisions = [item for item in growth_decisions if isinstance(item, dict)][:4]
+    opportunity_disposition = parsed.get("opportunity_disposition", {})
+    if not isinstance(opportunity_disposition, dict):
+        opportunity_disposition = {}
+    term_maintenance = parsed.get("term_maintenance", {})
+    if not isinstance(term_maintenance, dict):
+        term_maintenance = {}
     return {
         "week": context.state.week,
         "persona": context.persona,
         "strategic_goal": strategic_goal[:160],
         "actions": actions,
+        "growth_decisions": growth_decisions,
+        "opportunity_disposition": opportunity_disposition,
+        "term_maintenance": term_maintenance,
         "event_choice_id": str(event_choice_id or ""),
         "risk_awareness": [str(item)[:120] for item in risks[:5]],
         "expected_tradeoff": expected_tradeoff[:240],

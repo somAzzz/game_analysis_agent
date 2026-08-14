@@ -13,8 +13,10 @@ from game_analysis_agent.agents.interactive_player import (
     PERSONAS,
     InteractivePlayerAgent,
     _extract_action_ids,
+    _focus_for_week,
     _parse_decision,
     build_week_context,
+    load_player_personas,
 )
 from game_analysis_agent.game_tools import InteractiveProbe
 from game_analysis_agent.llm_client import LLMRequestError
@@ -387,6 +389,22 @@ def test_extract_action_ids_handles_dict_and_string() -> None:
 def test_persona_lookup_is_exhaustive() -> None:
     for slug in ("newbie", "study", "money", "social", "visa", "slacker"):
         assert slug in PERSONAS
+
+
+def test_live_newbie_profile_has_phased_focus_and_idle_guidance() -> None:
+    profiles = load_player_personas(Path(__file__).resolve().parents[2])
+    newbie = profiles["newbie"]
+
+    assert newbie["background"] == "self_regulation"
+    assert [_focus_for_week(newbie, week) for week in (1, 5, 9, 13, 17)] == [
+        "admin_stability",
+        "mental_recovery",
+        "study_sprint",
+        "work_recovery",
+        "study_sprint",
+    ]
+    assert any("二至三张" in rule for rule in newbie["planning_rules"])
+    assert any("money=0" in rule for rule in newbie["planning_rules"])
 
 
 def test_real_probe_dataclass_compatibility() -> None:
