@@ -402,6 +402,37 @@ def test_local_explicit_empty_actions_are_intentional_idle() -> None:
     assert result.decision.actions == []
 
 
+def test_local_completes_compact_disposition_identity() -> None:
+    context = _context().model_copy(
+        update={
+            "disposition_options": [
+                {
+                    "kind": "opportunity_disposition",
+                    "mode": "skip",
+                    "action_id": "rest_at_home",
+                    "playable": True,
+                }
+            ]
+        }
+    )
+    payload = _decision().model_dump(mode="json")
+    payload["opportunity_disposition"] = {"mode": "skip", "action": "rest_at_home"}
+    llm = _LocalLLM([json.dumps(payload)])
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+
+    result = gateway.decide(
+        PersonaDecisionRequest.from_context(context, request_id="newbie-42-w1-disposition")
+    )
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert result.decision is not None
+    assert result.decision.opportunity_disposition == {
+        "kind": "opportunity_disposition",
+        "mode": "skip",
+        "action_id": "rest_at_home",
+    }
+
+
 def test_local_normalizes_compact_model_variations_without_hiding_invalid_ids() -> None:
     llm = _LocalLLM(
         [

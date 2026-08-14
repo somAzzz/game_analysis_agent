@@ -413,6 +413,11 @@ def _decision_prefix() -> str:
                 '"expected_tradeoff":"short text","confidence":0.0}. '
                 "Confidence must be a number from 0 to 1."
             ),
+            (
+                "For each non-empty weekly decision, copy every identity field exactly from one "
+                "playable option: growth uses kind plus node_id or action_id/path_id; opportunity "
+                "disposition uses kind/mode/action_id. Use {} or [] to decline."
+            ),
         ]
     )
 
@@ -602,6 +607,7 @@ def _normalize_decision(parsed: dict[str, Any], request: PersonaDecisionRequest)
     opportunity_disposition = parsed.get("opportunity_disposition", {})
     if not isinstance(opportunity_disposition, dict):
         opportunity_disposition = {}
+    opportunity_disposition = _normalize_disposition(opportunity_disposition)
     term_maintenance = parsed.get("term_maintenance", {})
     if not isinstance(term_maintenance, dict):
         term_maintenance = {}
@@ -617,6 +623,18 @@ def _normalize_decision(parsed: dict[str, Any], request: PersonaDecisionRequest)
         "risk_awareness": [str(item)[:120] for item in risks[:5]],
         "expected_tradeoff": expected_tradeoff[:240],
         "confidence": confidence,
+    }
+
+
+def _normalize_disposition(value: dict[str, Any]) -> dict[str, Any]:
+    mode = str(value.get("mode", "") or "").strip()
+    action_id = str(value.get("action_id", "") or value.get("action", "") or "").strip()
+    if mode not in {"save", "skip", "delay"} or not action_id:
+        return {}
+    return {
+        "kind": "opportunity_disposition",
+        "mode": mode,
+        "action_id": action_id,
     }
 
 
