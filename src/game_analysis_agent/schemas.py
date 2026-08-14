@@ -333,6 +333,7 @@ class PlayerDecision(BaseModel):
     growth_decisions: list[dict[str, Any]] = Field(default_factory=list, max_length=4)
     opportunity_disposition: dict[str, Any] = Field(default_factory=dict)
     term_maintenance: dict[str, Any] = Field(default_factory=dict)
+    normalization_notes: list[str] = Field(default_factory=list, max_length=8)
     event_choice_id: str = ""
     risk_awareness: list[str] = Field(default_factory=list, max_length=5)
     expected_tradeoff: str = Field(default="", max_length=240)

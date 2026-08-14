@@ -13,7 +13,6 @@ from game_analysis_agent.local_persona_gateway import LocalChatPersonaGateway
 from game_analysis_agent.openai_persona_gateway import OpenAIResponsesPersonaGateway
 from game_analysis_agent.persona_gateway import (
     PersonaDecisionRequest,
-    PersonaErrorCategory,
     PersonaEventChoiceRequest,
     PersonaProvider,
     PersonaResultStatus,
@@ -370,7 +369,7 @@ def test_local_reasoning_is_never_parsed_as_the_final_choice() -> None:
     assert llm.thinking_flags == [True, False]
 
 
-def test_local_unknown_action_fails_after_one_shared_repair() -> None:
+def test_local_unknown_only_action_becomes_audited_idle() -> None:
     llm = _LocalLLM([_decision(action="ghost").model_dump_json()] * 2)
     gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
 
@@ -378,13 +377,13 @@ def test_local_unknown_action_fails_after_one_shared_repair() -> None:
         PersonaDecisionRequest.from_context(_context(), request_id="newbie-42-w1-invalid")
     )
 
-    assert result.status == PersonaResultStatus.FAILED
-    assert result.error is not None
-    assert result.error.category == PersonaErrorCategory.INVALID_DECISION
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert result.decision is not None
+    assert result.decision.actions == []
+    assert result.decision.normalization_notes == ["dropped_unavailable_action:ghost"]
     assert result.metadata.provider == PersonaProvider.VLLM
-    assert result.metadata.attempt_count == 2
-    assert result.metadata.usage.total_tokens == 30
-    assert llm.calls == 2
+    assert result.metadata.attempt_count == 1
+    assert llm.calls == 1
 
 
 def test_local_explicit_empty_actions_are_intentional_idle() -> None:
@@ -463,6 +462,9 @@ def test_local_played_action_supersedes_its_disposition() -> None:
     assert result.decision is not None
     assert result.decision.actions == ["budget_call"]
     assert result.decision.opportunity_disposition == {}
+    assert result.decision.normalization_notes == [
+        "played_action_superseded_disposition:budget_call"
+    ]
 
 
 def test_local_normalizes_compact_model_variations_without_hiding_invalid_ids() -> None:

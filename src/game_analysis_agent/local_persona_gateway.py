@@ -580,12 +580,13 @@ def _normalize_decision(parsed: dict[str, Any], request: PersonaDecisionRequest)
     if not isinstance(raw_actions, list):
         raw_actions = [] if raw_actions in (None, "") else [raw_actions]
     valid_action_ids = {action.id for action in context.available_actions}
-    actions = [str(item).strip() for item in raw_actions if str(item).strip() in valid_action_ids]
-    if raw_actions and not actions:
-        # Preserve one invalid id so shared validation rejects it. An explicit
-        # empty list means intentional idle; unknown-only output must not be
-        # silently normalized into idle.
-        actions = [str(raw_actions[0]).strip()]
+    requested_action_ids = [str(item).strip() for item in raw_actions if str(item).strip()]
+    actions = [item for item in requested_action_ids if item in valid_action_ids]
+    normalization_notes = [
+        f"dropped_unavailable_action:{item}"[:120]
+        for item in requested_action_ids
+        if item not in valid_action_ids
+    ][:4]
     risks = parsed.get("risk_awareness", [])
     if not isinstance(risks, list):
         risks = [] if risks in (None, "") else [risks]
@@ -611,6 +612,9 @@ def _normalize_decision(parsed: dict[str, Any], request: PersonaDecisionRequest)
     if opportunity_disposition.get("action_id") in actions:
         # Playing a card supersedes disposition. Dropping this redundant side
         # request preserves the explicit action without guessing another card.
+        normalization_notes.append(
+            f"played_action_superseded_disposition:{opportunity_disposition['action_id']}"[:120]
+        )
         opportunity_disposition = {}
     term_maintenance = parsed.get("term_maintenance", {})
     if not isinstance(term_maintenance, dict):
@@ -623,6 +627,7 @@ def _normalize_decision(parsed: dict[str, Any], request: PersonaDecisionRequest)
         "growth_decisions": growth_decisions,
         "opportunity_disposition": opportunity_disposition,
         "term_maintenance": term_maintenance,
+        "normalization_notes": normalization_notes[:8],
         "event_choice_id": str(event_choice_id or ""),
         "risk_awareness": [str(item)[:120] for item in risks[:5]],
         "expected_tradeoff": expected_tradeoff[:240],
