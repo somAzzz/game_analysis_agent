@@ -482,7 +482,7 @@ def _decision_repair_prompt(request: PersonaDecisionRequest, errors: list[str]) 
     return "\n".join(
         [
             "Repair the rejected PlayerDecision using this compact authoritative context.",
-            "For at_most_count, 1 to max_action_slots actions are valid; unused slots are allowed.",
+            "For at_most_count, 0 to max_action_slots actions are valid; unused slots are allowed.",
             (
                 "Keep accepted_action_ids. Remove rejected_action_ids or replace each with a "
                 "different available id. Do not repeat a rejected combination."
@@ -604,7 +604,11 @@ def _normalize_decision(parsed: dict[str, Any], request: PersonaDecisionRequest)
     growth_decisions = parsed.get("growth_decisions", [])
     if not isinstance(growth_decisions, list):
         growth_decisions = []
-    growth_decisions = [item for item in growth_decisions if isinstance(item, dict)][:4]
+    growth_decisions, growth_notes = _normalize_growth_decisions(
+        [item for item in growth_decisions if isinstance(item, dict)][:4],
+        context.growth_options,
+    )
+    normalization_notes.extend(growth_notes)
     opportunity_disposition = parsed.get("opportunity_disposition", {})
     if not isinstance(opportunity_disposition, dict):
         opportunity_disposition = {}
@@ -645,6 +649,58 @@ def _normalize_disposition(value: dict[str, Any]) -> dict[str, Any]:
         "mode": mode,
         "action_id": action_id,
     }
+
+
+def _normalize_growth_decisions(
+    requests: list[dict[str, Any]], options: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Canonicalize recognizable compact growth requests without guessing.
+
+    Local models commonly omit redundant identity fields or use short aliases.
+    A request is expanded only when its supplied identity selects exactly one
+    playable option. Ambiguous and unknown requests remain unchanged so the
+    shared validator still rejects them audibly.
+    """
+
+    identity_fields = ("kind", "action_id", "path_id", "node_id")
+    aliases = {
+        "type": "kind",
+        "action": "action_id",
+        "path": "path_id",
+        "node": "node_id",
+    }
+    normalized: list[dict[str, Any]] = []
+    notes: list[str] = []
+    for raw in requests:
+        request = dict(raw)
+        for alias, canonical in aliases.items():
+            if canonical not in request and alias in request:
+                request[canonical] = request[alias]
+        supplied = {
+            field: str(request[field])
+            for field in identity_fields
+            if str(request.get(field, "")).strip()
+        }
+        # action_id alone can refer to multiple upgrade paths; node_id or
+        # path_id is the stable, unique growth identity.
+        has_primary_identity = "node_id" in supplied or "path_id" in supplied
+        matches = [
+            option
+            for option in options
+            if has_primary_identity
+            and option.get("playable", True) is True
+            and all(str(option.get(field, "")) == value for field, value in supplied.items())
+        ]
+        if len(matches) != 1:
+            normalized.append(raw)
+            continue
+        option = matches[0]
+        canonical = {field: option[field] for field in identity_fields if field in option}
+        normalized.append(canonical)
+        if canonical != raw:
+            identity = canonical.get("node_id") or canonical.get("path_id") or "growth"
+            notes.append(f"canonicalized_growth_decision:{identity}"[:120])
+    return normalized, notes[:4]
 
 
 def _validation_errors(exc: ValidationError) -> list[str]:

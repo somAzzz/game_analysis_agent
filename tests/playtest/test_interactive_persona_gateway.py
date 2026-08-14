@@ -510,6 +510,81 @@ def test_local_discards_stale_action_when_another_legal_action_remains() -> None
     assert result.decision.actions == ["budget_call"]
 
 
+def test_local_canonicalizes_unambiguous_compact_growth_decision() -> None:
+    context = _context().model_copy(
+        update={
+            "growth_options": [
+                {
+                    "kind": "upgrade_card",
+                    "action_id": "library_day",
+                    "path_id": "deep_reading",
+                    "playable": True,
+                },
+                {
+                    "kind": "upgrade_card",
+                    "action_id": "library_day",
+                    "path_id": "exam_notes",
+                    "playable": True,
+                },
+            ]
+        }
+    )
+    payload = _decision().model_dump(mode="json")
+    payload["growth_decisions"] = [{"type": "upgrade_card", "path": "deep_reading"}]
+    llm = _LocalLLM([json.dumps(payload)])
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+
+    result = gateway.decide(
+        PersonaDecisionRequest.from_context(context, request_id="newbie-42-w1-growth")
+    )
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert result.decision is not None
+    assert result.decision.growth_decisions == [
+        {
+            "kind": "upgrade_card",
+            "action_id": "library_day",
+            "path_id": "deep_reading",
+        }
+    ]
+    assert result.decision.normalization_notes == [
+        "canonicalized_growth_decision:deep_reading"
+    ]
+
+
+def test_local_does_not_guess_an_ambiguous_growth_path() -> None:
+    context = _context().model_copy(
+        update={
+            "growth_options": [
+                {
+                    "kind": "upgrade_card",
+                    "action_id": "library_day",
+                    "path_id": "deep_reading",
+                    "playable": True,
+                },
+                {
+                    "kind": "upgrade_card",
+                    "action_id": "library_day",
+                    "path_id": "exam_notes",
+                    "playable": True,
+                },
+            ]
+        }
+    )
+    payload = _decision().model_dump(mode="json")
+    payload["growth_decisions"] = [{"action_id": "library_day"}]
+    llm = _LocalLLM([json.dumps(payload), json.dumps(payload)])
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+
+    result = gateway.decide(
+        PersonaDecisionRequest.from_context(context, request_id="newbie-42-w1-growth-ambiguous")
+    )
+
+    assert result.status == PersonaResultStatus.FAILED
+    assert result.error is not None
+    assert result.error.message == "Invalid growth_decisions[0]"
+
+
 def test_factory_defaults_to_governed_hash_pinned_replay() -> None:
     built = build_persona_gateway(PersonaRuntimeSettings.from_env({}), project_root=ROOT)
 
