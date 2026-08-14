@@ -427,10 +427,26 @@ def _decision_prompt(request: PersonaDecisionRequest) -> str:
     memory = context.memory.model_dump(mode="json")
     history = memory.pop("history", [])
     memory.pop("last_5_weeks", None)
+    # Exact historical action ids compete with the current hand in smaller
+    # local models and lead to stale-card selections. Preserve outcomes and
+    # rationale, but expose executable ids only in legal_action_ids and
+    # available_actions below.
+    memory.pop("repeated_actions", None)
+    recent_outcomes = [
+        {
+            "week": item.get("week"),
+            "event": item.get("event", ""),
+            "rationale": item.get("rationale", ""),
+            "delta": item.get("delta", {}),
+        }
+        for item in history[-5:]
+        if isinstance(item, dict)
+    ]
+    legal_action_ids = [action.id for action in context.available_actions]
     dynamic = {
         "persona": context.persona,
         "persona_strategy": context.persona_strategy,
-        "history": history,
+        "recent_outcomes_without_action_ids": recent_outcomes,
         "memory_summary": memory,
         "week": context.state.week,
         "state": context.state.model_dump(mode="json"),
@@ -438,6 +454,8 @@ def _decision_prompt(request: PersonaDecisionRequest) -> str:
         "current_event_id": context.current_event_id,
         "max_action_slots": context.max_action_slots,
         "action_slot_policy": context.action_slot_policy,
+        "legal_action_rule": "actions must be a subset of legal_action_ids",
+        "legal_action_ids": legal_action_ids,
         "available_actions": [
             action.model_dump(mode="json") for action in context.available_actions
         ],

@@ -258,10 +258,41 @@ def test_local_persona_messages_keep_rules_prefix_stable_when_legal_actions_chan
     dynamic_prompt = llm.messages[0][2]["content"]
     assert "available_actions" not in stable_prefix
     assert '"strategic_goal"' in stable_prefix
-    assert dynamic_prompt.index('"history"') < dynamic_prompt.index('"memory_summary"')
-    assert dynamic_prompt.index('"history"') < dynamic_prompt.index('"available_actions"')
+    assert dynamic_prompt.index('"recent_outcomes_without_action_ids"') < dynamic_prompt.index(
+        '"memory_summary"'
+    )
+    assert dynamic_prompt.index('"legal_action_ids"') < dynamic_prompt.index(
+        '"available_actions"'
+    )
     assert '"budget_call"' in dynamic_prompt
     assert '"rest_at_home"' in llm.messages[1][2]["content"]
+
+
+def test_local_persona_prompt_does_not_expose_stale_historical_action_ids() -> None:
+    payload = _context().model_dump(mode="json")
+    payload["memory"]["history"] = [
+        {
+            "week": 0,
+            "actions": ["stale_historical_card"],
+            "event": "arrival",
+            "rationale": "stabilized housing",
+            "delta": {"stress": -2},
+        }
+    ]
+    payload["memory"]["repeated_actions"] = {"stale_historical_card": 3}
+    context = WeekContext.model_validate(payload)
+    llm = _LocalLLM([_decision().model_dump_json()])
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+
+    result = gateway.decide(
+        PersonaDecisionRequest.from_context(context, request_id="newbie-42-w1-no-stale-history")
+    )
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    dynamic_prompt = llm.messages[0][2]["content"]
+    assert "stale_historical_card" not in dynamic_prompt
+    assert '"legal_action_ids":["budget_call","rest_at_home"]' in dynamic_prompt
+    assert '"rationale":"stabilized housing"' in dynamic_prompt
 
 
 def test_local_persona_trace_records_exact_request_without_response_content() -> None:
