@@ -89,8 +89,22 @@ class InteractiveProbe:
 
     def configure_week_strategy(self, focus_id: str, background_id: str = "") -> None:
         """Set the declared Focus for the next selection window."""
-        self.next_focus_id = str(focus_id or "")
-        self.background_id = str(background_id or "")
+        next_focus_id = str(focus_id or "")
+        next_background_id = str(background_id or "")
+        strategy_changed = (
+            next_focus_id != self.next_focus_id or next_background_id != self.background_id
+        )
+        self.next_focus_id = next_focus_id
+        self.background_id = next_background_id
+        if strategy_changed:
+            # The weekly hand is drawn after Focus selection. A cached hand
+            # generated under the previous Focus is not authoritative for the
+            # new selection window, so force list_available_actions() to replay
+            # the snapshot with the newly declared strategy.
+            self.available_actions = []
+            self.growth_options = []
+            self.disposition_options = []
+            self.term_maintenance_options = []
 
     def list_available_actions(self) -> dict[str, Any]:
         """Return currently legal actions for the active playthrough state."""

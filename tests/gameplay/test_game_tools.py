@@ -104,6 +104,37 @@ def test_probe_propagates_risk_guidance_from_snapshot(tmp_path: Path, monkeypatc
     assert payload["risk_guidance"] == guidance
 
 
+def test_focus_change_invalidates_the_cached_weekly_hand(tmp_path: Path, monkeypatch) -> None:
+    calls: list[dict[str, object]] = []
+
+    def fake_run_one_step(*_args, **kwargs):  # noqa: ANN001
+        calls.append(kwargs)
+        return {
+            "current_state": {"week": 5, "money": 500},
+            "next_available_actions": [{"id": "mental_recovery_card"}],
+            "growth_options": [{"kind": "unlock_ability", "node_id": "stress_pacing"}],
+            "disposition_options": [],
+            "term_maintenance_options": [],
+        }
+
+    monkeypatch.setattr(game_tools, "_run_one_step", fake_run_one_step)
+    probe = build_probe(_settings(tmp_path))
+    probe.next_focus_id = "admin_stability"
+    probe.background_id = "self_regulation"
+    probe.available_actions = [{"id": "stale_admin_card"}]
+    probe.growth_options = [{"kind": "stale_growth"}]
+
+    probe.configure_week_strategy("mental_recovery", "self_regulation")
+    result = probe.list_available_actions()
+
+    assert result == {"actions": [{"id": "mental_recovery_card"}]}
+    assert calls[0]["next_focus_id"] == "mental_recovery"
+    assert calls[0]["prepare_next_week"] is True
+    assert probe.growth_options == [
+        {"kind": "unlock_ability", "node_id": "stress_pacing"}
+    ]
+
+
 def test_build_tool_map_returns_callable_map(tmp_path: Path) -> None:
     probe = build_probe(_settings(tmp_path))
     tool_map = build_tool_map(probe)
