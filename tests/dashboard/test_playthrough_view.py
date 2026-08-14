@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
 
-from game_analysis_agent.campaign_contract import CampaignCellResult, CampaignManifest
+from game_analysis_agent.campaign_contract import (
+    CampaignCellResult,
+    CampaignManifest,
+    canonical_sha256,
+)
 from game_analysis_agent.playthrough_view import (
     TRUTH_LABEL,
     PlaythroughViewError,
@@ -86,6 +92,45 @@ def test_cell_view_rejects_tampered_raw_trace(tmp_path: Path) -> None:
             trace_path=tampered,
             summary_path=cell_dir / "playthrough_summary.md",
         )
+
+
+def test_cell_view_accepts_an_intentional_empty_action_plan(tmp_path: Path) -> None:
+    manifest = CampaignManifest.model_validate_json(
+        (CAMPAIGN / "campaign_manifest.json").read_text(encoding="utf-8")
+    )
+    source_dir = CAMPAIGN / "cells/money-seed-42-0814df41bd32"
+    result = CampaignCellResult.model_validate_json(
+        (source_dir / "cell_result.json").read_text(encoding="utf-8")
+    )
+    rows = [
+        json.loads(line)
+        for line in (source_dir / "playthrough.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    rows[0]["chosen_actions"] = []
+    rows[0]["decision"]["actions"] = []
+    trace = tmp_path / "playthrough.jsonl"
+    trace.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+    artifacts = [
+        item.model_copy(update={"sha256": hashlib.sha256(trace.read_bytes()).hexdigest()})
+        if item.path.endswith("playthrough.jsonl")
+        else item
+        for item in result.artifacts
+    ]
+    citations = list(result.citations)
+    citations[0] = citations[0].model_copy(update={"record_sha256": canonical_sha256(rows[0])})
+    result = result.model_copy(update={"artifacts": artifacts, "citations": citations})
+
+    view = build_cell_view(
+        manifest=manifest,
+        result=result,
+        trace_path=trace,
+        summary_path=source_dir / "playthrough_summary.md",
+    )
+
+    assert view["nodes"][0]["selected_action_ids"] == []
 
 
 def test_builder_emits_hash_bound_cell_index_for_lazy_review(tmp_path: Path) -> None:

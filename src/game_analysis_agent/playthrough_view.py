@@ -333,7 +333,11 @@ def build_cell_view(
 
         available = _string_list(row.get("available_actions"))
         chosen = _string_list(row.get("chosen_actions"))
-        if not available or not chosen or not set(chosen).issubset(available):
+        # An empty selection is a legal, intentional plan: unused action slots
+        # provide idle-slot recovery.  The evidence gate still requires the
+        # game to have exposed a legal action set, and every selected action
+        # must come from that set.
+        if not available or not set(chosen).issubset(available):
             raise PlaythroughViewError(
                 f"cell {request.cell_id}: illegal selected action at week {week}"
             )
