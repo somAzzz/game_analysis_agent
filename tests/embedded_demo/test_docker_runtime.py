@@ -52,25 +52,28 @@ def test_vllm_defaults_to_v026_hybrid_apc_without_mtp() -> None:
     assert "--max-num-batched-tokens 65536" not in command
 
 
-def test_sglang_is_primary_hybrid_radix_mtp_backend() -> None:
+def test_sglang_is_primary_qwen38_apc_dspark_backend() -> None:
     payload = yaml.safe_load((ROOT / "docker-compose.yml").read_text(encoding="utf-8"))
     service = payload["services"]["sglang"]
     command = " ".join(service["command"])
     environment = service["environment"]
 
-    assert service["image"] == "lmsysorg/sglang:v0.5.16-cu130-runtime"
+    assert service["image"] == "lmsysorg/sglang:qwen38-27b"
     assert service["profiles"] == ["local-nvidia", "local-sglang"]
-    assert "--quantization modelopt_fp4" in command
+    assert "$${SGLANG_MODEL_PATH:-RadixArk/Qwen3.8-27B-NVFP4}" in command
+    assert "--quantization" not in command
+    assert '--attention-backend "$${SGLANG_ATTENTION_BACKEND:-flashinfer}"' in command
+    assert '--chunked-prefill-size "$${SGLANG_CHUNKED_PREFILL_SIZE:-2048}"' in command
     assert "--mamba-radix-cache-strategy" in command
-    assert "$${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer}" in command
-    assert "--page-size" in command
-    assert 'if [ "$${SGLANG_ENABLE_MTP:-1}" = "1" ]' in command
-    assert "--speculative-algorithm NEXTN" in command
-    assert "--speculative-num-steps" in command
-    assert "--speculative-eagle-topk" in command
-    assert "--speculative-num-draft-tokens" in command
-    assert "SGLANG_ENABLE_MTP=${SGLANG_ENABLE_MTP:-1}" in environment
-    assert "SGLANG_SPEC_TOPK=${SGLANG_SPEC_TOPK:-1}" in environment
+    assert "$${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer_lazy}" in command
+    assert 'if [ "$${SGLANG_ENABLE_APC:-1}" != "1" ]' in command
+    assert "--disable-radix-cache" in command
+    assert 'if [ "$${SGLANG_ENABLE_DSPARK:-1}" = "1" ]' in command
+    assert "--speculative-algorithm DSPARK" in command
+    assert "--speculative-draft-model-path" in command
+    assert "RadixArk/Qwen3.8-27B-DSpark" in command
+    assert "SGLANG_ENABLE_APC=${SGLANG_ENABLE_APC:-1}" in environment
+    assert "SGLANG_ENABLE_DSPARK=${SGLANG_ENABLE_DSPARK:-1}" in environment
 
 
 def test_host_sglang_script_uses_the_same_primary_defaults() -> None:
@@ -78,11 +81,15 @@ def test_host_sglang_script_uses_the_same_primary_defaults() -> None:
     script = script_path.read_text(encoding="utf-8")
 
     assert os.access(script_path, os.X_OK)
-    assert 'ENABLE_MTP="${SGLANG_ENABLE_MTP:-1}"' in script
-    assert 'MAMBA_CACHE_STRATEGY="${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer}"' in script
-    assert "--quantization modelopt_fp4" in script
+    assert 'ENABLE_APC="${SGLANG_ENABLE_APC:-1}"' in script
+    assert 'ENABLE_DSPARK="${SGLANG_ENABLE_DSPARK:-1}"' in script
+    assert (
+        'MAMBA_CACHE_STRATEGY="${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer_lazy}"' in script
+    )
+    assert "--quantization" not in script
     assert "--mamba-radix-cache-strategy" in script
-    assert "--speculative-algorithm NEXTN" in script
+    assert "--speculative-algorithm DSPARK" in script
+    assert "RadixArk/Qwen3.8-27B-DSpark" in script
 
 
 def test_host_vllm_script_uses_the_same_apc_only_defaults() -> None:

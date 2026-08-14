@@ -1,4 +1,4 @@
-# Local SGLang + Qwen3.6 NVFP4
+# Local SGLang + Qwen3.8-27B NVFP4
 
 SGLang is the primary local inference backend. vLLM remains a separately
 profiled baseline and fallback; both expose the same OpenAI-compatible served
@@ -14,6 +14,12 @@ docker compose --profile local-nvidia up -d sglang
 docker compose logs -f sglang
 ```
 
+The Day-0 image contains the matching SGLang runtime, not the model weights.
+On first start, the container downloads both `RadixArk/Qwen3.8-27B-NVFP4`
+(about 21.9 GB) and `RadixArk/Qwen3.8-27B-DSpark` (about 2.7 GB). They are
+persisted in the host's `~/.cache/huggingface` bind mount, so normal container
+recreation does not download them again. Pre-downloading is optional.
+
 The host endpoint is `http://localhost:30000/v1`. The `agent` container uses
 `http://sglang:30000/v1`; keep these addresses separate because `localhost`
 inside a container refers to that container itself.
@@ -23,30 +29,31 @@ curl http://localhost:30000/v1/models \
   -H 'Authorization: Bearer local-dev-token'
 ```
 
-Expected served model: `qwen3.6-27b-nvfp4`.
+Expected served model: `qwen3.8-27b`.
 
 ## Primary configuration
 
 ```env
 LLM_PROVIDER=sglang
-LLM_MODEL=nvidia/Qwen3.6-27B-NVFP4
-LLM_SERVED_MODEL_NAME=qwen3.6-27b-nvfp4
-SGLANG_MODEL=qwen3.6-27b-nvfp4
+SGLANG_MODEL_PATH=RadixArk/Qwen3.8-27B-NVFP4
+SGLANG_MODEL=qwen3.8-27b
 SGLANG_BASE_URL=http://localhost:30000/v1
 SGLANG_API_KEY=local-dev-token
 
-SGLANG_MAMBA_CACHE_STRATEGY=extra_buffer
-SGLANG_PAGE_SIZE=64
-SGLANG_ENABLE_MTP=1
-SGLANG_SPEC_NUM_STEPS=3
-SGLANG_SPEC_TOPK=1
-SGLANG_SPEC_NUM_DRAFT_TOKENS=4
+SGLANG_MEM_FRACTION_STATIC=0.85
+SGLANG_ATTENTION_BACKEND=flashinfer
+SGLANG_CHUNKED_PREFILL_SIZE=2048
+SGLANG_ENABLE_APC=1
+SGLANG_MAMBA_CACHE_STRATEGY=extra_buffer_lazy
+SGLANG_ENABLE_DSPARK=1
+SGLANG_DRAFT_MODEL_PATH=RadixArk/Qwen3.8-27B-DSpark
 ```
 
-Radix prefix caching is enabled by default in SGLang. `extra_buffer` provides
-the hybrid Mamba/GDN state tracking required for overlap scheduling and
-branching-point caching. Qwen3.6's built-in MTP head is selected with NEXTN;
-no external draft checkpoint is loaded.
+APC is implemented by SGLang's Unified Radix Cache and is enabled unless
+`SGLANG_ENABLE_APC=0` adds `--disable-radix-cache`. The
+`extra_buffer_lazy` strategy reduces the hybrid GDN state cost while preserving
+branching-point caching. DSpark loads its trained draft checkpoint separately
+and runs with `--speculative-algorithm DSPARK`.
 
 The application keeps one provider-independent prompt/context contract. Local
 Qwen thinking uses the same `chat_template_kwargs`, and event-choice
@@ -63,7 +70,7 @@ and concurrency 4. Compare legality/parse/repair rates as well as latency.
 To isolate speculative decoding without abandoning SGLang:
 
 ```bash
-SGLANG_ENABLE_MTP=0 docker compose --profile local-sglang up -d --force-recreate sglang
+SGLANG_ENABLE_DSPARK=0 docker compose --profile local-sglang up -d --force-recreate sglang
 ```
 
 To return to the vLLM baseline:

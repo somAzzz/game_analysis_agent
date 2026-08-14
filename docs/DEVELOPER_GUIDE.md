@@ -148,10 +148,10 @@ Reports and dashboard
 ```
 
 The default local LLM backend is an OpenAI-compatible SGLang server. The Docker
-Compose stack is configured for NVIDIA's Qwen3.6 27B NVFP4 checkpoint with
-ModelOpt FP4, Qwen3 reasoning/tool parsing, hybrid Mamba Radix caching, and
-native MTP/NEXTN speculative decoding. vLLM remains the local baseline/fallback;
-DeepSeek remains a cloud-compatible option.
+Compose stack is configured for Qwen3.8-27B NVFP4 with Qwen3 reasoning/tool
+parsing, unified hybrid GDN Radix caching, and DSpark speculative decoding.
+vLLM remains the local baseline/fallback; DeepSeek remains a cloud-compatible
+option.
 
 中文说明保留在 [README.zh-CN.md](../README.zh-CN.md).
 
@@ -236,9 +236,8 @@ Edit `.env` for an OpenAI-compatible local endpoint:
 LLM_PROVIDER=sglang
 SGLANG_BASE_URL=http://localhost:30000/v1
 SGLANG_API_KEY=local-dev-token
-SGLANG_MODEL=qwen3.6-27b-nvfp4
-LLM_MODEL=nvidia/Qwen3.6-27B-NVFP4
-LLM_SERVED_MODEL_NAME=qwen3.6-27b-nvfp4
+SGLANG_MODEL_PATH=RadixArk/Qwen3.8-27B-NVFP4
+SGLANG_MODEL=qwen3.8-27b
 ```
 
 Run LLM review agents against a report directory:

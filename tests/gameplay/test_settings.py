@@ -55,7 +55,7 @@ class TestDefaults:
         assert s.provider() == "sglang"
         assert s.base_url().startswith("http://localhost:")
         assert s.model() == s.sglang_model
-        assert s.model() == "qwen3.6-27b-nvfp4"
+        assert s.model() == "qwen3.8-27b"
         assert s.persona_enable_thinking is False
         assert s.persona_decision_max_tokens == 2048
         assert s.persona_event_max_tokens == 64
@@ -92,6 +92,7 @@ class TestDefaults:
 class TestSelectors:
     def test_vllm_uses_shared_served_model_name(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _clear_env()
+        monkeypatch.setenv("LLM_PROVIDER", "vllm")
         monkeypatch.setenv("LLM_SERVED_MODEL_NAME", "local-model-alias")
 
         assert Settings().model() == "local-model-alias"

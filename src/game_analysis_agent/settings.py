@@ -88,9 +88,7 @@ class Settings:
         default_factory=lambda: _env("SGLANG_API_KEY", "local-dev-token")
     )
     sglang_model: str = field(
-        default_factory=lambda: _env(
-            "SGLANG_MODEL", _env("LLM_SERVED_MODEL_NAME", "qwen3.6-27b-nvfp4")
-        )
+        default_factory=lambda: _env("SGLANG_MODEL", "qwen3.8-27b")
     )
 
     # ---- DeepSeek (cloud fallback) -------------------------------------

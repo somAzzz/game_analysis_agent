@@ -132,7 +132,7 @@ uv run ruff check .
 3. 启动默认的本地 SGLang 服务（如果你用的是 `deepseek` 则可跳过）：
 
 ```bash
-MODEL_ID=/path/to/qwen3.6-nvfp4 ./tools/llm_runtime/run_sglang_qwen.sh
+MODEL_ID=/path/to/Qwen3.8-27B-NVFP4 ./tools/llm_runtime/run_sglang_qwen.sh
 ```
 
 4. 一键跑通整个流水线（模拟/分析 → 导出 → 全验证 → LLM QA → 质量门禁）：
@@ -450,7 +450,7 @@ tools/
   run_agent.py                  — 单个 agent CLI
   run_balance_sim.sh            — 包装 study-in-germany 的 RunSimulation.gd
   run_gameplay_agent.py         — 一站式 orchestration CLI
-  run_sglang_qwen.sh            — 默认 SGLang + Qwen3.6 启动脚本
+  run_sglang_qwen.sh            — 默认 SGLang + Qwen3.8 启动脚本
   run_vllm_qwen.sh              — vLLM fallback 启动脚本
 ```
 

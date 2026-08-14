@@ -10,7 +10,7 @@ Deployment and runtime docs for operators. All evergreen.
 3. [DOCKER.md](DOCKER.md) — CPU Judge default and opt-in runtime profiles
 4. [LINUX_P4_G4_CLOSEOUT.md](LINUX_P4_G4_CLOSEOUT.md) — native Linux, Docker, Godot, arm64 image, live OpenAI, and evidence import
 5. [LIVE_OPENAI_EVIDENCE.md](LIVE_OPENAI_EVIDENCE.md) — `.env`, Responses API, restricted-key run, and public-evidence redaction
-6. [SGLANG_QWEN_LOCAL_AGENT.md](SGLANG_QWEN_LOCAL_AGENT.md) — primary local SGLang + Qwen3.6 hybrid Radix/MTP deployment
+6. [SGLANG_QWEN_LOCAL_AGENT.md](SGLANG_QWEN_LOCAL_AGENT.md) — primary local SGLang + Qwen3.8 hybrid APC/DSpark deployment
 7. [VLLM_QWEN_LOCAL_AGENT.md](VLLM_QWEN_LOCAL_AGENT.md) — retained vLLM baseline and fallback
 8. [INFERENCE_AB_BENCHMARK.md](INFERENCE_AB_BENCHMARK.md) — APC-only versus MTP3-only benchmark and visualization plan
 9. [PERSONA_CAMPAIGN_RUNBOOK.md](PERSONA_CAMPAIGN_RUNBOOK.md) — 20-week local rehearsal, live OpenAI validation, retained UI evidence
