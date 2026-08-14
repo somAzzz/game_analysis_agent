@@ -326,10 +326,19 @@ def build_cell_view(
             raise PlaythroughViewError(
                 f"cell {request.cell_id}: result/state_after mismatch at week {week}"
             )
+        pre_decision_transition: dict[str, Any] | None = None
         if previous_after is not None and before != previous_after:
-            raise PlaythroughViewError(
-                f"cell {request.cell_id}: broken state continuity at week {week}"
+            week_context = _mapping(row, "week_context", request.cell_id, week)
+            pre_decision_transition = _focus_selection_transition(
+                previous_after,
+                before,
+                week_context,
+                week,
             )
+            if pre_decision_transition is None:
+                raise PlaythroughViewError(
+                    f"cell {request.cell_id}: broken state continuity at week {week}"
+                )
 
         available = _string_list(row.get("available_actions"))
         chosen = _string_list(row.get("chosen_actions"))
@@ -425,6 +434,7 @@ def build_cell_view(
                 "state_after": after,
                 "delta": delta,
                 "full_numeric_delta": full_numeric_delta,
+                "pre_decision_transition": pre_decision_transition,
                 "available_action_ids": available,
                 "selected_action_ids": chosen,
                 "decision": {
@@ -492,6 +502,38 @@ def build_cell_view(
             "available_actions": "legal-actions-not-future-state-branches",
             "projected_counterfactual_states": False,
         },
+    }
+
+
+def _focus_selection_transition(
+    previous: dict[str, Any],
+    current: dict[str, Any],
+    week_context: dict[str, Any],
+    week: int,
+) -> dict[str, Any] | None:
+    """Recognize the only legal state change between weekly trace rows."""
+
+    changed = {key for key in set(previous) | set(current) if previous.get(key) != current.get(key)}
+    focus_fields = {"focus_id", "focus_start_week", "focus_expires_week"}
+    if not changed or not changed.issubset(focus_fields):
+        return None
+    if str(previous.get("focus_id", "")) != "focus_none":
+        return None
+    focus_id = str(current.get("focus_id", ""))
+    if not focus_id or focus_id == "focus_none":
+        return None
+    if int(current.get("focus_start_week", -1)) != week:
+        return None
+    if int(current.get("focus_expires_week", -1)) < week:
+        return None
+    if str(week_context.get("active_focus_id", "")) != focus_id:
+        return None
+    return {
+        "kind": "focus_selection",
+        "focus_id": focus_id,
+        "start_week": int(current["focus_start_week"]),
+        "expires_week": int(current["focus_expires_week"]),
+        "changed_fields": sorted(changed),
     }
 
 

@@ -14,6 +14,7 @@ from game_analysis_agent.campaign_contract import (
 from game_analysis_agent.playthrough_view import (
     TRUTH_LABEL,
     PlaythroughViewError,
+    _focus_selection_transition,
     build_cell_view,
     build_playthrough_views,
     verify_playthrough_evidence,
@@ -131,6 +132,51 @@ def test_cell_view_accepts_an_intentional_empty_action_plan(tmp_path: Path) -> N
     )
 
     assert view["nodes"][0]["selected_action_ids"] == []
+
+
+def test_focus_selection_is_an_audited_pre_decision_transition() -> None:
+    previous = {
+        "week": 5,
+        "money": 500,
+        "focus_id": "focus_none",
+        "focus_start_week": 1,
+        "focus_expires_week": 4,
+    }
+    current = {
+        **previous,
+        "focus_id": "mental_recovery",
+        "focus_start_week": 5,
+        "focus_expires_week": 8,
+    }
+
+    transition = _focus_selection_transition(
+        previous, current, {"active_focus_id": "mental_recovery"}, 5
+    )
+
+    assert transition == {
+        "kind": "focus_selection",
+        "focus_id": "mental_recovery",
+        "start_week": 5,
+        "expires_week": 8,
+        "changed_fields": ["focus_expires_week", "focus_id", "focus_start_week"],
+    }
+
+
+def test_focus_transition_cannot_hide_a_numeric_state_jump() -> None:
+    previous = {"money": 500, "focus_id": "focus_none"}
+    current = {
+        "money": 900,
+        "focus_id": "mental_recovery",
+        "focus_start_week": 5,
+        "focus_expires_week": 8,
+    }
+
+    assert (
+        _focus_selection_transition(
+            previous, current, {"active_focus_id": "mental_recovery"}, 5
+        )
+        is None
+    )
 
 
 def test_builder_emits_hash_bound_cell_index_for_lazy_review(tmp_path: Path) -> None:
