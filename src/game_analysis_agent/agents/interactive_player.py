@@ -513,7 +513,15 @@ class InteractivePlayerAgent(Agent):
                 preview = _validate_probe_decision(probe, decision)
                 valid = isinstance(preview, dict) and preview.get("valid") is True
                 self._last_plan_preview = preview if valid else None
-                return [] if valid else [_authoritative_plan_error(preview)]
+                if valid:
+                    return []
+                normalized = _drop_godot_rejected_actions(decision, preview)
+                if normalized:
+                    retry_preview = _validate_probe_decision(probe, decision)
+                    if isinstance(retry_preview, dict) and retry_preview.get("valid") is True:
+                        self._last_plan_preview = retry_preview
+                        return []
+                return [_authoritative_plan_error(preview)]
 
             validator = authoritative_validator
 
@@ -1132,6 +1140,41 @@ def _authoritative_plan_error(preview: object) -> str:
         f"used_slots={used_text}; maximum_slots={maximum_text}. "
         "Keep accepted ids and remove or replace rejected ids with a different legal action."
     )
+
+
+def _drop_godot_rejected_actions(decision: PlayerDecision, preview: object) -> bool:
+    """Remove only rejection-indexed actions, then require a fresh Godot preview."""
+
+    if not isinstance(preview, dict) or preview.get("error_code") != "invalid_plan":
+        return False
+    submission = preview.get("plan_submission")
+    if not isinstance(submission, dict):
+        return False
+    requested = submission.get("requested_action_ids")
+    rejections = submission.get("rejections")
+    if not isinstance(requested, list) or not isinstance(rejections, list):
+        return False
+    rejected: dict[int, tuple[str, str]] = {}
+    for item in rejections[:8]:
+        if not isinstance(item, dict) or type(item.get("index")) is not int:
+            continue
+        index = item["index"]
+        if 0 <= index < len(requested):
+            rejected[index] = (
+                _safe_contract_token(item.get("action_id", requested[index])),
+                _safe_contract_token(item.get("code", "rejected")),
+            )
+    if not rejected:
+        return False
+    normalized = [str(value) for index, value in enumerate(requested) if index not in rejected]
+    if normalized == decision.actions:
+        return False
+    decision.actions = normalized
+    for index in sorted(rejected):
+        action_id, code = rejected[index]
+        decision.normalization_notes.append(f"godot_rejected_action:{action_id}:{code}"[:120])
+    decision.normalization_notes = decision.normalization_notes[:8]
+    return True
 
 
 def _safe_contract_token(value: object) -> str:

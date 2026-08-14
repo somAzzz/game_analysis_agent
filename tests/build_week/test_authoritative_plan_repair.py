@@ -363,6 +363,28 @@ class _AuthoritativeProbe:
         return []
 
 
+class _SubsetNormalizingProbe(_AuthoritativeProbe):
+    def validate_step(self, actions: list[str]) -> dict:
+        self.validation_calls.append(list(actions))
+        if actions != CONFLICTING:
+            return _valid_preview()
+        return {
+            "valid": False,
+            "error_code": "invalid_plan",
+            "plan_submission": {
+                "valid": False,
+                "requested_action_ids": CONFLICTING,
+                "accepted_action_ids": [],
+                "rejections": [
+                    {"index": 1, "action_id": "cheap_noodle_week", "code": "meal_conflict"},
+                    {"index": 2, "action_id": "mensa_coupon", "code": "meal_conflict"},
+                ],
+                "used_slots": 0,
+                "idle_slots": 4,
+            },
+        }
+
+
 def test_interactive_player_repairs_with_authoritative_feedback_and_reuses_preview(
     tmp_path: Path,
 ) -> None:
@@ -390,3 +412,28 @@ def test_interactive_player_repairs_with_authoritative_feedback_and_reuses_previ
     assert probe.validation_calls == [CONFLICTING, REPAIRED]
     assert probe.step_calls == [REPAIRED]
     assert len(llm.calls) == 2
+
+
+def test_interactive_player_drops_only_godot_rejected_actions(tmp_path: Path) -> None:
+    llm = _LocalLLM([_decision(CONFLICTING).model_dump_json()])
+    probe = _SubsetNormalizingProbe()
+    agent = InteractivePlayerAgent(
+        llm=llm,  # type: ignore[arg-type]
+        prompts_root=Path(__file__).resolve().parents[2] / "prompts",
+        settings=_settings(),
+        max_weeks=1,
+        persona="money",
+        seed=42,
+    )
+
+    result, _paths = agent.play_through(tmp_path, probe=probe)  # type: ignore[arg-type]
+
+    expected = ["cook_at_home", "go_running"]
+    assert result.steps[0].chosen_actions == expected
+    assert result.steps[0].decision["normalization_notes"] == [
+        "godot_rejected_action:cheap_noodle_week:meal_conflict",
+        "godot_rejected_action:mensa_coupon:meal_conflict",
+    ]
+    assert probe.validation_calls == [CONFLICTING, expected]
+    assert probe.step_calls == [expected]
+    assert len(llm.calls) == 1
