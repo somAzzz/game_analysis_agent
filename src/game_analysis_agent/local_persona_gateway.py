@@ -608,6 +608,10 @@ def _normalize_decision(parsed: dict[str, Any], request: PersonaDecisionRequest)
     if not isinstance(opportunity_disposition, dict):
         opportunity_disposition = {}
     opportunity_disposition = _normalize_disposition(opportunity_disposition)
+    if opportunity_disposition.get("action_id") in actions:
+        # Playing a card supersedes disposition. Dropping this redundant side
+        # request preserves the explicit action without guessing another card.
+        opportunity_disposition = {}
     term_maintenance = parsed.get("term_maintenance", {})
     if not isinstance(term_maintenance, dict):
         term_maintenance = {}

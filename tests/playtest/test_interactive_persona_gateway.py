@@ -433,6 +433,38 @@ def test_local_completes_compact_disposition_identity() -> None:
     }
 
 
+def test_local_played_action_supersedes_its_disposition() -> None:
+    context = _context().model_copy(
+        update={
+            "disposition_options": [
+                {
+                    "kind": "opportunity_disposition",
+                    "mode": "save",
+                    "action_id": "budget_call",
+                    "playable": True,
+                }
+            ]
+        }
+    )
+    payload = _decision().model_dump(mode="json")
+    payload["opportunity_disposition"] = {
+        "kind": "opportunity_disposition",
+        "mode": "save",
+        "action_id": "budget_call",
+    }
+    llm = _LocalLLM([json.dumps(payload)])
+    gateway = LocalChatPersonaGateway(llm)  # type: ignore[arg-type]
+
+    result = gateway.decide(
+        PersonaDecisionRequest.from_context(context, request_id="newbie-42-w1-play-wins")
+    )
+
+    assert result.status == PersonaResultStatus.COMPLETED
+    assert result.decision is not None
+    assert result.decision.actions == ["budget_call"]
+    assert result.decision.opportunity_disposition == {}
+
+
 def test_local_normalizes_compact_model_variations_without_hiding_invalid_ids() -> None:
     llm = _LocalLLM(
         [
