@@ -8,7 +8,10 @@ from pathlib import Path
 import pytest
 
 import game_analysis_agent.game_tools as game_tools
-from game_analysis_agent.agents.interactive_player import InteractivePlayerAgent
+from game_analysis_agent.agents.interactive_player import (
+    InteractivePlayerAgent,
+    _authoritative_plan_error,
+)
 from game_analysis_agent.game_tools import InteractiveProbeStepError, build_probe
 from game_analysis_agent.local_persona_gateway import LocalChatPersonaGateway
 from game_analysis_agent.persona_gateway import (
@@ -270,6 +273,34 @@ def test_interactive_probe_validation_is_non_mutating(tmp_path: Path, monkeypatc
     with pytest.raises(InteractiveProbeStepError, match="invalid_plan"):
         probe.preview_step(CONFLICTING)
     assert probe.__dict__ == before
+
+
+def test_authoritative_error_reads_current_plan_submission_contract() -> None:
+    error = _authoritative_plan_error(
+        {
+            "valid": False,
+            "error_code": "invalid_plan",
+            "plan_submission": {
+                "valid": False,
+                "requested_action_ids": CONFLICTING,
+                "accepted_action_ids": [],
+                "rejections": [
+                    {
+                        "action_id": "cheap_noodle_week",
+                        "code": "cooldown_group_conflict",
+                    },
+                    {"action_id": "mensa_coupon", "code": "cooldown_group_conflict"},
+                ],
+                "used_slots": 0,
+                "idle_slots": 4,
+            },
+        }
+    )
+
+    assert 'proposed_action_ids=["cook_at_home", "cheap_noodle_week"' in error
+    assert 'accepted_action_ids=["cook_at_home", "go_running"]' in error
+    assert 'rejected_action_ids=["cheap_noodle_week", "mensa_coupon"]' in error
+    assert "maximum_slots=4" in error
 
 
 class _AuthoritativeProbe:

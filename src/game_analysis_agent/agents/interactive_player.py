@@ -1086,24 +1086,42 @@ def _authoritative_plan_error(preview: object) -> str:
 
     if not isinstance(preview, dict):
         return "Authoritative plan rejected: error_code=invalid_probe_contract"
-    validation = preview.get("plan_validation")
+    validation = preview.get("plan_validation") or preview.get("plan_submission")
     validation = validation if isinstance(validation, dict) else {}
     error_code = _safe_contract_token(
         preview.get("error_code") or validation.get("code") or "invalid_probe_contract"
     )
-    raw_proposed_ids = validation.get("proposed_action_ids")
+    raw_proposed_ids = validation.get("proposed_action_ids") or validation.get(
+        "requested_action_ids"
+    )
     proposed_ids = (
         [_safe_contract_token(item) for item in raw_proposed_ids[:8]]
         if isinstance(raw_proposed_ids, list)
         else []
     )
-    raw_ids = validation.get("selected_action_ids")
+    raw_ids = validation.get("selected_action_ids") or validation.get("accepted_action_ids")
     accepted_ids = (
         [_safe_contract_token(item) for item in raw_ids[:8]] if isinstance(raw_ids, list) else []
     )
-    rejected_ids = [action_id for action_id in proposed_ids if action_id not in accepted_ids]
+    raw_rejections = validation.get("rejections")
+    explicit_rejected = (
+        [
+            _safe_contract_token(item.get("action_id", ""))
+            for item in raw_rejections[:8]
+            if isinstance(item, dict) and item.get("action_id")
+        ]
+        if isinstance(raw_rejections, list)
+        else []
+    )
+    rejected_ids = explicit_rejected or [
+        action_id for action_id in proposed_ids if action_id not in accepted_ids
+    ]
+    if not accepted_ids and rejected_ids:
+        accepted_ids = [action_id for action_id in proposed_ids if action_id not in rejected_ids]
     used_slots = validation.get("used_slots")
     maximum_slots = validation.get("maximum_slots", validation.get("required_slots"))
+    if type(maximum_slots) is not int and type(validation.get("idle_slots")) is int:
+        maximum_slots = (used_slots if type(used_slots) is int else 0) + validation["idle_slots"]
     used_text = str(used_slots) if type(used_slots) is int else "unknown"
     maximum_text = str(maximum_slots) if type(maximum_slots) is int else "unknown"
     return (
