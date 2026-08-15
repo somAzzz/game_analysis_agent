@@ -141,12 +141,17 @@ def test_focus_selection_is_an_audited_pre_decision_transition() -> None:
         "focus_id": "focus_none",
         "focus_start_week": 1,
         "focus_expires_week": 4,
+        "focus_selection_counts": {"admin_stability": 1},
     }
     current = {
         **previous,
         "focus_id": "mental_recovery",
         "focus_start_week": 5,
         "focus_expires_week": 8,
+        "focus_selection_counts": {
+            "admin_stability": 1,
+            "mental_recovery": 1,
+        },
     }
 
     transition = _focus_selection_transition(
@@ -158,8 +163,36 @@ def test_focus_selection_is_an_audited_pre_decision_transition() -> None:
         "focus_id": "mental_recovery",
         "start_week": 5,
         "expires_week": 8,
-        "changed_fields": ["focus_expires_week", "focus_id", "focus_start_week"],
+        "changed_fields": [
+            "focus_expires_week",
+            "focus_id",
+            "focus_selection_counts",
+            "focus_start_week",
+        ],
     }
+
+
+def test_focus_transition_rejects_an_unexplained_selection_count_jump() -> None:
+    previous = {
+        "focus_id": "focus_none",
+        "focus_start_week": 1,
+        "focus_expires_week": 4,
+        "focus_selection_counts": {"mental_recovery": 1},
+    }
+    current = {
+        **previous,
+        "focus_id": "mental_recovery",
+        "focus_start_week": 5,
+        "focus_expires_week": 8,
+        "focus_selection_counts": {"mental_recovery": 3},
+    }
+
+    assert (
+        _focus_selection_transition(
+            previous, current, {"active_focus_id": "mental_recovery"}, 5
+        )
+        is None
+    )
 
 
 def test_focus_transition_cannot_hide_a_numeric_state_jump() -> None:

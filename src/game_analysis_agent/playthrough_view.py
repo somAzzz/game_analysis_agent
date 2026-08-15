@@ -514,7 +514,12 @@ def _focus_selection_transition(
     """Recognize the only legal state change between weekly trace rows."""
 
     changed = {key for key in set(previous) | set(current) if previous.get(key) != current.get(key)}
-    focus_fields = {"focus_id", "focus_start_week", "focus_expires_week"}
+    focus_fields = {
+        "focus_id",
+        "focus_start_week",
+        "focus_expires_week",
+        "focus_selection_counts",
+    }
     if not changed or not changed.issubset(focus_fields):
         return None
     if str(previous.get("focus_id", "")) != "focus_none":
@@ -528,6 +533,15 @@ def _focus_selection_transition(
         return None
     if str(week_context.get("active_focus_id", "")) != focus_id:
         return None
+    previous_counts = previous.get("focus_selection_counts", {})
+    current_counts = current.get("focus_selection_counts", {})
+    if "focus_selection_counts" in changed:
+        if not isinstance(previous_counts, dict) or not isinstance(current_counts, dict):
+            return None
+        expected_counts = dict(previous_counts)
+        expected_counts[focus_id] = int(expected_counts.get(focus_id, 0)) + 1
+        if current_counts != expected_counts:
+            return None
     return {
         "kind": "focus_selection",
         "focus_id": focus_id,

@@ -91,8 +91,14 @@ class InteractiveProbe:
         """Set the declared Focus for the next selection window."""
         next_focus_id = str(focus_id or "")
         next_background_id = str(background_id or "")
+        # A Focus expires before the next four-week window is selected.  The
+        # desired ID may be identical to the previous window, but the cached
+        # hand was drawn after expiry with ``focus_none`` and is therefore no
+        # longer authoritative once the new monthly Focus is selected.
+        focus_window_needs_selection = self.active_focus_id in {"", "focus_none"}
         strategy_changed = (
             next_focus_id != self.next_focus_id or next_background_id != self.background_id
+            or focus_window_needs_selection
         )
         self.next_focus_id = next_focus_id
         self.background_id = next_background_id
