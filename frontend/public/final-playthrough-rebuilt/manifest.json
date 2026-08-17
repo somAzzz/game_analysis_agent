@@ -1,0 +1,284 @@
+{
+  "actual_edge_count": 108,
+  "campaign_id": "final-six-strategy-no-thinking-2048-2971eb3-v1",
+  "cell_count": 6,
+  "cell_index": {
+    "bytes": 1884,
+    "path": "index.json",
+    "role": "cell-index",
+    "sha256": "649dbfb6cc14858cc9c0bfaf4051963b99d3ab3d8ee6f69e1da3642fbcb396ac"
+  },
+  "checks": [
+    {
+      "detail": "6/6",
+      "id": "completed_cells",
+      "status": "passed"
+    },
+    {
+      "detail": "6 traces",
+      "id": "raw_hashes",
+      "status": "passed"
+    },
+    {
+      "detail": "114 rows",
+      "id": "row_citations",
+      "status": "passed"
+    },
+    {
+      "detail": "all adjacent nodes",
+      "id": "state_continuity",
+      "status": "passed"
+    },
+    {
+      "detail": "all selected actions",
+      "id": "action_legality",
+      "status": "passed"
+    },
+    {
+      "detail": "all selected choices",
+      "id": "event_choice_legality",
+      "status": "passed"
+    },
+    {
+      "detail": "all numeric deltas",
+      "id": "delta_consistency",
+      "status": "passed"
+    },
+    {
+      "detail": "0 fallback / 0 provider error",
+      "id": "provider_health",
+      "status": "passed"
+    }
+  ],
+  "derived_artifacts": [
+    {
+      "bytes": 248853,
+      "path": "cells/money-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "854c2856fa48332b9715710b9476fb3a53502c589b1413b83c3360748bd6390b"
+    },
+    {
+      "bytes": 207236,
+      "path": "cells/newbie-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "a9b69d0589ce82e624f330cc64fcc38b692a534f7a5d61f29df2ee834b927d5d"
+    },
+    {
+      "bytes": 196947,
+      "path": "cells/slacker-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "7840f4e2c63cf213823542cd8de456b22ded1205b8df36d20da351767641db63"
+    },
+    {
+      "bytes": 220120,
+      "path": "cells/social-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "0ff5ed7f159ea3e4dd9127f7c92b4f765dfc8938f54c77570872729da686be93"
+    },
+    {
+      "bytes": 232799,
+      "path": "cells/study-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "e3f72abd641d4d331c1d0e0db33e7faeff253848b3ce20b8be714a5198eca25b"
+    },
+    {
+      "bytes": 229535,
+      "path": "cells/visa-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "67c2cc7f35548e5b384bd189881f98e2ad2000671da4bac54e587bbfcf0d9cb4"
+    },
+    {
+      "bytes": 1884,
+      "path": "index.json",
+      "role": "cell-index",
+      "sha256": "649dbfb6cc14858cc9c0bfaf4051963b99d3ab3d8ee6f69e1da3642fbcb396ac"
+    },
+    {
+      "bytes": 7264,
+      "path": "personas.json",
+      "role": "persona-view",
+      "sha256": "8e8ff328fdb867d9e406dcf738b441c2a206c6ba6e427b0393c56193465fb4db"
+    }
+  ],
+  "frontend_implementation_requires_design_approval": true,
+  "legal_event_choice_count": 449,
+  "node_count": 114,
+  "playthrough_data_ready": true,
+  "request": {
+    "campaign_id": "final-six-strategy-no-thinking-2048-2971eb3-v1",
+    "concurrency": 4,
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "personas": [
+      "newbie",
+      "study",
+      "money",
+      "social",
+      "visa",
+      "slacker"
+    ],
+    "provider": "sglang",
+    "report_root": "reports/persona-campaigns",
+    "scenario": "default_first_semester",
+    "schema_version": "persona-campaign-request-v1",
+    "seeds": [
+      42
+    ]
+  },
+  "request_fingerprint": "d5df5fb0693229f7a2be17619315116e5a3edbdb0bb0260c7978682ee5451d04",
+  "schema_version": "playthrough-evidence-manifest-v1",
+  "source": {
+    "agent_commit": "167f5bf1e6fed240ca4d215ffc9858b3f5907246",
+    "agent_dirty": false,
+    "agent_tree": "59e1c9fd9ee05125d0026caf663f1e06a35f2a1c",
+    "campaign_config_sha256": "d5df5fb0693229f7a2be17619315116e5a3edbdb0bb0260c7978682ee5451d04",
+    "game_archive_sha256": "46ce8d80c662b4a28104d48dba33f155f80b65bd10108234a892391e24056d12",
+    "game_commit": "2971eb3f5f513728127ae75bce546f0faf7cf7b6",
+    "game_tree": "3dfb6192c3cfa236f6edd64dae9e9b07737fcbe4",
+    "provider": "sglang",
+    "provider_mode": "local",
+    "provider_revision": "model:qwen3.8-27b"
+  },
+  "source_action_catalog": {
+    "bytes": 28831,
+    "path": "demo/study-in-germany/data/actions/generated_actions.json",
+    "role": "game-action-catalog",
+    "sha256": "99fdfef2f370babe69e13c22ea5cbd17299e08c62c6b0f1a84d7247653ed2f3d"
+  },
+  "source_artifacts": [
+    {
+      "bytes": 10572,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/money-seed-42-7ace6f120bc0/cell_result.json",
+      "role": "cell-result",
+      "sha256": "e2290f5bc714579490dcdd6519574ef1f4e2315698f23606b6107536c89cf736"
+    },
+    {
+      "bytes": 1101314,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/money-seed-42-7ace6f120bc0/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "774187bc9f439afd86b56a93975ed85368030b380dc7272c14265136b4565ba7"
+    },
+    {
+      "bytes": 9592,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/money-seed-42-7ace6f120bc0/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "0ae231a5d2d59e525bb9c29e2f4cb045f7ae625eb3c6451f676b6ff74293380a"
+    },
+    {
+      "bytes": 10633,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/newbie-seed-42-3bd2d3c9b7fc/cell_result.json",
+      "role": "cell-result",
+      "sha256": "b9b9589a720c270d19dbb7ef0cd07a8517f0994eee170b925d14df3745f85fe9"
+    },
+    {
+      "bytes": 1123734,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/newbie-seed-42-3bd2d3c9b7fc/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "b70dec29809349201f2fe4d30aae1c82770c0eb86d86035ad35590f6c36b6d51"
+    },
+    {
+      "bytes": 7273,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/newbie-seed-42-3bd2d3c9b7fc/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "ce4e73d213b7f5ad29f5f90dcff2068587639dec8dc40549ef698be64820b698"
+    },
+    {
+      "bytes": 10694,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/slacker-seed-42-6bfcdc9794a8/cell_result.json",
+      "role": "cell-result",
+      "sha256": "23705eb6373a72301f55a89fc28ea65b659272b64990f96550fcf10fba189b45"
+    },
+    {
+      "bytes": 1049465,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/slacker-seed-42-6bfcdc9794a8/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "5c4ee0f9f8489b640d2fcd43c5700d3088eebdd7370cca468c7b254b4894539c"
+    },
+    {
+      "bytes": 6090,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/slacker-seed-42-6bfcdc9794a8/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "299817b8df29e2ef0170afcb1787750f667bbc5dd67494b6c459e342f81c4f19"
+    },
+    {
+      "bytes": 10633,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/social-seed-42-decdf6ee0143/cell_result.json",
+      "role": "cell-result",
+      "sha256": "89516b5483715cbaa110becc911074be7c0dd85f30e06df1a17cf309caae2780"
+    },
+    {
+      "bytes": 1107171,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/social-seed-42-decdf6ee0143/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "ee48996af0b7c8f508fb453f01072c0b0327ee7dfdeb275a76f33856ebf4082b"
+    },
+    {
+      "bytes": 9349,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/social-seed-42-decdf6ee0143/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "bd04f1b05ee2106d2c0a4b4868ffcd0610e90da41ed066e964984378cc86200e"
+    },
+    {
+      "bytes": 10572,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/study-seed-42-597755ba5658/cell_result.json",
+      "role": "cell-result",
+      "sha256": "c343e1de99eb3bfe9b834c4435069b954b73b54d69e36cee6e80bed66804a373"
+    },
+    {
+      "bytes": 1120236,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/study-seed-42-597755ba5658/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "10f14d750e18c6cf6279e728566e1f4717da169cecd7fbd6887769edee50a442"
+    },
+    {
+      "bytes": 10083,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/study-seed-42-597755ba5658/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "41c776430f7767538bd56720af1d971c32624ec3333408857a5bd6eed2011e9c"
+    },
+    {
+      "bytes": 10511,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/visa-seed-42-2c88aa32d8fe/cell_result.json",
+      "role": "cell-result",
+      "sha256": "a8ab3c172cd4e3e582f4834b651dabb08ffc9533c9c9412d5d3082048dc23cbf"
+    },
+    {
+      "bytes": 1112032,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/visa-seed-42-2c88aa32d8fe/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "63d4b786bb36d47733108a90f41aeedcf2c3b3169766302e0f088925fd66b63d"
+    },
+    {
+      "bytes": 9824,
+      "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/cells/visa-seed-42-2c88aa32d8fe/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "671857f21c6e3f5ec5c73c36093cfc8f479f073f7cbfc7b22b7130bcf76d32ce"
+    }
+  ],
+  "source_campaign_manifest": {
+    "bytes": 4534,
+    "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/public/campaign_manifest.json",
+    "role": "campaign-manifest",
+    "sha256": "a3d74cef12b20bb14f6fbbc195288b5e94f1b84bb6c165f2e1a05b5e1cbf32e7"
+  },
+  "source_failure_clusters": {
+    "bytes": 2430,
+    "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/public/failure_clusters.json",
+    "role": "failure-clusters",
+    "sha256": "1e62fe0d1599c0ced262611587faf445f3981d1d958e4996782a8428e8fdab1e"
+  },
+  "source_fingerprint": "1e23c974f0d01330901d12d5e8656d98ee3e2ddaab40c6d86a770c86f7564754",
+  "source_personas": {
+    "bytes": 2473,
+    "path": "config/player_personas.yaml",
+    "role": "persona-contract",
+    "sha256": "b3734201edc44bbd523bfc0c60d9ed3f472f5d973100a9ca0baa76092bace692"
+  },
+  "source_public_gate": {
+    "bytes": 2066,
+    "path": "reports/persona-campaigns/final-six-strategy-no-thinking-2048-2971eb3-v1/public/gate_report.json",
+    "role": "campaign-gate",
+    "sha256": "195d4c99c6a834807af1dc883bdc8e7f57feaaa579e157afdb274064d229187b"
+  },
+  "truth_label": "local-sglang-real-godot"
+}

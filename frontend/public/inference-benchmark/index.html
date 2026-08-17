@@ -1,0 +1,1521 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Qwen 本地推理 A/B：APC、MTP 与 DSpark 在真实游戏 persona 负载下的速度、质量门禁与默认配置决策。"
+    />
+    <meta name="theme-color" content="#102b46" />
+    <title>本地推理 A/B 遥测｜APC · MTP · DSpark</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #102b46;
+        --ink-soft: #3f5870;
+        --paper: #f4f7f8;
+        --sheet: #ffffff;
+        --line: #cbd7de;
+        --line-strong: #8ca3b0;
+        --apc: #2679a8;
+        --mtp: #e46f34;
+        --dspark: #7255b7;
+        --safe: #187b66;
+        --warn: #b55f16;
+        --danger: #b83e4b;
+        --shadow: 0 18px 50px rgba(16, 43, 70, 0.1);
+        --display: "Arial Narrow", "Roboto Condensed", "Noto Sans SC", sans-serif;
+        --body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", "Noto Sans SC", sans-serif;
+        --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          linear-gradient(rgba(16, 43, 70, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(16, 43, 70, 0.035) 1px, transparent 1px),
+          var(--paper);
+        background-size: 32px 32px;
+        font-family: var(--body);
+        line-height: 1.55;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      a:focus-visible,
+      summary:focus-visible {
+        outline: 3px solid #ef9b66;
+        outline-offset: 4px;
+      }
+
+      .skip-link {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 20;
+        padding: 10px 14px;
+        color: white;
+        background: var(--ink);
+        transform: translateY(-160%);
+        transition: transform 160ms ease;
+      }
+
+      .skip-link:focus {
+        transform: translateY(0);
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+        color: white;
+        background: rgba(16, 43, 70, 0.94);
+        backdrop-filter: blur(14px);
+      }
+
+      .topbar__inner {
+        width: min(1180px, calc(100% - 40px));
+        min-height: 56px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--display);
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .brand__mark {
+        width: 26px;
+        height: 18px;
+        background:
+          linear-gradient(
+            90deg,
+            var(--apc) 0 30%,
+            transparent 30% 35%,
+            var(--mtp) 35% 65%,
+            transparent 65% 70%,
+            #a996da 70%
+          );
+        transform: skewX(-12deg);
+      }
+
+      .topnav {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        font-family: var(--mono);
+        font-size: 0.78rem;
+      }
+
+      .topnav a {
+        color: #dce8ee;
+        text-decoration: none;
+      }
+
+      .topnav a:hover {
+        color: white;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        color: white;
+        background: var(--ink);
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.23;
+        background:
+          linear-gradient(115deg, transparent 0 49.7%, #ffffff 49.8% 50%, transparent 50.1%),
+          repeating-linear-gradient(90deg, transparent 0 94px, rgba(255, 255, 255, 0.13) 95px 96px);
+        transform: translateX(10%);
+      }
+
+      .hero__inner {
+        position: relative;
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 88px 0 72px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+        align-items: end;
+        gap: 64px;
+      }
+
+      .eyebrow,
+      .section-kicker,
+      .meta-label {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow {
+        color: #9fc6d9;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 790px;
+        margin: 20px 0 26px;
+        font-family: var(--display);
+        font-size: clamp(3.3rem, 8.5vw, 7.2rem);
+        font-stretch: condensed;
+        font-weight: 900;
+        letter-spacing: -0.06em;
+        line-height: 0.86;
+        text-transform: uppercase;
+      }
+
+      h1 span {
+        display: block;
+        color: #b9d5e2;
+        font-size: 0.43em;
+        letter-spacing: 0.01em;
+        line-height: 1.2;
+        text-transform: none;
+      }
+
+      .hero__lead {
+        max-width: 720px;
+        margin: 0;
+        color: #d9e7ed;
+        font-size: clamp(1rem, 1.7vw, 1.2rem);
+      }
+
+      .verdict-dial {
+        position: relative;
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 50%;
+        background:
+          conic-gradient(
+            from -90deg,
+            var(--dspark) 0 49.6%,
+            rgba(255, 255, 255, 0.12) 49.6% 50.4%,
+            var(--mtp) 50.4% 100%
+          );
+        box-shadow: inset 0 0 0 24px var(--ink), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      }
+
+      .verdict-dial::before,
+      .verdict-dial::after {
+        content: "";
+        position: absolute;
+        background: rgba(255, 255, 255, 0.28);
+      }
+
+      .verdict-dial::before {
+        width: 1px;
+        height: calc(100% + 22px);
+      }
+
+      .verdict-dial::after {
+        width: calc(100% + 22px);
+        height: 1px;
+      }
+
+      .verdict-dial__inside {
+        z-index: 1;
+        width: 56%;
+        text-align: center;
+      }
+
+      .verdict-dial strong {
+        display: block;
+        font-family: var(--display);
+        font-size: clamp(2rem, 4vw, 3.4rem);
+        line-height: 0.9;
+        text-transform: uppercase;
+      }
+
+      .verdict-dial small {
+        display: block;
+        margin-top: 10px;
+        color: #cfe0e8;
+        font-family: var(--mono);
+        font-size: 0.67rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      main {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .decision-strip {
+        margin-top: -1px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border: 1px solid var(--line-strong);
+        border-top: 0;
+        background: var(--sheet);
+        box-shadow: var(--shadow);
+      }
+
+      .decision {
+        position: relative;
+        min-height: 230px;
+        padding: 32px;
+      }
+
+      .decision + .decision {
+        border-left: 1px solid var(--line-strong);
+      }
+
+      .decision::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+      }
+
+      .decision--apc::before {
+        background: linear-gradient(90deg, var(--apc), var(--mtp));
+      }
+
+      .decision--dspark::before {
+        background: linear-gradient(90deg, var(--mtp), var(--dspark));
+      }
+
+      .decision__topline {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+      }
+
+      .decision h2 {
+        margin: 18px 0 10px;
+        font-family: var(--display);
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        letter-spacing: -0.04em;
+        line-height: 1;
+      }
+
+      .decision p {
+        max-width: 480px;
+        margin-bottom: 0;
+        color: var(--ink-soft);
+      }
+
+      .decision__number {
+        font-family: var(--mono);
+        font-size: 2.4rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border: 1px solid currentColor;
+        font-family: var(--mono);
+        font-size: 0.67rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .status::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .status--hold {
+        color: var(--warn);
+      }
+
+      .status--keep {
+        color: var(--safe);
+      }
+
+      .scope-note {
+        margin: 28px 0 0;
+        padding: 20px 24px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 18px;
+        align-items: start;
+        border: 1px dashed var(--line-strong);
+        background: rgba(255, 255, 255, 0.68);
+      }
+
+      .scope-note strong {
+        font-family: var(--display);
+        font-size: 1.1rem;
+        text-transform: uppercase;
+      }
+
+      .scope-note p {
+        margin: 0;
+        color: var(--ink-soft);
+      }
+
+      .experiment {
+        padding: 96px 0 40px;
+      }
+
+      .experiment__head {
+        margin-bottom: 36px;
+        display: grid;
+        grid-template-columns: 120px minmax(0, 1fr) minmax(280px, 0.52fr);
+        gap: 30px;
+        align-items: start;
+      }
+
+      .experiment__index {
+        font-family: var(--display);
+        font-size: 5.5rem;
+        font-weight: 900;
+        line-height: 0.8;
+        color: transparent;
+        -webkit-text-stroke: 1.5px var(--line-strong);
+      }
+
+      .section-kicker {
+        color: var(--ink-soft);
+      }
+
+      .experiment h2 {
+        margin: 12px 0 14px;
+        font-family: var(--display);
+        font-size: clamp(2.2rem, 5vw, 4rem);
+        letter-spacing: -0.045em;
+        line-height: 0.98;
+      }
+
+      .experiment__summary {
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: 1.02rem;
+      }
+
+      .experiment__meta {
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        border: 1px solid var(--line);
+        background: var(--line);
+      }
+
+      .experiment__meta div {
+        padding: 14px;
+        background: var(--sheet);
+      }
+
+      .experiment__meta dt {
+        color: var(--ink-soft);
+        font-family: var(--mono);
+        font-size: 0.64rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .experiment__meta dd {
+        margin: 5px 0 0;
+        font-family: var(--display);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      .panel-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+        gap: 20px;
+      }
+
+      .panel {
+        border: 1px solid var(--line-strong);
+        background: var(--sheet);
+        box-shadow: 0 10px 30px rgba(16, 43, 70, 0.06);
+      }
+
+      .panel__head {
+        padding: 22px 24px 18px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .panel__head h3 {
+        margin: 0;
+        font-family: var(--display);
+        font-size: 1.4rem;
+        line-height: 1.1;
+      }
+
+      .panel__unit {
+        color: var(--ink-soft);
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        text-align: right;
+      }
+
+      .panel__body {
+        padding: 26px 24px;
+      }
+
+      .lane + .lane {
+        margin-top: 30px;
+      }
+
+      .lane__title {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .lane__title strong {
+        font-size: 0.92rem;
+      }
+
+      .lane__mean {
+        color: var(--mtp);
+        font-family: var(--display);
+        font-size: 1.45rem;
+        font-weight: 900;
+      }
+
+      .rail {
+        position: relative;
+        height: 42px;
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(90deg, rgba(38, 121, 168, 0.09), rgba(228, 111, 52, 0.13)),
+          repeating-linear-gradient(90deg, transparent 0 calc(33.333% - 1px), var(--line) calc(33.333% - 1px) 33.333%);
+      }
+
+      .rail__mean {
+        position: absolute;
+        top: 11px;
+        left: 0;
+        height: 18px;
+        background: var(--mtp);
+        opacity: 0.24;
+      }
+
+      .rail__dot {
+        position: absolute;
+        top: 50%;
+        width: 17px;
+        height: 17px;
+        border: 3px solid var(--sheet);
+        border-radius: 50%;
+        background: var(--mtp);
+        box-shadow: 0 0 0 1px var(--mtp), 0 2px 7px rgba(16, 43, 70, 0.25);
+        transform: translate(-50%, -50%);
+      }
+
+      .rail__axis {
+        margin-top: 7px;
+        display: flex;
+        justify-content: space-between;
+        color: var(--ink-soft);
+        font-family: var(--mono);
+        font-size: 0.66rem;
+      }
+
+      .legend {
+        margin: 28px 0 0;
+        padding: 16px 0 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 20px;
+        border-top: 1px solid var(--line);
+        color: var(--ink-soft);
+        font-size: 0.78rem;
+      }
+
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .legend i {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--mtp);
+      }
+
+      .gate-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .gate-list li {
+        padding: 15px 0;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .gate-list li:first-child {
+        padding-top: 0;
+      }
+
+      .gate-list li:last-child {
+        padding-bottom: 0;
+        border-bottom: 0;
+      }
+
+      .gate-list span {
+        color: var(--ink-soft);
+        font-size: 0.84rem;
+      }
+
+      .gate-list strong {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        text-align: right;
+      }
+
+      .gate-list .bad {
+        color: var(--danger);
+      }
+
+      .gate-list .good {
+        color: var(--safe);
+      }
+
+      .verdict-card {
+        margin-top: 20px;
+        padding: 24px;
+        color: white;
+        background: var(--ink);
+      }
+
+      .verdict-card strong {
+        display: block;
+        margin: 7px 0 10px;
+        font-family: var(--display);
+        font-size: 2rem;
+        line-height: 1;
+      }
+
+      .verdict-card p {
+        margin: 0;
+        color: #cbdde5;
+        font-size: 0.86rem;
+      }
+
+      .photo-finish {
+        position: relative;
+        padding: 32px 24px 26px;
+      }
+
+      .photo-axis {
+        position: relative;
+        height: 264px;
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(90deg, rgba(114, 85, 183, 0.1), transparent 47%, transparent 53%, rgba(228, 111, 52, 0.1)),
+          repeating-linear-gradient(90deg, transparent 0 calc(25% - 1px), var(--line) calc(25% - 1px) 25%);
+      }
+
+      .photo-axis::before {
+        content: "0";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 2px;
+        padding-top: 6px;
+        color: var(--ink-soft);
+        background: var(--ink);
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        text-indent: 7px;
+      }
+
+      .photo-row {
+        position: relative;
+        height: 88px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .photo-row:last-child {
+        border-bottom: 0;
+      }
+
+      .photo-row__label {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 1;
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .photo-row__dot {
+        position: absolute;
+        top: 54px;
+        width: 18px;
+        height: 18px;
+        border: 4px solid var(--sheet);
+        border-radius: 50%;
+        background: var(--mtp);
+        box-shadow: 0 0 0 2px currentColor;
+        transform: translate(-50%, -50%);
+      }
+
+      .photo-row__dot--dspark {
+        color: var(--dspark);
+        background: var(--dspark);
+      }
+
+      .photo-row__value {
+        position: absolute;
+        top: 44px;
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        font-weight: 800;
+        transform: translate(13px, -50%);
+        white-space: nowrap;
+      }
+
+      .photo-row__value--left {
+        transform: translate(calc(-100% - 13px), -50%);
+      }
+
+      .photo-labels {
+        margin-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        color: var(--ink-soft);
+        font-family: var(--mono);
+        font-size: 0.67rem;
+      }
+
+      .photo-labels strong:first-child {
+        color: var(--dspark);
+      }
+
+      .photo-labels strong:last-child {
+        color: var(--mtp);
+      }
+
+      .absolute-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        border: 1px solid var(--line);
+        background: var(--line);
+      }
+
+      .absolute-card {
+        padding: 20px;
+        background: var(--sheet);
+      }
+
+      .absolute-card h4 {
+        margin: 0 0 18px;
+        font-family: var(--display);
+        font-size: 1.15rem;
+      }
+
+      .time-pair {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .time-pair div {
+        padding-top: 10px;
+        border-top: 3px solid;
+      }
+
+      .time-pair .mtp {
+        border-color: var(--mtp);
+      }
+
+      .time-pair .dspark {
+        border-color: var(--dspark);
+      }
+
+      .time-pair span,
+      .time-pair strong {
+        display: block;
+      }
+
+      .time-pair span {
+        color: var(--ink-soft);
+        font-family: var(--mono);
+        font-size: 0.64rem;
+        text-transform: uppercase;
+      }
+
+      .time-pair strong {
+        margin-top: 3px;
+        font-family: var(--display);
+        font-size: 1.25rem;
+      }
+
+      .telemetry {
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border: 1px solid var(--line-strong);
+        background: var(--sheet);
+      }
+
+      .telemetry__item {
+        padding: 22px;
+        border-right: 1px solid var(--line);
+      }
+
+      .telemetry__item:last-child {
+        border-right: 0;
+      }
+
+      .telemetry__value {
+        display: block;
+        font-family: var(--display);
+        font-size: clamp(1.75rem, 3vw, 2.6rem);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 1;
+      }
+
+      .telemetry__label {
+        display: block;
+        margin-top: 8px;
+        color: var(--ink-soft);
+        font-size: 0.75rem;
+      }
+
+      .decision-matrix {
+        margin: 80px 0 0;
+        padding: 44px;
+        color: white;
+        background: var(--ink);
+        box-shadow: var(--shadow);
+      }
+
+      .decision-matrix__head {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+      }
+
+      .decision-matrix h2 {
+        margin: 10px 0 0;
+        font-family: var(--display);
+        font-size: clamp(2.2rem, 5vw, 4.2rem);
+        letter-spacing: -0.04em;
+        line-height: 0.96;
+      }
+
+      .decision-matrix__lead {
+        margin: 0;
+        align-self: end;
+        color: #cfe0e8;
+      }
+
+      .matrix-table {
+        width: 100%;
+        margin-top: 36px;
+        border-collapse: collapse;
+      }
+
+      .matrix-table th,
+      .matrix-table td {
+        padding: 18px 14px;
+        border-top: 1px solid rgba(255, 255, 255, 0.18);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .matrix-table th {
+        color: #9fc1d1;
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .matrix-table td:first-child {
+        width: 23%;
+        font-weight: 800;
+      }
+
+      .matrix-table strong {
+        font-family: var(--display);
+        font-size: 1.1rem;
+      }
+
+      .methodology {
+        padding: 88px 0;
+      }
+
+      .methodology__grid {
+        display: grid;
+        grid-template-columns: 0.72fr 1.28fr;
+        gap: 60px;
+      }
+
+      .methodology h2 {
+        margin: 12px 0 18px;
+        font-family: var(--display);
+        font-size: clamp(2.1rem, 4vw, 3.3rem);
+        line-height: 1;
+      }
+
+      .methodology p {
+        color: var(--ink-soft);
+      }
+
+      details {
+        border-top: 1px solid var(--line-strong);
+      }
+
+      details:last-child {
+        border-bottom: 1px solid var(--line-strong);
+      }
+
+      summary {
+        padding: 18px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        cursor: pointer;
+        font-weight: 800;
+        list-style: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary::after {
+        content: "+";
+        font-family: var(--mono);
+        font-size: 1.35rem;
+      }
+
+      details[open] summary::after {
+        content: "−";
+      }
+
+      .details-body {
+        padding: 0 0 20px;
+        color: var(--ink-soft);
+        font-size: 0.9rem;
+      }
+
+      .details-body code {
+        overflow-wrap: anywhere;
+        font-family: var(--mono);
+        font-size: 0.78rem;
+      }
+
+      footer {
+        border-top: 1px solid var(--line-strong);
+        background: var(--sheet);
+      }
+
+      .footer__inner {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 30px 0 42px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 30px;
+        color: var(--ink-soft);
+        font-size: 0.78rem;
+      }
+
+      .footer__inner p {
+        max-width: 700px;
+        margin: 0;
+      }
+
+      .footer__inner a {
+        font-weight: 800;
+      }
+
+      @media (max-width: 900px) {
+        .hero__inner,
+        .experiment__head,
+        .panel-grid,
+        .methodology__grid,
+        .decision-matrix__head {
+          grid-template-columns: 1fr;
+        }
+
+        .hero__inner {
+          padding-top: 64px;
+        }
+
+        .verdict-dial {
+          width: min(320px, 72vw);
+        }
+
+        .experiment__index {
+          font-size: 3.7rem;
+        }
+
+        .absolute-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .telemetry {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .telemetry__item:nth-child(2) {
+          border-right: 0;
+        }
+
+        .telemetry__item:nth-child(-n + 2) {
+          border-bottom: 1px solid var(--line);
+        }
+      }
+
+      @media (max-width: 680px) {
+        .topbar__inner,
+        main,
+        .hero__inner,
+        .footer__inner {
+          width: min(100% - 24px, 1180px);
+        }
+
+        .topnav a:not(:last-child) {
+          display: none;
+        }
+
+        .decision-strip {
+          grid-template-columns: 1fr;
+        }
+
+        .decision + .decision {
+          border-top: 1px solid var(--line-strong);
+          border-left: 0;
+        }
+
+        .scope-note {
+          grid-template-columns: 1fr;
+        }
+
+        .experiment {
+          padding-top: 70px;
+        }
+
+        .experiment__meta {
+          grid-template-columns: 1fr;
+        }
+
+        .panel__head {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .panel__unit {
+          text-align: left;
+        }
+
+        .photo-row__value {
+          display: none;
+        }
+
+        .telemetry {
+          grid-template-columns: 1fr;
+        }
+
+        .telemetry__item,
+        .telemetry__item:nth-child(2) {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .telemetry__item:last-child {
+          border-bottom: 0;
+        }
+
+        .decision-matrix {
+          padding: 30px 20px;
+        }
+
+        .matrix-table,
+        .matrix-table tbody,
+        .matrix-table tr,
+        .matrix-table td {
+          display: block;
+        }
+
+        .matrix-table thead {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          overflow: hidden;
+          clip: rect(0 0 0 0);
+        }
+
+        .matrix-table tr {
+          padding: 12px 0;
+          border-top: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .matrix-table td,
+        .matrix-table td:first-child {
+          width: auto;
+          padding: 5px 0;
+          border: 0;
+        }
+
+        .footer__inner {
+          flex-direction: column;
+        }
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        .hero__copy > * {
+          animation: enter 520ms both cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .hero__copy > :nth-child(2) {
+          animation-delay: 70ms;
+        }
+
+        .hero__copy > :nth-child(3) {
+          animation-delay: 140ms;
+        }
+
+        .verdict-dial {
+          animation: dial-in 700ms 140ms both cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes enter {
+          from {
+            transform: translateY(18px);
+          }
+        }
+
+        @keyframes dial-in {
+          from {
+            transform: rotate(-8deg) scale(0.92);
+          }
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <header class="topbar">
+      <div class="topbar__inner">
+        <a class="brand" href="../" aria-label="返回 Playtest Forge 首页">
+          <span class="brand__mark" aria-hidden="true"></span>
+          Inference telemetry
+        </a>
+        <nav class="topnav" aria-label="页面目录">
+          <a href="#apc-mtp">APC / MTP</a>
+          <a href="#mtp-dspark">MTP / DSpark</a>
+          <a href="#decision">Decision</a>
+          <a href="../">返回首页 ↗</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <p class="eyebrow">Qwen local inference · game workload · 2026</p>
+          <h1 id="page-title">Two races.<span>APC、MTP、DSpark 的真实游戏推理对照</span></h1>
+          <p class="hero__lead">
+            两次 A/B 回答了两个不同的问题：Qwen3.6 中，MTP 的速度优势能否通过质量门禁？
+            Qwen3.8 中，原生 MTP 与独立 DSpark draft 到底谁更快？
+          </p>
+        </div>
+        <div
+          class="verdict-dial"
+          role="img"
+          aria-label="MTP 与 DSpark 在新实验中基本打平，DSpark 总墙钟时间快 0.56%"
+        >
+          <div class="verdict-dial__inside">
+            <strong>≈ Tie</strong>
+            <small>DSpark +0.56% wall</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main id="main">
+      <section class="decision-strip" aria-label="两次实验的默认配置决策">
+        <article class="decision decision--apc">
+          <div class="decision__topline">
+            <span class="status status--hold">速度胜出，发布门禁未过</span>
+            <span class="decision__number">01</span>
+          </div>
+          <h2>保留 APC</h2>
+          <p>
+            Qwen3.6 / vLLM 中 MTP 快 13.5%–22.7%，但出现一次被拒绝的整组运行，且两臂高度依赖
+            schema repair 与 length-limited thinking。性能胜出没有转化成默认配置变更。
+          </p>
+        </article>
+        <article class="decision decision--dspark">
+          <div class="decision__topline">
+            <span class="status status--keep">无实际赢家</span>
+            <span class="decision__number">02</span>
+          </div>
+          <h2>保留 DSpark</h2>
+          <p>
+            Qwen3.8 / SGLang 中，DSpark 总墙钟只快 0.56%、归一化吞吐只快 0.43%。单次顺序测试的
+            亚 1% 差异不足以证明稳定优势，因此不为速度切换默认值。
+          </p>
+        </article>
+      </section>
+
+      <aside class="scope-note">
+        <strong>不要横向比绝对值</strong>
+        <p>
+          两场实验使用不同模型版本、推理引擎与任务编排。页面比较的是每场实验内部的 A/B
+          结论，不把 Qwen3.6 的 weeks/hour 与 Qwen3.8 的 output tok/s 拼成跨实验排行榜。
+        </p>
+      </aside>
+
+      <section class="experiment" id="apc-mtp" aria-labelledby="apc-mtp-title">
+        <div class="experiment__head">
+          <div class="experiment__index" aria-hidden="true">01</div>
+          <div>
+            <p class="section-kicker">2026-08-03 · long-horizon campaign</p>
+            <h2 id="apc-mtp-title">APC-only vs MTP3-only</h2>
+            <p class="experiment__summary">
+              目标是决定 Qwen3.6 的 vLLM 默认 profile。每个场景 3 次配对重复，所有有效重复都由
+              MTP 胜出；最终决策仍由速度与质量门禁共同决定。
+            </p>
+          </div>
+          <dl class="experiment__meta">
+            <div><dt>Model</dt><dd>Qwen3.6 27B</dd></div>
+            <div><dt>Engine</dt><dd>vLLM 0.26.0</dd></div>
+            <div><dt>Valid arms</dt><dd>12</dd></div>
+            <div><dt>Game weeks</dt><dd>912</dd></div>
+          </dl>
+        </div>
+
+        <div class="panel-grid">
+          <article class="panel">
+            <header class="panel__head">
+              <h3>MTP 相对 APC 的配对加速</h3>
+              <span class="panel__unit">墙钟时间降低 · 3 repetitions / scenario</span>
+            </header>
+            <div class="panel__body">
+              <div class="lane">
+                <div class="lane__title">
+                  <strong>同 persona / 4 seeds</strong>
+                  <span class="lane__mean">平均 +13.5%</span>
+                </div>
+                <div class="rail" role="img" aria-label="三次 MTP 加速分别为 8.276%、17.421%、14.87%">
+                  <span class="rail__mean" style="width: 45.08%"></span>
+                  <span class="rail__dot" style="left: 27.59%" title="R1 · 8.276%"></span>
+                  <span class="rail__dot" style="left: 58.07%" title="R2 · 17.421%"></span>
+                  <span class="rail__dot" style="left: 49.57%" title="R3 · 14.870%"></span>
+                </div>
+                <div class="rail__axis" aria-hidden="true"><span>0%</span><span>10%</span><span>20%</span><span>30%</span></div>
+              </div>
+
+              <div class="lane">
+                <div class="lane__title">
+                  <strong>4 personas / same seed</strong>
+                  <span class="lane__mean">平均 +22.7%</span>
+                </div>
+                <div class="rail" role="img" aria-label="三次 MTP 加速分别为 28.591%、20.276%、19.356%">
+                  <span class="rail__mean" style="width: 75.8%"></span>
+                  <span class="rail__dot" style="left: 95.3%" title="R1 · 28.591%"></span>
+                  <span class="rail__dot" style="left: 67.59%" title="R2 · 20.276%"></span>
+                  <span class="rail__dot" style="left: 64.52%" title="R3 · 19.356%"></span>
+                </div>
+                <div class="rail__axis" aria-hidden="true"><span>0%</span><span>10%</span><span>20%</span><span>30%</span></div>
+              </div>
+
+              <div class="legend" aria-label="图例">
+                <span><i></i> 单次 repetition</span>
+                <span><i style="opacity: 0.3; border-radius: 0; width: 24px"></i> 平均加速区间</span>
+                <span>数值越靠右，MTP 越快</span>
+              </div>
+            </div>
+          </article>
+
+          <aside>
+            <article class="panel">
+              <header class="panel__head">
+                <h3>质量门禁</h3>
+                <span class="panel__unit">速度之外</span>
+              </header>
+              <div class="panel__body">
+                <ul class="gate-list">
+                  <li><span>有效 arm 的 provider error</span><strong class="good">0%</strong></li>
+                  <li><span>schema repair 使用率</span><strong class="bad">96.7–100%</strong></li>
+                  <li><span>length finish rate</span><strong class="bad">约 49–50%</strong></li>
+                  <li><span>MTP 被拒绝的整组尝试</span><strong class="bad">1 arm</strong></li>
+                  <li><span>有效重复中的速度方向</span><strong class="good">6 / 6 MTP</strong></li>
+                </ul>
+              </div>
+            </article>
+            <div class="verdict-card">
+              <span class="meta-label">Governed decision</span>
+              <strong>No-go for default change</strong>
+              <p>速度证据明确，但结构化输出路径没有满足预设门禁。继续使用 APC，先修质量再复测。</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="experiment" id="mtp-dspark" aria-labelledby="mtp-dspark-title">
+        <div class="experiment__head">
+          <div class="experiment__index" aria-hidden="true">02</div>
+          <div>
+            <p class="section-kicker">2026-08-15 · frozen game trace replay</p>
+            <h2 id="mtp-dspark-title">Native MTP vs DSpark</h2>
+            <p class="experiment__summary">
+              同一 Qwen3.8 target、同一 SGLang、同一批逐字节固定的游戏请求。四个 persona
+              并发，persona 内保持第 1–19 周顺序；只切换 speculative decoding 机制。
+            </p>
+          </div>
+          <dl class="experiment__meta">
+            <div><dt>Model</dt><dd>Qwen3.8 27B</dd></div>
+            <div><dt>Engine</dt><dd>SGLang</dd></div>
+            <div><dt>Requests / arm</dt><dd>304</dd></div>
+            <div><dt>Concurrency</dt><dd>4 personas</dd></div>
+          </dl>
+        </div>
+
+        <div class="panel-grid">
+          <article class="panel">
+            <header class="panel__head">
+              <h3>Photo finish：墙钟速度差</h3>
+              <span class="panel__unit">横轴放大为 ±2% · 正值 MTP 快 · 负值 DSpark 快</span>
+            </header>
+            <div class="photo-finish">
+              <div class="photo-axis">
+                <div class="photo-row">
+                  <span class="photo-row__label">Cold pass</span>
+                  <span class="photo-row__dot" style="left: 60.65%"></span>
+                  <span class="photo-row__value" style="left: 60.65%">MTP +0.43%</span>
+                </div>
+                <div class="photo-row">
+                  <span class="photo-row__label">Warm pass</span>
+                  <span class="photo-row__dot photo-row__dot--dspark" style="left: 10.85%"></span>
+                  <span class="photo-row__value photo-row__value--left" style="left: 10.85%">DSpark +1.57%</span>
+                </div>
+                <div class="photo-row">
+                  <span class="photo-row__label">Combined</span>
+                  <span class="photo-row__dot photo-row__dot--dspark" style="left: 35.98%"></span>
+                  <span class="photo-row__value photo-row__value--left" style="left: 35.98%">DSpark +0.56%</span>
+                </div>
+              </div>
+              <div class="photo-labels" aria-hidden="true">
+                <strong>← DSpark faster · −2%</strong>
+                <span>tie</span>
+                <strong>+2% · MTP faster →</strong>
+              </div>
+            </div>
+          </article>
+
+          <aside>
+            <article class="panel">
+              <header class="panel__head">
+                <h3>归一化结果</h3>
+                <span class="panel__unit">combined cold + warm</span>
+              </header>
+              <div class="panel__body">
+                <ul class="gate-list">
+                  <li><span>DSpark output throughput</span><strong>446.91 tok/s</strong></li>
+                  <li><span>MTP output throughput</span><strong>444.99 tok/s</strong></li>
+                  <li><span>DSpark 吞吐优势</span><strong class="good">+0.43%</strong></li>
+                  <li><span>completion token 差</span><strong>0.13%</strong></li>
+                  <li><span>HTTP failures</span><strong class="good">0 / 608</strong></li>
+                </ul>
+              </div>
+            </article>
+            <div class="verdict-card">
+              <span class="meta-label">Operational decision</span>
+              <strong>No practical winner</strong>
+              <p>一次顺序 A/B 的亚 1% 差异属于可疑噪声区间。保留当前 DSpark，不因速度切换。</p>
+            </div>
+          </aside>
+        </div>
+
+        <div class="absolute-grid" aria-label="MTP 与 DSpark 的绝对墙钟时间">
+          <article class="absolute-card">
+            <h4>Cold game trace</h4>
+            <div class="time-pair">
+              <div class="dspark"><span>DSpark</span><strong>469.97 s</strong></div>
+              <div class="mtp"><span>MTP</span><strong>467.97 s</strong></div>
+            </div>
+          </article>
+          <article class="absolute-card">
+            <h4>Warm game trace</h4>
+            <div class="time-pair">
+              <div class="dspark"><span>DSpark</span><strong>460.98 s</strong></div>
+              <div class="mtp"><span>MTP</span><strong>468.20 s</strong></div>
+            </div>
+          </article>
+          <article class="absolute-card">
+            <h4>Combined</h4>
+            <div class="time-pair">
+              <div class="dspark"><span>DSpark</span><strong>930.95 s</strong></div>
+              <div class="mtp"><span>MTP</span><strong>936.17 s</strong></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="telemetry" aria-label="新实验遥测摘要">
+          <div class="telemetry__item">
+            <span class="telemetry__value">4 × 19</span>
+            <span class="telemetry__label">persona × 游戏周次</span>
+          </div>
+          <div class="telemetry__item">
+            <span class="telemetry__value">416k</span>
+            <span class="telemetry__label">每种机制约生成 tokens</span>
+          </div>
+          <div class="telemetry__item">
+            <span class="telemetry__value">5.53 GB</span>
+            <span class="telemetry__label">MTP draft component</span>
+          </div>
+          <div class="telemetry__item">
+            <span class="telemetry__value">2.71 GB</span>
+            <span class="telemetry__label">DSpark draft checkpoint</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="decision-matrix" id="decision" aria-labelledby="decision-title">
+        <div class="decision-matrix__head">
+          <div>
+            <p class="eyebrow">Read the winner correctly</p>
+            <h2 id="decision-title">速度最快，不等于应该上线</h2>
+          </div>
+          <p class="decision-matrix__lead">
+            第一场有显著速度赢家，却被质量门禁挡住；第二场质量传输稳定，却没有实际速度赢家。
+            默认配置由“性能幅度 × 证据可信度 × 质量门禁”共同决定。
+          </p>
+        </div>
+        <table class="matrix-table">
+          <thead>
+            <tr><th>实验</th><th>性能信号</th><th>证据风险</th><th>当前默认</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>APC / MTP3</strong><br />Qwen3.6 · vLLM</td>
+              <td>MTP 在 6/6 有效配对中胜出，平均快 13.5% 与 22.7%</td>
+              <td>一次 MTP arm 被拒；两臂 repair 和 length finish 均触发红线</td>
+              <td><span class="status status--hold">APC retained</span></td>
+            </tr>
+            <tr>
+              <td><strong>MTP / DSpark</strong><br />Qwen3.8 · SGLang</td>
+              <td>Cold MTP 微胜；Warm 与 Combined DSpark 微胜；总差 &lt; 1%</td>
+              <td>仅一轮 DSpark→MTP 顺序，无法把亚 1% 差异与运行噪声分开</td>
+              <td><span class="status status--keep">DSpark retained</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="methodology" aria-labelledby="methodology-title">
+        <div class="methodology__grid">
+          <div>
+            <p class="section-kicker">Evidence notes</p>
+            <h2 id="methodology-title">如何读这份页面</h2>
+            <p>
+              本页只发布聚合指标，不包含 persona prompt、模型回复或私有运行日志。原始结果仍保留在本地
+              ignored reports 下；公开页面记录足以复核结论的样本量、配置、哈希和限制。
+            </p>
+          </div>
+          <div>
+            <details open>
+              <summary>APC / MTP3 实验边界</summary>
+              <div class="details-body">
+                12 个有效 arm、48 个完整 persona cells、912 个周决策。性能结论来自 3 次配对重复；
+                中止的 frozen diagnostic sweep 不进入结论。旧报告 generator revision：
+                <code>5868b344ad444341720a8504398c515dab56aacf</code>。
+              </div>
+            </details>
+            <details>
+              <summary>MTP / DSpark 实验边界</summary>
+              <div class="details-body">
+                冻结轨迹 SHA-256：
+                <code>c4e451cf5ec920d72052246f5c100f300efc6b109946daf10dfdae2bd0070a46</code>。
+                选择 attempt 1，包含 decision 与 event_choice；顺序为 DSpark 后 MTP，启动时间排除在外。
+              </div>
+            </details>
+            <details>
+              <summary>为什么新实验判定为“打平”</summary>
+              <div class="details-body">
+                Combined wall time 差 5.22 秒 / 约 15.5 分钟，归一化输出吞吐差 0.43%。只有一个 server
+                session / arm，且没有 ABBA 反向顺序重复，因此不把这一级别的差异解释成稳定机制优势。
+                建议复测门槛为：平衡顺序下，wall time 与 output tok/s 同向且稳定超过 3%。
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer__inner">
+        <p>
+          Aggregated from local inference evidence. This public view intentionally excludes raw prompts,
+          model responses, API credentials, and operator-local traces.
+        </p>
+        <p><a href="../">← 返回 Playtest Forge</a> · Updated 2026-08-15</p>
+      </div>
+    </footer>
+  </body>
+</html>

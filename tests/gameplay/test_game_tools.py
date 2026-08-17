@@ -135,6 +135,33 @@ def test_focus_change_invalidates_the_cached_weekly_hand(tmp_path: Path, monkeyp
     ]
 
 
+def test_repeated_monthly_focus_refreshes_an_expired_cached_hand(
+    tmp_path: Path, monkeypatch
+) -> None:
+    calls: list[dict[str, object]] = []
+
+    def fake_run_one_step(*_args, **kwargs):  # noqa: ANN001
+        calls.append(kwargs)
+        return {
+            "current_state": {"week": 5, "money": 500},
+            "next_available_actions": [{"id": "new_month_work_card"}],
+            "active_focus_id": "work_recovery",
+        }
+
+    monkeypatch.setattr(game_tools, "_run_one_step", fake_run_one_step)
+    probe = build_probe(_settings(tmp_path))
+    probe.next_focus_id = "work_recovery"
+    probe.active_focus_id = "focus_none"
+    probe.available_actions = [{"id": "expired_window_card"}]
+
+    probe.configure_week_strategy("work_recovery", "")
+    result = probe.list_available_actions()
+
+    assert result == {"actions": [{"id": "new_month_work_card"}]}
+    assert calls[0]["next_focus_id"] == "work_recovery"
+    assert calls[0]["prepare_next_week"] is True
+
+
 def test_build_tool_map_returns_callable_map(tmp_path: Path) -> None:
     probe = build_probe(_settings(tmp_path))
     tool_map = build_tool_map(probe)

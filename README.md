@@ -6,6 +6,7 @@
 
 [Open the public Judge experience](https://somazzz.github.io/game_analysis_agent/)
 · [Watch the 2:55 demo](https://www.youtube.com/watch?v=62tW2RoFwTo)
+· [Inference A/B dashboard](https://somazzz.github.io/game_analysis_agent/inference-benchmark/)
 · [Evaluator guide](JUDGE.md)
 · [Developer guide](docs/DEVELOPER_GUIDE.md)
 · [中文说明](README.zh-CN.md)

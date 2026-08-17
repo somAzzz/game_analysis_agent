@@ -1,5 +1,7 @@
 # game_analysis_agent
 
+[查看 APC、MTP 与 DSpark 推理 A/B 可视化](https://somazzz.github.io/game_analysis_agent/inference-benchmark/)
+
 ## 评审 / 自动初审入口
 
 在仓库根目录优先运行完全离线的两条命令：
