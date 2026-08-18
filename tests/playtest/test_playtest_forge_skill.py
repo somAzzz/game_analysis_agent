@@ -47,6 +47,8 @@ def test_skill_has_required_resources_without_placeholders() -> None:
         "persona/subagent playthroughs",
         "parameter",
         "State which results came from",
+        "default `normal`",
+        "config/matrix.<difficulty>.yaml",
     ):
         assert guardrail in skill
     assert len(skill.splitlines()) < 500

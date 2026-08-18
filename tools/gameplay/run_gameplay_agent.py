@@ -103,6 +103,16 @@ VALIDATOR_SCRIPTS = {
     "route": ("res://scripts/tools/ValidateRouteBoundaries.gd", "route_boundary_validation.json"),
     "demo": ("res://scripts/tools/ValidateDemoGates.gd", "demo_gate_validation.json"),
 }
+VALIDATION_PROFILES = {
+    "full": tuple(VALIDATOR_SCRIPTS),
+    # A difficulty lane validates only its own reports. The legacy composite
+    # demo validator is reserved for the cross-difficulty `full` profile
+    # because it creates a separate Realistic prerequisite report.
+    **{
+        difficulty: tuple(name for name in VALIDATOR_SCRIPTS if name != "demo")
+        for difficulty in ("easy", "normal", "hard", "realistic")
+    },
+}
 PROCESS_ONLY_VALIDATORS = frozenset({"json-content", "economy"})
 
 _REPORT_OUTPUT_PATTERNS = (
@@ -256,6 +266,7 @@ def cmd_sim(args: argparse.Namespace) -> int:
     weeks = args.weeks or settings.sim_weeks
     difficulty = args.difficulty or settings.sim_difficulty
     scenario = args.scenario or settings.sim_scenario
+    focus_schedule = str(getattr(args, "focus_schedule", None) or "")
 
     requested_report_dir = getattr(args, "report_dir", None)
     out_dir = (
@@ -277,6 +288,7 @@ def cmd_sim(args: argparse.Namespace) -> int:
             "weeks": weeks,
             "difficulty": difficulty,
             "scenario": scenario,
+            "focus_schedule": focus_schedule,
         },
         status="started",
     )
@@ -294,6 +306,8 @@ def cmd_sim(args: argparse.Namespace) -> int:
         f"--scenario={scenario}",
         f"--out={target_out}",
     ]
+    if focus_schedule:
+        extra_args.append(f"--focus-schedule={focus_schedule}")
     proc = _run_godot(
         settings,
         script="res://scripts/tools/RunSimulation.gd",
@@ -430,7 +444,7 @@ def cmd_probe(args: argparse.Namespace) -> int:
     run_id = args.run_id or f"boundary-{uuid.uuid4().hex[:6]}"
     requested_report_dir = getattr(args, "report_dir", None)
     out_dir = (
-        Path(requested_report_dir)
+        Path(requested_report_dir).resolve()
         if requested_report_dir
         else (ROOT / "reports" / "boundary" / run_id)
     )
@@ -444,6 +458,8 @@ def cmd_probe(args: argparse.Namespace) -> int:
         parameters={
             "runs": args.runs,
             "policy": _canonical_policy(args.policy),
+            "difficulty": args.difficulty,
+            "focus_schedule": str(args.focus_schedule or ""),
             "seed": args.seed,
             "weeks": args.weeks,
             "extreme": args.extreme,
@@ -458,11 +474,14 @@ def cmd_probe(args: argparse.Namespace) -> int:
     extra_args = [
         f"--runs={args.runs}",
         f"--policy={_canonical_policy(args.policy)}",
+        f"--difficulty={args.difficulty}",
         f"--seed={args.seed}",
         f"--weeks={args.weeks}",
         f"--extreme={args.extreme}",
         f"--out={target_out}",
     ]
+    if args.focus_schedule:
+        extra_args.append(f"--focus-schedule={args.focus_schedule}")
     proc = _run_godot(
         settings,
         script="res://scripts/tools/RunBoundaryProbe.gd",
@@ -527,7 +546,8 @@ def cmd_probe(args: argparse.Namespace) -> int:
 def cmd_validate(args: argparse.Namespace) -> int:
     settings = get_settings()
     args.report_dir.mkdir(parents=True, exist_ok=True)
-    selected = args.checks or list(VALIDATOR_SCRIPTS)
+    profile = str(getattr(args, "profile", "full"))
+    selected = args.checks or list(VALIDATION_PROFILES[profile])
     reuse_inputs = bool(getattr(args, "reuse_inputs", False))
     results: list[dict[str, object]] = []
     prerequisites: list[dict[str, object]] = []
@@ -613,6 +633,7 @@ def cmd_validate(args: argparse.Namespace) -> int:
         "schema_version": "validation-summary-v2",
         "passed": not failed,
         "generated_at": datetime.now(tz=UTC).isoformat(),
+        "profile": profile,
         "reuse_inputs": reuse_inputs,
         "checks": results,
         "prerequisites": prerequisites,
@@ -627,7 +648,7 @@ def cmd_validate(args: argparse.Namespace) -> int:
         report_type="validation",
         run_id=args.report_dir.name,
         command="validate",
-        parameters={"checks": selected, "reuse_inputs": reuse_inputs},
+        parameters={"checks": selected, "profile": profile, "reuse_inputs": reuse_inputs},
         generated_files=["validation_summary.json"]
         + [result["output_file"] for result in results if result.get("output_file")],
         status="failed" if failed else "completed",
@@ -1274,7 +1295,8 @@ def cmd_all(args: argparse.Namespace) -> int:
     rc = cmd_validate(
         argparse.Namespace(
             report_dir=report_dir,
-            checks=list(VALIDATOR_SCRIPTS),
+            checks=None,
+            profile=str(getattr(args, "validation_profile", "full")),
             reuse_inputs=bool(getattr(args, "reuse_validation_inputs", False)),
         )
     )
@@ -1384,6 +1406,11 @@ def build_parser() -> argparse.ArgumentParser:
     sim_p.add_argument("--difficulty", default=None)
     sim_p.add_argument("--scenario", default=None)
     sim_p.add_argument(
+        "--focus-schedule",
+        default=None,
+        help="One repeating Focus ID or five comma-separated window Focus IDs.",
+    )
+    sim_p.add_argument(
         "--report-dir",
         type=Path,
         default=None,
@@ -1412,8 +1439,18 @@ def build_parser() -> argparse.ArgumentParser:
     probe_p.add_argument("--run-id", default=None)
     probe_p.add_argument("--runs", type=int, default=3)
     probe_p.add_argument("--policy", default="balanced")
+    probe_p.add_argument(
+        "--difficulty",
+        default="realistic",
+        help="Godot difficulty used for every boundary case.",
+    )
     probe_p.add_argument("--seed", type=int, default=42)
     probe_p.add_argument("--weeks", type=int, default=12)
+    probe_p.add_argument(
+        "--focus-schedule",
+        default=None,
+        help="One repeating Focus ID or five comma-separated window Focus IDs.",
+    )
     probe_p.add_argument(
         "--report-dir",
         type=Path,
@@ -1459,6 +1496,12 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=ROOT / "reports" / "validation",
         help="Where validator JSON reports should be copied.",
+    )
+    validate_p.add_argument(
+        "--profile",
+        choices=tuple(VALIDATION_PROFILES),
+        default="full",
+        help="Validator scope. Difficulty lanes exclude the cross-difficulty demo validator.",
     )
     validate_p.add_argument(
         "--check",
@@ -1597,6 +1640,11 @@ def build_parser() -> argparse.ArgumentParser:
     all_p.add_argument("--difficulty", default=None)
     all_p.add_argument("--scenario", default=None)
     all_p.add_argument(
+        "--focus-schedule",
+        default=None,
+        help="One repeating Focus ID or five comma-separated window Focus IDs.",
+    )
+    all_p.add_argument(
         "--report-dir",
         type=Path,
         default=None,
@@ -1609,6 +1657,12 @@ def build_parser() -> argparse.ArgumentParser:
         help=argparse.SUPPRESS,
     )
     all_p.add_argument("--gates", type=Path, default=None)
+    all_p.add_argument(
+        "--validation-profile",
+        choices=tuple(VALIDATION_PROFILES),
+        default="full",
+        help="Validation scope; choose the same profile as the isolated difficulty lane.",
+    )
     all_p.add_argument(
         "--skip-qa",
         action="store_true",

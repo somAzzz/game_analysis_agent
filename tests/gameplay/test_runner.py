@@ -58,6 +58,73 @@ def test_analyze_rejects_missing_raw_runs(run_gameplay_agent, tmp_path) -> None:
     assert rc == 1
 
 
+def test_probe_resolves_relative_output_and_passes_normal_difficulty(
+    run_gameplay_agent,
+    tmp_path,
+    monkeypatch,
+) -> None:
+    trace = json.loads(
+        (ROOT / "tests" / "fixtures" / "contracts" / "trace_v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    for key in ("scenario", "content_version", "rules_version"):
+        trace.pop(key)
+    trace["difficulty"] = "normal"
+    trace["extreme"] = "zero_money"
+    completed = type("Proc", (), {"returncode": 0, "stdout": "ok", "stderr": ""})()
+
+    def run_probe(*_args, **kwargs):  # noqa: ANN002, ANN003
+        extra_args = kwargs["extra_args"]
+        assert "--difficulty=normal" in extra_args
+        assert "--focus-schedule=mental_recovery" in extra_args
+        output = Path(next(item for item in extra_args if item.startswith("--out=")).split("=", 1)[1])
+        assert output.is_absolute()
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(trace) + "\n", encoding="utf-8")
+        return completed
+
+    monkeypatch.chdir(tmp_path)
+    with (
+        patch.object(run_gameplay_agent, "_run_godot", side_effect=run_probe),
+        patch.object(run_gameplay_agent, "analyze_and_write"),
+        patch.object(run_gameplay_agent, "detect_and_write", return_value=[]),
+        patch.object(run_gameplay_agent, "write_bug_summary"),
+    ):
+        rc = run_gameplay_agent.main(
+            [
+                "probe",
+                "--run-id",
+                "normal-boundary",
+                "--runs",
+                "1",
+                "--difficulty",
+                "normal",
+                "--focus-schedule",
+                "mental_recovery",
+                "--extreme",
+                "zero_money",
+                "--report-dir",
+                "relative-boundary-report",
+            ]
+        )
+
+    assert rc == 0
+    assert (tmp_path / "relative-boundary-report" / "boundary_runs.jsonl").is_file()
+
+
+def test_runtime_boundary_overlay_has_no_hardcoded_realistic_difficulty() -> None:
+    source = (ROOT / "scripts" / "tools" / "RunBoundaryProbe.gd").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'config.get("difficulty", "realistic")' in source
+    assert '"difficulty": difficulty' in source
+    assert '"difficulty": "realistic"' not in source
+    assert '"event_effects": event_detail.get("effects", {})' in source
+    assert '"action_sequence": action_sequence' in source
+
+
 def test_play_fails_preflight_before_clearing_existing_report(
     run_gameplay_agent, tmp_path
 ) -> None:
@@ -462,8 +529,60 @@ def test_validate_defaults_to_all_checks(run_gameplay_agent, tmp_path) -> None:
     assert scripts == {script for script, _output in run_gameplay_agent.VALIDATOR_SCRIPTS.values()}
     summary = json.loads((tmp_path / "validation" / "validation_summary.json").read_text())
     assert summary["schema_version"] == "validation-summary-v2"
+    assert summary["profile"] == "full"
     assert len(summary["checks"]) == 6
     assert str(tmp_path) not in json.dumps(summary)
+
+
+@pytest.mark.parametrize("profile", ("easy", "normal", "hard", "realistic"))
+def test_validate_difficulty_profile_excludes_cross_difficulty_demo(
+    run_gameplay_agent,
+    tmp_path,
+    profile,
+) -> None:
+    completed = type("Proc", (), {"returncode": 0, "stdout": "ok", "stderr": ""})()
+
+    def run_validator(*_args, **kwargs):  # noqa: ANN002, ANN003
+        script = kwargs["script"]
+        if script not in {
+            "res://scripts/tools/ValidateJsonContent.gd",
+            "res://scripts/tools/ValidateEconomyRules.gd",
+        }:
+            output = Path(kwargs["extra_args"][0].removeprefix("--out="))
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(
+                json.dumps({"errors": [], "warnings": [], "summary": {}}),
+                encoding="utf-8",
+            )
+        return completed
+
+    with (
+        patch.object(run_gameplay_agent, "_ensure_route_validation_inputs", return_value=[]),
+        patch.object(
+            run_gameplay_agent,
+            "_ensure_demo_validation_inputs",
+            side_effect=AssertionError("difficulty lane requested cross-lane prerequisites"),
+        ),
+        patch.object(run_gameplay_agent, "_run_godot", side_effect=run_validator) as run_godot,
+    ):
+        rc = run_gameplay_agent.main(
+            [
+                "validate",
+                "--profile",
+                profile,
+                "--report-dir",
+                str(tmp_path / f"validation-{profile}"),
+            ]
+        )
+
+    assert rc == 0
+    scripts = {call.kwargs["script"] for call in run_godot.call_args_list}
+    assert "res://scripts/tools/ValidateDemoGates.gd" not in scripts
+    summary = json.loads(
+        (tmp_path / f"validation-{profile}" / "validation_summary.json").read_text()
+    )
+    assert summary["profile"] == profile
+    assert len(summary["checks"]) == 5
 
 
 def test_validate_fails_when_successful_process_has_no_output(
@@ -503,9 +622,12 @@ def test_all_runs_export_validation_qa_and_gates_in_order(
         args._report_dir = report_dir
         return 0
 
+    command_args: dict[str, object] = {}
+
     def record(name: str):
-        def command(_args) -> int:  # noqa: ANN001
+        def command(args) -> int:  # noqa: ANN001
             calls.append(name)
+            command_args[name] = args
             return 0
 
         return command
@@ -519,10 +641,14 @@ def test_all_runs_export_validation_qa_and_gates_in_order(
         patch.object(run_gameplay_agent, "cmd_qa", side_effect=record("qa")),
         patch.object(run_gameplay_agent, "cmd_gates", side_effect=record("gates")),
     ):
-        rc = run_gameplay_agent.main(["all", "--run-id", "full-run"])
+        rc = run_gameplay_agent.main(
+            ["all", "--run-id", "full-run", "--validation-profile", "normal"]
+        )
 
     assert rc == 0
     assert calls == ["sim", "export", "reanalyze", "validate", "qa", "gates"]
+    assert command_args["validate"].profile == "normal"
+    assert command_args["validate"].checks is None
 
 
 def test_matrix_cli_dry_run_expands_repository_config(
@@ -546,6 +672,37 @@ def test_matrix_cli_dry_run_expands_repository_config(
     assert manifest["summary"]["total"] == 140
     first_simulation = next(cell for cell in manifest["cells"] if cell["kind"] == "simulation")
     assert first_simulation["command"][2] == "sim"
+
+
+@pytest.mark.parametrize("difficulty", ("easy", "normal", "hard", "realistic"))
+def test_matrix_cli_dry_run_expands_difficulty_config(
+    run_gameplay_agent,
+    tmp_path,
+    difficulty,
+) -> None:
+    rc = run_gameplay_agent.main(
+        [
+            "matrix",
+            "--config",
+            str(ROOT / "config" / f"matrix.{difficulty}.yaml"),
+            "--dry-run",
+            "--jobs",
+            "4",
+            "--out",
+            str(tmp_path / f"matrix-{difficulty}"),
+        ]
+    )
+
+    assert rc == 0
+    manifest = json.loads(
+        (tmp_path / f"matrix-{difficulty}" / "matrix_manifest.json").read_text()
+    )
+    assert manifest["status"] == "planned"
+    assert manifest["summary"]["total"] == 77
+    assert all(
+        cell["parameters"].get("difficulty") == difficulty
+        for cell in manifest["cells"]
+    )
 
 
 def test_interactive_probe_cli_persists_canonical_risk_evidence(

@@ -47,10 +47,12 @@ repository's interactive path:
    provider. This read-only stage must not start the Judge API, select Godot, or
    call a model; provider-backed actions remain unavailable.
 3. Unless the user overrides a value, freeze the checked-in defaults without
-   pausing: `docker-godot`, `local-sglang`, `no-thinking-2048`, and
-   `six-strategy` (all six personas, seed 42, 20 weeks). Announce the defaults
-   before probing or execution. Explicit user choices always win; never infer
-   an override from installed tools, `.env`, or prior sessions.
+   pausing: difficulty `normal`, `docker-godot`, `local-sglang`,
+   `no-thinking-2048`, and `six-strategy` (all six personas, seed 42, 20
+   weeks). The selectable repair difficulties are `easy`, `normal`, `hard`,
+   and `realistic`; never mix them within one repair experiment. Announce the
+   defaults before probing or execution. Explicit user choices always win;
+   never infer an override from installed tools, `.env`, or prior sessions.
 4. Probe only the selected paths. For local Godot, resolve the exact executable
    and require Godot 4.4. For Docker Godot, require Docker plus the repository
    wrapper and verify its Godot 4.4 version. When starting the sidecar, set
@@ -90,9 +92,11 @@ repository's interactive path:
 
 1. Discover the game adapter, runtime, contracts, source revision, tests,
    telemetry, and writable report locations. Do not assume Godot or this repo.
-2. Freeze a test contract before interpreting results: scenarios, personas,
-   seeds, duration, parameters, outcomes, invariants, designed failures,
-   protected metrics, completeness rules, and provider truth labels.
+2. Freeze a test contract before interpreting results: exactly one repair
+   difficulty (default `normal`), scenarios, personas, seeds, duration,
+   parameters, outcomes, invariants, designed failures, protected metrics,
+   completeness rules, and provider truth labels. Use the matching
+   `config/matrix.<difficulty>.yaml` lane for deterministic evidence.
 3. Establish a deterministic baseline first. Use automated testing for state
    coverage, reproducibility, sensitivity, and regression truth.
 4. Add persona/subagent playthroughs when semantic choice quality, exploration,

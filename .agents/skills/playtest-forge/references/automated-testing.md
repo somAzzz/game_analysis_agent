@@ -15,6 +15,12 @@ Keep each cell isolated and resumable. Record expected, completed, partial,
 failed, and cancelled cells. Do not aggregate until every required cell has a
 terminal truth state.
 
+For a difficulty-specific review, choose exactly one committed lane:
+`config/matrix.easy.yaml`, `config/matrix.normal.yaml`,
+`config/matrix.hard.yaml`, or `config/matrix.realistic.yaml`. The default is
+Normal. Each lane must bind the same difficulty in simulation, boundary, and
+persona cells; do not reuse one lane's evidence as another difficulty's proof.
+
 ## Record per step
 
 Capture run/cell ID, seed, step/week, available actions, selected action,

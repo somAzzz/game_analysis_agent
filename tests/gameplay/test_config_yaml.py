@@ -42,3 +42,9 @@ def test_gates_yaml_has_required_sections() -> None:
     assert balance["max_single_ending_rate_normal"] <= 0.5
     assert balance["max_action_pick_share"] <= 1.0
     assert balance["min_distinct_endings_normal"] >= 3
+    # Easy inherits Normal and Hard inherits Realistic in the evaluator so the
+    # hash-locked historical gate file remains unchanged.
+    for difficulty in ("normal", "realistic"):
+        assert f"max_single_ending_rate_{difficulty}" in balance
+        assert f"min_distinct_endings_{difficulty}" in balance
+        assert f"min_designed_failure_types_{difficulty}" in gates["outcomes"]

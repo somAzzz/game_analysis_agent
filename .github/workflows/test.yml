@@ -62,6 +62,16 @@ jobs:
           uv run python tools/gameplay/run_gameplay_agent.py matrix
           --dry-run --jobs 4 --out /tmp/game-analysis-matrix-plan
 
+      - name: Validate every isolated difficulty matrix plan
+        env:
+          GAME_PROJECT_PATH: ${{ runner.temp }}/game_analysis_agent/project
+        run: |
+          for difficulty in easy normal hard realistic; do
+            uv run python tools/gameplay/run_gameplay_agent.py matrix \
+              --config "config/matrix.${difficulty}.yaml" --dry-run --jobs 4 \
+              --out "/tmp/game-analysis-${difficulty}-matrix-plan"
+          done
+
       - name: Run Ruff
         run: uv run ruff check .
 

@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from game_analysis_agent.campaign_contract import CampaignPersona  # noqa: E402
 from game_analysis_agent.persona_gateway import PersonaProvider  # noqa: E402
 from game_analysis_agent.playtest_session import (  # noqa: E402
+    GAME_DIFFICULTIES,
     describe_no_llm_session,
     describe_playtest_profiles,
     describe_session_choices,
@@ -35,6 +36,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--llm-provider",
         choices=("local-sglang", "local-vllm", "openai-api", "none"),
         help="primary interactive LLM choice",
+    )
+    parser.add_argument(
+        "--difficulty",
+        choices=GAME_DIFFICULTIES,
+        help="difficulty frozen across automation, persona evidence, and repair",
     )
     parser.add_argument(
         "--godot-runtime",
@@ -64,6 +70,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     catalog = load_playtest_session_catalog(ROOT / "config/playtest_session_profiles.json")
+    selected_difficulty = args.difficulty or catalog.defaults.difficulty
     if args.choices_only:
         payload = describe_session_choices(catalog)
         if args.json:
@@ -83,6 +90,7 @@ def main(argv: list[str] | None = None) -> int:
             build_parser().error("--profile is unavailable when --llm-provider none")
         payload = describe_no_llm_session(
             godot_runtime=args.godot_runtime,
+            difficulty=selected_difficulty,
             godot_bin=args.godot_bin,
         )
         if args.json:
@@ -127,6 +135,7 @@ def main(argv: list[str] | None = None) -> int:
         provider=provider,
         single_persona=CampaignPersona(args.persona),
         godot_runtime=args.godot_runtime,
+        difficulty=selected_difficulty,
         godot_bin=args.godot_bin,
         generation_profile=generation_profile,
     )
@@ -138,6 +147,7 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
     else:
         print(f"Godot: {payload['godot_runtime']} ({payload['godot_bin']})")
+        print(f"Difficulty: {payload['difficulty']} ({payload['difficulty_lane']})")
         print(f"LLM: {payload['llm_provider']} ({payload['provider']})")
         if payload["generation_profile_selection_required"]:
             print("Generation profile: choose one before execution")

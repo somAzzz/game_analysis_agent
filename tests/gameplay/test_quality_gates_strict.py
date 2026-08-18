@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from game_analysis_agent.quality_gates import evaluate_report_dir
 
 
@@ -106,6 +108,44 @@ design: {}
 
     assert report["passed"] is True
     assert "balanced/realistic/low_money" in report["balance_summary"]["cells"]
+
+
+@pytest.mark.parametrize(
+    ("difficulty", "rate"),
+    (("easy", 0.4), ("hard", 0.7)),
+)
+def test_new_difficulty_lanes_inherit_the_declared_nearest_threshold(
+    tmp_path: Path,
+    difficulty: str,
+    rate: float,
+) -> None:
+    gates = _write_gates(
+        tmp_path,
+        """
+critical_fail: {}
+balance:
+  max_single_ending_rate_normal: 0.45
+  max_single_ending_rate_realistic: 0.75
+outcomes: {}
+design: {}
+""",
+    )
+    rows = [("a", rate), ("b", 1 - rate)]
+    if difficulty == "easy":
+        rows = [("a", 0.4), ("b", 0.3), ("c", 0.3)]
+    (tmp_path / "ending_distribution.csv").write_text(
+        "policy,difficulty,scenario,ending_id,count,rate\n"
+        + "".join(
+            f"balanced,{difficulty},default,{ending},{round(value * 10)},{value}\n"
+            for ending, value in rows
+        ),
+        encoding="utf-8",
+    )
+
+    report = evaluate_report_dir(tmp_path, gates)
+
+    assert report["passed"] is True
+    assert f"balanced/{difficulty}/default" in report["balance_summary"]["cells"]
 
 
 def test_balance_is_evaluated_per_full_cell(tmp_path: Path) -> None:

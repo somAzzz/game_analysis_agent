@@ -13,6 +13,7 @@ from pydantic import ValidationError
 from game_analysis_agent.campaign_contract import CampaignPersona
 from game_analysis_agent.persona_gateway import PersonaProvider
 from game_analysis_agent.playtest_session import (
+    GAME_DIFFICULTIES,
     PlaytestSessionCatalog,
     describe_no_llm_session,
     describe_playtest_profiles,
@@ -43,6 +44,7 @@ def test_committed_profiles_freeze_full_semester_order_and_budgets() -> None:
         "llm_provider": "local-sglang",
         "generation_profile": "no-thinking-2048",
         "campaign_profile": "six-strategy",
+        "difficulty": "normal",
     }
     assert [profile.id for profile in catalog.generation_profiles] == [
         "no-thinking-2048",
@@ -69,6 +71,7 @@ def test_profile_command_preserves_provider_and_every_matrix_axis() -> None:
     assert evidence["command"][:2] == ["scripts/run-persona-campaign", "openai"]
     assert evidence["command"].count("--persona") == 6
     assert evidence["command"].count("--seed") == 3
+    assert evidence["command"][evidence["command"].index("--difficulty") + 1] == "normal"
     assert evidence["environment"] == {
         "GODOT_BIN": "scripts/godot-docker-wrapper",
         "PERSONA_MAX_RUNS": "18",
@@ -106,6 +109,10 @@ def test_initial_choices_expose_frozen_defaults_and_allow_overrides() -> None:
 
     assert payload["schema_version"] == "playtest-session-choices-v1"
     questions = {question["id"]: question for question in payload["questions"]}
+    assert questions["difficulty"]["default"] == "normal"
+    assert [option["id"] for option in questions["difficulty"]["options"]] == list(
+        GAME_DIFFICULTIES
+    )
     assert [option["id"] for option in questions["godot_runtime"]["options"]] == [
         "local-godot",
         "docker-godot",
@@ -139,6 +146,8 @@ def test_planner_cli_defaults_to_docker_sglang_no_thinking_six_strategy() -> Non
     assert payload["godot_runtime"] == "docker-godot"
     assert payload["llm_provider"] == "local-sglang"
     assert payload["generation_profile"]["id"] == "no-thinking-2048"
+    assert payload["difficulty"] == "normal"
+    assert payload["difficulty_lane"] == "config/matrix.normal.yaml"
     assert [profile["id"] for profile in payload["profiles"]] == ["six-strategy"]
     profile = payload["profiles"][0]
     assert profile["personas"] == ["newbie", "study", "money", "social", "visa", "slacker"]
@@ -188,7 +197,7 @@ def test_selected_generation_profile_freezes_both_environment_values(
     for profile in payload["profiles"]:
         assert profile["command"][2:4] == [
             "--campaign-id",
-            f"sglang-{profile['id']}-{profile_id}",
+            f"sglang-normal-{profile['id']}-{profile_id}",
         ]
         assert profile["environment"]["PERSONA_ENABLE_THINKING"] == thinking
         assert profile["environment"]["PERSONA_DECISION_MAX_TOKENS"] == max_tokens
@@ -232,19 +241,45 @@ def test_no_llm_route_has_zero_calls_and_no_persona_profiles() -> None:
     assert payload["profiles"] == []
     assert payload["fresh_persona_evidence"] is False
     assert payload["commands"][0] == ["scripts/godot-docker-wrapper", "--version"]
+    assert payload["commands"][1][6] == "config/matrix.normal.yaml"
     assert payload["route"] == "deterministic-automation-and-replay"
+
+
+@pytest.mark.parametrize("difficulty", GAME_DIFFICULTIES)
+def test_selected_difficulty_freezes_matrix_and_persona_campaign(difficulty: str) -> None:
+    catalog = load_playtest_session_catalog(ROOT / "config/playtest_session_profiles.json")
+    payload = describe_playtest_profiles(
+        catalog,
+        provider=PersonaProvider.OPENAI,
+        difficulty=difficulty,
+    )
+
+    assert payload["difficulty"] == difficulty
+    assert payload["difficulty_lane"] == f"config/matrix.{difficulty}.yaml"
+    for profile in payload["profiles"]:
+        index = profile["command"].index("--difficulty")
+        assert profile["command"][index + 1] == difficulty
+        assert profile["difficulty"] == difficulty
+
+    no_llm = describe_no_llm_session(
+        godot_runtime="docker-godot",
+        difficulty=difficulty,
+    )
+    assert no_llm["difficulty_lane"] == f"config/matrix.{difficulty}.yaml"
+    assert f"config/matrix.{difficulty}.yaml" in no_llm["commands"][1]
 
 
 def test_profile_rejects_a_call_budget_below_worst_case() -> None:
     with pytest.raises(ValidationError, match="worst case"):
         PlaytestSessionCatalog.model_validate(
             {
-                "schema_version": "playtest-session-profiles-v3",
+                "schema_version": "playtest-session-profiles-v4",
                 "defaults": {
                     "godot_runtime": "docker-godot",
                     "llm_provider": "local-sglang",
                     "generation_profile": "thinking-5120",
                     "campaign_profile": "profile-0",
+                    "difficulty": "normal",
                 },
                 "generation_profiles": [
                     {

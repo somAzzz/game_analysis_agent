@@ -1,10 +1,11 @@
 {
-  "schema_version": "playtest-session-profiles-v3",
+  "schema_version": "playtest-session-profiles-v4",
   "defaults": {
     "godot_runtime": "docker-godot",
     "llm_provider": "local-sglang",
     "generation_profile": "no-thinking-2048",
-    "campaign_profile": "six-strategy"
+    "campaign_profile": "six-strategy",
+    "difficulty": "normal"
   },
   "generation_profiles": [
     {

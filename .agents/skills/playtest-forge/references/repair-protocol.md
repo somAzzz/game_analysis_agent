@@ -3,13 +3,17 @@
 ## Before editing
 
 1. Verify the test/evidence bundle and design intent independently.
-2. Record cross-seed and, when relevant, cross-persona citations.
-3. State one causal hypothesis, predicted direction, protected metrics, and
+2. Freeze exactly one repair difficulty: `easy`, `normal`, `hard`, or
+   `realistic`. Default to `normal` when the user does not choose one. Bind the
+   matching `config/matrix.<difficulty>.yaml` lane and reject mixed-difficulty
+   evidence.
+3. Record cross-seed and, when relevant, cross-persona citations.
+4. State one causal hypothesis, predicted direction, protected metrics, and
    explicit rejection evidence.
-4. Select one mechanism class and the smallest source/parameter allowlist.
-5. Freeze source revision, fixed seeds, unseen holdouts, thresholds, file/line
+5. Select one mechanism class and the smallest source/parameter allowlist.
+6. Freeze source revision, fixed seeds, unseen holdouts, thresholds, file/line
    budget, runtime/provider contract, and artifact locations.
-6. Create an isolated worktree at the pinned baseline revision.
+7. Create an isolated worktree at the pinned baseline revision.
 
 ## Change validation
 
@@ -32,7 +36,7 @@
 7. Target, persona/strategy preservation, designed-failure, validity,
    fallback, and provider gates.
 
-Use identical scenario, difficulty, duration, persona/action policy, schemas,
+Use the selected difficulty and identical scenario, duration, persona/action policy, schemas,
 and aggregation in all four cohorts. Only revision and declared seed cohort may
 differ.
 

@@ -27,6 +27,10 @@ from game_analysis_agent.test_matrix import (
 
 ROOT = Path(__file__).resolve().parents[2]
 MATRIX_CONFIG = ROOT / "config" / "matrix.yaml"
+DIFFICULTY_MATRIX_CONFIGS = {
+    difficulty: ROOT / "config" / f"matrix.{difficulty}.yaml"
+    for difficulty in ("easy", "normal", "hard", "realistic")
+}
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -42,11 +46,21 @@ def _small_config(tmp_path: Path) -> Path:
             "difficulties": ["normal"],
             "policies": ["balanced"],
             "policy_aliases": {},
+            "focus_schedules": {"balanced": "study_sprint"},
             "scenarios": ["default_first_semester"],
+            "validation_profile": "normal",
         }
     )
     payload["boundary"].update(
-        {"runs": 2, "seed": 42, "weeks": 2, "policy": "balanced", "extremes": ["zero_money"]}
+        {
+            "runs": 2,
+            "seed": 42,
+            "weeks": 2,
+            "policy": "balanced",
+            "difficulty": "normal",
+            "focus_schedule": "study_sprint",
+            "extremes": ["zero_money"],
+        }
     )
     payload["play"].update(
         {
@@ -236,6 +250,32 @@ def test_load_and_expand_repository_matrix() -> None:
     assert len({cell.run_id for cell in cells}) == len(cells)
     assert len(config.config_hash) == 64
     assert config.boundary.policy == "balanced"
+    assert config.boundary.difficulty == "realistic"
+    assert config.boundary.focus_schedule == ""
+    assert config.focus_schedules == {}
+    assert config.validation_profile == "full"
+
+
+@pytest.mark.parametrize("difficulty", tuple(DIFFICULTY_MATRIX_CONFIGS))
+def test_difficulty_matrix_contains_only_selected_gameplay(difficulty: str) -> None:
+    config = load_matrix_config(DIFFICULTY_MATRIX_CONFIGS[difficulty])
+    cells = expand_matrix_cells(config)
+
+    assert config.difficulties == (difficulty,)
+    assert config.boundary.difficulty == difficulty
+    assert config.boundary.focus_schedule
+    assert config.play.difficulty == difficulty
+    assert config.validation_profile == difficulty
+    assert len(cells) == 77
+    assert all(
+        cell.parameters.get("difficulty") == difficulty
+        for cell in cells
+    )
+    assert all(
+        cell.parameters.get("focus_schedule")
+        for cell in cells
+        if cell.kind in {"simulation", "boundary"}
+    )
 
 
 def test_ids_and_command_plan_are_stable_and_complete(tmp_path: Path) -> None:
@@ -259,9 +299,14 @@ def test_ids_and_command_plan_are_stable_and_complete(tmp_path: Path) -> None:
     assert (
         simulation.report_dir == tmp_path / "out" / "reports" / "balance" / simulation.cell.run_id
     )
-    assert simulation.argv[-2:] == ("--report-dir", str(simulation.report_dir))
+    report_index = simulation.argv.index("--report-dir")
+    assert simulation.argv[report_index + 1] == str(simulation.report_dir)
+    assert simulation.argv[-4:-2] == ("--focus-schedule", "study_sprint")
+    assert simulation.argv[-2:] == ("--validation-profile", "normal")
     assert boundary.argv[2] == "probe"
-    assert boundary.argv[-2:] == ("--extreme", "zero_money")
+    assert "--difficulty" in boundary.argv
+    assert "--extreme" in boundary.argv
+    assert boundary.argv[-2:] == ("--focus-schedule", "study_sprint")
     assert persona.argv[2] == "play"
     assert "--persona" in persona.argv
     assert persona.report_dir == tmp_path / "out" / "reports" / "play" / persona.cell.run_id
@@ -275,6 +320,10 @@ def test_ids_and_command_plan_are_stable_and_complete(tmp_path: Path) -> None:
         (("seeds",), [42, 42], "duplicates"),
         (("seeds",), [42, 43], "batches overlap"),
         (("boundary", "runs"), -1, "positive integer"),
+        (("validation_profile",), "nightmare", "must be 'full'"),
+        (("difficulties",), ["nightmare"], "unsupported values"),
+        (("boundary", "difficulty"), "", "non-empty string"),
+        (("focus_schedules", "balanced"), "", "non-empty string"),
         (("play", "outcome_coverage", "designed_failure_is_valid"), "yes", "boolean"),
     ],
 )
@@ -285,6 +334,8 @@ def test_strict_schema_rejects_invalid_values(
     message: str,
 ) -> None:
     payload = yaml.safe_load(MATRIX_CONFIG.read_text(encoding="utf-8"))
+    if path[0] == "focus_schedules":
+        payload["focus_schedules"] = {"balanced": "study_sprint"}
     target = payload
     for key in path[:-1]:
         target = target[key]

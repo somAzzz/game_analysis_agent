@@ -128,16 +128,24 @@ ARTIFACTS = {
     ),
     "config/playtest_session_profiles.json": (
         "codex-playtest-profiles",
-        "playtest-session-profiles-v3",
+        "playtest-session-profiles-v4",
     ),
+    "config/matrix.easy.yaml": ("difficulty-test-lane", None),
+    "config/matrix.normal.yaml": ("difficulty-test-lane", None),
+    "config/matrix.hard.yaml": ("difficulty-test-lane", None),
+    "config/matrix.realistic.yaml": ("difficulty-test-lane", None),
     "src/game_analysis_agent/playtest_session.py": (
         "codex-playtest-planner",
         None,
     ),
+    "src/game_analysis_agent/test_matrix.py": ("difficulty-test-planner", None),
+    "src/game_analysis_agent/quality_gates.py": ("difficulty-gate-router", None),
     "tools/judge/describe_playtest_session.py": (
         "codex-playtest-planner-cli",
         None,
     ),
+    "tools/gameplay/run_gameplay_agent.py": ("difficulty-test-runner", None),
+    "tools/persona/run_persona_campaign.py": ("difficulty-persona-runner", None),
     ".agents/skills/playtest-forge/scripts/preflight": ("codex-skill-script", None),
     ".agents/skills/playtest-forge/scripts/run-campaign": ("codex-skill-script", None),
     ".agents/skills/playtest-forge/scripts/verify-repair": ("codex-skill-script", None),
@@ -149,6 +157,10 @@ for demo_file in sorted((ROOT / "demo/study-in-germany").rglob("*")):
         ARTIFACTS[demo_file.relative_to(ROOT).as_posix()] = ("embedded-demo-source", None)
 
 ARTIFACTS["scripts/tools/RunInteractiveProbe.gd"] = (
+    "embedded-demo-runtime-overlay",
+    None,
+)
+ARTIFACTS["scripts/tools/RunBoundaryProbe.gd"] = (
     "embedded-demo-runtime-overlay",
     None,
 )

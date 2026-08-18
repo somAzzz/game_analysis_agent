@@ -15,8 +15,6 @@ const PlayerPolicyScript := preload("res://scripts/policies/PlayerPolicy.gd")
 const RandomPolicyScript := preload("res://scripts/policies/RandomPolicy.gd")
 const BalancedPolicyScript := preload("res://scripts/policies/BalancedPolicy.gd")
 
-const AnomalyDetectorScript := preload("res://scripts/tools/AnomalyCollector.gd")
-
 var run_records: Array = []
 var ending_counts: Dictionary = {}
 
@@ -32,6 +30,7 @@ func _run() -> void:
 	var runs: int = int(config.get("runs", 3))
 	var base_seed: int = int(config.get("seed", 42))
 	var policy_name: String = str(config.get("policy", "random"))
+	var difficulty: String = str(config.get("difficulty", "realistic"))
 	var max_weeks: int = int(config.get("weeks", 12))
 	var out_path: String = str(config.get("out", "user://boundary_runs.jsonl"))
 	var extremes: Array = _parse_extremes(str(config.get("extreme", "zero_money,no_energy,all_negative,no_language,flag_chaos,week_zero")))
@@ -52,6 +51,7 @@ func _run() -> void:
 				run_id,
 				run_seed,
 				policy_name,
+				difficulty,
 				max_weeks,
 				extreme,
 				scenario,
@@ -70,6 +70,7 @@ func _simulate_run(
 	run_id: int,
 	run_seed: int,
 	policy_name: String,
+	difficulty: String,
 	max_weeks: int,
 	extreme: String,
 	scenario: Dictionary,
@@ -79,7 +80,7 @@ func _simulate_run(
 		"run_id": run_id,
 		"seed": run_seed,
 		"policy": policy_name,
-		"difficulty": "realistic",
+		"difficulty": difficulty,
 	})
 	if not scenario.is_empty():
 		game_state.apply_scenario(scenario)
@@ -87,6 +88,7 @@ func _simulate_run(
 	var policy = _make_policy(policy_name)
 	var engine = SimulationEngineScript.new()
 	var weekly_log: Array = []
+	var action_sequence: Array = []
 	var guard_iterations: int = 0
 	var guard_limit: int = maxi(60, max_weeks + 20)
 
@@ -107,6 +109,7 @@ func _simulate_run(
 		var after_actions_and_drift: Dictionary = game_state.export_public_stats()
 		var event_choice_id: String = ""
 		var event_choices: Array = []
+		var event_detail: Dictionary = {}
 		if event != null:
 			var available_choices: Array = _available_choices(event)
 			event_choices = available_choices
@@ -114,7 +117,7 @@ func _simulate_run(
 			if chosen_index >= 0 and chosen_index < available_choices.size():
 				var choice = available_choices[chosen_index]
 				event_choice_id = _choice_id(event, choice, chosen_index)
-				EventResolverScript.resolve_choice_detailed(event, choice, game_state)
+				event_detail = EventResolverScript.resolve_choice_detailed(event, choice, game_state)
 		var after_state: Dictionary = game_state.export_public_stats()
 		weekly_log.append({
 			"week": week,
@@ -124,23 +127,34 @@ func _simulate_run(
 			"after_state": after_state,
 			"triggered_event_id": event.id if event != null else "",
 			"event_choice_id": event_choice_id,
+			"event_effects": event_detail.get("effects", {}),
+			"event_success": event_detail.get("success", null),
+		})
+		action_sequence.append({
+			"week": week,
+			"actions": selected_action_ids,
+			"event_choice": event_choice_id,
 		})
 		if game_state.week >= max_weeks:
 			game_state.last_ending_id = "max_weeks_reached"
 			break
 		engine.finish_week()
 
+	var final_ending_id: String = str(game_state.last_ending_id)
+	if final_ending_id == "":
+		final_ending_id = "unknown"
 	return {
 		"run_id": run_id,
 		"seed": run_seed,
 		"policy": policy_name,
+		"difficulty": difficulty,
 		"extreme": extreme,
 		"max_weeks": max_weeks,
-		"final_ending_id": game_state.last_ending_id or "unknown",
+		"final_ending_id": final_ending_id,
 		"final_week": game_state.week,
 		"final_state": game_state.export_state_snapshot(),
 		"weekly_log": weekly_log,
-		"anomalies": AnomalyDetectorScript.collect(weekly_log, game_state.export_state_snapshot()),
+		"action_sequence": action_sequence,
 	}
 
 
@@ -169,7 +183,7 @@ func _parse_extremes(raw: String) -> Array:
 	var parts: Array = raw.split(",")
 	var result: Array = []
 	for part in parts:
-		var label: String = part.strip()
+		var label: String = part.strip_edges()
 		if label != "":
 			result.append(label)
 	return result

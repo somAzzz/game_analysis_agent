@@ -11,9 +11,11 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .campaign_contract import CampaignPersona
 from .persona_gateway import PersonaProvider
 
-PROFILE_SCHEMA = "playtest-session-profiles-v3"
+PROFILE_SCHEMA = "playtest-session-profiles-v4"
 GodotRuntime = Literal["local-godot", "docker-godot"]
 LlmProviderChoice = Literal["local-sglang", "local-vllm", "openai-api", "none"]
+GameDifficulty = Literal["easy", "normal", "hard", "realistic"]
+GAME_DIFFICULTIES: tuple[GameDifficulty, ...] = ("easy", "normal", "hard", "realistic")
 
 _LLM_PROVIDER_MAP: dict[LlmProviderChoice, PersonaProvider | None] = {
     "local-sglang": PersonaProvider.SGLANG,
@@ -34,12 +36,29 @@ def describe_session_choices(catalog: PlaytestSessionCatalog | None = None) -> d
             "llm_provider": "local-sglang",
             "generation_profile": "no-thinking-2048",
             "campaign_profile": "six-strategy",
+            "difficulty": "normal",
         }
     )
 
     return {
         "schema_version": "playtest-session-choices-v1",
         "questions": [
+            {
+                "id": "difficulty",
+                "prompt": "Which difficulty should this playtest and repair target?",
+                "required": False,
+                "default": defaults["difficulty"],
+                "options": [
+                    {
+                        "id": difficulty,
+                        "label": difficulty.title(),
+                        "description": (
+                            f"Freeze all automation, persona, and repair evidence to {difficulty}."
+                        ),
+                    }
+                    for difficulty in GAME_DIFFICULTIES
+                ],
+            },
             {
                 "id": "godot_runtime",
                 "prompt": "Which Godot runtime should execute the game?",
@@ -111,6 +130,7 @@ def default_godot_bin(runtime: GodotRuntime) -> str:
 def describe_no_llm_session(
     *,
     godot_runtime: GodotRuntime,
+    difficulty: GameDifficulty = "normal",
     godot_bin: str | None = None,
 ) -> dict[str, object]:
     """Describe the deterministic route without inventing a persona provider."""
@@ -120,6 +140,8 @@ def describe_no_llm_session(
         "schema_version": "playtest-session-options-v1",
         "godot_runtime": godot_runtime,
         "godot_bin": resolved_godot_bin,
+        "difficulty": difficulty,
+        "difficulty_lane": f"config/matrix.{difficulty}.yaml",
         "llm_provider": "none",
         "provider": None,
         "profile_selection_required": False,
@@ -128,6 +150,18 @@ def describe_no_llm_session(
         "route": "deterministic-automation-and-replay",
         "commands": [
             [resolved_godot_bin, "--version"],
+            [
+                "uv",
+                "run",
+                "python",
+                "tools/gameplay/run_gameplay_agent.py",
+                "matrix",
+                "--config",
+                f"config/matrix.{difficulty}.yaml",
+                "--dry-run",
+                "--jobs",
+                "4",
+            ],
             ["./judge", "--mode", "inspect", "--offline", "--json", "--output-dir", "-"],
             ["./judge", "--mode", "replay", "--offline", "--json", "--output-dir", "-"],
         ],
@@ -204,6 +238,7 @@ class PlaytestSessionDefaults(BaseModel):
     llm_provider: Literal["local-sglang", "local-vllm", "openai-api"] = "local-sglang"
     generation_profile: str = Field(pattern=r"^[a-z][a-z0-9-]+$")
     campaign_profile: str = Field(pattern=r"^[a-z][a-z0-9-]+$")
+    difficulty: GameDifficulty = "normal"
 
 
 class PlaytestSessionCatalog(BaseModel):
@@ -253,6 +288,7 @@ def describe_playtest_profiles(
     provider: PersonaProvider,
     single_persona: CampaignPersona = CampaignPersona.NEWBIE,
     godot_runtime: GodotRuntime = "docker-godot",
+    difficulty: GameDifficulty = "normal",
     godot_bin: str | None = None,
     generation_profile: PersonaGenerationProfile | None = None,
 ) -> dict[str, object]:
@@ -266,6 +302,7 @@ def describe_playtest_profiles(
             provider=provider,
             single_persona=single_persona,
             godot_bin=resolved_godot_bin,
+            difficulty=difficulty,
             generation_profile=generation_profile,
         )
         for profile in catalog.profiles
@@ -274,6 +311,8 @@ def describe_playtest_profiles(
         "schema_version": "playtest-session-options-v1",
         "godot_runtime": godot_runtime,
         "godot_bin": resolved_godot_bin,
+        "difficulty": difficulty,
+        "difficulty_lane": f"config/matrix.{difficulty}.yaml",
         "llm_provider": (
             "openai-api"
             if provider == PersonaProvider.OPENAI
@@ -301,6 +340,7 @@ def describe_playtest_profiles(
             "fallback_allowed": False,
             "repair_requires_cross_persona": True,
             "repair_proof_requires_fixed_and_unseen_holdout": True,
+            "repair_must_preserve_difficulty": True,
             "frontend_url": "http://127.0.0.1:5173/#/playthrough-inspector",
         },
         "recommended_order": ["one-strategy", "six-strategy", "repair-evidence"],
@@ -314,6 +354,7 @@ def _describe_profile(
     provider: PersonaProvider,
     single_persona: CampaignPersona,
     godot_bin: str,
+    difficulty: GameDifficulty,
     generation_profile: PersonaGenerationProfile | None,
 ) -> dict[str, object]:
     personas = (single_persona,) if profile.allow_persona_override else profile.personas
@@ -332,7 +373,7 @@ def _describe_profile(
         command.extend(
             (
                 "--campaign-id",
-                f"{provider.value}-{profile.id}-{generation_profile.id}",
+                f"{provider.value}-{difficulty}-{profile.id}-{generation_profile.id}",
             )
         )
     for persona in personas:
@@ -341,6 +382,8 @@ def _describe_profile(
         command.extend(("--seed", str(seed)))
     command.extend(
         (
+            "--difficulty",
+            difficulty,
             "--max-weeks",
             str(profile.max_weeks),
             "--concurrency",
@@ -356,6 +399,8 @@ def _describe_profile(
     )
     return {
         **profile.model_dump(mode="json"),
+        "difficulty": difficulty,
+        "difficulty_lane": f"config/matrix.{difficulty}.yaml",
         "personas": [persona.value for persona in personas],
         "cell_count": cells,
         "worst_case_calls": cells * profile.max_weeks * 2,
@@ -368,6 +413,8 @@ def _describe_profile(
 __all__ = [
     "PROFILE_SCHEMA",
     "GodotRuntime",
+    "GAME_DIFFICULTIES",
+    "GameDifficulty",
     "LlmProviderChoice",
     "PersonaGenerationProfile",
     "PlaytestSessionCatalog",

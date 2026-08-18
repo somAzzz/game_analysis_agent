@@ -29,10 +29,10 @@ CORE_STATE_FIELDS = frozenset(
         "academic_progress",
         "language",
         "social",
-        "visa_progress",
         "career_progress",
     }
 )
+RESIDENCE_STATE_FIELDS = frozenset({"visa_progress", "has_valid_stay"})
 
 
 class ContractKind(str, Enum):
@@ -62,6 +62,9 @@ def _require_state_fields(state: Mapping[str, Any], *, location: str) -> None:
     missing = sorted(CORE_STATE_FIELDS.difference(state))
     if missing:
         raise ValueError(f"{location} is missing core state fields: {', '.join(missing)}")
+    if RESIDENCE_STATE_FIELDS.isdisjoint(state):
+        alternatives = " or ".join(sorted(RESIDENCE_STATE_FIELDS))
+        raise ValueError(f"{location} must include {alternatives}")
 
 
 class WeeklyTrace(ContractModel):

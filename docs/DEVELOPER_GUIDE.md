@@ -415,6 +415,58 @@ uv run python tools/gameplay/run_gameplay_agent.py matrix --jobs 4
 uv run python tools/gameplay/run_gameplay_agent.py matrix --jobs 4 --resume
 ```
 
+Each difficulty has an isolated acceptance lane. Normal is the default:
+
+```bash
+# Replace normal with easy, hard, or realistic as needed.
+# Each lane has 77 cells: 63 simulations, 8 boundary probes, 6 personas.
+uv run python tools/gameplay/run_gameplay_agent.py matrix \
+  --config config/matrix.normal.yaml --dry-run --jobs 4
+
+uv run python tools/gameplay/run_gameplay_agent.py matrix \
+  --config config/matrix.normal.yaml --jobs 4
+```
+
+The committed lanes are `matrix.easy.yaml`, `matrix.normal.yaml`,
+`matrix.hard.yaml`, and `matrix.realistic.yaml`. Each freezes the same
+difficulty independently for simulations, boundary probes, and persona play.
+Its matching `validation_profile` skips the legacy composite demo validator,
+which would otherwise create a separate Realistic prerequisite report. Generic
+quality gates still evaluate every report. Easy initially inherits the
+established Normal balance thresholds; Hard initially inherits Realistic.
+Those thresholds must be tuned only with evidence from their own lanes.
+
+Use the original `config/matrix.yaml` for full cross-difficulty release
+regression. Never combine difficulty-specific evidence into one repair, rewrite
+historical matrix manifests, or relabel a single-lane result as a full release.
+
+Every difficulty profile also freezes `focus_schedules` per automated policy. This
+is required by the current game contract: strategy policies repeat their
+matching Focus, while `balanced` and `random` use the same five-window sequence.
+The resolved Focus schedule is included in every simulation/boundary cell and
+its command, so resume and before/after comparison cannot silently mix focus
+behavior.
+
+For a single Normal end-to-end run outside the matrix:
+
+```bash
+uv run python tools/gameplay/run_gameplay_agent.py all \
+  --run-id normal-mvp-smoke --difficulty normal \
+  --scenario default_first_semester --validation-profile normal --skip-qa
+```
+
+The Playtest Forge session planner uses Normal by default. Select another
+difficulty explicitly and it will bind the matching deterministic lane and
+pass the same value into every Persona campaign:
+
+```bash
+.agents/skills/playtest-forge/scripts/session-options \
+  --difficulty hard --llm-provider none --json
+
+.agents/skills/playtest-forge/scripts/session-options \
+  --difficulty realistic --profile repair-evidence --json
+```
+
 The committed `config/matrix.yaml` expands to 140 stable cells: 126 simulation
 cells (difficulty x policy x scenario x seed), 8 boundary cells, and 6 persona
 play cells. Matrix state is written atomically to `matrix_manifest.json`,
@@ -713,6 +765,10 @@ config/
   agent_profiles.yaml       Agent prompt/profile definitions
   gates.yaml                Quality gate thresholds
   matrix.yaml               Executable strict scenario/persona test matrix
+  matrix.easy.yaml          Isolated Easy matrix and validation profile
+  matrix.normal.yaml        Default isolated Normal matrix and validation profile
+  matrix.hard.yaml          Isolated Hard matrix and validation profile
+  matrix.realistic.yaml     Isolated Realistic matrix and validation profile
   player_personas.yaml      Interactive player personas
 
 docs/

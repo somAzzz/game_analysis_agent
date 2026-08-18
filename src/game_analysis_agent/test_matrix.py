@@ -41,6 +41,7 @@ MATRIX_SUMMARY_FILE = "matrix_summary.json"
 CELL_MANIFEST_FILE = "cell_manifest.json"
 SCHEMA_VERSION = "test-matrix-v1"
 CELL_STATUSES = ("planned", "running", "completed", "failed", "skipped")
+SUPPORTED_DIFFICULTIES = ("easy", "normal", "hard", "realistic")
 _SHARED_GODOT_OUTPUT_LOCK = threading.Lock()
 
 _SUCCESS_ENDINGS = {
@@ -77,6 +78,8 @@ class BoundaryConfig:
     seed: int
     weeks: int
     policy: str
+    difficulty: str
+    focus_schedule: str
     extremes: tuple[str, ...]
 
 
@@ -114,7 +117,9 @@ class MatrixConfig:
     difficulties: tuple[str, ...]
     policies: tuple[str, ...]
     policy_aliases: Mapping[str, str]
+    focus_schedules: Mapping[str, str]
     scenarios: tuple[str, ...]
+    validation_profile: str
     boundary: BoundaryConfig
     play: PlayConfig
     compare: CompareConfig
@@ -206,6 +211,7 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
             "play",
             "compare",
         },
+        optional={"focus_schedules", "validation_profile"},
     )
 
     version = _string(root["version"], "matrix.version")
@@ -220,8 +226,23 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
                 "matrix.runs_per_cell"
             )
     difficulties = _string_list(root["difficulties"], "matrix.difficulties")
+    unsupported_difficulties = sorted(set(difficulties) - set(SUPPORTED_DIFFICULTIES))
+    if unsupported_difficulties:
+        raise MatrixConfigError(
+            "matrix.difficulties contains unsupported values: "
+            + ", ".join(unsupported_difficulties)
+        )
     policies = _string_list(root["policies"], "matrix.policies")
     scenarios = _string_list(root["scenarios"], "matrix.scenarios")
+    validation_profile = _string(
+        root.get("validation_profile", "full"),
+        "matrix.validation_profile",
+    )
+    if validation_profile not in {"full", *SUPPORTED_DIFFICULTIES}:
+        raise MatrixConfigError(
+            "matrix.validation_profile must be 'full', 'easy', 'normal', 'hard', "
+            "or 'realistic'"
+        )
 
     aliases_raw = _mapping(root["policy_aliases"], "matrix.policy_aliases")
     aliases: dict[str, str] = {}
@@ -238,11 +259,29 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
             )
         aliases[alias_name] = target_name
 
+    focus_schedules_raw = _mapping(root.get("focus_schedules", {}), "matrix.focus_schedules")
+    focus_schedules: dict[str, str] = {}
+    for policy_name, schedule in focus_schedules_raw.items():
+        canonical_policy = aliases.get(str(policy_name), str(policy_name))
+        if canonical_policy not in policies:
+            raise MatrixConfigError(
+                f"matrix.focus_schedules references unknown policy {policy_name!r}"
+            )
+        if canonical_policy in focus_schedules:
+            raise MatrixConfigError(
+                f"matrix.focus_schedules duplicates canonical policy {canonical_policy!r}"
+            )
+        focus_schedules[canonical_policy] = _string(
+            schedule,
+            f"matrix.focus_schedules.{policy_name}",
+        )
+
     boundary_raw = _mapping(root["boundary"], "matrix.boundary")
     _keys(
         boundary_raw,
         path="matrix.boundary",
         required={"runs", "seed", "weeks", "policy", "extremes"},
+        optional={"difficulty", "focus_schedule"},
     )
     boundary_policy = _string(boundary_raw["policy"], "matrix.boundary.policy")
     canonical_boundary_policy = aliases.get(boundary_policy, boundary_policy)
@@ -250,11 +289,25 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
         raise MatrixConfigError(
             f"matrix.boundary.policy references unknown policy {boundary_policy!r}"
         )
+    boundary_difficulty = _string(
+        boundary_raw.get("difficulty", "realistic"),
+        "matrix.boundary.difficulty",
+    )
+    if boundary_difficulty not in difficulties:
+        raise MatrixConfigError(
+            "matrix.boundary.difficulty must be listed in matrix.difficulties"
+        )
     boundary = BoundaryConfig(
         runs=_positive_int(boundary_raw["runs"], "matrix.boundary.runs"),
         seed=_positive_int(boundary_raw["seed"], "matrix.boundary.seed"),
         weeks=_positive_int(boundary_raw["weeks"], "matrix.boundary.weeks"),
         policy=canonical_boundary_policy,
+        difficulty=boundary_difficulty,
+        focus_schedule=(
+            _string(boundary_raw["focus_schedule"], "matrix.boundary.focus_schedule")
+            if "focus_schedule" in boundary_raw
+            else ""
+        ),
         extremes=_string_list(boundary_raw["extremes"], "matrix.boundary.extremes"),
     )
 
@@ -338,7 +391,9 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
         difficulties=difficulties,
         policies=policies,
         policy_aliases=dict(aliases),
+        focus_schedules=focus_schedules,
         scenarios=scenarios,
+        validation_profile=validation_profile,
         boundary=boundary,
         play=play,
         compare=compare,
@@ -360,6 +415,7 @@ def expand_matrix_cells(config: MatrixConfig) -> tuple[MatrixCell, ...]:
                         "weeks": config.weeks,
                         "difficulty": difficulty,
                         "policy": policy,
+                        "focus_schedule": config.focus_schedules.get(policy, ""),
                         "scenario": scenario,
                         "seed": seed,
                     }
@@ -370,6 +426,8 @@ def expand_matrix_cells(config: MatrixConfig) -> tuple[MatrixCell, ...]:
             "runs": config.boundary.runs,
             "weeks": config.boundary.weeks,
             "policy": config.boundary.policy,
+            "difficulty": config.boundary.difficulty,
+            "focus_schedule": config.boundary.focus_schedule,
             "seed": config.boundary.seed,
             "extreme": extreme,
         }
@@ -451,6 +509,18 @@ def build_matrix_plan(
                 "--report-dir",
                 str(report_dir),
             )
+            if params["focus_schedule"]:
+                simulation_args = (
+                    *simulation_args,
+                    "--focus-schedule",
+                    str(params["focus_schedule"]),
+                )
+            if simulation_command == "all":
+                simulation_args = (
+                    *simulation_args,
+                    "--validation-profile",
+                    config.validation_profile,
+                )
             argv = (
                 *simulation_args,
                 *(("--catalog-dir", str(Path(catalog_dir).resolve())) if catalog_dir else ()),
@@ -471,11 +541,19 @@ def build_matrix_plan(
                 str(params["seed"]),
                 "--weeks",
                 str(params["weeks"]),
+                "--difficulty",
+                str(params["difficulty"]),
                 "--report-dir",
                 str(report_dir),
                 "--extreme",
                 str(params["extreme"]),
             )
+            if params["focus_schedule"]:
+                argv = (
+                    *argv,
+                    "--focus-schedule",
+                    str(params["focus_schedule"]),
+                )
         else:
             report_dir = reports_root / "play" / cell.run_id
             argv = (
@@ -1187,10 +1265,17 @@ def _mapping(value: Any, path: str) -> dict[str, Any]:
     return value
 
 
-def _keys(value: Mapping[str, Any], *, path: str, required: set[str]) -> None:
+def _keys(
+    value: Mapping[str, Any],
+    *,
+    path: str,
+    required: set[str],
+    optional: set[str] | None = None,
+) -> None:
     actual = set(value)
     missing = sorted(required - actual)
-    unknown = sorted(str(key) for key in actual - required)
+    allowed = required | (optional or set())
+    unknown = sorted(str(key) for key in actual - allowed)
     if missing:
         raise MatrixConfigError(f"{path} is missing required keys: {', '.join(missing)}")
     if unknown:

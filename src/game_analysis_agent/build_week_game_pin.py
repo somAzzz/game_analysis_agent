@@ -348,6 +348,7 @@ def _runtime_overlay_specs() -> tuple[tuple[str, str], ...]:
     game_overlay = "game-overlays/study-in-germany"
     return (
         ("scripts/tools/RunInteractiveProbe.gd", "scripts/tools/RunInteractiveProbe.gd"),
+        ("scripts/tools/RunBoundaryProbe.gd", "scripts/tools/RunBoundaryProbe.gd"),
         ("autoload/DataRegistry.gd", f"{game_overlay}/autoload/DataRegistry.gd"),
         ("scenes/main/Main.gd", f"{game_overlay}/scenes/main/Main.gd"),
         ("scripts/data/DataLoader.gd", f"{game_overlay}/scripts/data/DataLoader.gd"),

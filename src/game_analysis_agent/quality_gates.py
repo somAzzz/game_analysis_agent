@@ -14,6 +14,8 @@ from typing import Any
 import yaml
 
 Cell = tuple[str, str, str]
+SUPPORTED_DIFFICULTIES = ("easy", "normal", "hard", "realistic")
+DIFFICULTY_THRESHOLD_FALLBACK = {"easy": "normal", "hard": "realistic"}
 
 _ALLOWED_TOP_LEVEL = {"critical_fail", "balance", "outcomes", "design"}
 _ALLOWED_KEYS: dict[str, set[str]] = {
@@ -36,13 +38,17 @@ _ALLOWED_KEYS: dict[str, set[str]] = {
         "aps_pass_with_low_aps_knowledge",
     },
     "balance": {
+        "max_single_ending_rate_easy",
         "max_single_ending_rate_normal",
+        "max_single_ending_rate_hard",
         "max_single_ending_rate_realistic",
         "max_action_rate_per_run",
         "max_action_pick_share",
         "max_recovery_group_rate_per_run",
         "max_escape_group_rate_per_run",
+        "min_distinct_endings_easy",
         "min_distinct_endings_normal",
+        "min_distinct_endings_hard",
         "min_distinct_endings_realistic",
         "min_study_group_rate_per_run",
         "min_work_group_rate_per_run",
@@ -54,7 +60,9 @@ _ALLOWED_KEYS: dict[str, set[str]] = {
         "success_endings",
         "invalid_endings",
         "require_designed_failure_coverage",
+        "min_designed_failure_types_easy",
         "min_designed_failure_types_normal",
+        "min_designed_failure_types_hard",
         "min_designed_failure_types_realistic",
         "max_single_designed_failure_rate_play",
     },
@@ -160,10 +168,9 @@ def evaluate_report_dir(report_dir: Path, gates_path: Path) -> dict[str, Any]:
     _eval_critical(report_dir, critical, defaults, failures)
 
     ending_gates = {
-        "max_single_ending_rate_normal",
-        "max_single_ending_rate_realistic",
-        "min_distinct_endings_normal",
-        "min_distinct_endings_realistic",
+        f"{base}_{difficulty}"
+        for base in ("max_single_ending_rate", "min_distinct_endings")
+        for difficulty in SUPPORTED_DIFFICULTIES
     }
     action_gates = {
         "max_action_rate_per_run",
@@ -2206,7 +2213,8 @@ def _row_cell(
             )
         else:
             difficulty = "unspecified"
-    if difficulty_candidates and difficulty not in difficulty_candidates:
+    threshold_difficulty = DIFFICULTY_THRESHOLD_FALLBACK.get(difficulty, difficulty)
+    if difficulty_candidates and threshold_difficulty not in difficulty_candidates:
         _input_failure(
             failures,
             filename,
@@ -2257,10 +2265,10 @@ def _difficulty_candidates(
 ) -> set[str]:
     result = set()
     for key in (*balance, *outcomes):
-        if key.endswith("_normal"):
-            result.add("normal")
-        elif key.endswith("_realistic"):
-            result.add("realistic")
+        for difficulty in SUPPORTED_DIFFICULTIES:
+            if key.endswith(f"_{difficulty}"):
+                result.add(difficulty)
+                break
     return result
 
 
@@ -2273,7 +2281,15 @@ def _difficulty_threshold(
     key = f"{base}_{cell[1]}"
     if key in section:
         return _configured_number(section, key)
-    available = [name for name in (f"{base}_normal", f"{base}_realistic") if name in section]
+    inherited = DIFFICULTY_THRESHOLD_FALLBACK.get(cell[1])
+    inherited_key = f"{base}_{inherited}" if inherited else ""
+    if inherited_key in section:
+        return _configured_number(section, inherited_key)
+    available = [
+        name
+        for name in (f"{base}_{difficulty}" for difficulty in SUPPORTED_DIFFICULTIES)
+        if name in section
+    ]
     if available:
         _input_failure(
             failures,

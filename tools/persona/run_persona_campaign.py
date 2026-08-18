@@ -22,6 +22,7 @@ from game_analysis_agent.persona_campaign_service import (  # noqa: E402
 )
 from game_analysis_agent.persona_gateway import PersonaProvider  # noqa: E402
 from game_analysis_agent.persona_runtime import redact_sensitive_text  # noqa: E402
+from game_analysis_agent.playtest_session import GAME_DIFFICULTIES  # noqa: E402
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -39,6 +40,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--seed", action="append", type=int)
     parser.add_argument("--max-weeks", type=int, default=20)
+    parser.add_argument("--difficulty", choices=GAME_DIFFICULTIES, default="normal")
     parser.add_argument("--concurrency", type=int, default=1)
     parser.add_argument("--game-root", type=Path)
     parser.add_argument("--report-root", default="reports/persona-campaigns")
@@ -57,7 +59,7 @@ def main(argv: list[str] | None = None) -> int:
     personas = tuple(CampaignPersona(item) for item in (args.persona or ["newbie"]))
     seeds = tuple(args.seed or [42])
     campaign_id = args.campaign_id or _default_campaign_id(
-        args.provider, personas, seeds, args.max_weeks
+        args.provider, personas, seeds, args.max_weeks, args.difficulty
     )
     game_root = args.game_root or Path(os.environ.get("GAME_PROJECT_PATH", ""))
     if not str(game_root):
@@ -69,6 +71,7 @@ def main(argv: list[str] | None = None) -> int:
         personas=personas,
         seeds=seeds,
         max_weeks=args.max_weeks,
+        difficulty=args.difficulty,
         provider=PersonaProvider(args.provider),
         concurrency=args.concurrency,
         report_root=report_root,
@@ -101,10 +104,11 @@ def _default_campaign_id(
     personas: tuple[CampaignPersona, ...],
     seeds: tuple[int, ...],
     max_weeks: int,
+    difficulty: str,
 ) -> str:
     persona_part = "all-six" if len(personas) == 6 else "-".join(item.value for item in personas)
     seed_part = "-".join(str(seed) for seed in seeds)
-    return f"{provider}-{persona_part}-seed-{seed_part}-{max_weeks}w"
+    return f"{provider}-{difficulty}-{persona_part}-seed-{seed_part}-{max_weeks}w"
 
 
 if __name__ == "__main__":

@@ -66,6 +66,30 @@ def _interactive_probe_payload() -> dict:
     return json.loads((FIXTURES / "interactive_probe_v1.json").read_text(encoding="utf-8"))
 
 
+def test_trace_contract_accepts_discrete_residence_v4_state(tmp_path: Path) -> None:
+    payload = json.loads((FIXTURES / "trace_v1.json").read_text(encoding="utf-8"))
+    payload["final_state"].pop("visa_progress")
+    payload["final_state"]["has_valid_stay"] = True
+    for week in payload["weekly_log"]:
+        for state_name in ("before_state", "after_state"):
+            week[state_name].pop("visa_progress")
+            week[state_name]["has_valid_stay"] = True
+    path = tmp_path / "residence-v4.jsonl"
+    path.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+    validate_contract_file(path, kind=ContractKind.TRACE)
+
+
+def test_trace_contract_rejects_state_without_residence_truth(tmp_path: Path) -> None:
+    payload = json.loads((FIXTURES / "trace_v1.json").read_text(encoding="utf-8"))
+    payload["final_state"].pop("visa_progress")
+    path = tmp_path / "missing-residence.jsonl"
+    path.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+    with pytest.raises(ContractValidationError, match="has_valid_stay or visa_progress"):
+        validate_contract_file(path, kind=ContractKind.TRACE)
+
+
 def test_probe_contract_rejects_stale_risk_guidance() -> None:
     payload = _interactive_probe_payload()
     payload["risk_guidance"]["generated_for_week"] = 1

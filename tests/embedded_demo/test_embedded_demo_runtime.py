@@ -29,6 +29,7 @@ def test_prepares_verified_writable_runtime_with_audited_overlay(tmp_path: Path)
     assert (output / overlay["path"]).read_bytes() == (ROOT / overlay["source"]).read_bytes()
     assert {item["path"] for item in marker["overlays"]} == {
         "scripts/tools/RunInteractiveProbe.gd",
+        "scripts/tools/RunBoundaryProbe.gd",
         "autoload/DataRegistry.gd",
         "scenes/main/Main.gd",
         "scripts/data/DataLoader.gd",

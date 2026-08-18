@@ -163,22 +163,22 @@
       "sha256": "0e0f57f8bf7b0b9188f7eac32f4cfaf5b4dc8aefe5ab8dfd1d368cd1816164cf"
     },
     {
-      "bytes": 9318,
+      "bytes": 9612,
       "path": ".agents/skills/playtest-forge/SKILL.md",
       "role": "codex-skill",
-      "sha256": "d405fccd44080df1c77856b5e1021a3502610250d00eba33ba9d81cbddf2af12"
+      "sha256": "b69439f2d58fbfc705a65bb32739784cc4c317f9f05ea4087bfde613b15a27b8"
     },
     {
-      "bytes": 308,
+      "bytes": 393,
       "path": ".agents/skills/playtest-forge/agents/openai.yaml",
       "role": "codex-skill-metadata",
-      "sha256": "4ea86157cb980b83ddc78e4c77f44cda1b1595ee1d04352c8e82e7cb04a77680"
+      "sha256": "cabf8d1f3299238fead308ac98471f248422bc273ec3d7e24a902080ba2926e8"
     },
     {
-      "bytes": 1681,
+      "bytes": 2040,
       "path": ".agents/skills/playtest-forge/references/automated-testing.md",
       "role": "codex-skill-reference",
-      "sha256": "1a2b531d12328383e2ef82167036eabde43c50d21b2d51acd4a6823e97f58ebe"
+      "sha256": "aaf3a9973cd4401097d0ce15ef0f85dfe0dc3f85106c7fd0a59ef5e62eed36ab"
     },
     {
       "bytes": 1415,
@@ -205,10 +205,10 @@
       "sha256": "f5160126da4addd13ad9c05fb340dffc34844d60edd12f22c915b60791069b34"
     },
     {
-      "bytes": 2061,
+      "bytes": 2319,
       "path": ".agents/skills/playtest-forge/references/repair-protocol.md",
       "role": "codex-skill-reference",
-      "sha256": "34db0b69d373ab1334083aa30d4c64a0e69ebaed3efa8d98315d9aad7e1cad74"
+      "sha256": "612ddc635e37355c58a2c086f4b2d59af7194ae455aa313ca2605d779c38633a"
     },
     {
       "bytes": 1088,
@@ -247,10 +247,10 @@
       "sha256": "c8cb5309d0658beefdbd3864b0931329420259f223aae6395a758f25c1c9c847"
     },
     {
-      "bytes": 10418,
+      "bytes": 10969,
       "path": ".agents/skills/playtest-forge/references/codex-session-orchestration.md",
       "role": "codex-skill-reference",
-      "sha256": "9dd7c0a80c3e6fb0d6b8f8bcadb02585226222954f6c81b9b2269ffdaef84769"
+      "sha256": "93c1cc6136a83bd453c1a1dec8706a6fd830c4e950473799ccc35449b450a496"
     },
     {
       "bytes": 156,
@@ -259,23 +259,71 @@
       "sha256": "b84de3cd146f71ca84889252e683a7d4c528221f13fd4dde3b5b0cd172a16682"
     },
     {
-      "bytes": 2288,
+      "bytes": 2316,
       "path": "config/playtest_session_profiles.json",
       "role": "codex-playtest-profiles",
-      "schema_version": "playtest-session-profiles-v3",
-      "sha256": "d559bd70d12d46230854faea7fb52a77c71c2d07965e3e7cc5e104becab4edfe"
+      "schema_version": "playtest-session-profiles-v4",
+      "sha256": "6cc41aeee270db0c322b43fab5bb85ef3757dd1e38e0b43d8e449754a6ed6ecc"
     },
     {
-      "bytes": 14304,
+      "bytes": 1762,
+      "path": "config/matrix.easy.yaml",
+      "role": "difficulty-test-lane",
+      "sha256": "431d2a51e025233607347dd5ee88543ab73bf2eafd9682a61cbdbfe6653a3ee9"
+    },
+    {
+      "bytes": 2215,
+      "path": "config/matrix.normal.yaml",
+      "role": "difficulty-test-lane",
+      "sha256": "c3d92134ae0d4bb4a12788408b445dfde2abaaecf75c9c4ee33d36a26544a74b"
+    },
+    {
+      "bytes": 1762,
+      "path": "config/matrix.hard.yaml",
+      "role": "difficulty-test-lane",
+      "sha256": "01ee743bf4fcbb0b035d97ae8b6b51bda92202a7fb7e93137436d2adfd986ede"
+    },
+    {
+      "bytes": 1802,
+      "path": "config/matrix.realistic.yaml",
+      "role": "difficulty-test-lane",
+      "sha256": "66ea79379e05fffd0a004f1fffdf5a59b9819a33b3926c06da8b00e866aeb126"
+    },
+    {
+      "bytes": 16129,
       "path": "src/game_analysis_agent/playtest_session.py",
       "role": "codex-playtest-planner",
-      "sha256": "683ee57efa9e8a5341f959cdc4ac61a77d4d5acf05f70513ca8eb68e27a46c9a"
+      "sha256": "f363964b4a38bbd459d69011f52bd865416ba47a38e4f1662af11a533a9393c3"
     },
     {
-      "bytes": 6030,
+      "bytes": 47195,
+      "path": "src/game_analysis_agent/test_matrix.py",
+      "role": "difficulty-test-planner",
+      "sha256": "9271be808a62b30deb4963ebf208e19fe69ad0cffadbd4ae862acf621f8d63da"
+    },
+    {
+      "bytes": 82768,
+      "path": "src/game_analysis_agent/quality_gates.py",
+      "role": "difficulty-gate-router",
+      "sha256": "5ef0784d0fcd16ca209413d37f1fbae8da1553eb7b50d2bdf0a84711213e1c12"
+    },
+    {
+      "bytes": 6467,
       "path": "tools/judge/describe_playtest_session.py",
       "role": "codex-playtest-planner-cli",
-      "sha256": "fc102b3a84d498a8641a7566f3853fcf50feb78438baa2f0c533d9908ea85544"
+      "sha256": "e001c3c2f889c13a441b4dc9f5034cf20e7866dc79fa2fcf40b1717acfab917c"
+    },
+    {
+      "bytes": 58467,
+      "path": "tools/gameplay/run_gameplay_agent.py",
+      "role": "difficulty-test-runner",
+      "sha256": "02fc41af4205ec057a37b3b86f9ed8231d021a9910c085146167ee318354412a"
+    },
+    {
+      "bytes": 4000,
+      "path": "tools/persona/run_persona_campaign.py",
+      "role": "difficulty-persona-runner",
+      "sha256": "c8eb93ad11c51d2b3bc4379daaa0d1bbaaa4d1435965743a9c59ed1e4dfdca60"
     },
     {
       "bytes": 216,
@@ -794,10 +842,16 @@
       "sha256": "5dc96425dc59d52bc8d9c5b981e4aedbc791386e131cc5c397bd1c17b4e074c0"
     },
     {
-      "bytes": 30901,
+      "bytes": 9451,
+      "path": "scripts/tools/RunBoundaryProbe.gd",
+      "role": "embedded-demo-runtime-overlay",
+      "sha256": "768a062b3e9ddf28f986ab57014c6707de026c74e4058828cd3973adafc236e5"
+    },
+    {
+      "bytes": 30985,
       "path": "src/game_analysis_agent/build_week_game_pin.py",
       "role": "embedded-demo-overlay-service",
-      "sha256": "2ccc3652a63cff753a76b6efde49f9157e216cbde7c35c804f28b9f5886757a0"
+      "sha256": "0136ab6cb7b95ca13eade8a3761e8ed761f5fa25f04c6cd6539e2d0267cdc165"
     },
     {
       "bytes": 91899,

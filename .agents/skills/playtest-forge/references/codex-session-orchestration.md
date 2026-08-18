@@ -61,6 +61,7 @@ call a model.
 Use these checked-in defaults when the user asks to start testing without
 specifying alternatives:
 
+- Difficulty: `normal`;
 - Godot runtime: `docker-godot` via `scripts/godot-docker-wrapper`;
 - LLM: `local-sglang`;
 - generation: `no-thinking-2048`;
@@ -71,6 +72,13 @@ overrides its default. `local-godot`, `local-vllm`, `openai-api`, `none`,
 `thinking-5120`, `one-strategy`, and `repair-evidence` remain available.
 Never infer an override because a binary, Docker daemon, endpoint, or key is
 present. Availability is readiness evidence, not user authorization.
+
+Difficulty is a first-class repair choice. Accept `easy`, `normal`, `hard`, or
+`realistic`; default to `normal`. Once selected, use only
+`config/matrix.<difficulty>.yaml`, pass the same `--difficulty` to every live
+persona campaign, and retain it unchanged across baseline, patched, fixed, and
+holdout evidence. A result from one difficulty cannot accept a repair for
+another.
 
 ### 3. Probe only the selected runtime and provider
 
@@ -110,6 +118,7 @@ Run the planner only to freeze the runtime and truth boundary:
 .agents/skills/playtest-forge/scripts/session-options \
   --godot-runtime docker-godot \
   --llm-provider none \
+  --difficulty normal \
   --json
 ```
 
@@ -158,10 +167,11 @@ Use the planner with all confirmed values. Examples:
 ```
 
 The no-argument command emits the default Docker Godot, local SGLang,
-`no-thinking-2048`, six-persona campaign.
+`no-thinking-2048`, Normal-difficulty six-persona campaign.
 
 ```bash
 .agents/skills/playtest-forge/scripts/session-options \
+  --difficulty hard \
   --godot-runtime docker-godot \
   --llm-provider openai-api \
   --profile one-strategy \
@@ -243,6 +253,7 @@ manifest, gate report, cell rows, and hashes only after `completed`.
 
 After completion, report:
 
+- selected difficulty and exact matrix lane;
 - selected Godot runtime and resolved executable/wrapper;
 - LLM choice, provider, model, mode, and exact truth label;
 - completed cells, recorded decisions/weeks, calls used, endings, and gate;
@@ -260,4 +271,5 @@ game, or merge anything.
 cross-persona cluster but has only one fixed seed. Use `repair-evidence` before
 freezing a repair target, then follow `repair-protocol.md`: preserve fixed seeds
 42/43/44, use unseen holdouts 1042/1043/1044, change one mechanism in an
-isolated game worktree, and accept or reject against all protected gates.
+isolated game worktree, keep the selected difficulty unchanged, and accept or
+reject against all protected gates.
