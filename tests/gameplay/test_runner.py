@@ -110,7 +110,9 @@ def test_probe_resolves_relative_output_and_passes_normal_difficulty(
         )
 
     assert rc == 0
-    assert (tmp_path / "relative-boundary-report" / "boundary_runs.jsonl").is_file()
+    report = tmp_path / "relative-boundary-report"
+    assert not (report / "boundary_runs.jsonl").exists()
+    assert (report / "boundary_runs.jsonl.zst").is_file()
 
 
 def test_runtime_boundary_overlay_has_no_hardcoded_realistic_difficulty() -> None:
@@ -215,7 +217,8 @@ def test_sim_runs_full_pipeline_with_mocked_godot(run_gameplay_agent, tmp_path) 
         )
     assert rc == 0
     out = ROOT / "reports" / "balance" / "test" / "raw_runs.jsonl"
-    assert out.exists()
+    assert not out.exists()
+    assert out.with_name(f"{out.name}.zst").is_file()
     manifest = ROOT / "reports" / "balance" / "test" / "report_manifest.json"
     assert manifest.exists()
     payload = json.loads(manifest.read_text(encoding="utf-8"))
@@ -312,7 +315,8 @@ def test_sim_honors_isolated_report_directory(run_gameplay_agent, tmp_path) -> N
         )
 
     assert rc == 0
-    assert (report_dir / "raw_runs.jsonl").is_file()
+    assert not (report_dir / "raw_runs.jsonl").exists()
+    assert (report_dir / "raw_runs.jsonl.zst").is_file()
     assert not (ROOT / "reports" / "balance" / "cell" / "raw_runs.jsonl").exists()
 
 
@@ -341,7 +345,8 @@ def test_sim_resolves_relative_report_directory_before_godot(
     expected = (tmp_path / "relative-report" / "raw_runs.jsonl").resolve()
     assert rc == 0
     assert captured_output == [expected]
-    assert expected.is_file()
+    assert not expected.exists()
+    assert expected.with_name(f"{expected.name}.zst").is_file()
 
 
 def test_copy_godot_output_accepts_configured_project_name(

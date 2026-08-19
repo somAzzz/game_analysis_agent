@@ -51,6 +51,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("frontend/public/live-playthrough"),
     )
     parser.add_argument("--no-resume", action="store_true")
+    parser.add_argument(
+        "--keep-jsonl",
+        action="store_true",
+        help="Keep private cell JSONL expanded after publication (debugging only).",
+    )
     return parser
 
 
@@ -86,6 +91,7 @@ def main(argv: list[str] | None = None) -> int:
             view_dir=args.view,
             environment=os.environ,
             resume=not args.no_resume,
+            keep_jsonl=args.keep_jsonl,
         )
     except Exception as exc:
         safe_message = redact_sensitive_text(str(exc))

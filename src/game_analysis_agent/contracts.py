@@ -16,6 +16,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
+from .report_archive import ReportArchiveError, iter_jsonl_rows
+
 CONTRACT_VERSION = "1.0"
 SUPPORTED_CONTRACT_VERSIONS = frozenset({CONTRACT_VERSION})
 
@@ -364,18 +366,11 @@ def validate_contract_file(
     """Load and validate a JSON artifact or every row in a JSONL artifact."""
 
     artifact_path = Path(path)
-    if artifact_path.suffix == ".jsonl":
+    if artifact_path.name.endswith((".jsonl", ".jsonl.zst")):
         validated: list[ContractArtifact] = []
-        with artifact_path.open(encoding="utf-8") as handle:
-            for line_number, raw_line in enumerate(handle, start=1):
-                if not raw_line.strip():
-                    continue
-                try:
-                    payload = json.loads(raw_line)
-                except json.JSONDecodeError as exc:
-                    raise ContractValidationError(
-                        f"{artifact_path}:{line_number}: invalid JSON: {exc.msg}"
-                    ) from exc
+        try:
+            rows = iter_jsonl_rows(artifact_path)
+            for line_number, payload in rows:
                 try:
                     validated.append(
                         validate_contract(
@@ -387,6 +382,8 @@ def validate_contract_file(
                     )
                 except ContractValidationError as exc:
                     raise ContractValidationError(f"{artifact_path}:{line_number}: {exc}") from exc
+        except ReportArchiveError as exc:
+            raise ContractValidationError(str(exc)) from exc
         if not validated:
             raise ContractValidationError(f"{artifact_path}: JSONL artifact is empty")
         return validated

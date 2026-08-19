@@ -47,6 +47,11 @@ from .playthrough_view import (
     truth_label_for,
     verify_playthrough_evidence,
 )
+from .report_archive import (
+    ReportArchiveError,
+    archive_jsonl_tree,
+    iter_jsonl_rows,
+)
 from .settings import Settings
 
 
@@ -385,6 +390,7 @@ def run_persona_campaign(
     environment: Mapping[str, str] | None = None,
     failure_rules_path: str | Path | None = None,
     resume: bool = True,
+    keep_jsonl: bool = False,
     external_cancelled: Callable[[], bool] | None = None,
 ) -> dict[str, Any]:
     """Run one bounded campaign and publish sanitized, frontend-ready evidence."""
@@ -444,6 +450,7 @@ def run_persona_campaign(
         project_root=project,
         local_llm=local_llm,
         cancellation=cancellation,
+        archive_completed_jsonl=not keep_jsonl,
     )
     built.gateway.validate_campaign(
         runs=runs,
@@ -540,6 +547,12 @@ def run_persona_campaign(
             }
         _write_json(bundle / "repair_eligibility.json", eligibility)
 
+        storage = _archive_campaign_cells(
+            project,
+            summary.results,
+            keep_jsonl=keep_jsonl,
+        )
+
         _clear_view_evidence(view)
         view_manifest = build_playthrough_views(
             source_root=project,
@@ -573,6 +586,7 @@ def run_persona_campaign(
             "view": view.relative_to(project).as_posix(),
             "truth_label": view_manifest["truth_label"],
             "repair_target_eligible": eligibility["eligible"],
+            "storage": storage,
         }
     except Exception as exc:
         publisher.failed(f"Campaign finalization failed: {exc}")
@@ -604,8 +618,8 @@ def _provider_call_count(
     for result in results:
         path = project / result.request.output_dir / "playthrough.jsonl"
         try:
-            rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
-        except (OSError, json.JSONDecodeError):
+            rows = [row for _, row in iter_jsonl_rows(path)]
+        except (OSError, ReportArchiveError):
             continue
         for row in rows:
             if not isinstance(row, dict):
@@ -614,6 +628,44 @@ def _provider_call_count(
             if isinstance(calls, list):
                 count += sum(isinstance(call, dict) for call in calls)
     return count
+
+
+def _archive_campaign_cells(
+    project: Path,
+    results: tuple[CampaignCellResult, ...],
+    *,
+    keep_jsonl: bool,
+) -> dict[str, int | str]:
+    totals: dict[str, int | str] = {
+        "status": "kept_jsonl" if keep_jsonl else "archived",
+        "files": 0,
+        "records": 0,
+        "uncompressed_bytes": 0,
+        "compressed_bytes": 0,
+    }
+    for result in results:
+        cell_dir = project / result.request.output_dir
+        cell_storage = archive_jsonl_tree(
+            cell_dir,
+            keep_jsonl=keep_jsonl,
+        )
+        if keep_jsonl:
+            for key in ("files", "records", "uncompressed_bytes", "compressed_bytes"):
+                totals[key] = int(totals[key]) + int(cell_storage.get(key, 0))
+            continue
+        for manifest_path in cell_dir.glob("*.jsonl.zst.manifest.json"):
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            totals["files"] = int(totals["files"]) + 1
+            totals["records"] = int(totals["records"]) + int(manifest["records"])
+            totals["uncompressed_bytes"] = int(totals["uncompressed_bytes"]) + int(
+                manifest["uncompressed_bytes"]
+            )
+            totals["compressed_bytes"] = int(totals["compressed_bytes"]) + int(
+                manifest["compressed_bytes"]
+            )
+    if totals["files"] == 0 and not keep_jsonl:
+        totals["status"] = "no_jsonl"
+    return totals
 
 
 def _clear_view_evidence(view: Path) -> None:

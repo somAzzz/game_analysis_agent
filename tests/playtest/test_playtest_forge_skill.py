@@ -49,6 +49,8 @@ def test_skill_has_required_resources_without_placeholders() -> None:
         "State which results came from",
         "default `normal`",
         "config/matrix.<difficulty>.yaml",
+        "--keep-jsonl",
+        "verified Zstandard",
     ):
         assert guardrail in skill
     assert len(skill.splitlines()) < 500

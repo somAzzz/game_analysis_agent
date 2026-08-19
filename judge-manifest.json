@@ -163,10 +163,10 @@
       "sha256": "0e0f57f8bf7b0b9188f7eac32f4cfaf5b4dc8aefe5ab8dfd1d368cd1816164cf"
     },
     {
-      "bytes": 9612,
+      "bytes": 10130,
       "path": ".agents/skills/playtest-forge/SKILL.md",
       "role": "codex-skill",
-      "sha256": "b69439f2d58fbfc705a65bb32739784cc4c317f9f05ea4087bfde613b15a27b8"
+      "sha256": "10373cac55aa538589322baa4dd9b0e453d659d737d793c2908be4008973af2c"
     },
     {
       "bytes": 393,
@@ -175,10 +175,10 @@
       "sha256": "cabf8d1f3299238fead308ac98471f248422bc273ec3d7e24a902080ba2926e8"
     },
     {
-      "bytes": 2040,
+      "bytes": 2879,
       "path": ".agents/skills/playtest-forge/references/automated-testing.md",
       "role": "codex-skill-reference",
-      "sha256": "aaf3a9973cd4401097d0ce15ef0f85dfe0dc3f85106c7fd0a59ef5e62eed36ab"
+      "sha256": "f538caa869b9f8cee3d731d8fcf5d45ca7ba8ce1e0c6a917851aa835eba539e0"
     },
     {
       "bytes": 1415,
@@ -187,10 +187,10 @@
       "sha256": "6fab3b7b86b2f9be412e4b6b5e3afaa9c9e14a04a7292b6cffa6f5b431b01d41"
     },
     {
-      "bytes": 3249,
+      "bytes": 4201,
       "path": ".agents/skills/playtest-forge/references/evidence-contract.md",
       "role": "codex-skill-reference",
-      "sha256": "5670c68a2a2717c43e85b88013039cb04632cb145a3f260ef6dc3ab1095667fd"
+      "sha256": "de86e2b8ff2bab5348d0476048ed106e9de2d20d6d69372bc440563a49055833"
     },
     {
       "bytes": 2072,
@@ -205,10 +205,10 @@
       "sha256": "f5160126da4addd13ad9c05fb340dffc34844d60edd12f22c915b60791069b34"
     },
     {
-      "bytes": 2319,
+      "bytes": 2953,
       "path": ".agents/skills/playtest-forge/references/repair-protocol.md",
       "role": "codex-skill-reference",
-      "sha256": "612ddc635e37355c58a2c086f4b2d59af7194ae455aa313ca2605d779c38633a"
+      "sha256": "01829ae49146268267a83424c1820985659f0642b31dd2925145b904878ca467"
     },
     {
       "bytes": 1088,
@@ -296,16 +296,16 @@
       "sha256": "f363964b4a38bbd459d69011f52bd865416ba47a38e4f1662af11a533a9393c3"
     },
     {
-      "bytes": 47195,
+      "bytes": 48463,
       "path": "src/game_analysis_agent/test_matrix.py",
       "role": "difficulty-test-planner",
-      "sha256": "9271be808a62b30deb4963ebf208e19fe69ad0cffadbd4ae862acf621f8d63da"
+      "sha256": "a0cf72eee11def2801786dd0c8654808ddf244d67442feb8714e6424dcd64b24"
     },
     {
-      "bytes": 82768,
+      "bytes": 82591,
       "path": "src/game_analysis_agent/quality_gates.py",
       "role": "difficulty-gate-router",
-      "sha256": "5ef0784d0fcd16ca209413d37f1fbae8da1553eb7b50d2bdf0a84711213e1c12"
+      "sha256": "507cac0814be60bb2d397c68ce718d47b60a4bf69d582d939f6626f0f6ab78f4"
     },
     {
       "bytes": 6467,
@@ -314,16 +314,16 @@
       "sha256": "e001c3c2f889c13a441b4dc9f5034cf20e7866dc79fa2fcf40b1717acfab917c"
     },
     {
-      "bytes": 58467,
+      "bytes": 60602,
       "path": "tools/gameplay/run_gameplay_agent.py",
       "role": "difficulty-test-runner",
-      "sha256": "02fc41af4205ec057a37b3b86f9ed8231d021a9910c085146167ee318354412a"
+      "sha256": "f0700be76808fc82af572a94cf9e7523c83fcb8649e63922d75b3ac47b22e00c"
     },
     {
-      "bytes": 4000,
+      "bytes": 4209,
       "path": "tools/persona/run_persona_campaign.py",
       "role": "difficulty-persona-runner",
-      "sha256": "c8eb93ad11c51d2b3bc4379daaa0d1bbaaa4d1435965743a9c59ed1e4dfdca60"
+      "sha256": "07bc9c567b6d9413cca88cd778f5160dcfb9b71c95a2d762629e8c156886fa0b"
     },
     {
       "bytes": 216,

@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import json
+import shutil
 import threading
 import time
 from pathlib import Path
+
+import pytest
 
 from game_analysis_agent.campaign_contract import (
     CampaignCellState,
@@ -80,9 +83,7 @@ class _Executor:
                 )
                 if self.delay_s:
                     time.sleep(self.delay_s)
-            (output_dir / "playthrough.jsonl").write_text(
-                "\n".join(rows) + "\n", encoding="utf-8"
-            )
+            (output_dir / "playthrough.jsonl").write_text("\n".join(rows) + "\n", encoding="utf-8")
             return CellExecutionOutcome(
                 state=CampaignCellState.COMPLETED,
                 stop_reason="week_limit",
@@ -111,6 +112,23 @@ def test_runner_isolates_cells_caps_concurrency_and_writes_citations(tmp_path: P
     assert all(len(result.citations) == 2 for result in summary.results)
     assert all(result.artifacts[0].record_count == 2 for result in summary.results)
     assert not list(tmp_path.rglob("*.tmp"))
+
+
+@pytest.mark.skipif(shutil.which("zstd") is None, reason="zstd is unavailable")
+def test_runner_seals_each_completed_cell_immediately(tmp_path: Path) -> None:
+    summary = CampaignRunner(
+        project_root=tmp_path,
+        request=_request(personas=["newbie"], seeds=[42]),
+        source=_source(),
+        executor=_Executor(),
+        archive_completed_jsonl=True,
+    ).run()
+
+    cell_dir = tmp_path / summary.results[0].request.output_dir
+    assert summary.submittable is True
+    assert not (cell_dir / "playthrough.jsonl").exists()
+    assert (cell_dir / "playthrough.jsonl.zst").is_file()
+    assert (cell_dir / "playthrough.jsonl.zst.manifest.json").is_file()
 
 
 def test_resume_skips_only_exact_completed_source_and_input(tmp_path: Path) -> None:

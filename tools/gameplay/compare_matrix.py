@@ -29,6 +29,12 @@ from game_analysis_agent.contracts import (  # noqa: E402
     validate_contract_file,
     validate_trace_catalog_consistency,
 )
+from game_analysis_agent.report_archive import (  # noqa: E402
+    ReportArchiveError,
+    iter_jsonl_rows,
+    jsonl_identity,
+    resolve_jsonl_artifact,
+)
 from tools.gameplay.compare_reports import compare_reports  # noqa: E402
 
 MATRIX_MANIFEST_FILE = "matrix_manifest.json"
@@ -165,8 +171,8 @@ def compare_matrix_runs(
                 after_artifact = after_report / relative_name
                 _validate_artifact(before_artifact, cell_id=cell_id, label="before")
                 _validate_artifact(after_artifact, cell_id=cell_id, label="after")
-                before_sha = _sha256(before_artifact)
-                after_sha = _sha256(after_artifact)
+                before_sha, before_bytes = _artifact_identity(before_artifact)
+                after_sha, after_bytes = _artifact_identity(after_artifact)
                 changed = before_sha != after_sha
                 changed_artifacts += int(changed)
                 unchanged_artifacts += int(not changed)
@@ -175,8 +181,8 @@ def compare_matrix_runs(
                         "path": relative_name,
                         "before_sha256": before_sha,
                         "after_sha256": after_sha,
-                        "before_bytes": before_artifact.stat().st_size,
-                        "after_bytes": after_artifact.stat().st_size,
+                        "before_bytes": before_bytes,
+                        "after_bytes": after_bytes,
                         "changed": changed,
                     }
                 )
@@ -570,23 +576,22 @@ def _require_keys(path: Path, keys: set[str]) -> dict[str, Any]:
 
 
 def _validate_artifact(path: Path, *, cell_id: str, label: str) -> None:
-    if not path.is_file():
+    try:
+        artifact = resolve_jsonl_artifact(path) if path.name.endswith(".jsonl") else path
+    except ReportArchiveError as exc:
+        raise MatrixCompareError(f"cell {cell_id} missing {label} artifact: {path}") from exc
+    if not artifact.is_file():
         raise MatrixCompareError(f"cell {cell_id} missing {label} artifact: {path}")
     try:
-        if path.suffix == ".json":
-            value = json.loads(path.read_text(encoding="utf-8"))
+        if artifact.suffix == ".json":
+            value = json.loads(artifact.read_text(encoding="utf-8"))
             if not isinstance(value, dict):
                 raise ValueError("JSON artifact is not an object")
-        elif path.suffix == ".jsonl":
-            with path.open("r", encoding="utf-8") as handle:
-                for line_number, line in enumerate(handle, start=1):
-                    if not line.strip():
-                        continue
-                    value = json.loads(line)
-                    if not isinstance(value, dict):
-                        raise ValueError(f"line {line_number} is not a JSON object")
-        elif path.suffix == ".csv":
-            with path.open("r", encoding="utf-8", newline="") as handle:
+        elif path.name.endswith(".jsonl"):
+            for _line_number, _value in iter_jsonl_rows(path):
+                pass
+        elif artifact.suffix == ".csv":
+            with artifact.open("r", encoding="utf-8", newline="") as handle:
                 reader = csv.DictReader(handle)
                 if not reader.fieldnames or any(not column.strip() for column in reader.fieldnames):
                     raise ValueError("CSV header is missing or contains blank columns")
@@ -598,9 +603,23 @@ def _validate_artifact(path: Path, *, cell_id: str, label: str) -> None:
                     if None in row:
                         raise ValueError("CSV row has more columns than the header")
         else:
-            path.read_bytes()
-    except (OSError, UnicodeError, json.JSONDecodeError, csv.Error, ValueError) as exc:
+            artifact.read_bytes()
+    except (
+        OSError,
+        UnicodeError,
+        json.JSONDecodeError,
+        csv.Error,
+        ValueError,
+        ReportArchiveError,
+    ) as exc:
         raise MatrixCompareError(f"cell {cell_id} invalid {label} artifact {path}: {exc}") from exc
+
+
+def _artifact_identity(path: Path) -> tuple[str, int]:
+    if path.name.endswith(".jsonl"):
+        identity = jsonl_identity(path)
+        return identity.sha256, identity.bytes
+    return _sha256(path), path.stat().st_size
 
 
 def _sha256(path: Path) -> str:

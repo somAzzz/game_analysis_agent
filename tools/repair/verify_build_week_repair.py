@@ -33,6 +33,10 @@ from game_analysis_agent.repair_verification import (  # noqa: E402
     validate_plan_against_design,
 )
 from game_analysis_agent.repair_worktree import validate_verification_worktrees  # noqa: E402
+from game_analysis_agent.report_archive import (  # noqa: E402
+    ReportArchiveError,
+    archive_jsonl_tree,
+)
 from game_analysis_agent.settings import Settings  # noqa: E402
 
 
@@ -47,6 +51,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--feedback-session-id", required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--concurrency", type=int, default=4, choices=(1, 2, 3, 4))
+    parser.add_argument(
+        "--keep-jsonl",
+        action="store_true",
+        help="Keep terminal private JSONL expanded instead of archiving it.",
+    )
+    parser.add_argument("--archive-level", type=int, default=3, choices=range(1, 20))
+    parser.add_argument("--zstd-bin", default="zstd")
     return parser
 
 
@@ -133,6 +144,26 @@ def main(argv: list[str] | None = None) -> int:
         record.comparison.model_dump_json(indent=2) + "\n", encoding="utf-8"
     )
     (output / "repair_summary.md").write_text(_summary(record), encoding="utf-8")
+    try:
+        storage = _finalize_report_storage(
+            output,
+            keep_jsonl=args.keep_jsonl,
+            level=args.archive_level,
+            zstd_bin=args.zstd_bin,
+        )
+    except (OSError, ReportArchiveError) as exc:
+        print(
+            json.dumps(
+                {
+                    "status": record.decision.value,
+                    "record": str(output / "repair_experiment.json"),
+                    "storage": {"status": "failed", "error": str(exc)},
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 2
     print(
         json.dumps(
             {
@@ -143,12 +174,29 @@ def main(argv: list[str] | None = None) -> int:
                 "fixed_reduction": record.comparison.fixed_relative_reduction,
                 "holdout_reduction": record.comparison.holdout_relative_reduction,
                 "record": str(output / "repair_experiment.json"),
+                "storage": storage,
             },
             indent=2,
             sort_keys=True,
         )
     )
     return 0 if record.decision.value == "accepted" else 1
+
+
+def _finalize_report_storage(
+    output: Path,
+    *,
+    keep_jsonl: bool,
+    level: int = 3,
+    zstd_bin: str = "zstd",
+) -> dict[str, int | str]:
+    """Archive terminal JSONL only after all decision artifacts are complete."""
+    return archive_jsonl_tree(
+        output,
+        keep_jsonl=keep_jsonl,
+        level=level,
+        zstd_bin=zstd_bin,
+    )
 
 
 def _run_focused_test(patched_game: Path, settings: Settings, output: Path) -> FocusedTestResult:

@@ -42,6 +42,11 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from game_analysis_agent.report_archive import (  # noqa: E402
+    ReportArchiveError,
+    iter_jsonl_rows,
+    jsonl_artifact_exists,
+)
 
 # ---------------------------------------------------------------------------
 # Tiny markdown renderer (subset)
@@ -202,19 +207,12 @@ def _load_csv(path: Path) -> list[dict[str, str]]:
 
 
 def _load_jsonl(path: Path) -> list[dict]:
-    if not path.exists():
+    if not jsonl_artifact_exists(path):
         return []
-    rows: list[dict] = []
-    with path.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                rows.append(json.loads(line))
-            except json.JSONDecodeError:
-                continue
-    return rows
+    try:
+        return [row for _, row in iter_jsonl_rows(path)]
+    except ReportArchiveError:
+        return []
 
 
 def _load_json(path: Path) -> dict | None:
@@ -332,15 +330,13 @@ def _scan_agents(report_dir: Path) -> list[dict[str, str]]:
 
 def _aggregate_balance_issue(report_dir: Path, slug: str) -> Issue | None:
     summary = _load_json(report_dir / "summary.json")
-    if not summary and not (report_dir / "raw_runs.jsonl").exists():
+    if not summary and not jsonl_artifact_exists(report_dir / "raw_runs.jsonl"):
         return None
     name = report_dir.name
 
     endings_rows = _load_csv(report_dir / "ending_distribution.csv")
     endings_pretty = []
-    for row in sorted(
-        endings_rows, key=lambda r: float(r.get("rate", 0) or 0), reverse=True
-    )[:6]:
+    for row in sorted(endings_rows, key=lambda r: float(r.get("rate", 0) or 0), reverse=True)[:6]:
         endings_pretty.append(
             {
                 "policy": row.get("policy", ""),
@@ -434,9 +430,7 @@ def _aggregate_boundary_issue(report_dir: Path, slug: str) -> Issue | None:
     for run in boundary_runs:
         ext = str(run.get("extreme", "unknown"))
         by_extreme_counts[ext] += 1
-        ending = str(
-            run.get("final_ending_id") or run.get("ending_id") or "unknown"
-        )
+        ending = str(run.get("final_ending_id") or run.get("ending_id") or "unknown")
         ending_counts[ending] += 1
         for a in run.get("anomalies", []) or []:
             anomalies.append(a)
@@ -472,7 +466,10 @@ def _aggregate_boundary_issue(report_dir: Path, slug: str) -> Issue | None:
 
 def _aggregate_play_issue(report_dir: Path, slug: str) -> Issue | None:
     raw_runs_path = report_dir / "raw_runs.jsonl"
-    if not raw_runs_path.exists() and not (report_dir / "playthrough_summary.md").exists():
+    if (
+        not jsonl_artifact_exists(raw_runs_path)
+        and not (report_dir / "playthrough_summary.md").exists()
+    ):
         return None
     raw_runs = _load_jsonl(raw_runs_path)
     name = report_dir.name
@@ -539,18 +536,14 @@ def _discover_issues(reports: Path) -> list[Issue]:
     if balance_root.exists():
         for child in sorted(balance_root.iterdir()):
             if child.is_dir():
-                issue = _aggregate_balance_issue(
-                    child, f"balance/{child.name}"
-                )
+                issue = _aggregate_balance_issue(child, f"balance/{child.name}")
                 if issue:
                     issues.append(issue)
     boundary_root = reports / "boundary"
     if boundary_root.exists():
         for child in sorted(boundary_root.iterdir()):
             if child.is_dir():
-                issue = _aggregate_boundary_issue(
-                    child, f"boundary/{child.name}"
-                )
+                issue = _aggregate_boundary_issue(child, f"boundary/{child.name}")
                 if issue:
                     issues.append(issue)
     play_root = reports / "play"
@@ -1150,37 +1143,24 @@ def _svg_sparkline(
         px = (x - x_min) / (x_max - x_min) * (width - 20) + 10
         py = (1 - (y - y_min) / (y_max - y_min)) * (height - 30) + 10
         pts.append((px, py))
-    path = " ".join(
-        f"{'M' if i == 0 else 'L'} {px:.1f} {py:.1f}" for i, (px, py) in enumerate(pts)
-    )
+    path = " ".join(f"{'M' if i == 0 else 'L'} {px:.1f} {py:.1f}" for i, (px, py) in enumerate(pts))
     last_y = pts[-1][1]
     last_x = pts[-1][0]
     return (
         f"<svg viewBox='0 0 {width} {height}' role='img' aria-label='{html.escape(label)}'>"
-        f"<path class='sparkline-path delay-{min(delay,4)}' d='{path}' "
+        f"<path class='sparkline-path delay-{min(delay, 4)}' d='{path}' "
         f"stroke='{color}' stroke-width='2' fill='none' />"
         f"<circle cx='{last_x:.1f}' cy='{last_y:.1f}' r='3' fill='{color}' />"
         f"</svg>"
     )
 
 
-def _spark_block_for_metric(
-    issue: Issue, metric: str, *, color: str, delay: int
-) -> str:
-    series = sorted(
-        (p.week, p.mean) for p in issue.weekly_series if p.metric == metric
-    )
+def _spark_block_for_metric(issue: Issue, metric: str, *, color: str, delay: int) -> str:
+    series = sorted((p.week, p.mean) for p in issue.weekly_series if p.metric == metric)
     if not series:
         return ""
-    svg = _svg_sparkline(
-        series, label=f"{metric} by week", color=color, delay=delay
-    )
-    return (
-        "<div class='sparkblock'>"
-        f"<h4>{html.escape(metric)}</h4>"
-        f"{svg}"
-        "</div>"
-    )
+    svg = _svg_sparkline(series, label=f"{metric} by week", color=color, delay=delay)
+    return f"<div class='sparkblock'><h4>{html.escape(metric)}</h4>{svg}</div>"
 
 
 def _top_findings_table(findings: list[dict], *, limit: int = 6) -> str:
@@ -1189,9 +1169,9 @@ def _top_findings_table(findings: list[dict], *, limit: int = 6) -> str:
     rows = findings[:limit]
     body = "".join(
         "<tr>"
-        f"<td><span class='severity {html.escape(str(f.get('severity','')))}'>{html.escape(str(f.get('severity','')))}</span></td>"
-        f"<td>{html.escape(str(f.get('description',''))[:160])}</td>"
-        f"<td class='right'>{html.escape(str(f.get('value','')))}</td>"
+        f"<td><span class='severity {html.escape(str(f.get('severity', '')))}'>{html.escape(str(f.get('severity', '')))}</span></td>"
+        f"<td>{html.escape(str(f.get('description', ''))[:160])}</td>"
+        f"<td class='right'>{html.escape(str(f.get('value', '')))}</td>"
         "</tr>"
         for f in rows
     )
@@ -1225,10 +1205,7 @@ def _anomaly_marginalia(issue: Issue) -> str:
     if not items:
         return ""
     body = "\n".join(items)
-    return (
-        "<h4>Anomaly marginalia</h4>"
-        f"<ul class='mn-list'>{body}</ul>"
-    )
+    return f"<h4>Anomaly marginalia</h4><ul class='mn-list'>{body}</ul>"
 
 
 def _playthrough_spine(issue: Issue) -> str:
@@ -1260,7 +1237,7 @@ def _playthrough_spine(issue: Issue) -> str:
     return (
         "<div class='playthrough-spine'>"
         "<h3 style='font-family:var(--serif);font-style:italic;margin:0 0 18px;"
-        "font-variation-settings:\"opsz\" 96, \"wght\" 420, \"SOFT\" 100;'>"
+        'font-variation-settings:"opsz" 96, "wght" 420, "SOFT" 100;\'>'
         f"The {len(weeks)}-week spine</h3>"
         f"<div class='axis'><div class='spine-line'></div>{''.join(nodes)}</div>"
         "</div>"
@@ -1402,7 +1379,8 @@ def _compute_graph_layout(
         lane_events_sorted = sorted(
             lane_events,
             key=lambda e: (
-                _trigger_week(e.get("trigger") or {}) if _trigger_week(e.get("trigger") or {}) is not None
+                _trigger_week(e.get("trigger") or {})
+                if _trigger_week(e.get("trigger") or {}) is not None
                 else float(e.get("source_order", 0) or 0) * 100
             ),
         )
@@ -1437,9 +1415,7 @@ def _compute_graph_layout(
     )
 
 
-def _wedge_path(
-    cx: float, cy: float, r: float, idx: int, total: int
-) -> str:
+def _wedge_path(cx: float, cy: float, r: float, idx: int, total: int) -> str:
     """Build the SVG path for one wedge of a pie chart."""
     if total <= 0:
         return ""
@@ -1472,13 +1448,13 @@ def _choice_index_from_id(choice_id: str, num_choices: int) -> int:
     if not choice_id or num_choices <= 0:
         return -1
     patterns = [
-        r"\.choice_(\d+)_",   # event.choice_01_text
-        r"\.choice_(\d+)$",   # event.choice_01
-        r"/c(\d+)$",          # event/c1
-        r"/choice(\d+)$",     # event/choice1
-        r":choice_?(\d+)$",   # event:choice1
-        r":(\d+)$",           # event:1
-        r"_(\d+)$",           # event_1
+        r"\.choice_(\d+)_",  # event.choice_01_text
+        r"\.choice_(\d+)$",  # event.choice_01
+        r"/c(\d+)$",  # event/c1
+        r"/choice(\d+)$",  # event/choice1
+        r":choice_?(\d+)$",  # event:choice1
+        r":(\d+)$",  # event:1
+        r"_(\d+)$",  # event_1
     ]
     for pat in patterns:
         match = re.search(pat, choice_id)
@@ -1505,9 +1481,7 @@ def _choice_index_from_record(week: dict, choices: list) -> int:
     explicit = week.get("selected_choice_index")
     if isinstance(explicit, int) and 0 <= explicit < len(choices):
         return explicit
-    return _choice_index_from_id(
-        str(week.get("event_choice_id") or ""), len(choices)
-    )
+    return _choice_index_from_id(str(week.get("event_choice_id") or ""), len(choices))
 
 
 def _safe_get_choice_text(choice: Any) -> str:
@@ -1533,9 +1507,7 @@ def _safe_get_choice_effects(choice: Any) -> dict[str, float]:
     return {}
 
 
-def _decision_graph_payload(
-    event_graph: dict, run: dict
-) -> dict:
+def _decision_graph_payload(event_graph: dict, run: dict) -> dict:
     """Compute the layout + path geometry + per-week metadata for the graph page.
 
     Tolerates many schema variations:
@@ -1561,9 +1533,7 @@ def _decision_graph_payload(
         )
         max_week = max(max_week, observed_max_week)
 
-    layout = _compute_graph_layout(
-        event_graph.get("events") or [], max_week=max_week
-    )
+    layout = _compute_graph_layout(event_graph.get("events") or [], max_week=max_week)
     triggered_events: list[dict] = []
     seen_event_ids: list[str] = []
     diagnostics: list[str] = []  # textual log of what we adapted to
@@ -1572,12 +1542,7 @@ def _decision_graph_payload(
         if not isinstance(week, dict):
             diagnostics.append(f"Skipped non-dict weekly_log entry: {type(week).__name__}")
             continue
-        ev_id = (
-            week.get("triggered_event_id")
-            or week.get("event_id")
-            or week.get("event")
-            or ""
-        )
+        ev_id = week.get("triggered_event_id") or week.get("event_id") or week.get("event") or ""
         if not ev_id:
             continue
         ev = layout.event_index.get(ev_id)
@@ -1595,7 +1560,9 @@ def _decision_graph_payload(
             _safe_get_choice_text(choices[choice_index]) if 0 <= choice_index < len(choices) else ""
         )
         choice_effects = (
-            _safe_get_choice_effects(choices[choice_index]) if 0 <= choice_index < len(choices) else {}
+            _safe_get_choice_effects(choices[choice_index])
+            if 0 <= choice_index < len(choices)
+            else {}
         )
         try:
             week_no = int(week.get("week", 0) or 0)
@@ -1614,11 +1581,7 @@ def _decision_graph_payload(
                 "choice_text": choice_text,
                 "choice_effects": choice_effects,
                 "selected_actions": [
-                    str(a) for a in (
-                        week.get("selected_action_ids")
-                        or week.get("actions")
-                        or []
-                    )
+                    str(a) for a in (week.get("selected_action_ids") or week.get("actions") or [])
                 ],
                 "after_state": dict(week.get("after_state") or week.get("state") or {}),
                 "x": layout.positions.get(ev_id, (0, 0))[0],
@@ -1631,10 +1594,7 @@ def _decision_graph_payload(
         "run": run,
         "events": triggered_events,
         "ending_id": str(
-            run.get("final_ending_id")
-            or run.get("ending_id")
-            or run.get("last_ending_id")
-            or ""
+            run.get("final_ending_id") or run.get("ending_id") or run.get("last_ending_id") or ""
         ),
         "final_state": run.get("final_state") or {},
         "policy": str(run.get("policy") or ""),
@@ -1643,7 +1603,9 @@ def _decision_graph_payload(
         "seed_display": str(run.get("seed") if run.get("seed") is not None else "—"),
         "max_week": max_week,
         "all_event_ids": [
-            ev.get("id") for ev in event_graph.get("events", []) if isinstance(ev, dict) and ev.get("id")
+            ev.get("id")
+            for ev in event_graph.get("events", [])
+            if isinstance(ev, dict) and ev.get("id")
         ],
         "diagnostics": diagnostics,
         "lane_order": layout.lane_order,
@@ -1656,9 +1618,7 @@ def _decision_graph_svg(payload: dict) -> str:
     triggered = payload["events"]
     triggered_by_id = {e["event_id"]: e for e in triggered}
     # Path data: ordered (x, y) through triggered events.
-    path_points = " ".join(
-        f"{e['x']:.2f},{e['y']:.2f}" for e in triggered
-    )
+    path_points = " ".join(f"{e['x']:.2f},{e['y']:.2f}" for e in triggered)
     # Edges (curved lines between consecutive triggered events)
     edges: list[str] = []
     for prev, curr in zip(triggered, triggered[1:], strict=False):
@@ -1718,8 +1678,8 @@ def _decision_graph_svg(payload: dict) -> str:
         all_event_dots.append(
             f'<circle class="event-node {html.escape(lane_name)}" cx="{x:.1f}" cy="{y:.1f}" '
             f'r="3.2" data-event-id="{html.escape(ev_id)}">'
-            f'<title>{html.escape(ev.get("title", ev_id))}</title>'
-            f'</circle>'
+            f"<title>{html.escape(ev.get('title', ev_id))}</title>"
+            f"</circle>"
         )
 
     # Triggered event nodes + choice wedges
@@ -1735,8 +1695,8 @@ def _decision_graph_svg(payload: dict) -> str:
             f'<g class="path-event-group" data-week="{ev["week"]}" data-event-id="{html.escape(ev_id)}">'
             f'<circle class="event-node triggered {html.escape(lane_name)}" cx="{cx:.1f}" cy="{cy:.1f}" '
             f'r="9" data-event-id="{html.escape(ev_id)}" data-week="{ev["week"]}" data-choice-index="{choice_index}">'
-            f'<title>W{ev["week"]} · {html.escape(ev.get("title", ev_id))}</title>'
-            f'</circle>'
+            f"<title>W{ev['week']} · {html.escape(ev.get('title', ev_id))}</title>"
+            f"</circle>"
         )
         if 0 <= choice_index < len(choices) and len(choices) > 1:
             wedge = _wedge_path(cx, cy, 9, choice_index, len(choices))
@@ -1783,9 +1743,7 @@ def render_decision_graph_page(
     # Per-week timeline cells (for the scrubber)
     timeline_cells = []
     for week in range(0, payload["max_week"] + 1):
-        triggered_at = next(
-            (e for e in triggered if e["week"] == week), None
-        )
+        triggered_at = next((e for e in triggered if e["week"] == week), None)
         cls = "timeline-cell"
         if triggered_at:
             cls += " is-triggered"
@@ -1817,23 +1775,27 @@ def render_decision_graph_page(
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Decision graph — run {payload['seed_display']} · {html.escape(payload['policy'])}</title>
+<title>Decision graph — run {payload["seed_display"]} · {html.escape(payload["policy"])}</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>{_CSS}</style>
 </head>
 <body>
 <header class="masthead">
   <span class="kicker"><a href="{html.escape(back_href)}">← Back to issue</a></span>
-  <span class="issue-line">Decision graph · run seed {payload['seed_display']} · policy <em>{html.escape(payload['policy'])}</em></span>
+  <span class="issue-line">Decision graph · run seed {payload["seed_display"]} · policy <em>{
+        html.escape(payload["policy"])
+    }</em></span>
   <span class="date">{html.escape(_byline_now())}</span>
 </header>
 
 <section class="cover">
   <div class="issue-meta">
-    <span><strong>{payload['policy'] or '—'}</strong>policy<strong>played</strong></span>
+    <span><strong>{payload["policy"] or "—"}</strong>policy<strong>played</strong></span>
     <span><strong>{len(triggered)}</strong>events<strong>triggered</strong></span>
-    <span><strong>{payload['max_week']}</strong>weeks<strong>simulated</strong></span>
-    <span><strong>{html.escape(payload['ending_id'] or 'unknown')}</strong>final<strong>ending</strong></span>
+    <span><strong>{payload["max_week"]}</strong>weeks<strong>simulated</strong></span>
+    <span><strong>{
+        html.escape(payload["ending_id"] or "unknown")
+    }</strong>final<strong>ending</strong></span>
   </div>
   <h1>The decision <em>graph</em></h1>
   <p class="deck">
@@ -1847,7 +1809,12 @@ def render_decision_graph_page(
 
 <main class="graph-shell">
   <div class="legend-row">
-    {''.join(f'<span><span class="swatch {html.escape(name)}"></span>{html.escape(name)} event ({sum(1 for e in triggered_events_full if _lane_for_event(e) == name)})</span>' for name in lane_order_for_legend)}
+    {
+        "".join(
+            f'<span><span class="swatch {html.escape(name)}"></span>{html.escape(name)} event ({sum(1 for e in triggered_events_full if _lane_for_event(e) == name)})</span>'
+            for name in lane_order_for_legend
+        )
+    }
     <span><span class="swatch path"></span>agent path</span>
     <span style="color:var(--accent);font-style:italic;font-family:var(--serif);font-size:13px">
       wedge numerals = the choice index the agent picked (1-indexed)
@@ -1864,18 +1831,28 @@ def render_decision_graph_page(
     replays the highlight up to that point in the simulation.
   </div>
 
-  {('<details class="graph-diagnostics" style="margin:18px 0 0;font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--ink-soft)">'
-    '<summary style="cursor:pointer;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-soft);padding:6px 0;border-top:1px dotted var(--rule);border-bottom:1px dotted var(--rule)">'
-    'Adaptive diagnostics · ' + str(len(payload.get("diagnostics", []))) + ' note(s)'
-    '</summary>'
-    '<div style="padding:10px 14px;background:var(--paper-deep);border-left:2px solid var(--accent);margin-top:6px">'
-    + ("".join("<div>· " + html.escape(d) + "</div>" for d in payload.get("diagnostics", []))
-       or '<div style="color:var(--muted)">No schema adaptions were needed — payload parsed cleanly.</div>')
-    + '</div></details>') if payload.get("diagnostics") is not None else ''}
+  {
+        (
+            '<details class="graph-diagnostics" style="margin:18px 0 0;font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--ink-soft)">'
+            '<summary style="cursor:pointer;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-soft);padding:6px 0;border-top:1px dotted var(--rule);border-bottom:1px dotted var(--rule)">'
+            "Adaptive diagnostics · " + str(len(payload.get("diagnostics", []))) + " note(s)"
+            "</summary>"
+            '<div style="padding:10px 14px;background:var(--paper-deep);border-left:2px solid var(--accent);margin-top:6px">'
+            + (
+                "".join(
+                    "<div>· " + html.escape(d) + "</div>" for d in payload.get("diagnostics", [])
+                )
+                or '<div style="color:var(--muted)">No schema adaptions were needed — payload parsed cleanly.</div>'
+            )
+            + "</div></details>"
+        )
+        if payload.get("diagnostics") is not None
+        else ""
+    }
 
   <div class="timeline-rail" id="timeline-rail">
     <div class="timeline-strip">
-      {''.join(timeline_cells)}
+      {"".join(timeline_cells)}
     </div>
     <div class="timeline-controls">
       <div class="row">
@@ -1885,7 +1862,9 @@ def render_decision_graph_page(
       </div>
       <div class="row">
         <span style="color:var(--ink-soft)">W</span>
-        <input type="range" id="week-slider" min="0" max="{payload['max_week']}" value="0" step="1" />
+        <input type="range" id="week-slider" min="0" max="{
+        payload["max_week"]
+    }" value="0" step="1" />
         <span id="week-current" style="color:var(--accent);font-weight:600">0</span>
       </div>
       <div class="legend">
@@ -1909,7 +1888,9 @@ def render_decision_graph_page(
     </div>
     <aside>
       <div class="panel-card" id="choice-panel">
-        {default_block or '<h4>Pick a week</h4><div>Use the slider or click any node to start.</div>'}
+        {
+        default_block or "<h4>Pick a week</h4><div>Use the slider or click any node to start.</div>"
+    }
       </div>
     </aside>
   </div>
@@ -1919,7 +1900,9 @@ def render_decision_graph_page(
 
 <footer class="colophon">
   <div class="row">
-    <span>{html.escape(report_dir.name)} · seed {payload['seed'] or '—'} · policy {html.escape(payload['policy'])}</span>
+    <span>{html.escape(report_dir.name)} · seed {payload["seed"] or "—"} · policy {
+        html.escape(payload["policy"])
+    }</span>
     <span>Generated by tools/dashboard/build_dashboard.py · decision-graph</span>
   </div>
 </footer>
@@ -2093,11 +2076,14 @@ def render_decision_graph_page(
 
 def _render_choice_panel(ev: dict) -> str:
     effects = ev.get("choice_effects") or {}
-    eff_html = "".join(
-        f'<span class="{("pos" if float(v) >= 0 else "neg")}">{html.escape(str(k))} '
-        f'{("+" if float(v) >= 0 else "")}{html.escape(str(v))}</span>'
-        for k, v in effects.items()
-    ) or '<span style="color:var(--muted)">no effects recorded</span>'
+    eff_html = (
+        "".join(
+            f'<span class="{("pos" if float(v) >= 0 else "neg")}">{html.escape(str(k))} '
+            f"{('+' if float(v) >= 0 else '')}{html.escape(str(v))}</span>"
+            for k, v in effects.items()
+        )
+        or '<span style="color:var(--muted)">no effects recorded</span>'
+    )
     return (
         f"<h4>W{ev['week']} · choice #{ev['choice_index'] + 1}</h4>"
         f'<span class="pick-text">"{html.escape(ev.get("choice_text") or "(no text)")}"</span>'
@@ -2151,7 +2137,7 @@ def render_front_page(issues: list[Issue]) -> str:
 <header class="masthead">
   <span class="kicker">Vol. 0.2 · Field reports</span>
   <span class="issue-line">No. ∞ · A continuous publication</span>
-  <span class="date">{datetime.now(tz=UTC).strftime('%a %d %b %Y · %H:%M UTC')}</span>
+  <span class="date">{datetime.now(tz=UTC).strftime("%a %d %b %Y · %H:%M UTC")}</span>
 </header>
 <section class="banner">
   <div class="banner-inner">
@@ -2180,10 +2166,10 @@ def render_front_page(issues: list[Issue]) -> str:
 
   <div class="section-rule"><span class="num">§II</span><span class="label">In this edition — issues to read cover-to-cover</span></div>
   <div class="issue-shelf">
-    {''.join(issue_cards)}
+    {"".join(issue_cards)}
   </div>
 
-  <div class="byline-rule" style="margin-top:64px">Game Analysis Agent · Reports Index · {datetime.now(tz=UTC).strftime('%Y-%m-%d %H:%M UTC')}</div>
+  <div class="byline-rule" style="margin-top:64px">Game Analysis Agent · Reports Index · {datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M UTC")}</div>
 </main>
 
 <footer class="colophon">
@@ -2201,7 +2187,12 @@ def render_front_page(issues: list[Issue]) -> str:
 def _highlight(title: str) -> str:
     """Italicise occasional words in the title for editorial flavour."""
     out = html.escape(title)
-    out = re.sub(r"\b(critical|cohort|overpick|underuse|route|probe|boundary)\b", r"<em>\1</em>", out, flags=re.I)
+    out = re.sub(
+        r"\b(critical|cohort|overpick|underuse|route|probe|boundary)\b",
+        r"<em>\1</em>",
+        out,
+        flags=re.I,
+    )
     return out
 
 
@@ -2237,7 +2228,7 @@ def render_issue(issue: Issue) -> str:
             f"<tr><td>{html.escape(row['policy'])}</td><td>{html.escape(row['ending_id'])}</td>"
             f"<td class='right'>{row['count']}</td>"
             f"<td class='right'>"
-            f"<span class='bar' style='width:{int(float(row['rate'])*80)}px'></span>{row['rate']}"
+            f"<span class='bar' style='width:{int(float(row['rate']) * 80)}px'></span>{row['rate']}"
             f"</td></tr>"
             for row in issue.endings
         )
@@ -2245,7 +2236,7 @@ def render_issue(issue: Issue) -> str:
             "<div class='endgrid'>"
             "<div>"
             "<h3 style='font-family:var(--serif);font-style:italic;font-size:32px;"
-            "font-variation-settings:\"opsz\" 96, \"wght\" 380, \"SOFT\" 100;margin:0 0 12px'>"
+            'font-variation-settings:"opsz" 96, "wght" 380, "SOFT" 100;margin:0 0 12px\'>'
             "Where the runs came to rest</h3>"
             "<div class='endtable'><table>"
             "<thead><tr><th>policy</th><th>ending</th><th class='right'>n</th><th class='right'>rate</th></tr></thead>"
@@ -2253,7 +2244,7 @@ def render_issue(issue: Issue) -> str:
             "</div>"
             "<div>"
             "<h3 style='font-family:var(--serif);font-style:italic;font-size:32px;"
-            "font-variation-settings:\"opsz\" 96, \"wght\" 380, \"SOFT\" 100;margin:0 0 12px'>"
+            'font-variation-settings:"opsz" 96, "wght" 380, "SOFT" 100;margin:0 0 12px\'>'
             "Actions at the top of the heap</h3>"
             "<div class='endtable'><table>"
             "<thead><tr><th>policy</th><th>action_id</th><th class='right'>n</th><th class='right'>rate/run</th></tr></thead>"
@@ -2284,7 +2275,7 @@ def render_issue(issue: Issue) -> str:
             "<article class='article fade-in'>"
             "<div class='column'>"
             "<h2 style='font-family:var(--serif);font-style:italic;font-size:44px;"
-            "font-variation-settings:\"opsz\" 144, \"wght\" 360, \"SOFT\" 100;margin-top:0'>"
+            'font-variation-settings:"opsz" 144, "wght" 360, "SOFT" 100;margin-top:0\'>'
             "Pulse of the simulation</h2>"
             "<p class='deck' style='font-style:italic;color:var(--ink-soft);font-size:18px'>"
             "Four metrics, drawn week by week. Solid line is the cohort mean. "
@@ -2312,7 +2303,7 @@ def render_issue(issue: Issue) -> str:
             "<article class='article fade-in'>"
             "<div class='column'>"
             "<h2 style='font-family:var(--serif);font-style:italic;font-size:36px;"
-            "font-variation-settings:\"opsz\" 96, \"wght\" 360, \"SOFT\" 100;margin-top:0'>"
+            'font-variation-settings:"opsz" 96, "wght" 360, "SOFT" 100;margin-top:0\'>'
             "What the number nerds found</h2>"
             f"{_top_findings_table(issue.value_findings, limit=8)}"
             "</div>"
@@ -2329,7 +2320,7 @@ def render_issue(issue: Issue) -> str:
             "<article class='article fade-in'>"
             "<div class='column'>"
             "<h2 style='font-family:var(--serif);font-style:italic;font-size:36px;"
-            "font-variation-settings:\"opsz\" 96, \"wght\" 360, \"SOFT\" 100;margin-top:0'>"
+            'font-variation-settings:"opsz" 96, "wght" 360, "SOFT" 100;margin-top:0\'>'
             "An LLM at the wheel</h2>"
             "<p class='deck' style='font-style:italic;color:var(--ink-soft);font-size:18px'>"
             "One playthrough, twenty weeks, the LLM calling its own shots. "
@@ -2413,7 +2404,7 @@ def render_issue(issue: Issue) -> str:
   {spark_section}
   {value_table_section}
   {playthrough_section}
-  {''.join(sections)}
+  {"".join(sections)}
 </main>
 
 <footer class="colophon">
@@ -2509,7 +2500,7 @@ def _emit_decision_graph_for(
     run_id: int = 0,
 ) -> bool:
     """Render one decision-graph page + diagnostics. Returns True on success."""
-    if not (report_dir / "raw_runs.jsonl").exists():
+    if not jsonl_artifact_exists(report_dir / "raw_runs.jsonl"):
         return False
     if not (report_dir / "event_graph.json").exists():
         return False
@@ -2571,13 +2562,11 @@ def _write_diagnostics_json(
     new event types, dropped triggered events, unparseable choice_ids —
     so a human can see exactly what changed when the event tree evolves.
     """
-    event_types = sorted({
-        _lane_for_event(ev) for ev in event_graph.get("events") or [] if isinstance(ev, dict)
-    })
+    event_types = sorted(
+        {_lane_for_event(ev) for ev in event_graph.get("events") or [] if isinstance(ev, dict)}
+    )
     triggered_ids = {e.get("event_id") for e in payload.get("events", [])}
-    graph_ids = {
-        ev.get("id") for ev in event_graph.get("events") or [] if isinstance(ev, dict)
-    }
+    graph_ids = {ev.get("id") for ev in event_graph.get("events") or [] if isinstance(ev, dict)}
     payload_diagnostics = payload.get("diagnostics", []) or []
     diagnostics = {
         "generated_at": datetime.now(tz=UTC).isoformat(),
@@ -2596,9 +2585,7 @@ def _write_diagnostics_json(
             "ending_id": payload.get("ending_id"),
         },
         "adaptations": {
-            "triggered_but_missing_in_graph": sorted(
-                triggered_ids - graph_ids
-            ),
+            "triggered_but_missing_in_graph": sorted(triggered_ids - graph_ids),
             "diagnostics_notes": payload_diagnostics,
         },
     }
@@ -2635,7 +2622,7 @@ def cmd_all(args) -> int:
         report_dir = reports / issue.issue_kind / issue.issue_id
         if (
             issue.issue_kind in ("balance", "play")
-            and (report_dir / "raw_runs.jsonl").exists()
+            and jsonl_artifact_exists(report_dir / "raw_runs.jsonl")
             and _emit_decision_graph_for(
                 browse_root=browse_root,
                 report_dir=report_dir,
@@ -2712,7 +2699,7 @@ def cmd_decision_graph(args) -> int:
         return 2
     raw_runs_path = report_dir / "raw_runs.jsonl"
     event_graph_path = report_dir / "event_graph.json"
-    if not raw_runs_path.exists():
+    if not jsonl_artifact_exists(raw_runs_path):
         print(f"missing raw_runs.jsonl under {report_dir}", file=sys.stderr)
         return 3
     if not event_graph_path.exists():

@@ -18,6 +18,7 @@ from .campaign_contract import (
 )
 from .persona_gateway import PersonaCallMetadata, PersonaProviderError
 from .persona_runtime import redact_sensitive_text
+from .report_archive import ReportArchiveError, iter_jsonl_rows
 
 BUNDLE_GATE_SCHEMA = "campaign-bundle-gate-v1"
 PERSONA_RUN_SCHEMA = "public-persona-run-v1"
@@ -178,8 +179,7 @@ def build_public_campaign_bundle(
         campaign_id=manifest.request.campaign_id,
         rules_fingerprint=aggregation.rules_fingerprint,
         clusters=tuple(
-            _public_cluster(cluster, public_citations)
-            for cluster in aggregation.clusters
+            _public_cluster(cluster, public_citations) for cluster in aggregation.clusters
         ),
     )
 
@@ -298,7 +298,9 @@ def _public_calls(
         path = project / result.request.output_dir / "playthrough.jsonl"
         rows = _read_jsonl(path)
         for week, row in enumerate(rows, start=1):
-            raw_calls = row.get("persona_calls") if isinstance(row.get("persona_calls"), list) else []
+            raw_calls = (
+                row.get("persona_calls") if isinstance(row.get("persona_calls"), list) else []
+            )
             for raw in raw_calls:
                 if not isinstance(raw, dict):
                     continue
@@ -348,8 +350,7 @@ def _public_run_rows(
                 valid=validation.get("valid") is True,
                 fallback_used=validation.get("fallback_used") is True,
                 provider_error=any(
-                    isinstance(call, dict) and call.get("status") != "completed"
-                    for call in calls
+                    isinstance(call, dict) and call.get("status") != "completed" for call in calls
                 ),
                 ending=str(
                     result_payload.get("final_ending")
@@ -382,9 +383,7 @@ def _public_cluster(
     representatives = tuple(
         citations[(item.cell_id, item.week)] for item in cluster.representatives
     )
-    return cluster.model_copy(
-        update={"members": members, "representatives": representatives}
-    )
+    return cluster.model_copy(update={"members": members, "representatives": representatives})
 
 
 def _public_state(row: dict[str, Any]) -> dict[str, Any]:
@@ -439,14 +438,10 @@ def _artifact(path: Path, *, relative: str, records: int | None) -> BundleArtifa
 
 
 def _read_jsonl(path: Path) -> list[dict[str, Any]]:
-    rows = []
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if line.strip():
-            payload = json.loads(line)
-            if not isinstance(payload, dict):
-                raise CampaignBundleError(f"JSONL row is not an object: {path.name}")
-            rows.append(payload)
-    return rows
+    try:
+        return [payload for _, payload in iter_jsonl_rows(path)]
+    except ReportArchiveError as exc:
+        raise CampaignBundleError(f"invalid JSONL artifact: {path.name}: {exc}") from exc
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -459,8 +454,7 @@ def _write_json(path: Path, payload: object) -> None:
 def _write_jsonl(path: Path, rows: list[BaseModel]) -> None:
     path.write_text(
         "".join(
-            json.dumps(row.model_dump(mode="json"), ensure_ascii=False, sort_keys=True)
-            + "\n"
+            json.dumps(row.model_dump(mode="json"), ensure_ascii=False, sort_keys=True) + "\n"
             for row in rows
         ),
         encoding="utf-8",

@@ -16,9 +16,16 @@ import platform
 import shutil
 import subprocess
 import sys
+from contextlib import suppress
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+from game_analysis_agent.report_archive import (
+    ReportArchiveError,
+    iter_jsonl_rows,
+    resolve_jsonl_artifact,
+)
 
 MANIFEST_FILE = "report_manifest.json"
 REPORT_INDEX_FILE = "report_index.json"
@@ -195,6 +202,9 @@ def _trace_index(report_dir: Path, run_id: str) -> dict[str, Any]:
 def _file_ref(report_dir: Path, item: str | Path) -> dict[str, Any]:
     raw_path = item if isinstance(item, Path) else Path(item)
     path = raw_path if raw_path.is_absolute() else report_dir / raw_path
+    if path.name.endswith(".jsonl") and not path.exists():
+        with suppress(ReportArchiveError):
+            path = resolve_jsonl_artifact(path)
     exists = path.exists()
     rel = _display_artifact_path(path, report_dir=report_dir)
     return {
@@ -444,8 +454,11 @@ def _dedupe_refs(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def _first_existing(report_dir: Path, names: list[str]) -> Path | None:
     for name in names:
         path = report_dir / name
-        if path.exists():
+        try:
+            resolve_jsonl_artifact(path)
             return path
+        except ReportArchiveError:
+            continue
     return None
 
 
@@ -460,18 +473,10 @@ def _read_json(path: Path) -> dict[str, Any]:
 
 
 def _read_jsonl_with_lines(path: Path) -> list[tuple[int, dict[str, Any]]]:
-    rows: list[tuple[int, dict[str, Any]]] = []
-    with path.open("r", encoding="utf-8") as handle:
-        for line_no, line in enumerate(handle, start=1):
-            if not line.strip():
-                continue
-            try:
-                payload = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if isinstance(payload, dict):
-                rows.append((line_no, payload))
-    return rows
+    try:
+        return list(iter_jsonl_rows(path))
+    except ReportArchiveError:
+        return []
 
 
 __all__ = [

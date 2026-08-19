@@ -25,6 +25,7 @@ from game_analysis_agent.analytics import (  # noqa: E402
     write_csv,
 )
 from game_analysis_agent.coverage import analyze_and_write_coverage  # noqa: E402
+from game_analysis_agent.report_archive import jsonl_artifact_exists  # noqa: E402
 from game_analysis_agent.report_manifest import write_report_manifest  # noqa: E402
 
 
@@ -32,7 +33,9 @@ def usage() -> None:
     print("Usage: python3 tools/gameplay/analyze_balance.py <raw_runs.jsonl> <out_dir>")
 
 
-def analyze(runs: list[dict], out_dir: Path, *, raw_runs_path: Path | None = None) -> dict[str, list]:
+def analyze(
+    runs: list[dict], out_dir: Path, *, raw_runs_path: Path | None = None
+) -> dict[str, list]:
     out_dir.mkdir(parents=True, exist_ok=True)
     ending_rows = compute_ending_distribution(runs)
     action_rows = compute_action_pick_rates(runs)
@@ -122,7 +125,7 @@ def main() -> int:
         return 2
     raw_path = Path(sys.argv[1])
     out_dir = Path(sys.argv[2])
-    if not raw_path.exists():
+    if not jsonl_artifact_exists(raw_path):
         print(f"Missing raw file: {raw_path}", file=sys.stderr)
         return 1
     runs = load_runs(raw_path)

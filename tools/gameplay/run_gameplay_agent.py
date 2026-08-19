@@ -66,6 +66,11 @@ from game_analysis_agent.llm_client import (  # noqa: E402
     LocalLLMClient,
 )
 from game_analysis_agent.quality_gates import evaluate_report_dir, write_gate_report  # noqa: E402
+from game_analysis_agent.report_archive import (  # noqa: E402
+    ReportArchiveError,
+    archive_jsonl_tree,
+    jsonl_artifact_exists,
+)
 from game_analysis_agent.report_manifest import (  # noqa: E402
     write_report_manifest,
     write_reports_index,
@@ -138,6 +143,8 @@ _REPORT_OUTPUT_PATTERNS = (
     "*_agent_report.json",
     "*_agent_report.md",
     "*_findings.jsonl",
+    "*.jsonl.zst",
+    "*.jsonl.zst.manifest.json",
     "agent_eval.json",
 )
 
@@ -254,6 +261,21 @@ def _run_godot(
 # ---------------------------------------------------------------------------
 # Sub-commands
 # ---------------------------------------------------------------------------
+
+
+def _finalize_report_storage(args: argparse.Namespace, report_dir: Path) -> int:
+    """Seal completed JSONL evidence unless explicitly kept for debugging."""
+
+    try:
+        storage = archive_jsonl_tree(
+            report_dir,
+            keep_jsonl=bool(getattr(args, "keep_jsonl", False)),
+        )
+    except (OSError, ReportArchiveError) as exc:
+        print(f"Report storage finalization failed: {exc}", file=sys.stderr)
+        return 9
+    print(f"Report storage: {json.dumps(storage, sort_keys=True)}")
+    return 0
 
 
 def cmd_sim(args: argparse.Namespace) -> int:
@@ -384,7 +406,7 @@ def cmd_sim(args: argparse.Namespace) -> int:
     )
     print(f"Copied raw runs to {target_out}")
     args._report_dir = out_dir
-    return cmd_analyze(
+    rc = cmd_analyze(
         argparse.Namespace(
             report_dir=out_dir,
             raw_runs=target_out,
@@ -392,14 +414,21 @@ def cmd_sim(args: argparse.Namespace) -> int:
             run_value=True,
         )
     )
+    if rc != 0:
+        return rc
+    return _finalize_report_storage(args, out_dir)
 
 
 def cmd_analyze(args: argparse.Namespace) -> int:
     raw_path = args.raw_runs or (args.report_dir / "raw_runs.jsonl")
-    if not raw_path.exists():
+    if not jsonl_artifact_exists(raw_path):
         print(f"Missing raw runs: {raw_path}", file=sys.stderr)
         return 1
-    runs = load_runs(raw_path)
+    try:
+        runs = load_runs(raw_path)
+    except (OSError, ReportArchiveError, ValueError) as exc:
+        print(f"Could not read raw runs: {exc}", file=sys.stderr)
+        return 1
     out_dir = args.report_dir
     analyze(runs, out_dir, raw_runs_path=raw_path)
     if args.run_anomalies:
@@ -540,7 +569,7 @@ def cmd_probe(args: argparse.Namespace) -> int:
         summary={"total_runs": len(runs), "anomalies": len(anomalies)},
     )
     print(f"Boundary probe complete; {len(runs)} runs -> {target_out}")
-    return 0
+    return _finalize_report_storage(args, out_dir)
 
 
 def cmd_validate(args: argparse.Namespace) -> int:
@@ -1187,7 +1216,7 @@ def cmd_play(args: argparse.Namespace) -> int:
         for error in [*evaluation["errors"], *evaluation["quality_errors"]]:
             print(f"[play failed] {error}", file=sys.stderr)
         return 8
-    return 0
+    return _finalize_report_storage(args, args.report_dir)
 
 
 def cmd_interactive_probe(args: argparse.Namespace) -> int:
@@ -1260,7 +1289,10 @@ def cmd_eval(args: argparse.Namespace) -> int:
 
 
 def cmd_all(args: argparse.Namespace) -> int:
+    keep_jsonl = bool(getattr(args, "keep_jsonl", False))
+    args.keep_jsonl = True
     rc = cmd_sim(args)
+    args.keep_jsonl = keep_jsonl
     if rc != 0:
         return rc
     report_dir = args._report_dir
@@ -1314,13 +1346,16 @@ def cmd_all(args: argparse.Namespace) -> int:
         if rc != 0:
             return rc
 
-    return cmd_gates(
+    rc = cmd_gates(
         argparse.Namespace(
             report_dir=report_dir,
             gates=getattr(args, "gates", None),
             out=None,
         )
     )
+    if rc != 0:
+        return rc
+    return _finalize_report_storage(args, report_dir)
 
 
 def cmd_matrix(args: argparse.Namespace) -> int:
@@ -1349,6 +1384,7 @@ def cmd_matrix(args: argparse.Namespace) -> int:
             jobs=args.jobs,
             dry_run=args.dry_run,
             resume=args.resume,
+            keep_jsonl=args.keep_jsonl,
         )
     except MatrixConfigError as exc:
         print(f"Invalid matrix config: {exc}", file=sys.stderr)
@@ -1424,6 +1460,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sim_p.add_argument("--no-anomalies", dest="run_anomalies", action="store_false")
     sim_p.add_argument("--no-value", dest="run_value", action="store_false")
+    sim_p.add_argument(
+        "--keep-jsonl",
+        action="store_true",
+        help="Keep expanded JSONL after success (short-lived debugging only).",
+    )
     sim_p.set_defaults(func=cmd_sim)
 
     analyze_p = sub.add_parser("analyze", help="Re-analyze an existing raw_runs.jsonl.")
@@ -1460,6 +1501,11 @@ def build_parser() -> argparse.ArgumentParser:
     probe_p.add_argument(
         "--extreme",
         default="zero_money,deep_debt,no_energy,all_negative,no_language,flag_chaos,week_zero,already_registered",
+    )
+    probe_p.add_argument(
+        "--keep-jsonl",
+        action="store_true",
+        help="Keep expanded JSONL after success (short-lived debugging only).",
     )
     probe_p.set_defaults(func=cmd_probe)
 
@@ -1531,6 +1577,11 @@ def build_parser() -> argparse.ArgumentParser:
     matrix_p.add_argument("--jobs", type=int, default=1)
     matrix_p.add_argument("--dry-run", action="store_true")
     matrix_p.add_argument("--resume", action="store_true")
+    matrix_p.add_argument(
+        "--keep-jsonl",
+        action="store_true",
+        help="Keep every completed cell expanded (short-lived debugging only).",
+    )
     matrix_p.add_argument(
         "--simulation-command",
         choices=("sim", "all"),
@@ -1626,6 +1677,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Godot scenario id to inject into the interactive probe.",
     )
     play_p.add_argument("--seed", type=int, default=42, help="Seed passed to the persona block.")
+    play_p.add_argument(
+        "--keep-jsonl",
+        action="store_true",
+        help="Keep expanded JSONL after success (short-lived debugging only).",
+    )
     play_p.set_defaults(func=cmd_play)
 
     all_p = sub.add_parser(
@@ -1672,6 +1728,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--reuse-validation-inputs",
         action="store_true",
         help="Opt in to existing route/demo prerequisites; fresh inputs are the default.",
+    )
+    all_p.add_argument(
+        "--keep-jsonl",
+        action="store_true",
+        help="Keep expanded JSONL after all gates pass (short-lived debugging only).",
     )
     all_p.set_defaults(func=cmd_all)
 

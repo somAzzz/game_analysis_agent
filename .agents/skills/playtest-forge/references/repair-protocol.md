@@ -47,6 +47,16 @@ direction, focused tests pass, critical invariants remain clean, protected
 metrics stay bounded, intentional failure remains possible, and all artifacts
 reparse and hash. Otherwise reject and retain the failed experiment.
 
+Each fixed or holdout cell may move from hot storage to verified Zstandard as
+soon as that cell is immutable and its contract, provenance, completeness, and
+evidence checks pass. Comparison and repair gates must consume the verified raw
+identity from either representation. After the accepted/rejected record is
+written, the standard verifier seals any remaining private JSONL. It removes
+each raw file only after an exact round-trip proof. Use `--keep-jsonl` only when
+a downstream compatibility or active debugging need requires expanded
+evidence. Never archive a running/finalizing file, and treat archive failure as
+non-success.
+
 For this repository, run `scripts/verify-repair`. On another project, use the
 typed verifier declared in its project profile; never assume this wrapper is
 portable.

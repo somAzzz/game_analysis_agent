@@ -139,6 +139,11 @@ python tools/reports/prune_expired_reports.py          # dry-run
 python tools/reports/prune_expired_reports.py --apply  # actually delete
 ```
 
+Large immutable JSONL evidence is retained losslessly as verified Zstandard
+archives. Standard matrices seal each cell after its evidence checks pass;
+first-party readers re-analyze the archive directly. See
+`docs/operations/REPORT_ARCHIVES.md`.
+
 `reports/` is gitignored, so the deleted artifacts will not appear in
 `git status`. The script prints every path it would remove so the
 operation is auditable.

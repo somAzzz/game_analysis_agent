@@ -29,6 +29,11 @@ from .campaign_contract import (
     resume_compatible,
 )
 from .persona_runtime import PersonaCancellationToken, redact_sensitive_text
+from .report_archive import (
+    ReportArchiveError,
+    archive_jsonl_tree,
+    iter_jsonl_rows,
+)
 
 
 class CampaignRunnerError(RuntimeError):
@@ -139,6 +144,7 @@ class CampaignRunner:
         cancellation: PersonaCancellationToken | None = None,
         children: ChildProcessRegistry | None = None,
         clock: Callable[[], datetime] | None = None,
+        archive_completed_jsonl: bool = False,
     ) -> None:
         if request.provider != source.provider:
             raise CampaignRunnerError("campaign request/source provider mismatch")
@@ -150,6 +156,7 @@ class CampaignRunner:
         self.children = children or ChildProcessRegistry()
         self.context = CampaignExecutionContext(self.cancellation, self.children)
         self.clock = clock or (lambda: datetime.now(tz=UTC))
+        self.archive_completed_jsonl = archive_completed_jsonl
 
     @property
     def campaign_dir(self) -> Path:
@@ -215,9 +222,7 @@ class CampaignRunner:
         path = self.campaign_dir / "campaign_manifest.json"
         if path.is_file():
             try:
-                existing = CampaignManifest.model_validate_json(
-                    path.read_text(encoding="utf-8")
-                )
+                existing = CampaignManifest.model_validate_json(path.read_text(encoding="utf-8"))
             except (OSError, ValidationError):
                 existing = None
             if (
@@ -268,6 +273,19 @@ class CampaignRunner:
         except (CampaignRunnerError, ValidationError, OSError, ValueError) as exc:
             result = self._result_after_exception(cell, output_dir, started, exc)
         self._write_result(result)
+        if result.state == CampaignCellState.COMPLETED and self.archive_completed_jsonl:
+            try:
+                archive_jsonl_tree(output_dir)
+            except (OSError, ReportArchiveError) as exc:
+                result = CampaignCellResult.model_validate(
+                    {
+                        **result.model_dump(mode="python"),
+                        "state": CampaignCellState.PARTIAL,
+                        "stop_reason": CampaignStopReason.INVARIANT_FAILED,
+                        "error": redact_sensitive_text(f"storage finalization failed: {exc}"),
+                    }
+                )
+                self._write_result(result)
         return result
 
     def _result_from_outcome(
@@ -451,20 +469,12 @@ class CampaignRunner:
 
 
 def _read_playthrough(path: Path) -> list[dict[str, Any]]:
-    if not path.is_file():
-        return []
-    rows = []
-    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-        if not line.strip():
-            continue
-        try:
-            row = json.loads(line)
-        except json.JSONDecodeError as exc:
-            raise CampaignRunnerError(f"invalid playthrough JSON at line {line_number}") from exc
-        if not isinstance(row, dict):
-            raise CampaignRunnerError(f"playthrough line {line_number} is not an object")
-        rows.append(row)
-    return rows
+    try:
+        return [row for _, row in iter_jsonl_rows(path)]
+    except ReportArchiveError as exc:
+        if "unavailable" in str(exc):
+            return []
+        raise CampaignRunnerError(f"invalid playthrough JSON: {exc}") from exc
 
 
 def _atomic_write_json(path: Path, payload: object) -> None:

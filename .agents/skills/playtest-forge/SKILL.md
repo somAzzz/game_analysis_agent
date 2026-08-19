@@ -120,6 +120,13 @@ repository's interactive path:
     failure, and provider-health gates—in that order.
 12. Write `accepted` only when every frozen gate passes. Otherwise preserve the
     evidence and write `rejected` with the failed causal or safety gates.
+13. Seal each immutable matrix cell's private JSONL immediately after its own
+    schema, provenance, and evidence checks pass; first-party cohort readers
+    must stream the verified Zstandard archive transparently. After the aggregate gates
+    and terminal decision, seal any remaining private JSONL. Never archive a
+    `running` or `finalizing` file. Keep expanded JSONL only for an explicit
+    compatibility/debugging need such as `--keep-jsonl`; treat archive or
+    round-trip failure as a non-success state.
 
 ## Evidence-to-edit rules
 

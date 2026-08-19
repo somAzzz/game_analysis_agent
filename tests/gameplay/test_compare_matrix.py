@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 from typing import Any
 
 import pytest
 
 from game_analysis_agent.agent_eval import evaluate_and_write
+from game_analysis_agent.report_archive import archive_jsonl_tree
 from tools.gameplay import run_gameplay_agent
 from tools.gameplay.compare_matrix import (
     MATRIX_COMPARE_SUMMARY_FILE,
@@ -320,6 +322,20 @@ def test_compare_matrix_pairs_fixed_seed_cells_and_writes_diffs(tmp_path: Path) 
     assert Path(simulation["diff_file"]).is_file()
     diff = _read(Path(simulation["diff_file"]))
     assert diff["endings"]["rows"][0]["delta"] == pytest.approx(0.2)
+
+
+@pytest.mark.skipif(shutil.which("zstd") is None, reason="zstd is unavailable")
+def test_compare_matrix_streams_verified_archived_jsonl(tmp_path: Path) -> None:
+    before = _write_matrix(tmp_path, "before")
+    after = _write_matrix(tmp_path, "after")
+    for manifest_path in (before, after):
+        for cell in _read(manifest_path)["cells"]:
+            archive_jsonl_tree(Path(cell["report_dir"]))
+
+    result = compare_matrix_runs(before, after, output_dir=tmp_path / "comparison")
+
+    assert result.exit_code == 0
+    assert result.summary["comparable_cells"] == 1
 
 
 def test_compare_matrix_rejects_seed_or_parameter_drift(tmp_path: Path) -> None:

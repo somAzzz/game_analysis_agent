@@ -21,6 +21,18 @@ Hash immutable artifacts and canonical JSONL rows. Hashes detect later mutation
 and bind citations to exact evidence; they do not make bad data correct. Verify
 schema, completeness, provenance, and design meaning separately.
 
+Private JSONL is hot evidence only while its producing cell is running and
+until that cell's evidence checks pass. An immutable validated cell may be
+sealed before cohort aggregation because first-party readers stream and verify
+the cold representation. Archive it by default as `<name>.jsonl.zst` plus an adjacent
+`<name>.jsonl.zst.manifest.json`. The manifest must bind the exact raw and
+compressed SHA-256, byte counts, JSON record count, codec, level, and schema.
+Delete the raw source only after decompression, JSONL parsing, and every raw
+identity field match. An archive failure is a non-success state and must leave
+the current raw source intact. Never seal a file still open for writing. Restore
+exact JSONL before using a reader that does not support compressed input. Keep
+compact public evidence uncompressed.
+
 Do not publish prompts, raw model responses, secrets, private game text, host
 paths, or private traces. Create a sanitized bundle with the same aggregate and
 citation identities.
@@ -55,4 +67,6 @@ citing them:
 Run `tools/build_week/review_build_week_g2.py --skip-commands` or `scripts/preflight`.
 The final current-project experiment contains `repair_experiment.json`,
 `repair_summary.md`, baseline/patched fixed and holdout snapshots,
-`comparison.json`, and `patch.diff`.
+`comparison.json`, and `patch.diff`. `scripts/verify-repair` archives terminal
+private JSONL by default; `--keep-jsonl` is the explicit compatibility/debug
+override.

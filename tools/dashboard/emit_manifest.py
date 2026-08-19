@@ -27,6 +27,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_REPORTS = ROOT / "reports"
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from game_analysis_agent.report_archive import (  # noqa: E402
+    ReportArchiveError,
+    iter_jsonl_rows,
+    jsonl_artifact_exists,
+)
 
 
 def _load_csv(path: Path) -> list[dict[str, str]]:
@@ -37,19 +46,12 @@ def _load_csv(path: Path) -> list[dict[str, str]]:
 
 
 def _load_jsonl(path: Path) -> list[dict]:
-    if not path.exists():
+    if not jsonl_artifact_exists(path):
         return []
-    rows: list[dict] = []
-    with path.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                rows.append(json.loads(line))
-            except json.JSONDecodeError:
-                continue
-    return rows
+    try:
+        return [row for _, row in iter_jsonl_rows(path)]
+    except ReportArchiveError:
+        return []
 
 
 def _load_json(path: Path) -> dict | None:
@@ -103,7 +105,7 @@ def _scan_agents(report_dir: Path) -> list[dict[str, str]]:
 def _issue_card_payload(report_dir: Path, kind: str, issue_id: str) -> dict | None:
     """Build a slim payload for the front-page issue shelf."""
     summary = _load_json(report_dir / "summary.json")
-    if not summary and not (report_dir / "raw_runs.jsonl").exists():
+    if not summary and not jsonl_artifact_exists(report_dir / "raw_runs.jsonl"):
         return None
     raw_runs = _load_jsonl(report_dir / "raw_runs.jsonl")
     boundary_runs = _load_jsonl(report_dir / "boundary_runs.jsonl")
@@ -122,12 +124,7 @@ def _issue_card_payload(report_dir: Path, kind: str, issue_id: str) -> dict | No
         for row in endings_rows
     ]
     top_ending = max(endings, key=lambda r: r["rate"]) if endings else None
-    total_runs = (
-        (summary or {}).get("total_runs")
-        or len(raw_runs)
-        or len(boundary_runs)
-        or 0
-    )
+    total_runs = (summary or {}).get("total_runs") or len(raw_runs) or len(boundary_runs) or 0
     anomaly_total = len(anomalies) + len(boundary_anomalies)
     severity = "info"
     for a in anomalies + boundary_anomalies:
@@ -150,7 +147,7 @@ def _issue_card_payload(report_dir: Path, kind: str, issue_id: str) -> dict | No
         "top_ending": top_ending,
         "anomaly_total": anomaly_total,
         "severity": severity,
-        "has_decision_graph": (report_dir / "raw_runs.jsonl").exists()
+        "has_decision_graph": jsonl_artifact_exists(report_dir / "raw_runs.jsonl")
         and (report_dir / "event_graph.json").exists(),
     }
 
@@ -232,7 +229,7 @@ def _emit_decision_graph_manifest(
     run_id: int = 0,
 ) -> dict | None:
     """Build the per-decision-graph manifest consumed by the graph route."""
-    if not (report_dir / "raw_runs.jsonl").exists():
+    if not jsonl_artifact_exists(report_dir / "raw_runs.jsonl"):
         return None
     if not (report_dir / "event_graph.json").exists():
         return None
@@ -300,7 +297,9 @@ def emit_all(reports: Path = DEFAULT_REPORTS) -> dict:
                         encoding="utf-8",
                     )
                     graph_count += 1
-                    (browse_root / "decision_graph" / child.name / "0").joinpath("_diagnostics.json").write_text(
+                    (browse_root / "decision_graph" / child.name / "0").joinpath(
+                        "_diagnostics.json"
+                    ).write_text(
                         json.dumps(
                             {
                                 "issue_id": child.name,
@@ -350,18 +349,12 @@ def emit_all(reports: Path = DEFAULT_REPORTS) -> dict:
                     json.dumps(manifest, ensure_ascii=False, indent=2),
                     encoding="utf-8",
                 )
-                issues_meta.append(
-                    {"kind": "play", "id": child.name, "path": f"play/{child.name}"}
-                )
+                issues_meta.append({"kind": "play", "id": child.name, "path": f"play/{child.name}"})
 
     # Front page manifest
     total_runs = sum(card["total_runs"] for card in issue_cards)
     total_anomalies = sum(card["anomaly_total"] for card in issue_cards)
-    total_critical = sum(
-        1
-        for card in issue_cards
-        if card["severity"] == "critical"
-    )
+    total_critical = sum(1 for card in issue_cards if card["severity"] == "critical")
     front = {
         "generated_at": datetime.now(tz=UTC).isoformat(),
         "counts": {
@@ -378,7 +371,9 @@ def emit_all(reports: Path = DEFAULT_REPORTS) -> dict:
         json.dumps(front, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    print(f"Wrote {reports / 'manifest.json'} ({len(issue_cards)} issues, {graph_count} decision graphs)")
+    print(
+        f"Wrote {reports / 'manifest.json'} ({len(issue_cards)} issues, {graph_count} decision graphs)"
+    )
     return front
 
 

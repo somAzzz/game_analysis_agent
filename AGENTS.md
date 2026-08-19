@@ -171,3 +171,31 @@ isolated game worktree, budgeted allowlisted edits, fixed and unseen-holdout
 verification, and an explicit accepted/rejected record. Never edit the
 canonical baseline bundle under `demo/study-in-germany` in place
 and never merge a repair automatically.
+
+## Large report storage
+
+Large JSONL evidence must not remain expanded after its producing cell is
+immutable and its evidence checks have passed. Standard matrices seal each
+completed cell immediately; compressed-aware aggregators and comparisons read
+the verified raw identity directly. `scripts/verify-repair` seals any remaining
+terminal JSONL by default; use
+`--keep-jsonl` only for an explicit short-lived debugging or compatibility
+need. For other terminal report trees, use the repository's lossless archive
+service:
+
+```bash
+uv run python tools/reports/archive_jsonl.py archive <terminal-report-dir> --apply --replace
+```
+
+The command deletes a source only after the Zstandard archive decompresses,
+reparses, and matches the original record count, byte count, and SHA-256. Never
+archive a running/finalizing cohort or a file that another process still has
+open. Verify cold evidence directly with the `verify` subcommand; restore the
+exact JSONL with `restore --apply` before invoking an existing reader that has
+not yet gained compressed-input support. Remove scratch duplicates only after
+their raw SHA-256 values match the formal archive manifests. See
+`docs/operations/REPORT_ARCHIVES.md`.
+
+For governed matrices, use `tools/gameplay/run_gameplay_agent.py matrix` or
+`tools/persona/run_persona_campaign.py`; do not replace them with direct Godot
+shell loops that bypass cell validation and storage finalization.

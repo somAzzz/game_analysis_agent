@@ -12,6 +12,12 @@ from typing import Any
 import yaml
 
 from .campaign_contract import CampaignCellResult, CampaignManifest, canonical_sha256
+from .report_archive import (
+    ReportArchiveError,
+    iter_jsonl_rows,
+    jsonl_identity,
+    resolve_jsonl_artifact,
+)
 
 VIEW_SCHEMA = "playthrough-view-v1"
 MANIFEST_SCHEMA = "playthrough-evidence-manifest-v1"
@@ -293,7 +299,11 @@ def build_cell_view(
     )
     if artifact is None:
         raise PlaythroughViewError(f"cell {request.cell_id}: playthrough artifact is missing")
-    if hashlib.sha256(trace.read_bytes()).hexdigest() != artifact.sha256:
+    try:
+        trace_identity = jsonl_identity(trace)
+    except ReportArchiveError as exc:
+        raise PlaythroughViewError(f"cell {request.cell_id}: raw trace unavailable: {exc}") from exc
+    if trace_identity.sha256 != artifact.sha256:
         raise PlaythroughViewError(f"cell {request.cell_id}: raw trace hash mismatch")
     rows = _load_jsonl(trace)
     if len(rows) != result.completed_weeks or artifact.record_count != len(rows):
@@ -714,13 +724,10 @@ def _load_json(path: Path) -> dict[str, Any]:
 
 
 def _load_jsonl(path: Path) -> list[dict[str, Any]]:
-    rows = []
-    for index, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
-        payload = json.loads(line)
-        if not isinstance(payload, dict):
-            raise PlaythroughViewError(f"expected JSON object at {path}:{index}")
-        rows.append(payload)
-    return rows
+    try:
+        return [payload for _, payload in iter_jsonl_rows(path)]
+    except ReportArchiveError as exc:
+        raise PlaythroughViewError(f"invalid JSONL artifact {path}: {exc}") from exc
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -731,6 +738,11 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
 
 
 def _artifact(root: Path, path: Path, *, role: str) -> dict[str, Any]:
+    if path.name.endswith(".jsonl") and not path.exists():
+        try:
+            path = resolve_jsonl_artifact(path)
+        except ReportArchiveError as exc:
+            raise PlaythroughViewError(f"artifact is unavailable: {path}: {exc}") from exc
     resolved = path.resolve()
     try:
         relative = resolved.relative_to(root.resolve()).as_posix()

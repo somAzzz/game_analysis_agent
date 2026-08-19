@@ -34,6 +34,11 @@ from game_analysis_agent.contracts import (
     validate_contract_file,
     validate_trace_catalog_consistency,
 )
+from game_analysis_agent.report_archive import (
+    ReportArchiveError,
+    archive_jsonl_tree,
+    jsonl_artifact_exists,
+)
 from game_analysis_agent.report_manifest import execution_source_fingerprint
 
 MATRIX_MANIFEST_FILE = "matrix_manifest.json"
@@ -240,8 +245,7 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
     )
     if validation_profile not in {"full", *SUPPORTED_DIFFICULTIES}:
         raise MatrixConfigError(
-            "matrix.validation_profile must be 'full', 'easy', 'normal', 'hard', "
-            "or 'realistic'"
+            "matrix.validation_profile must be 'full', 'easy', 'normal', 'hard', or 'realistic'"
         )
 
     aliases_raw = _mapping(root["policy_aliases"], "matrix.policy_aliases")
@@ -294,9 +298,7 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
         "matrix.boundary.difficulty",
     )
     if boundary_difficulty not in difficulties:
-        raise MatrixConfigError(
-            "matrix.boundary.difficulty must be listed in matrix.difficulties"
-        )
+        raise MatrixConfigError("matrix.boundary.difficulty must be listed in matrix.difficulties")
     boundary = BoundaryConfig(
         runs=_positive_int(boundary_raw["runs"], "matrix.boundary.runs"),
         seed=_positive_int(boundary_raw["seed"], "matrix.boundary.seed"),
@@ -476,9 +478,7 @@ def build_matrix_plan(
         else root / "reports" / "matrix" / matrix_id
     )
     python = str(python_executable or sys.executable)
-    game_root = Path(
-        os.environ.get("GAME_PROJECT_PATH", str(root / "demo/study-in-germany"))
-    )
+    game_root = Path(os.environ.get("GAME_PROJECT_PATH", str(root / "demo/study-in-germany")))
     code_fingerprint = execution_source_fingerprint(root, game_root)
     runner = root / "tools" / "run_gameplay_agent.py"
     reports_root = output_dir / "reports"
@@ -523,6 +523,7 @@ def build_matrix_plan(
                 )
             argv = (
                 *simulation_args,
+                "--keep-jsonl",
                 *(("--catalog-dir", str(Path(catalog_dir).resolve())) if catalog_dir else ()),
             )
         elif cell.kind == "boundary":
@@ -547,6 +548,7 @@ def build_matrix_plan(
                 str(report_dir),
                 "--extreme",
                 str(params["extreme"]),
+                "--keep-jsonl",
             )
             if params["focus_schedule"]:
                 argv = (
@@ -572,6 +574,7 @@ def build_matrix_plan(
                 str(params["difficulty"]),
                 "--scenario",
                 str(params["scenario"]),
+                "--keep-jsonl",
             )
         plans.append(
             CommandPlan(
@@ -604,6 +607,7 @@ def run_matrix_file(
     simulation_command: Literal["all", "sim"] = "all",
     verify_evidence: bool = True,
     catalog_dir: str | Path | None = None,
+    keep_jsonl: bool = False,
 ) -> MatrixRunResult:
     """Convenience entry point for a CLI: load, plan, execute, and persist."""
 
@@ -622,6 +626,7 @@ def run_matrix_file(
         resume=resume,
         executor=executor,
         verify_evidence=verify_evidence,
+        keep_jsonl=keep_jsonl,
     )
 
 
@@ -633,6 +638,7 @@ def execute_matrix(
     resume: bool = False,
     executor: Executor | None = None,
     verify_evidence: bool = True,
+    keep_jsonl: bool = False,
 ) -> MatrixRunResult:
     """Execute a plan with safe per-cell persistence and optional concurrency."""
 
@@ -651,9 +657,11 @@ def execute_matrix(
             verify_evidence=verify_evidence,
         ):
             evidence = _cell_evidence(item, plan.config) if verify_evidence else {}
+            storage = archive_jsonl_tree(item.report_dir, keep_jsonl=keep_jsonl)
             entries[index] = {
                 **entries[index],
                 **evidence,
+                "storage": storage,
                 "status": "skipped",
                 "exit_code": 0,
                 "started_at": previous.get("started_at"),
@@ -685,6 +693,7 @@ def execute_matrix(
                 item,
                 active_executor,
                 verify_evidence=verify_evidence,
+                keep_jsonl=keep_jsonl,
             )
             entries[index_by_cell[item.cell.cell_id]] = outcome
             _write_matrix_state(
@@ -706,6 +715,7 @@ def execute_matrix(
                     item,
                     active_executor,
                     verify_evidence=verify_evidence,
+                    keep_jsonl=keep_jsonl,
                 ): item
                 for item in runnable
             }
@@ -815,12 +825,18 @@ def _execute_cell(
     executor: Executor,
     *,
     verify_evidence: bool,
+    keep_jsonl: bool,
 ) -> dict[str, Any]:
     previous = _read_json(command_plan.manifest_path)
     try:
         previous_attempt = int(previous.get("attempt", 0))
     except (TypeError, ValueError):
         previous_attempt = 0
+    if previous_attempt:
+        for pattern in ("*.jsonl.zst", "*.jsonl.zst.manifest.json"):
+            for artifact in command_plan.report_dir.glob(pattern):
+                if artifact.is_file():
+                    artifact.unlink()
     started_at = _now()
     running = {
         **_planned_entry(command_plan),
@@ -845,12 +861,21 @@ def _execute_cell(
         return final
 
     evidence: dict[str, Any] = {}
+    storage: dict[str, int | str] = {}
     evidence_error = ""
     if outcome.returncode == 0 and verify_evidence:
         try:
             evidence = _cell_evidence(command_plan, matrix_plan.config)
         except (OSError, ValueError, ContractValidationError) as exc:
             evidence_error = f"evidence validation failed: {exc}"
+    if outcome.returncode == 0 and not evidence_error:
+        try:
+            storage = archive_jsonl_tree(
+                command_plan.report_dir,
+                keep_jsonl=keep_jsonl,
+            )
+        except (OSError, ReportArchiveError) as exc:
+            evidence_error = f"storage finalization failed: {exc}"
 
     stderr_tail = _tail(outcome.stderr)
     stdout_tail = _tail(outcome.stdout)
@@ -858,6 +883,7 @@ def _execute_cell(
     final = {
         **running,
         **evidence,
+        "storage": storage,
         "status": "completed" if completed else "failed",
         "finished_at": _now(),
         "exit_code": outcome.returncode
@@ -920,7 +946,15 @@ def _cell_evidence(plan: CommandPlan, config: MatrixConfig) -> dict[str, Any]:
             "agent_eval.json",
         ),
     }[plan.cell.kind]
-    missing = [name for name in required if not (plan.report_dir / name).is_file()]
+    missing = [
+        name
+        for name in required
+        if not (
+            jsonl_artifact_exists(plan.report_dir / name)
+            if name.endswith(".jsonl")
+            else (plan.report_dir / name).is_file()
+        )
+    ]
     if missing:
         raise ValueError(f"missing required report artifacts: {missing}")
 

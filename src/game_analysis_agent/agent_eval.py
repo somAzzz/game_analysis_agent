@@ -8,6 +8,8 @@ from pathlib import Path
 from statistics import fmean
 from typing import Any
 
+from .report_archive import ReportArchiveError, iter_jsonl_rows, jsonl_artifact_exists
+
 
 class AgentEvalError(ValueError):
     """Raised when a playthrough artifact cannot be evaluated safely."""
@@ -251,20 +253,12 @@ def evaluate_and_write(report_dir: Path, output: Path | None = None) -> dict[str
 def _read_jsonl(path: Path) -> tuple[list[dict[str, Any]], list[str]]:
     errors: list[str] = []
     rows: list[dict[str, Any]] = []
-    if not path.exists():
+    if not jsonl_artifact_exists(path):
         return [], [f"missing required artifact: {path.name}"]
-    for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
-        if not line.strip():
-            continue
-        try:
-            payload = json.loads(line)
-        except json.JSONDecodeError as exc:
-            errors.append(f"{path.name}:{line_no}: invalid JSON: {exc.msg}")
-            continue
-        if not isinstance(payload, dict):
-            errors.append(f"{path.name}:{line_no}: row must be an object")
-            continue
-        rows.append(payload)
+    try:
+        rows.extend(payload for _line_number, payload in iter_jsonl_rows(path))
+    except ReportArchiveError as exc:
+        errors.append(f"{path.name}: {exc}")
     return rows, errors
 
 

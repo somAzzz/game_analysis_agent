@@ -16,6 +16,7 @@ from .campaign_contract import (
     CampaignCitation,
     canonical_sha256,
 )
+from .report_archive import ReportArchiveError, iter_jsonl_rows
 
 RULES_SCHEMA = "campaign-failure-rules-v1"
 AGGREGATION_SCHEMA = "campaign-aggregation-v1"
@@ -225,22 +226,12 @@ def _verified_rows(project: Path, result: CampaignCellResult) -> list[dict[str, 
         return []
     path = project / result.request.output_dir / "playthrough.jsonl"
     try:
-        lines = path.read_text(encoding="utf-8").splitlines()
-    except OSError as exc:
+        streamed = list(iter_jsonl_rows(path))
+    except (OSError, ReportArchiveError) as exc:
         raise CampaignAggregationError(f"missing playthrough for {result.request.cell_id}") from exc
     rows = []
     citations = {item.line_number: item for item in result.citations}
-    for line_number, line in enumerate(lines, start=1):
-        if not line.strip():
-            continue
-        try:
-            row = json.loads(line)
-        except json.JSONDecodeError as exc:
-            raise CampaignAggregationError(
-                f"invalid playthrough row {result.request.cell_id}:{line_number}"
-            ) from exc
-        if not isinstance(row, dict):
-            raise CampaignAggregationError("playthrough row must be an object")
+    for line_number, row in streamed:
         citation = citations.get(line_number)
         if citation is None or citation.record_sha256 != canonical_sha256(row):
             raise CampaignAggregationError(
@@ -370,9 +361,7 @@ def _alignment(row: dict[str, Any]) -> bool | None:
         if str(action_id)
     }
     legacy_priorities = priorities if not tags and not ids and not risk_guided else set()
-    if not tags and not ids and not legacy_priorities and not (
-        risk_guided and suggested_actions
-    ):
+    if not tags and not ids and not legacy_priorities and not (risk_guided and suggested_actions):
         return None
     action_tags = set()
     for action in actions:

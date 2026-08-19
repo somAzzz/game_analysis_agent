@@ -267,10 +267,7 @@ def test_difficulty_matrix_contains_only_selected_gameplay(difficulty: str) -> N
     assert config.play.difficulty == difficulty
     assert config.validation_profile == difficulty
     assert len(cells) == 77
-    assert all(
-        cell.parameters.get("difficulty") == difficulty
-        for cell in cells
-    )
+    assert all(cell.parameters.get("difficulty") == difficulty for cell in cells)
     assert all(
         cell.parameters.get("focus_schedule")
         for cell in cells
@@ -301,14 +298,18 @@ def test_ids_and_command_plan_are_stable_and_complete(tmp_path: Path) -> None:
     )
     report_index = simulation.argv.index("--report-dir")
     assert simulation.argv[report_index + 1] == str(simulation.report_dir)
-    assert simulation.argv[-4:-2] == ("--focus-schedule", "study_sprint")
-    assert simulation.argv[-2:] == ("--validation-profile", "normal")
+    assert simulation.argv[-5:-3] == ("--focus-schedule", "study_sprint")
+    assert simulation.argv[-3:-1] == ("--validation-profile", "normal")
+    assert simulation.argv[-1] == "--keep-jsonl"
     assert boundary.argv[2] == "probe"
     assert "--difficulty" in boundary.argv
     assert "--extreme" in boundary.argv
-    assert boundary.argv[-2:] == ("--focus-schedule", "study_sprint")
+    focus_index = boundary.argv.index("--focus-schedule")
+    assert boundary.argv[focus_index + 1] == "study_sprint"
+    assert "--keep-jsonl" in boundary.argv
     assert persona.argv[2] == "play"
     assert "--persona" in persona.argv
+    assert "--keep-jsonl" in persona.argv
     assert persona.report_dir == tmp_path / "out" / "reports" / "play" / persona.cell.run_id
 
 
@@ -528,7 +529,9 @@ def test_resume_retries_completed_cell_when_report_evidence_was_deleted(
     first = execute_matrix(plan, executor=first_executor)
     assert first.status == "completed"
     simulation = next(item for item in plan.cells if item.cell.kind == "simulation")
-    (simulation.report_dir / "raw_runs.jsonl").unlink()
+    archive = simulation.report_dir / "raw_runs.jsonl.zst"
+    archive.unlink()
+    archive.with_name(f"{archive.name}.manifest.json").unlink()
     retried: list[str] = []
 
     def retry_executor(command_plan: Any) -> int:

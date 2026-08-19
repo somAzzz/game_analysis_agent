@@ -15,6 +15,20 @@ Keep each cell isolated and resumable. Record expected, completed, partial,
 failed, and cancelled cells. Do not aggregate until every required cell has a
 terminal truth state.
 
+Keep JSONL expanded only while a cell is active and until that cell's contract,
+provenance, and evidence checks pass. Then seal the immutable cell immediately
+with a verified Zstandard archive and raw-identity manifest; cohort aggregation
+and comparison stream cold evidence transparently. Never archive `running` or
+`finalizing` output. Restore exact JSONL only for a legacy reader that has not
+gained compressed-input support.
+
+Use `tools/gameplay/run_gameplay_agent.py matrix` for simulation, boundary, and
+single-play matrices, and `tools/persona/run_persona_campaign.py` for campaign
+cells. These entry points keep child output hot until validation, then own the
+seal. Do not implement campaign matrices as direct Godot shell loops because
+that bypasses lifecycle state, evidence checks, resume validation, and storage
+finalization.
+
 For a difficulty-specific review, choose exactly one committed lane:
 `config/matrix.easy.yaml`, `config/matrix.normal.yaml`,
 `config/matrix.hard.yaml`, or `config/matrix.realistic.yaml`. The default is

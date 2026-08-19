@@ -13,6 +13,8 @@ from typing import Any
 
 import yaml
 
+from .report_archive import ReportArchiveError, iter_jsonl_rows, jsonl_artifact_exists
+
 Cell = tuple[str, str, str]
 SUPPORTED_DIFFICULTIES = ("easy", "normal", "hard", "realistic")
 DIFFICULTY_THRESHOLD_FALLBACK = {"easy": "normal", "hard": "realistic"}
@@ -1540,7 +1542,7 @@ def _eval_design(
     }
     agent_eval = None
     agent_eval_path = report_dir / "agent_eval.json"
-    play_paths = sorted(report_dir.rglob("playthrough.jsonl"))
+    play_paths = _discover_logical_jsonl(report_dir, "playthrough.jsonl")
     has_play_evidence = agent_eval_path.exists() or bool(play_paths)
     configured_eval = eval_keys.intersection(design)
     if configured_eval and has_play_evidence:
@@ -1920,7 +1922,7 @@ def _playthrough_anomaly_rates(
     report_dir: Path,
     failures: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    paths = sorted(report_dir.rglob("playthrough.jsonl"))
+    paths = _discover_logical_jsonl(report_dir, "playthrough.jsonl")
     results = []
     for path in paths:
         rows = _read_jsonl(
@@ -2102,7 +2104,7 @@ def _read_jsonl(
     allow_empty: bool,
     gate: str,
 ) -> list[tuple[int, dict[str, Any]]] | None:
-    if not path.exists():
+    if not jsonl_artifact_exists(path):
         if required:
             _input_failure(
                 failures,
@@ -2114,33 +2116,11 @@ def _read_jsonl(
         return None
     rows = []
     try:
-        lines = path.read_text(encoding="utf-8").splitlines()
-    except (OSError, UnicodeError) as exc:
+        parsed_rows = list(iter_jsonl_rows(path))
+    except (OSError, UnicodeError, ReportArchiveError) as exc:
         _input_failure(failures, path.name, "invalid", str(exc), gate)
         return None
-    for line, raw in enumerate(lines, start=1):
-        if not raw.strip():
-            continue
-        try:
-            payload = json.loads(raw)
-        except json.JSONDecodeError as exc:
-            _input_failure(
-                failures,
-                path.name,
-                "invalid",
-                f"line {line}: {exc}",
-                gate,
-            )
-            continue
-        if not isinstance(payload, dict):
-            _input_failure(
-                failures,
-                path.name,
-                "invalid",
-                f"line {line} must contain a JSON object",
-                gate,
-            )
-            continue
+    for line, payload in parsed_rows:
         rows.append((line, payload))
     if not rows and not allow_empty:
         _input_failure(
@@ -2152,6 +2132,15 @@ def _read_jsonl(
         )
         return None
     return rows
+
+
+def _discover_logical_jsonl(report_dir: Path, name: str) -> list[Path]:
+    """Find hot and cold copies while returning one logical JSONL path each."""
+
+    paths = set(report_dir.rglob(name))
+    for archive in report_dir.rglob(f"{name}.zst"):
+        paths.add(archive.with_name(name))
+    return sorted(paths)
 
 
 def _manifest_defaults(manifest: dict[str, Any]) -> dict[str, str]:
