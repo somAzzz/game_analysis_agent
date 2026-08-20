@@ -296,10 +296,10 @@
       "sha256": "f363964b4a38bbd459d69011f52bd865416ba47a38e4f1662af11a533a9393c3"
     },
     {
-      "bytes": 48463,
+      "bytes": 49418,
       "path": "src/game_analysis_agent/test_matrix.py",
       "role": "difficulty-test-planner",
-      "sha256": "a0cf72eee11def2801786dd0c8654808ddf244d67442feb8714e6424dcd64b24"
+      "sha256": "9967adb5b622120f3fde322f3329c5c21754dcf17434e707e153dc69eee423d9"
     },
     {
       "bytes": 82591,
@@ -314,10 +314,10 @@
       "sha256": "e001c3c2f889c13a441b4dc9f5034cf20e7866dc79fa2fcf40b1717acfab917c"
     },
     {
-      "bytes": 60602,
+      "bytes": 61545,
       "path": "tools/gameplay/run_gameplay_agent.py",
       "role": "difficulty-test-runner",
-      "sha256": "f0700be76808fc82af572a94cf9e7523c83fcb8649e63922d75b3ac47b22e00c"
+      "sha256": "5d32fe837fb90295148ea3dffcfe8c29f102374e70223c26f7c1bdfc115412c7"
     },
     {
       "bytes": 4209,

@@ -289,6 +289,7 @@ def cmd_sim(args: argparse.Namespace) -> int:
     difficulty = args.difficulty or settings.sim_difficulty
     scenario = args.scenario or settings.sim_scenario
     focus_schedule = str(getattr(args, "focus_schedule", None) or "")
+    event_scheduler_v2 = bool(getattr(args, "event_scheduler_v2", False))
 
     requested_report_dir = getattr(args, "report_dir", None)
     out_dir = (
@@ -311,6 +312,7 @@ def cmd_sim(args: argparse.Namespace) -> int:
             "difficulty": difficulty,
             "scenario": scenario,
             "focus_schedule": focus_schedule,
+            "event_scheduler_v2": event_scheduler_v2,
         },
         status="started",
     )
@@ -330,6 +332,8 @@ def cmd_sim(args: argparse.Namespace) -> int:
     ]
     if focus_schedule:
         extra_args.append(f"--focus-schedule={focus_schedule}")
+    if event_scheduler_v2:
+        extra_args.append("--event-scheduler-v2=true")
     proc = _run_godot(
         settings,
         script="res://scripts/tools/RunSimulation.gd",
@@ -399,6 +403,7 @@ def cmd_sim(args: argparse.Namespace) -> int:
             "weeks": weeks,
             "difficulty": difficulty,
             "scenario": scenario,
+            "event_scheduler_v2": event_scheduler_v2,
         },
         source_files=[target_out],
         generated_files=[target_out],
@@ -1361,11 +1366,13 @@ def cmd_all(args: argparse.Namespace) -> int:
 def cmd_matrix(args: argparse.Namespace) -> int:
     try:
         config = load_matrix_config(args.config)
+        simulation_only = bool(getattr(args, "simulation_only", False))
         initial_plan = build_matrix_plan(
             config,
             project_root=ROOT,
             matrix_dir=args.out,
             simulation_command=args.simulation_command,
+            simulation_only=simulation_only,
         )
         catalog_dir = initial_plan.matrix_dir / "catalog"
         plan = build_matrix_plan(
@@ -1374,6 +1381,7 @@ def cmd_matrix(args: argparse.Namespace) -> int:
             matrix_dir=initial_plan.matrix_dir,
             simulation_command=args.simulation_command,
             catalog_dir=catalog_dir if args.simulation_command == "sim" else None,
+            simulation_only=simulation_only,
         )
         if not args.dry_run and args.simulation_command == "sim":
             rc = cmd_export(argparse.Namespace(report_dir=catalog_dir))
@@ -1445,6 +1453,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--focus-schedule",
         default=None,
         help="One repeating Focus ID or five comma-separated window Focus IDs.",
+    )
+    sim_p.add_argument(
+        "--event-scheduler-v2",
+        action="store_true",
+        help="Run the release event scheduler instead of the legacy one.",
     )
     sim_p.add_argument(
         "--report-dir",
@@ -1591,6 +1604,11 @@ def build_parser() -> argparse.ArgumentParser:
             "to run validators, model QA, and gates per simulation cell."
         ),
     )
+    matrix_p.add_argument(
+        "--simulation-only",
+        action="store_true",
+        help="Plan and execute only the simulation cells (skip boundary and persona cells).",
+    )
     matrix_p.set_defaults(func=cmd_matrix)
 
     compare_matrix_p = sub.add_parser(
@@ -1699,6 +1717,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--focus-schedule",
         default=None,
         help="One repeating Focus ID or five comma-separated window Focus IDs.",
+    )
+    all_p.add_argument(
+        "--event-scheduler-v2",
+        action="store_true",
+        help="Run the release event scheduler instead of the legacy one.",
     )
     all_p.add_argument(
         "--report-dir",

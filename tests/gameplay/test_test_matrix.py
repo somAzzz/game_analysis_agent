@@ -254,6 +254,7 @@ def test_load_and_expand_repository_matrix() -> None:
     assert config.boundary.focus_schedule == ""
     assert config.focus_schedules == {}
     assert config.validation_profile == "full"
+    assert config.event_scheduler_v2 is False
 
 
 @pytest.mark.parametrize("difficulty", tuple(DIFFICULTY_MATRIX_CONFIGS))
@@ -311,6 +312,90 @@ def test_ids_and_command_plan_are_stable_and_complete(tmp_path: Path) -> None:
     assert "--persona" in persona.argv
     assert "--keep-jsonl" in persona.argv
     assert persona.report_dir == tmp_path / "out" / "reports" / "play" / persona.cell.run_id
+    assert simulation.cell.parameters["event_scheduler_v2"] is False
+    assert "--event-scheduler-v2" not in simulation.argv
+    assert all("--event-scheduler-v2" not in item.argv for item in first.cells)
+
+
+def test_event_scheduler_v2_true_flags_simulation_cells_only(tmp_path: Path) -> None:
+    config_path = _small_config(tmp_path)
+    payload = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    payload["event_scheduler_v2"] = True
+    config_path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+    config = load_matrix_config(config_path)
+    assert config.event_scheduler_v2 is True
+
+    plan = build_matrix_plan(config, project_root=ROOT, matrix_dir=tmp_path / "out-v2")
+    simulation, boundary, persona = plan.cells
+
+    assert simulation.cell.parameters["event_scheduler_v2"] is True
+    assert "--event-scheduler-v2" in simulation.argv
+    assert "--event-scheduler-v2" not in boundary.argv
+    assert "--event-scheduler-v2" not in persona.argv
+    assert "event_scheduler_v2" not in boundary.cell.parameters
+    assert "event_scheduler_v2" not in persona.cell.parameters
+
+
+def test_simulation_only_selection_keeps_only_simulation_cells(tmp_path: Path) -> None:
+    config = load_matrix_config(_small_config(tmp_path))
+
+    default = build_matrix_plan(config, project_root=ROOT, matrix_dir=tmp_path / "out")
+    assert [item.cell.kind for item in default.cells] == ["simulation", "boundary", "persona"]
+    assert len(default.cells) == 3
+
+    simulation_only = build_matrix_plan(
+        config,
+        project_root=ROOT,
+        matrix_dir=tmp_path / "out",
+        simulation_only=True,
+    )
+    assert [item.cell.kind for item in simulation_only.cells] == ["simulation"]
+    assert len(simulation_only.cells) == 1
+    assert simulation_only.cells[0].cell.cell_id == default.cells[0].cell.cell_id
+    assert simulation_only.cells[0].argv == default.cells[0].argv
+
+
+def test_simulation_only_with_event_scheduler_v2_keeps_flag_on_simulation_cell(
+    tmp_path: Path,
+) -> None:
+    config_path = _small_config(tmp_path)
+    payload = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    payload["event_scheduler_v2"] = True
+    config_path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+    config = load_matrix_config(config_path)
+
+    plan = build_matrix_plan(
+        config,
+        project_root=ROOT,
+        matrix_dir=tmp_path / "out-sim-v2",
+        simulation_only=True,
+    )
+    assert [item.cell.kind for item in plan.cells] == ["simulation"]
+    simulation = plan.cells[0]
+    assert simulation.cell.parameters["event_scheduler_v2"] is True
+    assert "--event-scheduler-v2" in simulation.argv
+
+
+def test_run_matrix_file_simulation_only_plans_simulation_cells_only(tmp_path: Path) -> None:
+    config_path = _small_config(tmp_path)
+    output_dir = tmp_path / "sim-only"
+
+    result = run_matrix_file(
+        config_path,
+        project_root=ROOT,
+        matrix_dir=output_dir,
+        dry_run=True,
+        simulation_only=True,
+    )
+
+    assert result.status == "planned"
+    assert result.summary["total"] == 1
+    assert [cell["kind"] for cell in result.cells] == ["simulation"]
+    manifest = _read_json(output_dir / MATRIX_MANIFEST_FILE)
+    assert [cell["kind"] for cell in manifest["cells"]] == ["simulation"]
+    assert manifest["summary"]["by_kind"]["simulation"]["total"] == 1
+    assert manifest["summary"]["by_kind"]["boundary"]["total"] == 0
+    assert manifest["summary"]["by_kind"]["persona"]["total"] == 0
 
 
 @pytest.mark.parametrize(
@@ -326,6 +411,8 @@ def test_ids_and_command_plan_are_stable_and_complete(tmp_path: Path) -> None:
         (("boundary", "difficulty"), "", "non-empty string"),
         (("focus_schedules", "balanced"), "", "non-empty string"),
         (("play", "outcome_coverage", "designed_failure_is_valid"), "yes", "boolean"),
+        (("event_scheduler_v2",), "yes", "boolean"),
+        (("event_scheduler_v2",), 1, "boolean"),
     ],
 )
 def test_strict_schema_rejects_invalid_values(

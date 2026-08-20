@@ -320,6 +320,41 @@ def test_sim_honors_isolated_report_directory(run_gameplay_agent, tmp_path) -> N
     assert not (ROOT / "reports" / "balance" / "cell" / "raw_runs.jsonl").exists()
 
 
+@pytest.mark.parametrize("enabled", (True, False))
+def test_sim_event_scheduler_v2_godot_arg_and_manifest(
+    run_gameplay_agent,
+    tmp_path,
+    enabled,
+) -> None:
+    report_dir = tmp_path / "matrix" / "reports" / "balance" / ("v2" if enabled else "legacy")
+    completed = type("Proc", (), {"returncode": 0, "stdout": "ok", "stderr": ""})()
+
+    def run_godot(*_args, **kwargs):  # noqa: ANN002, ANN003
+        out_arg = next(arg for arg in kwargs["extra_args"] if arg.startswith("--out="))
+        output = Path(out_arg.removeprefix("--out="))
+        output.parent.mkdir(parents=True, exist_ok=True)
+        fixture = ROOT / "tests" / "fixtures" / "contracts" / "trace_v1.json"
+        payload = json.loads(fixture.read_text(encoding="utf-8"))
+        output.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+        return completed
+
+    argv = ["sim", "--run-id", "cell-v2", "--runs", "1", "--report-dir", str(report_dir)]
+    if enabled:
+        argv.append("--event-scheduler-v2")
+
+    with patch.object(run_gameplay_agent, "_run_godot", side_effect=run_godot) as run_godot:
+        rc = run_gameplay_agent.main(argv)
+
+    assert rc == 0
+    extra_args = run_godot.call_args.kwargs["extra_args"]
+    if enabled:
+        assert "--event-scheduler-v2=true" in extra_args
+    else:
+        assert not any(arg.startswith("--event-scheduler-v2") for arg in extra_args)
+    manifest = json.loads((report_dir / "report_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["parameters"]["event_scheduler_v2"] is enabled
+
+
 def test_sim_resolves_relative_report_directory_before_godot(
     run_gameplay_agent, tmp_path, monkeypatch
 ) -> None:
@@ -708,6 +743,29 @@ def test_matrix_cli_dry_run_expands_difficulty_config(
         cell["parameters"].get("difficulty") == difficulty
         for cell in manifest["cells"]
     )
+
+
+def test_matrix_cli_simulation_only_plans_simulation_cells_only(
+    run_gameplay_agent,
+    tmp_path,
+) -> None:
+    rc = run_gameplay_agent.main(
+        [
+            "matrix",
+            "--dry-run",
+            "--simulation-only",
+            "--out",
+            str(tmp_path / "matrix-sim-only"),
+        ]
+    )
+
+    assert rc == 0
+    manifest = json.loads(
+        (tmp_path / "matrix-sim-only" / "matrix_manifest.json").read_text()
+    )
+    assert manifest["status"] == "planned"
+    assert manifest["summary"]["total"] == 126
+    assert all(cell["kind"] == "simulation" for cell in manifest["cells"])
 
 
 def test_interactive_probe_cli_persists_canonical_risk_evidence(

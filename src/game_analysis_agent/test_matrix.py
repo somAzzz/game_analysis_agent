@@ -130,6 +130,7 @@ class MatrixConfig:
     compare: CompareConfig
     config_hash: str
     raw: Mapping[str, Any]
+    event_scheduler_v2: bool = False
 
 
 @dataclass(frozen=True)
@@ -216,7 +217,7 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
             "play",
             "compare",
         },
-        optional={"focus_schedules", "validation_profile"},
+        optional={"focus_schedules", "validation_profile", "event_scheduler_v2"},
     )
 
     version = _string(root["version"], "matrix.version")
@@ -247,6 +248,10 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
         raise MatrixConfigError(
             "matrix.validation_profile must be 'full', 'easy', 'normal', 'hard', or 'realistic'"
         )
+    event_scheduler_v2 = _boolean(
+        root.get("event_scheduler_v2", False),
+        "matrix.event_scheduler_v2",
+    )
 
     aliases_raw = _mapping(root["policy_aliases"], "matrix.policy_aliases")
     aliases: dict[str, str] = {}
@@ -401,6 +406,7 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
         compare=compare,
         config_hash=config_hash,
         raw=dict(root),
+        event_scheduler_v2=event_scheduler_v2,
     )
 
 
@@ -420,6 +426,7 @@ def expand_matrix_cells(config: MatrixConfig) -> tuple[MatrixCell, ...]:
                         "focus_schedule": config.focus_schedules.get(policy, ""),
                         "scenario": scenario,
                         "seed": seed,
+                        "event_scheduler_v2": config.event_scheduler_v2,
                     }
                     cells.append(_cell(config, "simulation", parameters))
 
@@ -465,8 +472,14 @@ def build_matrix_plan(
     python_executable: str | Path | None = None,
     simulation_command: Literal["all", "sim"] = "all",
     catalog_dir: str | Path | None = None,
+    simulation_only: bool = False,
 ) -> MatrixExecutionPlan:
-    """Build an immutable command plan suitable for CLI or programmatic use."""
+    """Build an immutable command plan suitable for CLI or programmatic use.
+
+    ``simulation_only=True`` selects only the simulation cells before any
+    commands are built, so boundary and persona cells are never planned.
+    The default keeps the full simulation/boundary/persona matrix.
+    """
 
     if simulation_command not in {"all", "sim"}:
         raise ValueError("simulation_command must be 'all' or 'sim'")
@@ -484,7 +497,10 @@ def build_matrix_plan(
     reports_root = output_dir / "reports"
     plans: list[CommandPlan] = []
 
-    for cell in expand_matrix_cells(config):
+    cells = expand_matrix_cells(config)
+    if simulation_only:
+        cells = tuple(cell for cell in cells if cell.kind == "simulation")
+    for cell in cells:
         params = cell.parameters
         if cell.kind == "simulation":
             report_dir = reports_root / "balance" / cell.run_id
@@ -521,6 +537,8 @@ def build_matrix_plan(
                     "--validation-profile",
                     config.validation_profile,
                 )
+            if params["event_scheduler_v2"]:
+                simulation_args = (*simulation_args, "--event-scheduler-v2")
             argv = (
                 *simulation_args,
                 "--keep-jsonl",
@@ -608,8 +626,12 @@ def run_matrix_file(
     verify_evidence: bool = True,
     catalog_dir: str | Path | None = None,
     keep_jsonl: bool = False,
+    simulation_only: bool = False,
 ) -> MatrixRunResult:
-    """Convenience entry point for a CLI: load, plan, execute, and persist."""
+    """Convenience entry point for a CLI: load, plan, execute, and persist.
+
+    ``simulation_only=True`` plans and executes only the simulation cells.
+    """
 
     config = load_matrix_config(config_path)
     plan = build_matrix_plan(
@@ -618,6 +640,7 @@ def run_matrix_file(
         matrix_dir=matrix_dir,
         simulation_command=simulation_command,
         catalog_dir=catalog_dir,
+        simulation_only=simulation_only,
     )
     return execute_matrix(
         plan,
