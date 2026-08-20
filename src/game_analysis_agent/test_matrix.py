@@ -765,7 +765,15 @@ def execute_matrix(
                 )
 
     finished_at = _now()
-    outcome_coverage = _persona_outcome_coverage(plan.config, entries) if verify_evidence else None
+    # Persona outcome coverage only applies when the plan actually contains
+    # persona cells.  Simulation-only or boundary-only plans must not fail
+    # because configured expected categories were never planned to be observed.
+    has_persona_cells = any(entry["kind"] == "persona" for entry in entries)
+    outcome_coverage = (
+        _persona_outcome_coverage(plan.config, entries)
+        if verify_evidence and has_persona_cells
+        else None
+    )
     final_status = (
         "failed"
         if any(row["status"] == "failed" for row in entries)

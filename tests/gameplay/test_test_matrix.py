@@ -450,6 +450,89 @@ def test_run_matrix_file_simulation_only_plans_simulation_cells_only(tmp_path: P
     assert manifest["summary"]["by_kind"]["persona"]["total"] == 0
 
 
+def test_simulation_only_execution_completes_without_persona_coverage_gate(
+    tmp_path: Path,
+) -> None:
+    """Simulation-only runs must not fail on configured persona categories.
+
+    The small config keeps ``expected_categories: [success]`` configured, so
+    before the fix the missing persona observations failed the matrix even
+    though no persona cell was planned.
+    """
+    config_path = _small_config(tmp_path)
+    output_dir = tmp_path / "sim-only-exec"
+
+    def executor(command_plan: Any) -> int:
+        _write_cell_evidence(command_plan)
+        return 0
+
+    result = run_matrix_file(
+        config_path,
+        project_root=ROOT,
+        matrix_dir=output_dir,
+        executor=executor,
+        simulation_only=True,
+    )
+
+    assert result.status == "completed"
+    assert result.exit_code == 0
+    assert result.summary["completed"] == 1
+    assert result.summary["failed"] == 0
+    assert "persona_outcome_coverage" not in result.summary
+    manifest = _read_json(output_dir / MATRIX_MANIFEST_FILE)
+    assert manifest["status"] == "completed"
+    assert "persona_outcome_coverage" not in manifest["summary"]
+
+
+def test_boundary_only_execution_completes_without_persona_coverage_gate(
+    tmp_path: Path,
+) -> None:
+    config = load_matrix_config(_small_config(tmp_path))
+    full_plan = build_matrix_plan(config, project_root=ROOT, matrix_dir=tmp_path / "boundary-only")
+    plan = replace(
+        full_plan,
+        cells=tuple(item for item in full_plan.cells if item.cell.kind == "boundary"),
+    )
+
+    def executor(command_plan: Any) -> int:
+        _write_cell_evidence(command_plan)
+        return 0
+
+    result = execute_matrix(plan, executor=executor)
+
+    assert result.status == "completed"
+    assert result.summary["completed"] == 1
+    assert result.summary["failed"] == 0
+    assert "persona_outcome_coverage" not in result.summary
+
+
+def test_persona_matrix_still_fails_when_expected_category_missing(tmp_path: Path) -> None:
+    """Plans containing persona cells keep the missing-category failure gate."""
+    config_path = _small_config(tmp_path)
+    payload = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    payload["play"]["outcome_coverage"]["expected_categories"] = [
+        "success",
+        "designed_failure",
+    ]
+    config_path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+    config = load_matrix_config(config_path)
+    plan = build_matrix_plan(config, project_root=ROOT, matrix_dir=tmp_path / "coverage-gap")
+
+    def executor(command_plan: Any) -> int:
+        _write_cell_evidence(command_plan)
+        return 0
+
+    result = execute_matrix(plan, executor=executor)
+
+    assert result.status == "failed"
+    assert result.summary["completed"] == 3
+    assert result.summary["failed"] == 0
+    coverage = result.summary["persona_outcome_coverage"]
+    assert coverage["expected_categories"] == ["designed_failure", "success"]
+    assert coverage["observed_categories"] == {"success": 1}
+    assert coverage["missing_categories"] == ["designed_failure"]
+
+
 @pytest.mark.parametrize(
     ("path", "value", "message"),
     [

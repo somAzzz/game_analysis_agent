@@ -296,10 +296,10 @@
       "sha256": "f363964b4a38bbd459d69011f52bd865416ba47a38e4f1662af11a533a9393c3"
     },
     {
-      "bytes": 49431,
+      "bytes": 49793,
       "path": "src/game_analysis_agent/test_matrix.py",
       "role": "difficulty-test-planner",
-      "sha256": "d119a908705c75edbb4f49e6f0bf043accb6100096ddef3139a6d781a22515b9"
+      "sha256": "b2faa8a49d3fa1558b71c9e6be639ad785e99b572e83f55d3161eb53de90c8b3"
     },
     {
       "bytes": 82591,
