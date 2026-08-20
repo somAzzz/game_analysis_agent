@@ -8,6 +8,8 @@ from itertools import combinations
 from pathlib import Path
 from typing import Any
 
+from .contracts import canonical_event_choice_id
+
 
 def analyze_coverage(
     runs: list[dict[str, Any]],
@@ -320,11 +322,15 @@ def _event_catalog_ids(
         for index, choice in enumerate(raw_choices, start=1):
             if not isinstance(choice, dict):
                 continue
-            choice_id = str(choice.get("choice_id") or choice.get("id") or "")
-            if not choice_id:
-                safe_text = str(choice.get("text") or "").lower().replace(" ", "_")
-                choice_id = f"{event_id}.choice_{index:02d}_{safe_text}"
-            choices.add(choice_id)
+            raw_id = choice.get("choice_id") or choice.get("id") or ""
+            choices.add(
+                canonical_event_choice_id(
+                    event_id,
+                    str(raw_id) if raw_id else None,
+                    index,
+                    str(choice.get("text") or ""),
+                )
+            )
     return events, choices
 
 

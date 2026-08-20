@@ -165,3 +165,44 @@ def test_catalog_coverage_uses_real_choice_ids_and_excludes_unknowns() -> None:
     ]
     assert report["action_coverage"]["selected_action_rate"] == 0.5
     assert report["action_coverage"]["unknown_observed_action_ids"] == ["ghost"]
+
+
+def test_event_catalog_ids_use_canonical_choice_identities() -> None:
+    report = analyze_coverage(
+        [
+            {
+                "weekly_log": [
+                    {
+                        "triggered_event_id": "academic_gap",
+                        "event_choice_id": "academic_gap.choice_01",
+                        "selected_action_ids": ["study"],
+                        "after_state": {"week": 1},
+                    },
+                ]
+            }
+        ],
+        event_graph={
+            "events": [
+                {
+                    "id": "academic_gap",
+                    "choices": [
+                        {"choice_id": "choice_01", "text": "Ask for help"},
+                        {"id": "choice_02", "text": "Wait"},
+                        {"choice_id": "academic_gap.choice_03", "text": "Qualified"},
+                        {"text": "No id"},
+                    ],
+                }
+            ]
+        },
+        action_catalog={"actions": [{"id": "study"}]},
+    )
+
+    choice = report["choice_coverage"]
+    assert choice["catalog_choices"] == 4
+    assert choice["selected_choice_rate"] == 0.25
+    assert choice["unknown_observed_choice_ids"] == []
+    assert choice["unselected_choice_ids"] == [
+        "academic_gap.choice_02",
+        "academic_gap.choice_03",
+        "academic_gap.choice_04_no_id",
+    ]

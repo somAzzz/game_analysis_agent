@@ -176,6 +176,29 @@ class EventChoiceRecord(ContractModel):
     requirements: dict[str, Any]
     set_flag: str
     next_event_id: str
+    choice_id: str | None = None
+
+
+def canonical_event_choice_id(
+    event_id: str,
+    choice_id: str | None,
+    index: int,
+    text: str,
+) -> str:
+    """Return the canonical trace identity for one exported event choice.
+
+    An exported ``choice_id`` already qualified for this event
+    (``<event_id>.<choice_id>``) is kept as-is; a short id (e.g.
+    ``choice_01``) is qualified with the event id; when no id is exported the
+    legacy ``<event_id>.choice_NN_<lowercased text, spaces as underscores>``
+    fallback is preserved.
+    """
+    if choice_id:
+        prefix = f"{event_id}."
+        if choice_id.startswith(prefix):
+            return choice_id
+        return f"{event_id}.{choice_id}"
+    return f"{event_id}.choice_{index:02d}_{text.lower().replace(' ', '_')}"
 
 
 class EventRecord(ContractModel):
@@ -419,7 +442,7 @@ def validate_trace_catalog_consistency(
     action_ids = {action.id for action in catalog.actions}
     event_choices = {
         event.id: {
-            f"{event.id}.choice_{index:02d}_{choice.text.lower().replace(' ', '_')}"
+            canonical_event_choice_id(event.id, choice.choice_id, index, choice.text)
             for index, choice in enumerate(event.choices, start=1)
         }
         for event in graph.events

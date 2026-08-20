@@ -179,6 +179,101 @@ def test_trace_catalog_consistency_rejects_unknown_action(tmp_path: Path) -> Non
         validate_trace_catalog_consistency(trace_path, graph_path, catalog_path)
 
 
+def _write_consistency_fixtures(
+    tmp_path: Path, trace: dict, graph: dict, catalog: dict
+) -> tuple[Path, Path, Path]:
+    trace_path = tmp_path / "raw_runs.jsonl"
+    graph_path = tmp_path / "event_graph.json"
+    catalog_path = tmp_path / "action_catalog.json"
+    trace_path.write_text(json.dumps(trace) + "\n", encoding="utf-8")
+    graph_path.write_text(json.dumps(graph), encoding="utf-8")
+    catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+    return trace_path, graph_path, catalog_path
+
+
+def _pin_week_to_catalog(trace: dict, catalog: dict, event: dict, choice_id: str) -> None:
+    action_id = catalog["actions"][0]["id"]
+    week = trace["weekly_log"][0]
+    week["available_action_ids"] = [action_id]
+    week["selected_action_ids"] = [action_id]
+    week["triggered_event_id"] = event["id"]
+    week["event_choice_id"] = choice_id
+
+
+def _load_consistency_fixtures() -> tuple[dict, dict, dict]:
+    trace = json.loads((FIXTURES / "trace_v1.json").read_text(encoding="utf-8"))
+    graph = json.loads((FIXTURES / "event_graph_v1.json").read_text(encoding="utf-8"))
+    catalog = json.loads((FIXTURES / "action_catalog_v1.json").read_text(encoding="utf-8"))
+    return trace, graph, catalog
+
+
+def test_trace_catalog_consistency_accepts_short_exported_choice_id(tmp_path: Path) -> None:
+    trace, graph, catalog = _load_consistency_fixtures()
+    event = graph["events"][0]
+    event["choices"][0]["choice_id"] = "choice_01"
+    _pin_week_to_catalog(trace, catalog, event, f"{event['id']}.choice_01")
+    trace_path, graph_path, catalog_path = _write_consistency_fixtures(
+        tmp_path, trace, graph, catalog
+    )
+
+    summary = validate_trace_catalog_consistency(trace_path, graph_path, catalog_path)
+
+    assert summary["observed_choices"] == 1
+
+
+def test_trace_catalog_consistency_keeps_qualified_choice_id(tmp_path: Path) -> None:
+    trace, graph, catalog = _load_consistency_fixtures()
+    event = graph["events"][0]
+    event["choices"][0]["choice_id"] = f"{event['id']}.choice_01"
+    _pin_week_to_catalog(trace, catalog, event, f"{event['id']}.choice_01")
+    trace_path, graph_path, catalog_path = _write_consistency_fixtures(
+        tmp_path, trace, graph, catalog
+    )
+
+    summary = validate_trace_catalog_consistency(trace_path, graph_path, catalog_path)
+
+    assert summary["observed_choices"] == 1
+
+
+def test_trace_catalog_consistency_legacy_choice_identity_unchanged(tmp_path: Path) -> None:
+    trace, graph, catalog = _load_consistency_fixtures()
+    event = graph["events"][0]
+    choice = event["choices"][0]
+    legacy_id = f"{event['id']}.choice_01_{choice['text'].lower().replace(' ', '_')}"
+    _pin_week_to_catalog(trace, catalog, event, legacy_id)
+    trace_path, graph_path, catalog_path = _write_consistency_fixtures(
+        tmp_path, trace, graph, catalog
+    )
+
+    summary = validate_trace_catalog_consistency(trace_path, graph_path, catalog_path)
+
+    assert summary["observed_choices"] == 1
+
+
+def test_trace_catalog_consistency_rejects_unknown_choice_id(tmp_path: Path) -> None:
+    trace, graph, catalog = _load_consistency_fixtures()
+    event = graph["events"][0]
+    event["choices"][0]["choice_id"] = "choice_01"
+    _pin_week_to_catalog(trace, catalog, event, f"{event['id']}.choice_99")
+    trace_path, graph_path, catalog_path = _write_consistency_fixtures(
+        tmp_path, trace, graph, catalog
+    )
+
+    with pytest.raises(ContractValidationError, match="unknown choice ids"):
+        validate_trace_catalog_consistency(trace_path, graph_path, catalog_path)
+
+
+def test_event_graph_contract_retains_optional_choice_id() -> None:
+    payload = json.loads((FIXTURES / "event_graph_v1.json").read_text(encoding="utf-8"))
+    payload["events"][0]["choices"][0]["choice_id"] = "choice_01"
+    graph = validate_contract(payload, kind=ContractKind.EVENT_GRAPH)
+    assert graph.events[0].choices[0].choice_id == "choice_01"
+
+    legacy = json.loads((FIXTURES / "event_graph_v1.json").read_text(encoding="utf-8"))
+    legacy_graph = validate_contract(legacy, kind=ContractKind.EVENT_GRAPH)
+    assert legacy_graph.events[0].choices[0].choice_id is None
+
+
 def _game_project() -> Path:
     configured = os.getenv("GAME_PROJECT_PATH")
     if not configured:
