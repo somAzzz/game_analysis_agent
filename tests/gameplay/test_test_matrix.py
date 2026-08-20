@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import threading
 import time
 from dataclasses import replace
@@ -315,6 +317,56 @@ def test_ids_and_command_plan_are_stable_and_complete(tmp_path: Path) -> None:
     assert simulation.cell.parameters["event_scheduler_v2"] is False
     assert "--event-scheduler-v2" not in simulation.argv
     assert all("--event-scheduler-v2" not in item.argv for item in first.cells)
+
+
+def test_planned_commands_reference_existing_domain_organized_cli(tmp_path: Path) -> None:
+    """Every planned command must point at the tracked domain-organized CLI."""
+    config = load_matrix_config(_small_config(tmp_path))
+    plan = build_matrix_plan(config, project_root=ROOT, matrix_dir=tmp_path / "out")
+
+    expected_runner = ROOT / "tools" / "gameplay" / "run_gameplay_agent.py"
+    assert expected_runner.is_file()
+
+    for item in plan.cells:
+        # argv layout: [python, runner, subcommand, ...]
+        assert item.argv[0] == sys.executable
+        runner_path = Path(item.argv[1])
+        assert runner_path == expected_runner
+        assert runner_path.is_file()
+
+    simulation, boundary, persona = plan.cells
+    for item in (simulation, boundary, persona):
+        assert item.argv[1] == str(expected_runner)
+        assert item.argv[2] in {"all", "sim", "probe", "play"}
+
+
+def test_simulation_only_plan_entry_point_is_launchable(tmp_path: Path) -> None:
+    """A simulation-only plan must target a real, launchable Python entry point.
+
+    Launches the planned CLI with a harmless ``sim --help`` so no Godot or
+    external service is invoked, proving the planned path resolves to an
+    executable module.
+    """
+    config = load_matrix_config(_small_config(tmp_path))
+    plan = build_matrix_plan(
+        config,
+        project_root=ROOT,
+        matrix_dir=tmp_path / "out",
+        simulation_only=True,
+    )
+    assert [item.cell.kind for item in plan.cells] == ["simulation"]
+
+    python, runner = plan.cells[0].argv[0], plan.cells[0].argv[1]
+    assert Path(runner).is_file()
+
+    completed = subprocess.run(
+        [python, runner, "sim", "--help"],
+        capture_output=True,
+        text=True,
+        cwd=ROOT,
+    )
+    assert completed.returncode == 0
+    assert "usage" in completed.stdout.lower()
 
 
 def test_event_scheduler_v2_true_flags_simulation_cells_only(tmp_path: Path) -> None:

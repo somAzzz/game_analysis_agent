@@ -493,7 +493,7 @@ def build_matrix_plan(
     python = str(python_executable or sys.executable)
     game_root = Path(os.environ.get("GAME_PROJECT_PATH", str(root / "demo/study-in-germany")))
     code_fingerprint = execution_source_fingerprint(root, game_root)
-    runner = root / "tools" / "run_gameplay_agent.py"
+    runner = root / "tools" / "gameplay" / "run_gameplay_agent.py"
     reports_root = output_dir / "reports"
     plans: list[CommandPlan] = []
 
