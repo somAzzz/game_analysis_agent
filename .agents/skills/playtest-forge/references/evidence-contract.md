@@ -52,7 +52,7 @@ never fall back to Replay or a different provider under the same identity.
 
 ## Current repository adapter
 
-For the retained Build Week campaign, verify these committed artifacts before
+For the retained reference campaign, verify these committed artifacts before
 citing them:
 
 - `examples/build_week_2026/campaign-v1/campaign_manifest.json`
@@ -64,7 +64,7 @@ citing them:
 - `examples/build_week_2026/campaign-v1/gate_report.json`
 - `config/build_week_2026_target.json`
 
-Run `tools/build_week/review_build_week_g2.py --skip-commands` or `scripts/preflight`.
+Run `scripts/preflight` before interpreting the reference campaign.
 The final current-project experiment contains `repair_experiment.json`,
 `repair_summary.md`, baseline/patched fixed and holdout snapshots,
 `comparison.json`, and `patch.diff`. `scripts/verify-repair` archives terminal

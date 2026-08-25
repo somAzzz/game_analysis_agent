@@ -1,29 +1,9 @@
 # Reviews
 
-Date-sorted audit and feedback material. Markdown audits normally use YAML
-frontmatter; machine-readable gate records use versioned JSON schemas.
-
-For the current competition state, start with the
-[Build Week reviewer hub](../plans/openai_build_week_2026/README.md).
+Date-sorted engineering audit and feedback material. Markdown audits normally
+use YAML frontmatter.
 
 Read in date order, not position order. Newest first.
-
-## 2026-07-17
-
-- [openai_build_week_2026/LOCAL_VLLM_AB_REPAIR_PROOF_2026-07-17.md](openai_build_week_2026/LOCAL_VLLM_AB_REPAIR_PROOF_2026-07-17.md) — *completed* — A/B frozen plans, sensitivity, fixed plus unseen holdout proof, rejection, and persistent Persona/seed evidence
-- [openai_build_week_2026/SUBMISSION_COMPLIANCE_AUDIT_2026-07-17.md](openai_build_week_2026/SUBMISSION_COMPLIANCE_AUDIT_2026-07-17.md) — *active* — official rule audit, final hybrid delivery decision, README coverage, and remaining release blockers
-- [openai_build_week_2026/FULL_CAMPAIGN_REVIEW_REMEDIATION_REVIEW.md](openai_build_week_2026/FULL_CAMPAIGN_REVIEW_REMEDIATION_REVIEW.md) — *implemented* — shared provider execution, exact-path replay, large-batch evidence indexing, Judge updates, and remaining follow-ups
-- [openai_build_week_2026/HUMAN_DECISION_FRONTEND_INTEGRATION_REVIEW.md](openai_build_week_2026/HUMAN_DECISION_FRONTEND_INTEGRATION_REVIEW.md) — *implemented* — Human Decision information architecture, design-language audit, interaction boundaries, and before/after visual evidence
-- [openai_build_week_2026/local-vllm-25-seed-audit-2026-07-17/README.md](openai_build_week_2026/local-vllm-25-seed-audit-2026-07-17/README.md) — *completed* — 150-cell real-Godot local-vLLM audit, agent/game reports, and pressure-burnout cross-check
-
-## 2026-07-16
-
-- [openai_build_week_2026/P3-skill-transfer.md](openai_build_week_2026/P3-skill-transfer.md) — *passed* — fresh-context Unity scenario validates transferable automated/persona evidence-to-change reasoning without claiming runtime support
-- [openai_build_week_2026/BRANCH_AUDITS.md](openai_build_week_2026/BRANCH_AUDITS.md) — *active* — two independent branch reviews, remediation trace, and platform handoff
-- [openai_build_week_2026/G4-evaluator.md](openai_build_week_2026/G4-evaluator.md) — *failed closed* — evaluator and UI pass; platform execution and published multi-arch image remain blockers
-- [openai_build_week_2026/P4-platform-delivery.md](openai_build_week_2026/P4-platform-delivery.md) — *partial* — macOS native path verified; Docker/Linux/live rows explicitly pending or not run
-- [G1-providers.md](G1-providers.md) — *passed* — provider correctness, failure truthfulness, shared contract, and secret-boundary gate; live smoke recorded as `not_run`
-- [G0-baseline.md](G0-baseline.md) — *passed* — OpenAI Build Week canonical baseline, reproducibility, provenance, and clean-room gate
 
 ## 2026-07-13
 
@@ -41,5 +21,5 @@ Read in date order, not position order. Newest first.
 
 - Start with the newest `active` or `passed` audit for the current state of the system.
 - `superseded` documents describe earlier points in time and should not be used to judge the current codebase.
-- Gate reviews must identify exact commands, machine-readable evidence, fail-closed criteria, and any non-blocking limitation.
+- Reviews should identify exact commands, machine-readable evidence, fail-closed criteria, and any non-blocking limitation.
 - The implementation log lives in [REVIEW_FEEDBACK.md](REVIEW_FEEDBACK.md) ("落实日志" section); the structured task list lives in [ACTION_PLAN.md](ACTION_PLAN.md).

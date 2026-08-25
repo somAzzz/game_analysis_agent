@@ -35,13 +35,11 @@ Read these in order:
 
 ## For reviewers / auditors
 
-1. [plans/openai_build_week_2026/README.md](plans/openai_build_week_2026/README.md) — authoritative Build Week reviewer hub
-2. [../JUDGE.md](../JUDGE.md) — canonical offline commands and evidence map
-3. [reviews/README.md](reviews/README.md) — date-sorted audit index
-4. [reviews/REVIEW_FEEDBACK.md](reviews/REVIEW_FEEDBACK.md) — original feedback
-5. [reviews/ACTION_PLAN.md](reviews/ACTION_PLAN.md) — T01–T13 task plan
-6. [reviews/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md](reviews/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md) — latest real-game audit
-7. Older audits: [ALIGNMENT_AUDIT.md](reviews/ALIGNMENT_AUDIT.md), [DETAILED_EXECUTION_PLAN.md](reviews/DETAILED_EXECUTION_PLAN.md), [REAL_TEST_GAP_ANALYSIS.md](reviews/REAL_TEST_GAP_ANALYSIS.md)
+1. [reviews/README.md](reviews/README.md) — date-sorted engineering audit index
+2. [reviews/REVIEW_FEEDBACK.md](reviews/REVIEW_FEEDBACK.md) — original feedback
+3. [reviews/ACTION_PLAN.md](reviews/ACTION_PLAN.md) — T01–T13 task plan
+4. [reviews/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md](reviews/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md) — latest real-game audit
+5. Older audits: [ALIGNMENT_AUDIT.md](reviews/ALIGNMENT_AUDIT.md), [DETAILED_EXECUTION_PLAN.md](reviews/DETAILED_EXECUTION_PLAN.md), [REAL_TEST_GAP_ANALYSIS.md](reviews/REAL_TEST_GAP_ANALYSIS.md)
 
 Dated docs in `reviews/` and `plans/` have YAML frontmatter
 (`status`, `date`, `audience`, `scope`) — read in date order, not position order.
@@ -49,4 +47,4 @@ Dated docs in `reviews/` and `plans/` have YAML frontmatter
 ## About this index
 
 `legacy/` contains superseded docs and is intentionally not linked.
-Last updated: 2026-07-18.
+Last updated: 2026-08-26.

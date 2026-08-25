@@ -14,9 +14,6 @@ appropriate `status` (active / superseded / archived).
 
 - [interactive_playtest/](interactive_playtest/) — interactive playtest design rulebook + a snapshot run
 - [playability_fix/](playability_fix/) — explainable-failure v0.3 design plan
-- [openai_build_week_2026/README.md](openai_build_week_2026/README.md) — authoritative Build Week reviewer and execution hub
-- [openai_build_week_2026/IMPLEMENTATION_PLAN.md](openai_build_week_2026/IMPLEMENTATION_PLAN.md) — Playtest Forge competition implementation, judge experience, and review record
-- [openai_build_week_2026/EXECUTION_PLAN.md](openai_build_week_2026/EXECUTION_PLAN.md) — stepwise delivery order, evidence requirements, and P0-P5 review gates
 - [GAME_PARAMETER_WORKBENCH_DISCOVERY_2026-08-21.md](GAME_PARAMETER_WORKBENCH_DISCOVERY_2026-08-21.md) — 游戏参数/卡牌/图片作者工作台的现状盘点、参数字典、缺口和分阶段方案材料
 
 All dated docs in subfolders carry YAML frontmatter. Snapshot / one-shot

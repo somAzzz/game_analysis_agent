@@ -221,7 +221,7 @@ services:
   dashboard:
     build:
       context: .
-      dockerfile: Dockerfile.judge
+      dockerfile: Dockerfile.dashboard
     entrypoint: ["/app/.venv/bin/python", "tools/judge/run_judge_api.py"]
     command: ["--host", "0.0.0.0", "--port", "8080", "--frontend", "/app/frontend/dist"]
     environment:
@@ -243,21 +243,6 @@ services:
       timeout: 3s
       retries: 5
 
-  replay:
-    build:
-      context: .
-      dockerfile: Dockerfile.judge
-    command: ["--mode", "replay", "--offline", "--json", "--output-dir", "-"]
-    network_mode: none
-    read_only: true
-    tmpfs:
-      - /tmp:size=32m
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    profiles:
-      - judge
 
   agent:
     # Built from the Dockerfile in this repo. This container is intended for
@@ -288,6 +273,6 @@ services:
     command: ["python", "tools/gameplay/run_gameplay_agent.py", "--help"]
 
 # A bare ``docker compose up`` starts only the CPU dashboard. Use profile
-# ``judge`` for offline Replay, ``game-tools`` for Godot, ``cli`` for the legacy
-# agent, ``local-nvidia``/``local-sglang`` for the primary SGLang backend, and
+# ``game-tools`` for Godot, ``cli`` for the legacy agent,
+# ``local-nvidia``/``local-sglang`` for the primary SGLang backend, and
 # ``local-vllm`` for the retained baseline.

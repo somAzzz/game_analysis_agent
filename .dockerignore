@@ -14,23 +14,14 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+!frontend/dist/
+!frontend/dist/**
 
 # Tests + fixtures inside the image — they go to /app by default but
 # skipping them keeps the image smaller; the dev container rebuilds
 # from the same recipe, and CI runs tests via `python -m pytest`
 # (not inside the runtime image).
 tests/
-!tests/
-tests/*
-!tests/gameplay/
-tests/gameplay/*
-!tests/gameplay/test_event_localization.py
-!tests/build_week/
-tests/build_week/*
-!tests/build_week/test_experiment_registry.py
-!tests/judge/
-tests/judge/*
-!tests/judge/test_judge_inspect.py
 
 # Local config + secrets
 .env

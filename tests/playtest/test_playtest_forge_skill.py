@@ -70,7 +70,7 @@ def test_skill_routes_scenarios_and_keeps_project_details_in_a_profile() -> None
         "migration-guide.md",
     ):
         assert route in skill
-    assert "current Build Week integration" in profile
+    assert "retained Study in Germany reference integration" in profile
     assert "Godot scripts, Unity tests, Unreal commandlets" in migration
 
 

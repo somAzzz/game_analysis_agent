@@ -104,9 +104,9 @@ reports/
 
 ## 5. 安全策略
 
-### Build Week bounded repair exception
+### Governed bounded repair exception
 
-The default product remains read/report/propose. The Build Week workflow adds
+The default product remains read/report/propose. The Playtest Forge workflow adds
 one governed implementation experiment: Codex may edit only allowlisted files
 inside an isolated worktree, under an explicit line/file budget, after freezing
 one mechanism. Fixed and unseen-holdout evidence decide acceptance. The system

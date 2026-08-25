@@ -13,11 +13,11 @@ SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
 
 from game_analysis_agent.build_week_campaign import FrozenRepairTarget  # noqa: E402
-from game_analysis_agent.build_week_g2 import (  # noqa: E402
+from game_analysis_agent.campaign_bundle import verify_public_campaign_bundle  # noqa: E402
+from game_analysis_agent.campaign_evidence import (  # noqa: E402
     recompute_public_clusters,
     recompute_public_evidence,
 )
-from game_analysis_agent.campaign_bundle import verify_public_campaign_bundle  # noqa: E402
 from game_analysis_agent.design_contract import load_design_contract  # noqa: E402
 
 

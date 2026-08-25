@@ -204,15 +204,6 @@ jobs:
         run: uv run pytest tests/gameplay/test_game_contract.py -m game_contract -q -ra
         working-directory: game-analysis-agent
 
-      - name: Validate pinned Linux Godot evidence packet
-        if: always()
-        run: |
-          mkdir -p reports/platform-ci
-          uv run python tools/platform/record_platform_evidence.py \
-            --mode linux-godot --artifact-dir reports \
-            --output reports/platform-ci/linux-godot-evidence.json
-        working-directory: game-analysis-agent
-
       - name: Upload generated contract evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -221,7 +212,6 @@ jobs:
           path: |
             game-analysis-agent/reports/balance/ci-smoke
             game-analysis-agent/reports/interactive/ci-smoke
-            game-analysis-agent/reports/platform-ci
             game-analysis-agent/reports/expected-demo-findings.json
           if-no-files-found: warn
           retention-days: 14

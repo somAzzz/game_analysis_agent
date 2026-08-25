@@ -1,7 +1,7 @@
 ---
 status: active
 date: 2026-07-16
-audience: maintainers, OpenAI Build Week judges
+audience: maintainers, gameplay analysts
 scope: deterministic persona campaign inputs, cell lifecycle, provenance, and citations
 ---
 
@@ -18,7 +18,7 @@ repository-relative report root. `auto` is deliberately not accepted: provider
 selection belongs to P1 preflight and the selected provider is part of the
 campaign fingerprint. Judge concurrency cannot exceed four.
 
-The canonical Build Week request is tracked in
+The canonical reference request is tracked in
 `config/build_week_2026_campaign.json`: six personas, seeds 42/43/44, twenty
 weeks, normal difficulty, the first-semester scenario, Replay, and concurrency
 four. Changing any field changes the request fingerprint and every cell ID.

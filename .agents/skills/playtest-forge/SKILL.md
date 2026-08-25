@@ -30,7 +30,7 @@ Read only the references required for the request:
 - Define citations, artifacts, schemas, and public evidence:
   `references/evidence-contract.md`.
 - Adapt the Skill to another project or engine: `references/migration-guide.md`.
-- Work on this repository's Build Week case: `references/design-contract.md`.
+- Work on this repository's retained reference case: `references/design-contract.md`.
 - Explain the retained cashflow repair example: `references/session-case-study.md`.
 
 ## Codex-guided session entrypoint

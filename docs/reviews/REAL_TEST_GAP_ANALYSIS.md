@@ -10,7 +10,7 @@ scope: 与 study-in-germany 的真实测试能力差距分析
 > Superseded snapshot. This file describes the pre-embedded-game boundary as
 > it existed on 2026-07-13. Do not use its private-checkout or token steps for
 > current evaluation. Start at the
-> [Build Week reviewer hub](../plans/openai_build_week_2026/README.md).
+> See the current [developer guide](../DEVELOPER_GUIDE.md) before using this historical snapshot.
 
 Date: 2026-07-13
 

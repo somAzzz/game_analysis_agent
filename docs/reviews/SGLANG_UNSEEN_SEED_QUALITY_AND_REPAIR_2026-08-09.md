@@ -17,7 +17,7 @@ acknowledgement and no more than a 0.05 decline in mean pairwise persona action
 TV. Persona-local deltas were inspected separately.
 
 The repair experiment retained fixed seeds 42/43/44 and unseen holdouts
-1042/1043/1044. It used the hash-locked Build Week design contract and the
+1042/1043/1044. It used the hash-locked reference design contract and the
 deterministic `fixture-authoring-policy-v1` against real Docker Godot.
 
 ## Paired generation result

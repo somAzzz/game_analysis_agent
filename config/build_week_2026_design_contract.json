@@ -3,8 +3,6 @@
   "contract_id": "build-week-2026-cashflow-stress-v1",
   "approved_before_patch": true,
   "approval_basis": {
-    "g2_review": "docs/reviews/openai_build_week_2026/G2-campaign.review.json",
-    "g2_review_sha256": "bdadb9fec83f94cc2ebe87a49610b4afec555cc1010dfd03e2e0df60fc0490f2",
     "target": "config/build_week_2026_target.json",
     "target_sha256": "3d871f195d6857f2f9839ac26b991b92dfce5a1cacf4ed304aa8b86094910e57",
     "gates_sha256": "8f85db1daab8385d4bb6e70bdea605332c7ed67899b9ed6e89dab315468da002",

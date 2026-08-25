@@ -13,7 +13,7 @@
 
 Agent **不是**游戏运行时 NPC。本项目不修改 `study-in-germany` 的运行时，只读 + 报告。
 
-Build Week 2026 增加一个受控例外：Codex 只在隔离 worktree 中应用单一、
+Playtest Forge 增加一个受控例外：Codex 只在隔离 worktree 中应用单一、
 有预算且有 allowlist 的 candidate patch，并用 fixed 与 unseen holdout 复验。
 系统永不自动 merge；未通过因果门禁的 patch 保持 rejected。提交中的内嵌
 demo 是只读基线，Godot 仅运行经过校验的可写副本。详见

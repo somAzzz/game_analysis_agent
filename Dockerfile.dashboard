@@ -21,7 +21,6 @@ RUN python -m pip install --no-cache-dir "uv==${UV_VERSION}"
 COPY pyproject.toml uv.lock README.md ./
 RUN uv sync --frozen --no-dev --no-install-project
 
-COPY judge judge-manifest.json JUDGE.md ./
 COPY .agents/ ./.agents/
 COPY src/ ./src/
 COPY tools/ ./tools/
@@ -31,18 +30,11 @@ COPY config/ ./config/
 COPY demo/ ./demo/
 COPY fixtures/ ./fixtures/
 COPY examples/build_week_2026/ ./examples/build_week_2026/
-COPY docs/reviews/openai_build_week_2026/ ./docs/reviews/openai_build_week_2026/
 COPY frontend/public-demo/ ./frontend/public-demo/
 COPY frontend/dist/ ./frontend/dist/
-COPY frontend/src/lib/api.ts frontend/src/lib/eventLocalization.ts ./frontend/src/lib/
-COPY frontend/src/pages/JudgePage.tsx ./frontend/src/pages/
-COPY frontend/src/types.ts ./frontend/src/
-COPY frontend/tests/App.test.tsx frontend/tests/api.test.ts frontend/tests/eventLocalization.test.ts ./frontend/tests/
-COPY tests/gameplay/test_event_localization.py tests/build_week/test_experiment_registry.py tests/judge/test_judge_inspect.py ./tests/
+RUN useradd --create-home --uid 10001 dashboard \
+ && chown -R dashboard:dashboard /app
+USER dashboard
 
-RUN useradd --create-home --uid 10001 judge \
- && chown -R judge:judge /app
-USER judge
-
-ENTRYPOINT ["./judge"]
-CMD ["--mode", "inspect", "--offline", "--json", "--output-dir", "-"]
+ENTRYPOINT ["/app/.venv/bin/python", "tools/judge/run_judge_api.py"]
+CMD ["--host", "0.0.0.0", "--port", "8080", "--frontend", "/app/frontend/dist"]

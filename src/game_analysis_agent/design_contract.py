@@ -21,8 +21,6 @@ class DesignContractError(ValueError):
 class ApprovalBasis(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    g2_review: str
-    g2_review_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     target: str
     target_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     gates_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -131,7 +129,6 @@ def load_design_contract(
     project = Path(project_root).resolve()
     basis = contract.approval_basis
     expected = {
-        basis.g2_review: basis.g2_review_sha256,
         basis.target: basis.target_sha256,
         "config/gates.yaml": basis.gates_sha256,
         "config/player_personas.yaml": basis.personas_sha256,
@@ -148,7 +145,7 @@ def load_design_contract(
         or target.member_count != contract.selected_target.baseline_fixed_members
         or target.persona_count != contract.selected_target.baseline_fixed_personas
     ):
-        raise DesignContractError("design target differs from G2 target evidence")
+        raise DesignContractError("design target differs from frozen target evidence")
     return contract
 
 

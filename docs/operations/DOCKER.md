@@ -1,13 +1,13 @@
 # Docker setup
 
-The default Compose path is a CPU-only, read-only dashboard. Offline Replay,
-Godot tooling, the legacy CLI, and NVIDIA inference are separate opt-in profiles, so
-an evaluator never downloads a model or reserves a GPU by running bare
+The default Compose path is a CPU-only, read-only dashboard. Godot tooling, the
+legacy CLI, and NVIDIA inference are separate opt-in profiles, so a dashboard
+user never downloads a model or reserves a GPU by running bare
 `docker compose up`.
 
 ## 1. Prerequisites
 
-- Docker Engine 24+ for the dashboard or Judge image.
+- Docker Engine 24+ for the dashboard image.
 - NVIDIA Container Toolkit and a Blackwell card only for the optional
   `local-nvidia` profile. NVFP4
   requires `sm_100` or `sm_120` — it **will not** run on H100 / A100 /
@@ -18,21 +18,16 @@ an evaluator never downloads a model or reserves a GPU by running bare
   writable copy under `reports/`; pure `analyze`, recorded `eval`, and report
   QA do not invoke Godot.
 
-## 2. CPU-only Judge dashboard and Replay
+## 2. CPU-only dashboard
 
 ```bash
 docker compose up -d dashboard
-docker compose --profile judge run --rm replay
 ```
 
-The dashboard listens on `http://127.0.0.1:8080` by default. Replay has no
-network, runs read-only as an unprivileged user, and needs no API key. The
-multi-architecture source is `Dockerfile.judge`; its official Python base is
-pinned by image-index digest and does not force an amd64 platform on Apple
-Silicon.
-
-The image is not claimed as published until `tools/judge/build_judge_image.sh` has
-produced registry metadata for both `linux/amd64` and `linux/arm64`.
+The dashboard listens on `http://127.0.0.1:8080` by default. It runs read-only
+as an unprivileged user and needs no API key for recorded evidence. The image
+source is `Dockerfile.dashboard`; its official Python base is pinned by
+image-index digest and does not force an amd64 platform on Apple Silicon.
 
 ## 3. Optional local game and model setup
 
@@ -113,11 +108,11 @@ python3 tools/gameplay/run_gameplay_agent.py all --runs 100 --policy balanced
 The Docker setup keeps both external runtimes available while the Python CLI
 remains easy to run and debug on the host.
 
-## 7. Final evaluator and Codex communication model
+## 7. Dashboard and Codex communication model
 
-The supported competition delivery is deliberately hybrid:
+The supported development topology is deliberately hybrid:
 
-- GitHub Pages and the Judge image are evaluator surfaces; they need no model,
+- GitHub Pages and the dashboard image are evidence surfaces; they need no model,
   game checkout, API key, or Docker socket.
 - Codex runs on the host, discovers `.agents/skills/playtest-forge`, and calls
   the repository services/scripts through its shell tool. MCP is not required.
@@ -129,13 +124,10 @@ The supported competition delivery is deliberately hybrid:
   The OpenAI provider uses the same campaign request, progress, aggregation, and
   experiment-registry contracts, with the key retained server-side.
 
-The Judge image contains `game-overlays/` plus the curated signed and
-deterministic static experiment fixtures. Raw local-vLLM A/B logs are excluded
-from both the image and Git. The first rebuild exposed a missing
-`frontend/public-demo/` copy; `Dockerfile.judge` packages only the curated
-fixtures. Publish a new immutable multi-architecture digest only after rerunning
-the restricted image checks from this source state. The `agent` container is
-not claimed as a controller for sibling containers.
+The dashboard image contains `game-overlays/` plus curated deterministic static
+experiment fixtures. Raw local-model logs are excluded from both the image and
+Git. `Dockerfile.dashboard` packages only the public fixture set. The `agent`
+container is not a controller for sibling containers.
 
 ## 8. Configurable knobs
 

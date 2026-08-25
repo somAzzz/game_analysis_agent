@@ -17,7 +17,7 @@ Creation is atomic and `--replace` removes the source JSONL only after the
 archive has decompressed, reparsed, and matched all raw identity fields.
 
 The standard gameplay matrix seals every completed cell, the persona campaign
-seals private cell traces after its public bundle passes, and the Build Week
+seals private cell traces after its public bundle passes, and the reference
 repair verifier seals any remaining terminal JSONL. Their default is cold
 `.jsonl.zst` evidence; pass `--keep-jsonl` only for temporary debugging or
 compatibility. If archival fails, the command is non-success and keeps the

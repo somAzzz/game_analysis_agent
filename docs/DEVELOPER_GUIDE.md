@@ -1,70 +1,44 @@
 # game_analysis_agent — Developer Guide
 
-> This is the complete engineering and operations guide. For the competition
-> overview and evaluator quickstart, start at the repository [README](../README.md).
+> This is the complete engineering and operations guide. For a shorter
+> introduction, start at the repository [README](../README.md).
 > Unless a section changes directory explicitly, run shell commands from the
 > repository root.
 
-## Judge / automated evaluator quickstart
+## Development quickstart
 
-The primary review path is repository-only and offline:
+Install the locked environments and run the deterministic suites:
 
 ```bash
-./judge --mode inspect --offline --json --output-dir -
-./judge --mode replay --offline --json --output-dir -
+uv sync --extra dev --locked
+npm --prefix frontend ci
+uv run pytest -q -ra
+uv run ruff check .
+npm --prefix frontend run test:coverage
+npm --prefix frontend run build:public
 ```
 
-Inspect needs only Python 3.9+ and validates 599 committed artifact hashes,
-schemas, provenance gates, and seven exact public claim references. Replay adds
-the locked `uv` environment and consumes hash-pinned persona fixtures; it does
-not need Godot, Docker, a GPU, network, an API key, a browser, or an external
-game checkout. The complete demo source is embedded and hash-inventoried under
-`demo/study-in-germany`. Both commands print one `judge-result-v1` JSON object. Expected
-status is `passed`; `failed` and `unsupported` are never fallback successes.
+These checks need neither Godot nor an LLM. The complete reference demo is
+embedded under `demo/study-in-germany` for real-game integration tests.
 
-The committed case is explicitly **prerecorded Replay evidence** driven by a
-deterministic persona-policy fixture, not a recorded LLM playthrough: Codex formed
-and implemented a bounded repair hypothesis, then rejected the candidate after
-fixed and holdout cohorts both failed to improve the target cluster. It is not
-presented as a fresh OpenAI call or a successful game fix. See [JUDGE.md](../JUDGE.md)
-for the evidence map, commands, exit codes, and limitations.
-
-To prepare the complete evaluator UI from locked dependencies, run
-`scripts/setup-evaluator`; use `EVALUATOR_OFFLINE=1 scripts/setup-evaluator`
-when dependency caches are already populated. `tools/judge/judge_doctor.py` reports
-whether a selected native, container, real-game, or live-OpenAI mode is ready
-without printing environment secrets.
-
-## Codex Skill discovery and evaluator route
+## Codex Skill discovery and workflow route
 
 The complete reusable workflow is checked in at
 [`.agents/skills/playtest-forge/SKILL.md`](../.agents/skills/playtest-forge/SKILL.md).
 When Codex starts from the repository root, it scans `.agents/skills` and sees
 the Skill metadata automatically. Codex can then select it implicitly from the
-task description; explicit `$playtest-forge` invocation is more deterministic
-for judging.
+task description; explicit `$playtest-forge` invocation is deterministic.
 
-Recommended AI-review sequence:
+For a gameplay-evidence task, invoke:
 
-1. Run the two offline Judge commands above.
-2. Invoke:
+```text
+Use $playtest-forge to review the automated and persona-playthrough evidence,
+explain the rejected candidate, and propose the next bounded experiment.
+```
 
-   ```text
-   Use $playtest-forge to review the committed automated and persona-playthrough
-   evidence, explain the rejected candidate, and propose the next bounded experiment.
-   ```
-
-3. Verify that the response distinguishes automated, live, focused, and
-   prerecorded evidence; cites fixed and holdout results; and does not claim
-   the rejected patch was merged.
-
-If `$playtest-forge` is unavailable in the evaluator UI, read `SKILL.md`
-directly and follow its routed references. This fallback preserves the review
-workflow for non-Codex or restricted evaluators. The full Skill bundle is
-tracked by Git and hash-verified by `judge-manifest.json`; it is not excluded
-because `.agents` is a hidden directory. See the official
-[Codex Skills guide](https://learn.chatgpt.com/docs/build-skills) for repository
-discovery and explicit/implicit invocation behavior.
+If Skill discovery is unavailable, read `SKILL.md` directly and follow its
+routed references. The Skill distinguishes deterministic, live, focused, and
+prerecorded evidence and requires fixed plus holdout proof for repairs.
 
 ## How Codex, GPT-5.6, and humans are used
 
@@ -72,19 +46,18 @@ Codex is the primary build and repair director. From the repository root it
 loads `playtest-forge`, freezes persona/seed/holdout and acceptance gates before
 source edits, launches the shared campaign services, proposes an allowlisted
 candidate in an isolated game worktree, and publishes the exact patch plus a
-machine accept/reject recommendation. The Judge UI exposes the same evidence
-fingerprint to automated evaluators and human reviewers.
+machine accept/reject recommendation. The dashboard exposes the same evidence
+fingerprint to automated checks and human reviewers.
 
 GPT-5.6 is implemented as the optional live Persona action provider through the
-same contract used by local vLLM. Keys remain server-side; the browser can only
-select a provider and start a bounded campaign. The final release checklist
-still requires one retained, redacted GPT-5.6 campaign, so prerecorded Replay
-and local-vLLM records are not represented as OpenAI calls.
+same contract used by local inference. Keys remain server-side; the browser can
+only select a provider and start a bounded campaign. Prerecorded Replay and
+local-model records are never represented as live OpenAI calls.
 
 Humans choose the experiment scope and frozen policy, may inspect every retained
 cohort and exact diff, and record Approve / Reject / Needs more evidence with a
 reviewer note. Human review never rewrites evidence and never auto-merges a game
-patch. See the [submission compliance audit](../docs/reviews/openai_build_week_2026/SUBMISSION_COMPLIANCE_AUDIT_2026-07-17.md).
+patch.
 
 Development-side AI agent pipeline for simulation games. The current reference
 integration is the Godot `study-in-germany` demo, but the project is structured
@@ -156,12 +129,10 @@ option.
 
 中文说明保留在 [README.zh-CN.md](../README.zh-CN.md).
 
-## License, attribution, and competition scope
+## License and attribution
 
 The project is available under the [MIT License](../LICENSE). See
-[ATTRIBUTION.md](../ATTRIBUTION.md) for third-party and artwork provenance, and
-[the prior-versus-Build-Week disclosure](../submission/build-week-2026/PRIOR_VS_BUILD_WEEK.md)
-for the exact competition scope.
+[ATTRIBUTION.md](../ATTRIBUTION.md) for third-party and artwork provenance.
 
 ## Current Status
 
@@ -180,15 +151,15 @@ for the exact competition scope.
 
 ## Requirements
 
-The evaluator paths have progressively larger requirements:
+The execution paths have progressively larger requirements:
 
-- Inspect: Python 3.9+ only.
-- Replay: `uv` and the committed lockfile; no model or game rebuild.
+- Deterministic Python/frontend suites: `uv`, Node 20, and the lockfiles.
+- Recorded Replay: `uv` and the committed fixtures; no model or game rebuild.
 - Embedded real-Godot run: Godot 4.4 or the Docker wrapper; the demo is already
   under `demo/study-in-germany` and is copied to a writable runtime.
 - Live persona run: a server-side OpenAI key and a configured Godot runtime.
-- External game checkouts and local/DeepSeek-compatible endpoints are optional
-  development adapters, not Judge requirements.
+- External game checkouts and other OpenAI-compatible endpoints are optional
+  development adapters.
 
 The pure Python analyzers and tests can run without Godot or a live LLM.
 
@@ -197,9 +168,8 @@ The pure Python analyzers and tests can run without Godot or a live LLM.
 | Path | Supported environment | Rebuild/model/key required |
 |---|---|---|
 | GitHub Pages | Current desktop/mobile browsers | None |
-| `./judge --mode inspect` | Python 3.9+ on Linux or macOS | None |
-| `./judge --mode replay` | Linux or macOS with locked `uv` environment | No model, Godot, Docker, or key |
-| Judge container/dashboard | Docker Engine 24+ on linux/amd64 or linux/arm64 | Image build/pull only; no model or key |
+| Python and frontend tests | Linux or macOS with locked environments | No model, Godot, Docker, or key |
+| Dashboard container | Docker Engine 24+ | Image build/pull only; no model or key |
 | Real game authoring | Host Codex + Godot 4.4 or Docker Godot wrapper | Writable demo runtime |
 | Local persona campaign | Host Codex + Docker Godot/vLLM sidecars | NVIDIA-compatible local model stack |
 | OpenAI persona campaign | Host Codex + Godot runtime | Server-side OpenAI API key |
@@ -839,7 +809,6 @@ Start at [docs/README.md](../docs/README.md) — audience-keyed index.
 
 Selected entry points:
 
-- [Build Week 2026 reviewer hub](../docs/plans/openai_build_week_2026/README.md)
 - [Architecture](../docs/architecture/ARCHITECTURE.md)
 - [Data Contracts](../docs/architecture/DATA_CONTRACTS.md)
 - [Gameplay Agent](../docs/architecture/GAMEPLAY_AGENT.md)
@@ -859,15 +828,10 @@ Selected entry points:
 The deterministic Python/frontend suites do not need Godot or an LLM. Real
 simulation, validators, and live interactive play still require a compatible
 Godot 4 binary; live persona evaluation additionally requires an LLM endpoint.
-The reference demo is embedded, so CI and evaluators need no private-repository
-token or sibling checkout. The final local A/B Judge image has passed no-network, read-only Inspect
-and Replay plus a read-only, dropped-capability Dashboard/API check after packaging
-the embedded game overlays and signed static experiment fixtures. Full local/OpenAI
-campaign authoring intentionally remains a host-Codex plus Docker-sidecar path rather than an all-container path.
-After any committed evidence or frontend change, the final image must still be
-rebuilt and the same restricted acceptance rows rerun. The project is MIT
-licensed; the remaining G5 blockers are submission evidence and owner actions,
-not licensing.
+The reference demo is embedded, so CI needs no private-repository token or
+sibling checkout. Full local or API-backed campaign authoring intentionally
+remains a host-Codex plus runtime-sidecar path rather than an all-container
+path. The project is MIT licensed.
 
 ## Notes
 

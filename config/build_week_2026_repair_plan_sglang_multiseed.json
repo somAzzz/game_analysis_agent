@@ -3,7 +3,7 @@
   "experiment_id": "sglang-multiseed-normal-living-cost-v1",
   "created_at": "2026-08-09T18:00:00Z",
   "design_contract_path": "config/build_week_2026_design_contract.json",
-  "design_contract_sha256": "f6e0e2217f5d278764f1321aaf22c7212301c7145fc4f973f5ece4f41b9a8af0",
+    "design_contract_sha256": "e4c97f839136634c2ff556237e0aa7f7dc7b822ef1c27a62df13cd71d22593a0",
   "target_path": "config/build_week_2026_target.json",
   "target_sha256": "3d871f195d6857f2f9839ac26b991b92dfce5a1cacf4ed304aa8b86094910e57",
   "selected_cluster_id": "cashflow-stress-attractor",

@@ -10,13 +10,13 @@ authoritative version record.
   (`@xyflow/react`), Dagre, and the OpenAI Python SDK are used under their
   respective upstream licenses.
 - Godot Engine is MIT-licensed. The engine itself is not vendored here.
-- The embedded `demo/study-in-germany` snapshot and competition distribution
+- The embedded `demo/study-in-germany` snapshot and repository distribution
   are covered by the maintainer ownership attestation recorded in
   `config/build_week_2026_scope.json`; its exact source identity and hashes are
   recorded in `config/build_week_2026_game_pin.json` and
   `demo/study-in-germany/.playtest-forge-source.json`.
 
-## Competition artwork
+## Frontend artwork
 
 The strategy-persona characters, mission map, review compositions, and their
 two-frame motion variants were generated specifically for this project and

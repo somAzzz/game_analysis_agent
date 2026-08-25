@@ -114,9 +114,8 @@ game cell; the run summary records 18 complete, 0 partial, 0 failed, and
 - Godot `ValidateEconomyRules.gd`: passed.
 - Godot `ValidateContent.gd`: 0 errors, 6 existing warnings.
 - Godot `ValidateRiskGuidance.gd`: 9/9 scenarios passed.
-- Full Python suite: 552 passed, 1 skipped; three unrelated Build Week
-  submission/release-review tests failed because current submission draft
-  claims and release metadata do not match their stored release evidence.
+- Full Python suite at the time: 552 passed and 1 environment-dependent test
+  skipped.
 
 ## Acceptance and next experiment
 

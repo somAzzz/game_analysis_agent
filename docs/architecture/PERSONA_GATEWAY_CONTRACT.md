@@ -1,7 +1,7 @@
 ---
 status: active
 date: 2026-07-16
-audience: maintainers, OpenAI Build Week judges
+audience: maintainers, gameplay analysts
 scope: provider-neutral interactive persona decision boundary
 ---
 

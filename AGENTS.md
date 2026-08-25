@@ -65,8 +65,7 @@ After the scope decision:
 2. For an in-scope task, read `.agents/skills/playtest-forge/SKILL.md`
    completely, then read only the references it routes to for the request.
 3. Use the verification commands selected by the Skill and the task's evidence
-   contract. The archived Build Week evaluator remains available for historical
-   evidence review, but it is not a repository-wide prerequisite.
+   contract. There is no repository-wide competition or submission prerequisite.
 
 A canonical explicit evaluator prompt is:
 
@@ -130,10 +129,10 @@ tools, construct `argparse.Namespace` inside MCP code, or duplicate
 Godot/contract/report logic in an MCP package. CLI and MCP must share the same
 typed request/result services.
 
-## Retained Build Week repair material
+## Retained reference repair material
 
-The committed Build Week persona campaign is retained as a reference case, not
-as a repository-wide preflight gate. When a task explicitly uses that evidence
+The committed persona campaign is retained as a reference case, not as a
+repository-wide preflight gate. When a task explicitly uses that evidence
 to judge or repair gameplay, follow the selected `$playtest-forge` workflow,
 keep the canonical baseline under `demo/study-in-germany` immutable, and require
 fixed plus unseen-holdout evidence before accepting a repair.

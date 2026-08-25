@@ -1,513 +1,142 @@
-# game_analysis_agent
+# Playtest Forge
 
-[查看 APC、MTP 与 DSpark 推理 A/B 可视化](https://somazzz.github.io/game_analysis_agent/inference-benchmark/)
+Playtest Forge 是一个由 Codex 驱动的游戏质量分析系统。它把确定性模拟、
+玩家人格试玩、证据诊断和有边界的修复实验组合起来；只有固定种子与未见
+holdout 证据都支持时，候选修改才会被接受。
 
-## 评审 / 自动初审入口
+[开发指南](docs/DEVELOPER_GUIDE.md) ·
+[架构](docs/architecture/ARCHITECTURE.md) ·
+[Docker 指南](docs/operations/DOCKER.md) ·
+[English](README.md)
 
-在仓库根目录优先运行完全离线的两条命令：
+参考集成使用仓库内置的 Godot 游戏 **Study in Germany**，但核心实现采用可复用的
+typed service、provider contract 和 evidence contract。
 
-```bash
-./judge --mode inspect --offline --json --output-dir -
-./judge --mode replay --offline --json --output-dir -
-```
+## 主要能力
 
-Inspect 只需 Python 3.9+，当前会校验 206 个已提交证据、Skill 与 demo 源码文件的哈希、schema、来源门禁，
-以及 9 条公开结论对应的精确 JSON 指针。Replay 额外使用锁定的 `uv` 环境并消费
-哈希固定的 persona fixture；两者都不需要 Godot、Docker、GPU、网络、API key、
-浏览器、端口或相邻的私有游戏仓库。完整 demo 已固定在
-`demo/study-in-germany`。输出是单个 `judge-result-v1` JSON；只有
-`passed` 是成功，`failed` 和 `unsupported` 不能视为降级成功。
-
-当前案例明确标记为**确定性 persona-policy fixture 的预录 Replay 证据**，不是
-录制的 LLM 试玩：Codex 提出并实现受限修复假设，但 fixed
-和 holdout 都没有改善目标失败簇，因此系统拒绝候选补丁。它不是一次新的 OpenAI
-调用，也不声称游戏已经修好。完整证据地图与限制见 [JUDGE.md](JUDGE.md)。
-
-面向 Godot 数值模拟游戏的开发侧 AI Agent 流水线。本项目把"试玩 / 边界 / Bug / 数值"分析自动化：
-让 LLM 在压缩报告、异常检测和工具调用之上产生诊断，而不是把 LLM 塞进游戏运行时当 NPC。
-
-```text
-Godot headless simulation
-  ├─ RunSimulation.gd           (Monte Carlo via study-in-germany)
-  ├─ RunBoundaryProbe.gd        (extreme-scenario probing)
-  ├─ ExportEventGraph.gd        (event / action / ending catalog)
-  └─ RunInteractiveProbe.gd     (driven by the interactive player)
-        │
-        ▼
-Python analysis layer
-  ├─ analytics.py               (ending / weekly / pick / event / choice stats)
-  ├─ anomaly_detector.py        (invariant + repeat + dead-state + spike detection)
-  ├─ value_analyzer.py          (dominant / dead actions, choice bias, ending lock-in)
-  └─ bug_summarizer.py          (anomaly → markdown)
-        │
-        ▼
-LLM/persona layer (provider: openai | vllm | sglang | deepseek)
-  ├─ balance                    (existing) — diagnose ending distribution + tuning
-  ├─ content_qa                 (existing) — review event text + choices
-  ├─ event_graph                (existing) — audit trigger graph
-  ├─ bug_hunter                 (new) — review anomalies + raw runs → bug_diagnosis.md
-  ├─ boundary_prober            (new) — review extreme runs → boundary_report.md
-  ├─ value_reviewer             (new) — review value_report.json → value_review.md
-  └─ interactive_player         (new) — drive the simulator with tool calls
-```
-
-比赛主线通过 OpenAI Responses API 使用 `gpt-5.6-luna` 生成 live persona 决策；
-本地开发仍可使用 vLLM/SGLang/DeepSeek。OpenAI key 只保留在服务端环境，绝不进入浏览器、
-公开报告或 Git。
+- 运行 Godot 确定性模拟、边界探测、验证器和难度矩阵。
+- 通过录制 Replay、本地 SGLang/vLLM 或 OpenAI-compatible provider 运行人格试玩。
+- 保存 provider 身份、源码指纹、每周决策、游戏状态和失败聚类。
+- 使用固定与未见 holdout 对有边界的候选修改做因果比较。
+- 当修改破坏 invariant、设计失败、人格一致性或证据完整性时拒绝修改。
+- 在 React dashboard 中浏览 campaign、decision、report 和 human review。
 
 ## 快速开始
 
-### 比赛主线：Docker Godot + OpenAI API（推荐）
-
 ```bash
-cp .env.example .env
-# 编辑被 Git 忽略的 .env：
-# OPENAI_API_KEY=...
-# OPENAI_PERSONA_MODEL=gpt-5.6-luna
-# GODOT_DOCKER_MOUNT_ROOT=/game_analysis_agent 所在目录的绝对路径
+uv sync --extra dev --locked
+npm --prefix frontend ci
 
-scripts/setup-evaluator
-
-# Docker Client/Server 都必须可用；这里只启动 Godot，不需要 NVIDIA GPU。
-docker version
-docker compose --profile game-tools up -d godot
-export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
-"$GODOT_BIN" --version               # 必须是 Godot 4.4
-docker compose ps                     # godot 必须 healthy
+uv run pytest -q
+uv run ruff check .
+npm --prefix frontend run test:coverage
+npm --prefix frontend run build:public
 ```
 
-比赛完整运行是混合部署：Codex、Judge API 和 campaign runner 在宿主机，Docker
-提供可复现的 Godot 4.4 sidecar，OpenAI API 提供 live persona 决策。CPU-only
-`dashboard` 镜像只是评审界面，不能控制旁边的 Godot 容器。
-
-分别在两个终端启动 viewer 和服务端 API：
+启动只读 dashboard：
 
 ```bash
-# 终端 1
 npm --prefix frontend run prepare:public
 npm --prefix frontend run dev -- --host 127.0.0.1
-
-# 终端 2
-GODOT_BIN="$PWD/scripts/godot-docker-wrapper" \
-  scripts/run-judge-dev --host 127.0.0.1 --port 8080
 ```
 
-打开 `http://127.0.0.1:5173/#/playthrough-inspector`。先生成一个受限的
-`one-strategy` 配置：
+打开 `http://127.0.0.1:5173/`。如需本地 API 与可持久化的人工审阅记录：
 
 ```bash
-.agents/skills/playtest-forge/scripts/session-options \
-  --godot-runtime docker-godot \
-  --llm-provider openai-api \
-  --profile one-strategy \
-  --persona newbie \
-  --json
+npm --prefix frontend run build:public
+uv run python tools/judge/run_judge_api.py \
+  --host 127.0.0.1 --port 8080 --frontend frontend/dist
 ```
 
-确认模型调用额度后，执行 planner 输出的 `shell_preview`。该 profile 最坏 40 次
-决策/事件调用，上限 50 次，只验证 OpenAI、真实 Godot、证据保留和逐周 UI，不能证明
-游戏修复。任何 partial cell、provider/runtime error 或 fallback 都会让 campaign 失败，
-不会静默切换到 Replay。详见英文根 README 的 Competition deployment、
-[Docker 部署](docs/operations/DOCKER.md) 和
-[官方比赛规则](https://openai.devpost.com/rules)。
+Provider 凭据只存在于服务端环境变量中，不会传给浏览器。
 
-### 本地开发备选：Python + 已有 vLLM endpoint
+## Godot 运行时
 
-1. 复制环境变量模板：
-
-```bash
-cp .env.example .env
-```
-
-2. 安装依赖（推荐使用 `uv` / `pip` + virtualenv）：
-
-```bash
-uv venv .venv
-source .venv/bin/activate
-uv pip install -e ".[dev]"
-
-# 不需要 Godot 或 LLM 的确定性检查
-uv run pytest -q -ra
-uv run ruff check .
-```
-
-3. 启动默认的本地 SGLang 服务（如果你用的是 `deepseek` 则可跳过）：
-
-```bash
-MODEL_ID=/path/to/Qwen3.8-27B-NVFP4 ./tools/llm_runtime/run_sglang_qwen.sh
-```
-
-4. 一键跑通整个流水线（模拟/分析 → 导出 → 全验证 → LLM QA → 质量门禁）：
-
-```bash
-python3 tools/gameplay/run_gameplay_agent.py all --runs 20 --policy balanced
-```
-
-   这条命令会输出到：
-
-   ```text
-   reports/balance/<run_id>/raw_runs.jsonl
-   reports/balance/<run_id>/summary.json
-   reports/balance/<run_id>/ending_distribution.csv
-   reports/balance/<run_id>/weekly_stats.csv
-   reports/balance/<run_id>/action_pick_rates.csv
-   reports/balance/<run_id>/event_trigger_rates.csv
-   reports/balance/<run_id>/choice_pick_rates.csv
-   reports/balance/<run_id>/anomalies.jsonl
-   reports/balance/<run_id>/bugs.jsonl
-   reports/balance/<run_id>/bugs_summary.md
-   reports/balance/<run_id>/value_report.json
-   reports/balance/<run_id>/route_report.json
-   reports/balance/<run_id>/coverage_report.json
-   reports/balance/<run_id>/validation_summary.json
-   reports/balance/<run_id>/gate_report.json
-   reports/balance/<run_id>/agent_diagnosis.md
-   reports/balance/<run_id>/tuning_proposal.md
-   reports/balance/<run_id>/content_issues.md
-   reports/balance/<run_id>/event_graph_report.md
-   reports/balance/<run_id>/bug_diagnosis.md
-   reports/balance/<run_id>/value_review.md
-   reports/balance/<run_id>/report_manifest.json
-   ```
-
-5. 单独运行其它子命令：
-
-```bash
-# 仅模拟 + 分析（不调 LLM）
-python3 tools/gameplay/run_gameplay_agent.py sim --runs 100 --policy random
-python3 tools/gameplay/run_gameplay_agent.py analyze --report-dir reports/balance/baseline
-
-# 边界探测（需要 Godot + GAME_PROJECT_PATH 指向 study-in-germany）
-python3 tools/gameplay/run_gameplay_agent.py probe --extreme "zero_money,deep_debt,flag_chaos"
-
-# 默认运行 content / json-content / economy / risk / route / demo 六个验证器。
-# route/demo 的前置输入默认重新生成；仅在明确需要时传 --reuse-inputs。
-python3 tools/gameplay/run_gameplay_agent.py validate \
-  --report-dir reports/validation/<run_id>
-
-# 执行确定性质量门禁
-python3 tools/gameplay/run_gameplay_agent.py gates \
-  --report-dir reports/balance/<run_id>
-
-# 让 LLM 当玩家试玩
-python3 tools/gameplay/run_gameplay_agent.py play --report-dir reports/play/test --weeks 20
-
-# 离线评估已经记录的试玩，不调用 Godot 或 LLM
-python3 tools/gameplay/run_gameplay_agent.py eval --report-dir reports/play/test
-
-# 不调用 LLM，直接捕获游戏原生 RiskEvaluator 风险建议；缺失时失败
-python3 tools/gameplay/run_gameplay_agent.py interactive-probe \
-  --report-dir reports/interactive/test
-
-# 先严格校验并枚举全部 140 个单元
-python3 tools/gameplay/run_gameplay_agent.py matrix --dry-run --jobs 4
-
-# before/after 各自拥有隔离的 cell 报告目录，不会互相覆盖
-python3 tools/gameplay/run_gameplay_agent.py matrix \
-  --out reports/matrix/before --jobs 4
-# 应用待验证的代码改动，但保持 config/matrix.yaml 不变
-python3 tools/gameplay/run_gameplay_agent.py matrix \
-  --out reports/matrix/after --jobs 4
-# 中断后在同一个 --out 上续跑
-python3 tools/gameplay/run_gameplay_agent.py matrix \
-  --out reports/matrix/after --jobs 4 --resume
-python3 tools/gameplay/run_gameplay_agent.py compare-matrix \
-  --before reports/matrix/before --after reports/matrix/after \
-  --out reports/compare/matrix
-
-# 仅跑某个 agent（如果只想看一份诊断）
-python3 tools/gameplay/run_agent.py balance reports/balance/baseline
-
-# Build an editorial-style HTML dashboard over all reports/
-python3 tools/dashboard/build_dashboard.py all
-# → reports/index.html + reports/browse/<kind>/<id>/index.html
-# → reports/browse/decision_graph/<run>/<id>/index.html  (full decision graph
-#   with every game event plotted across three lanes; agent's path glowing)
-# → reports/manifest.json + reports/browse/<kind>/<id>/manifest.json
-#   (data feed for the React frontend below)
-
-# Render the decision graph for one specific run on demand:
-python3 tools/dashboard/build_dashboard.py decision-graph \
-  --report-dir reports/balance/<run>/ --run-id 0
-
-# React + React Flow frontend (alternative to the static HTML):
-cd frontend && npm ci
-npm test
-npm run test:coverage
-npm run dev          # http://localhost:5173
-npm run build        # → frontend/dist/   (static SPA, ready to serve)
-# Mirror the manifest into the Vite project for development:
-python3 tools/dashboard/build_dashboard.py emit-frontend-manifest \
-  --reports reports --frontend-public frontend/public
-```
-
-默认的 `config/matrix.yaml` 会展开为 140 个稳定单元：126 个模拟单元
-（难度 × 策略 × 场景 × seed）、8 个边界单元和 6 个 persona 试玩单元。
-矩阵 YAML 使用严格 schema，未知或非法字段会在执行前失败；状态会原子写入
-`matrix_manifest.json`、`matrix_summary.json` 和每个单元的
-`cell_manifest.json`。矩阵和单元都记录精确的运行源码 SHA-256；源码变化后
-`--resume` 会重新执行旧成功单元。`compare-matrix` 仅接受完整、非 dry-run
-且 config hash、cell 集合、参数、命令、seed 和 cell manifest 相匹配的两次
-执行，并独立重验 CSV schema、coverage/catalog 一致性、模拟/边界契约、报告源码
-指纹及重新计算的 persona 评估。产物内容允许变化，变化会写入
-`matrix_compare_summary.json` 和逐模拟单元的结构化 diff。
-每次矩阵的实际 report 目录都隔离在对应 `--out` 下，因此不需要复制旧报告或
-使用不同 worktree。
-
-## 可追溯报告
-
-每个报告目录都会写 `trace-manifest-v2` 格式的
-`report_manifest.json`。除报告级 `run_id`、命令参数、源文件/生成文件、
-SHA-256、修改时间和 JSONL 行号索引外，`provenance` 还记录：
-
-- Agent 与游戏仓库的 Git commit 和 dirty 状态；
-- Python、平台、Godot 版本或可用性；
-- `config/` 与 `prompts/` 的内容哈希。
-- 可区分不同 dirty worktree 的运行源码 SHA-256。
-
-前端列表读取 `reports/report_index.json`，再打开每份报告的 manifest
-下钻。交互试玩还会写 `playthrough_agent_report.json`（完整 LLM 调用审计）
-和 `agent_eval.json`；后者统计首轮/最终合法率、回退与修复率、非法动作、
-事件选择、异常、风险确认、persona 对齐以及 LLM 错误/延迟。
-
-## 测试系统
-
-宿主机没有 `godot4` 时，优先使用仓库内的 Docker wrapper。它会保持宿主机与
-容器中的绝对路径一致，并使用当前 UID/GID，避免生成 root 所有的报告：
+仓库在 `demo/study-in-germany` 内置了参考游戏。主机没有 Godot 时可使用 Docker：
 
 ```bash
 uv run python tools/build_week/prepare_embedded_demo.py \
-  --output reports/docker-game-runtime --replace --json
-export GAME_PROJECT_PATH="$PWD/reports/docker-game-runtime"
+  --output reports/local-game-runtime --replace --json
+export GAME_PROJECT_PATH="$PWD/reports/local-game-runtime"
 export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
-docker compose --profile game-tools --profile local-nvidia up -d godot sglang
+export GODOT_DOCKER_MOUNT_ROOT="$(cd .. && pwd)"
+docker compose --profile game-tools up -d godot
 "$GODOT_BIN" --version
-
-uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
-  --report-dir reports/interactive/docker-smoke
 ```
 
-wrapper 会优先复用 compose 中常驻的 `godot` 服务；服务未启动时退回一次性
-容器。默认镜像是本机已缓存的 `barichello/godot-ci:4.4`；可通过
-`GODOT_DOCKER_IMAGE` 覆盖。挂载约定和 CI 完整性要求见 [AGENTS.md](AGENTS.md)。
-
-### 使用本地 LLM Agent 做真实测试
-
-最直接的端到端测试是让本地 LLM 选择行动，同时由真实 Godot 项目推进游戏。
-先做不调用 LLM 的游戏契约预检，便于区分 Godot 和模型问题：
+确定性 smoke：
 
 ```bash
-docker compose --profile local-nvidia --profile game-tools up -d sglang godot
-docker compose ps
-
-uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
-  --report-dir reports/interactive/local-smoke
-```
-
-然后运行 5 周 smoke test，并独立重验录制证据：
-
-```bash
-uv run python tools/gameplay/run_gameplay_agent.py play \
-  --report-dir reports/play/local-newbie-smoke \
-  --persona newbie \
-  --difficulty normal \
-  --scenario default_first_semester \
-  --seed 42 \
-  --weeks 5
-
-uv run python tools/gameplay/run_gameplay_agent.py eval \
-  --report-dir reports/play/local-newbie-smoke
-
-uv run python -m json.tool \
-  reports/play/local-newbie-smoke/agent_eval.json
-```
-
-正式测试把 `--weeks` 改成 `20`。可用 persona 为 `newbie`、`study`、
-`money`、`social`、`visa` 和 `slacker`。合格结果至少应满足：
-
-- `valid: true`、`strict_passed: true`，且 `errors`、`quality_errors` 为空；
-- `final_valid_rate >= 0.95`；
-- `fallback_rate <= 0.05`；
-- `illegal_action_rate == 0`；
-- `llm_error_rate <= 0.05`；
-- `anomaly_rate_per_5_weeks <= 1`。
-
-`persona_alignment_rate` 和 `risk_acknowledgement_rate` 分别反映角色策略
-一致性以及模型是否理解游戏原生风险提示，也应人工对比不同 persona。
-
-若要让六个 LLM 审查 Agent 分析新生成的真实游戏数据，可把所有证据写入同一个
-报告目录：
-
-```bash
-REPORT=reports/balance/local-real-42
-
 uv run python tools/gameplay/run_gameplay_agent.py sim \
-  --report-dir "$REPORT" --runs 200 --weeks 20 \
-  --policy balanced --difficulty normal --seed 42
-uv run python tools/gameplay/run_gameplay_agent.py export --report-dir "$REPORT"
-uv run python tools/gameplay/run_gameplay_agent.py probe \
-  --report-dir "$REPORT" --runs 30 --weeks 20 \
-  --policy balanced --seed 42 \
-  --extreme "zero_money,deep_debt,no_energy,flag_chaos"
-uv run python tools/gameplay/run_gameplay_agent.py qa --report-dir "$REPORT"
-uv run python tools/gameplay/run_gameplay_agent.py gates --report-dir "$REPORT"
+  --run-id smoke --runs 12 --policy balanced \
+  --difficulty normal --seed 4242 \
+  --scenario default_first_semester --weeks 20
 ```
 
-`play` 会生成 `playthrough.jsonl`、`playthrough_summary.md`、
-`playthrough_agent_report.json`、`agent_eval.json` 和
-`report_manifest.json`。虽然 `play` 已自动生成评估，仍建议再运行一次
-`eval`：录制证据无效时，独立命令会返回非零退出码。当前游戏 demo 有 3 个
-已知平衡失败，所以一体化 `all` 可能在 validator 阶段正确停止、尚未进入
-LLM QA；上面的分步流程可以分别检查每个阶段。
+## 本地 SGLang
 
-本地确定性检查：
+默认本地 profile 使用 Qwen3.8-27B NVFP4 + DFlash2；DSpark 和 target-only 是显式回滚：
 
 ```bash
-uv sync --extra dev --locked
-uv run pytest -q -ra
-uv run ruff check .
-
-cd frontend
-npm ci
-npm test
-npm run test:coverage
-npm run build
+cp .env.example .env
+docker compose -f docker-compose.yml -f docker-compose.sglang-dflash2.yml build sglang
+docker compose --env-file .env --env-file config/sglang/dflash2.env \
+  --profile local-sglang up -d sglang
 ```
 
-Pull Request 和 `main` 分支 push 会执行完整 Python 测试、全仓 Ruff、
-140 单元矩阵 dry-run、带覆盖率门槛的前端 Vitest 和公开站点生产构建。
-定时或手动的 real-Godot job 会：
+详见 [SGLANG_QWEN_LOCAL_AGENT.md](docs/operations/SGLANG_QWEN_LOCAL_AGENT.md)。
 
-1. 使用 secret 检出固定 commit 的私有 `study-in-germany`；
-2. 下载官方 Godot 包并验证 SHA-512；
-3. 生成并分析新鲜 trace，导出 catalog，运行全部六个 validator；
-4. 执行确定性 smoke gates；
-5. 捕获游戏原生交互风险建议，验证六类跨仓库数据契约并上传 Agent/游戏证据。
+## Codex 引导的试玩
 
-详见 [游戏产物契约测试](docs/operations/GAME_CONTRACT_TESTING.md)。
+仓库内置 `playtest-forge` Skill。开始时先做只读 preflight，并列出运行选择：
 
-## 目录结构
+```bash
+.agents/skills/playtest-forge/scripts/preflight
+.agents/skills/playtest-forge/scripts/session-options --choices-only --json
+```
+
+流程会在执行前冻结 Godot runtime、provider、难度、persona、seed、时长、保护指标和
+证据合同。启动 provider、消耗 API 额度或修改游戏仍需要相应授权。
+
+难度矩阵必须通过受控 matrix 命令执行：
+
+```bash
+uv run python tools/gameplay/run_gameplay_agent.py matrix \
+  --config config/matrix.normal.yaml --dry-run --jobs 4 \
+  --out reports/matrix-normal
+```
+
+## 报告存储
+
+运行报告位于 `reports/`，默认不进入 Git。受控矩阵会自动封存完成的 JSONL；其他终态
+报告可以使用无损归档服务：
+
+```bash
+uv run python tools/reports/archive_jsonl.py archive \
+  <terminal-report-dir> --apply --replace
+```
+
+只有在 Zstandard 解压、重新解析、记录数、字节数和 SHA-256 全部一致后才删除源文件。
+
+## 目录
 
 ```text
-config/
-  agent_profiles.yaml           — agent 配置（system_prompt / user_prompt / output_files / temperature）
-  gates.yaml                    — 可执行、失败关闭的质量门禁
-  matrix.yaml                   — 可执行、严格、可恢复的测试矩阵
-  player_personas.yaml          — 交互试玩 persona
-
-docs/
-  README.md                     — 按读者分类的索引，从这里开始
-  architecture/                 — 开发者与评审参考（长期）
-  operations/                   — Docker + vLLM + 契约测试计划
-  portfolio/                    — 公开 / 作品集说明
-  reviews/                      — 按日期排序的审计与差距分析
-  plans/                        — 设计草稿与设计迭代
-  legacy/                       — 已废弃文档（README 不再链接）
-
-prompts/
-  balance_agent_{system,user}.md
-  bug_hunter_{system,user}.md
-  boundary_prober_{system,user}.md
-  content_qa_agent_{system,user}.md
-  event_graph_agent_{system,user}.md
-  player_{system,user}.md
-  value_reviewer_{system,user}.md
-
-scripts/tools/
-  RunBalanceSim.gd              — deprecated stub; 真实跑局见 study-in-germany/RunSimulation.gd
-  AnomalyCollector.gd           — 镜像 Python 不变量检测，给 boundary_runs 附带轻量标记
-
-src/game_analysis_agent/
-  __init__.py
-  agent_eval.py                 — 录制试玩的确定性质量评估
-  env.py                        — .env loader
-  settings.py                   — Settings dataclass + get_settings()
-  schemas.py                    — Pydantic LLMCall / Anomaly / Finding
-  contracts.py                  — 跨仓库产物契约
-  llm_client.py                 — OpenAI-compatible client with provider switching + audit
-  tool_loop.py                  — OpenAI-compatible tool-calling loop
-  analytics.py                  — 纯统计函数
-  coverage.py                   — 状态/事件/动作/转移覆盖率
-  anomaly_detector.py           — 不变量 / 重复 / 死局 / 突变检测
-  value_analyzer.py             — 必选 / 死选 / 偏向 / 终局单一化检测
-  bug_summarizer.py             — anomalies → Markdown
-  game_tools.py                 — OpenAI tools + Godot subprocess wrappers
-  quality_gates.py              — 严格、失败关闭的门禁执行器
-  test_matrix.py                — 140 单元矩阵计划、并发与恢复
-  agents/
-    base.py                     — Agent 抽象基类
-    balance.py
-    content_qa.py
-    event_graph.py
-    bug_hunter.py
-    boundary_prober.py
-    value_reviewer.py
-    interactive_player.py
-
-tests/                          — 单元测试 + fixture
-tools/
-  analyze_balance.py            — CLI 入口，拆出业务逻辑到 analytics.py
-  compare_matrix.py             — 固定 seed 的严格矩阵 before/after 对比
-  generate_agent_prompt.py
-  run_agent.py                  — 单个 agent CLI
-  run_balance_sim.sh            — 包装 study-in-germany 的 RunSimulation.gd
-  run_gameplay_agent.py         — 一站式 orchestration CLI
-  run_sglang_qwen.sh            — 默认 SGLang + Qwen3.8 启动脚本
-  run_vllm_qwen.sh              — vLLM fallback 启动脚本
+.agents/skills/playtest-forge/    Codex 工作流与证据协议
+config/                           profile、target、gate 和 contract
+demo/study-in-germany/            内置 Godot 参考游戏
+examples/                         脱敏的 campaign 与 repair fixture
+frontend/                         dashboard、inspector、report、human review
+src/game_analysis_agent/          typed service、provider 和分析逻辑
+tools/ 与 scripts/                CLI adapter 与运行时辅助工具
+docs/                             架构、运维、计划和通用评审文档
 ```
 
-## 项目文档
+## 当前限制
 
-从 [docs/README.md](docs/README.md) 进入，按读者角色查看。
+- 真实游戏运行需要 Godot 4.4 或 Docker wrapper。
+- 实时人格 campaign 需要兼容的模型端点。
+- Dashboard API 面向可信本地环境，不是带多租户认证、quota、TTL 和计费治理的托管服务。
+- 内置游戏是参考 fixture，不是完整商业游戏。
+- Human review 不会自动合并候选修改。
 
-常用入口：
-
-- [完整项目规划](docs/plans/PROJECT_PLAN.md)
-- [系统架构](docs/architecture/ARCHITECTURE.md)
-- [新 agent 类型说明](docs/architecture/GAMEPLAY_AGENT.md)
-- [与 study-in-germany 的集成约定](docs/architecture/INTEGRATION_WITH_STUDY_IN_GERMANY.md)
-- [Godot 接入规范](docs/architecture/GODOT_INTEGRATION.md)
-- [Docker 部署](docs/operations/DOCKER.md)
-- [本地 vLLM + Qwen 接入](docs/operations/VLLM_QWEN_LOCAL_AGENT.md)
-- [数据与报告规范](docs/architecture/DATA_CONTRACTS.md)
-- [本地 LLM 游戏系统真实测试报告（2026-07-13）](docs/reviews/LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md)
-- [Service-first MCP 迁移计划](docs/architecture/MCP_MIGRATION_PLAN.md)
-
-## 当前状态
-
-- ✅ Settings + 三 provider 切换（vllm / sglang / deepseek）
-- ✅ Pydantic 审计 + 不变量 / 重复 / 死局 / 突变检测
-- ✅ 7 个 agent（balance, content_qa, event_graph, bug_hunter, boundary_prober,
-  value_reviewer, interactive_player）
-- ✅ Tool-calling loop（OpenAI 兼容 + JSON fallback helper）
-- ✅ 3 个新 Godot 工具（RunBoundaryProbe / ExportEventGraph / RunInteractiveProbe）
-- ✅ `all` 串联 export、六个 validator、可选 LLM QA 和质量门禁
-- ✅ 严格、可并发、可恢复的 140 单元测试矩阵
-- ✅ 隔离 report 目录、严格配对的固定 seed `compare-matrix`
-- ✅ Godot `RiskEvaluator` 原生 top-risks 契约、严格校验和可审计 fallback
-- ✅ `agent_eval.json`、coverage v2、统计置信区间和 provenance manifest
-- ✅ pytest + Ruff + Vitest + 前端生产构建的 CI
-- ✅ 六类跨仓库产物契约及 real-Godot 定时/手动 smoke job
-
-在另一台环境复现完整流水线，需要：
-
-1. 一台能跑 Godot 4 的机器（`godot4 --headless`）。
-2. 仓库内置的 `demo/study-in-germany`；迁移到其它游戏时才需要外部 checkout。
-3. 若要运行 fresh persona 单元，还需服务端 OpenAI API key，或
-   vLLM / SGLang / DeepSeek 任意一个 endpoint。
-
-缺任何一个，Python 侧仍然能跑：analytics / anomaly_detector / value_analyzer / tests
-全部基于本地 fixture 自测，前端也可以基于公开样例运行测试和构建。
-
-## 当前环境限制
-
-历史开发验证曾使用 SHA-512 校验的官方 Godot 4.7-dev5；当前比赛路径固定为
-Godot 4.4，并已在 macOS 完成真实模拟。历史验证还包括边界、catalog、
-五个干净 validator、交互 RiskEvaluator 契约及 Agent 关键门禁验证。游戏自身的
-`demo` validator 仍如实报告 3 个平衡失败（动作集中度 2 项、结局多样性 1 项），
-因此完整 `all` 正确返回非零；这不是测试系统跳过或伪造通过。仓库已保留经过验证的
-`gpt-5.6-luna` live OpenAI campaign；新的 fresh persona 矩阵仍需操作者提供服务端
-OpenAI key 或本地模型 endpoint。CI 已直接使用哈希固定的内置 demo，不再需要
-`STUDY_IN_GERMANY_TOKEN`。当前 macOS 环境没有 Docker，因此 Docker Godot 主线仍需在
-Linux/Docker 环境复测。仓库采用 MIT License；第三方依赖与素材来源见
-[ATTRIBUTION.md](ATTRIBUTION.md)。
+项目使用 MIT License；第三方与生成资产来源见 [ATTRIBUTION.md](ATTRIBUTION.md)。
