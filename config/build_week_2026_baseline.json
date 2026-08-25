@@ -1,0 +1,51 @@
+{
+  "schema_version": "build-week-baseline-config-v1",
+  "run_id": "canonical-normal-seed-42",
+  "parameters": {
+    "runs": 100,
+    "policy": "balanced",
+    "seed": 42,
+    "weeks": 20,
+    "difficulty": "normal",
+    "scenario": "default_first_semester"
+  },
+  "contract_validators": [
+    "content",
+    "json-content",
+    "economy",
+    "risk",
+    "route"
+  ],
+  "quality_observation": {
+    "validator": "demo",
+    "expected_error_count": 3,
+    "required_error_fragments": [
+      "normal top action take_a_real_break share",
+      "realistic top action take_a_real_break share",
+      "normal scenario has 2 ending types"
+    ]
+  },
+  "invariant_gates": "config/ci_gates.yaml",
+  "canonical_artifacts": [
+    "raw_runs.jsonl",
+    "event_graph.json",
+    "action_catalog.json",
+    "summary.json",
+    "ending_distribution.csv",
+    "weekly_stats.csv",
+    "action_pick_rates.csv",
+    "event_trigger_rates.csv",
+    "choice_pick_rates.csv",
+    "coverage_report.json",
+    "anomalies.jsonl",
+    "value_report.json",
+    "route_report.json",
+    "content_validation.json",
+    "json_content_validation.json",
+    "economy_validation.json",
+    "risk_guidance_validation.json",
+    "route_boundary_validation.json",
+    "invariant_gate_report.json",
+    "quality-observation/demo_gate_validation.json"
+  ]
+}

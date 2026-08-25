@@ -1,0 +1,284 @@
+{
+  "actual_edge_count": 108,
+  "campaign_id": "openai-all-six-seed-42-20w",
+  "cell_count": 6,
+  "cell_index": {
+    "bytes": 1876,
+    "path": "index.json",
+    "role": "cell-index",
+    "sha256": "6f5f9e80e2af41c702735637cdd91f0d9bb60a8dc68c242b937e8d9af697acb8"
+  },
+  "checks": [
+    {
+      "detail": "6/6",
+      "id": "completed_cells",
+      "status": "passed"
+    },
+    {
+      "detail": "6 traces",
+      "id": "raw_hashes",
+      "status": "passed"
+    },
+    {
+      "detail": "114 rows",
+      "id": "row_citations",
+      "status": "passed"
+    },
+    {
+      "detail": "all adjacent nodes",
+      "id": "state_continuity",
+      "status": "passed"
+    },
+    {
+      "detail": "all selected actions",
+      "id": "action_legality",
+      "status": "passed"
+    },
+    {
+      "detail": "all selected choices",
+      "id": "event_choice_legality",
+      "status": "passed"
+    },
+    {
+      "detail": "all numeric deltas",
+      "id": "delta_consistency",
+      "status": "passed"
+    },
+    {
+      "detail": "0 fallback / 0 provider error",
+      "id": "provider_health",
+      "status": "passed"
+    }
+  ],
+  "derived_artifacts": [
+    {
+      "bytes": 213463,
+      "path": "cells/money-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "78fd0d1315f6790a7538c10a2753748479038227cd3c2ce5a168ea2610737486"
+    },
+    {
+      "bytes": 242059,
+      "path": "cells/newbie-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "42291202ce2c870ce1b521ad48fd78de59aaaac277e133888266a9391e7659c7"
+    },
+    {
+      "bytes": 208205,
+      "path": "cells/slacker-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "77704027abd88f11724f681054352f7beeb1e56e75f19dab4495d79ce54d7f19"
+    },
+    {
+      "bytes": 217380,
+      "path": "cells/social-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "0ae06c34919a211a368aaf1bcf071ea127f25fdc9ce46589b3379f6d8b737ed3"
+    },
+    {
+      "bytes": 239289,
+      "path": "cells/study-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "bc166ff6ec2b514deae099dab2aad7248e7e6e1686db146270bd862cfc3a2c91"
+    },
+    {
+      "bytes": 238847,
+      "path": "cells/visa-seed-42.json",
+      "role": "playthrough-view",
+      "sha256": "5bfc9ad2e950bf0aaf3c6e520c0b019045c1e255d4d66a863008d4de13dba347"
+    },
+    {
+      "bytes": 1876,
+      "path": "index.json",
+      "role": "cell-index",
+      "sha256": "6f5f9e80e2af41c702735637cdd91f0d9bb60a8dc68c242b937e8d9af697acb8"
+    },
+    {
+      "bytes": 7611,
+      "path": "personas.json",
+      "role": "persona-view",
+      "sha256": "1abb90cdd32b4eeeda3d448529024b73ff8b67db93c1e8f082e9530b160b2f8e"
+    }
+  ],
+  "frontend_implementation_requires_design_approval": true,
+  "legal_event_choice_count": 445,
+  "node_count": 114,
+  "playthrough_data_ready": true,
+  "request": {
+    "campaign_id": "openai-all-six-seed-42-20w",
+    "concurrency": 4,
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "personas": [
+      "newbie",
+      "study",
+      "money",
+      "social",
+      "visa",
+      "slacker"
+    ],
+    "provider": "openai",
+    "report_root": "reports/persona-campaigns",
+    "scenario": "default_first_semester",
+    "schema_version": "persona-campaign-request-v1",
+    "seeds": [
+      42
+    ]
+  },
+  "request_fingerprint": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+  "schema_version": "playthrough-evidence-manifest-v1",
+  "source": {
+    "agent_commit": "fb1a09ac14b35396c7424b5066c28196a7896889",
+    "agent_dirty": false,
+    "agent_tree": "81ba89c5844cfa99f4049df05a368c1fefc48ebe",
+    "campaign_config_sha256": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "openai",
+    "provider_mode": "live",
+    "provider_revision": "model:gpt-5.6-luna"
+  },
+  "source_action_catalog": {
+    "bytes": 28831,
+    "path": "demo/study-in-germany/data/actions/generated_actions.json",
+    "role": "game-action-catalog",
+    "sha256": "99fdfef2f370babe69e13c22ea5cbd17299e08c62c6b0f1a84d7247653ed2f3d"
+  },
+  "source_artifacts": [
+    {
+      "bytes": 9752,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/money-seed-42-b965cd87a14f/cell_result.json",
+      "role": "cell-result",
+      "sha256": "fedb4597011b17132fb95d2c4e9f016f7891290ccfbdbdcf474096eeb9cb7f36"
+    },
+    {
+      "bytes": 450185,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/money-seed-42-b965cd87a14f/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "7a1d179f5cd1a937484256318ff94c677c9184b9a4501eb18730c1892fcf6e25"
+    },
+    {
+      "bytes": 10289,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/money-seed-42-b965cd87a14f/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "656d48e4665d863c60b8fdf078b8bbc600febf2c66d5b5c71dca440a7c75c916"
+    },
+    {
+      "bytes": 9813,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/newbie-seed-42-b3fd42b3bc17/cell_result.json",
+      "role": "cell-result",
+      "sha256": "2cb0d030bd6c8cd4977c3cdbbae592c4d87ee4ae093174854e8bb34f5ee64afc"
+    },
+    {
+      "bytes": 470705,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/newbie-seed-42-b3fd42b3bc17/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "5f10171317fab5ab823507432ee2cb4672a9c0023da0eca3c82cae3f607ae412"
+    },
+    {
+      "bytes": 10074,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/newbie-seed-42-b3fd42b3bc17/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "9b45a5e1a4a4c2124d360c1a23e78629c1a04c7dcb9559ba5c72f6d699b6f65f"
+    },
+    {
+      "bytes": 9874,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/slacker-seed-42-0887a1172174/cell_result.json",
+      "role": "cell-result",
+      "sha256": "1283151c146468b7fa3f5ee10b57fe3434034da9c9316046e0da913d108cd031"
+    },
+    {
+      "bytes": 425884,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/slacker-seed-42-0887a1172174/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "bf653b25a257da0bd4116130249eac1831e4da6a1717e9a6763d99faf0f9254c"
+    },
+    {
+      "bytes": 10281,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/slacker-seed-42-0887a1172174/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "1f17b1406d2e639937c93cba7b6da4dabc9dd7fbadef21c86eb470d617620ebf"
+    },
+    {
+      "bytes": 9813,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/social-seed-42-8529ae48470c/cell_result.json",
+      "role": "cell-result",
+      "sha256": "837681831f784389c20af710b8bcb11b27bd65151e7b6228f7225dda56f83887"
+    },
+    {
+      "bytes": 481797,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/social-seed-42-8529ae48470c/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "538fcaeea39d3dab268651a77aa1bdfbb0bf9f9985a39b7e175044eab219c751"
+    },
+    {
+      "bytes": 10528,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/social-seed-42-8529ae48470c/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "de26c7e794e91794658af41674dca931ac4564248edc3e89258c404c89f0d0b2"
+    },
+    {
+      "bytes": 9752,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/study-seed-42-832f407df65d/cell_result.json",
+      "role": "cell-result",
+      "sha256": "ad248ef0fc9f77c54dd6d025562b13cb73ce160612f4dca969f2958ffa0e3299"
+    },
+    {
+      "bytes": 474260,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/study-seed-42-832f407df65d/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "1d0db6951315d58274cfba6a700387f288f46c22d24986a6b0c3e3d2752e72c4"
+    },
+    {
+      "bytes": 10246,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/study-seed-42-832f407df65d/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "8e44b26bfe2602d3bd641965a35e4a0cf73c043c2f98d0ef34b70a7de11c20bb"
+    },
+    {
+      "bytes": 9691,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/visa-seed-42-5031492fa46c/cell_result.json",
+      "role": "cell-result",
+      "sha256": "6870e3af3b1502f43a0c9ad69b93b11ec82180b3cc43b08222ff394cd6c8d22f"
+    },
+    {
+      "bytes": 460895,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/visa-seed-42-5031492fa46c/playthrough.jsonl",
+      "role": "raw-playthrough",
+      "sha256": "933f29a2bb337616535a19f36c9693d1fe3e0d726222f29adb534dd0dd0ff84a"
+    },
+    {
+      "bytes": 10395,
+      "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/cells/visa-seed-42-5031492fa46c/playthrough_summary.md",
+      "role": "playthrough-summary",
+      "sha256": "3c065e254c1a1e0488397aeb6c3be3dd85c1347c674b6691c2d83e07d7feb255"
+    }
+  ],
+  "source_campaign_manifest": {
+    "bytes": 4274,
+    "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/public/campaign_manifest.json",
+    "role": "campaign-manifest",
+    "sha256": "f4b687a480f55932d628d3a7fbf2a7c9a88e6d4574e13ebb78406c03d0f0d8b0"
+  },
+  "source_failure_clusters": {
+    "bytes": 8599,
+    "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/public/failure_clusters.json",
+    "role": "failure-clusters",
+    "sha256": "2843d8eb69247b6b59d66f5b5f24f35883e07c3ec226cac4e4339d8420c8a3bc"
+  },
+  "source_fingerprint": "113c7f4438c324992bda241a7f01863feb033e014eee1a1a68385773e500fc74",
+  "source_personas": {
+    "bytes": 2473,
+    "path": "config/player_personas.yaml",
+    "role": "persona-contract",
+    "sha256": "b3734201edc44bbd523bfc0c60d9ed3f472f5d973100a9ca0baa76092bace692"
+  },
+  "source_public_gate": {
+    "bytes": 2047,
+    "path": "reports/persona-campaigns/openai-all-six-seed-42-20w/public/gate_report.json",
+    "role": "campaign-gate",
+    "sha256": "a488880e639bc9663bd3b8d7a2b8d19003a2cdf360da105cce097b4ecb6817ed"
+  },
+  "truth_label": "live-openai-real-godot"
+}

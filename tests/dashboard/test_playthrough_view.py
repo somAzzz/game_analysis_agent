@@ -1,0 +1,248 @@
+from __future__ import annotations
+
+import hashlib
+import json
+from pathlib import Path
+
+import pytest
+
+from game_analysis_agent.campaign_contract import (
+    CampaignCellResult,
+    CampaignManifest,
+    canonical_sha256,
+)
+from game_analysis_agent.playthrough_view import (
+    TRUTH_LABEL,
+    PlaythroughViewError,
+    _focus_selection_transition,
+    build_cell_view,
+    build_playthrough_views,
+    verify_playthrough_evidence,
+)
+
+ROOT = Path(__file__).resolve().parents[2]
+EVIDENCE = ROOT / "examples/build_week_2026/playthrough-v1"
+SOURCE = EVIDENCE / "source"
+CAMPAIGN = SOURCE / "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1"
+
+
+def test_committed_playthrough_evidence_is_complete_and_hash_verified() -> None:
+    result = verify_playthrough_evidence(EVIDENCE)
+
+    assert result == {
+        "status": "passed",
+        "campaign_id": "playthrough-evidence-full-v1",
+        "cells": 18,
+        "nodes": 342,
+        "actual_edges": 324,
+        "truth_label": TRUTH_LABEL,
+    }
+
+
+def test_money_seed_42_view_uses_actual_trace_and_truthful_branch_semantics() -> None:
+    manifest = CampaignManifest.model_validate_json(
+        (CAMPAIGN / "campaign_manifest.json").read_text(encoding="utf-8")
+    )
+    cell_dir = CAMPAIGN / "cells/money-seed-42-0814df41bd32"
+    result = CampaignCellResult.model_validate_json(
+        (cell_dir / "cell_result.json").read_text(encoding="utf-8")
+    )
+
+    view = build_cell_view(
+        manifest=manifest,
+        result=result,
+        trace_path=cell_dir / "playthrough.jsonl",
+        summary_path=cell_dir / "playthrough_summary.md",
+        attractors={3: ["cashflow-stress-attractor"], 4: ["burnout-risk"]},
+    )
+
+    assert view["completed_weeks"] == 19
+    assert view["final_ending"] == "cashflow_collapse"
+    assert view["nodes"][0]["selected_action_ids"] == [
+        "problem_set",
+        "library_day",
+        "language_school_germany",
+        "language_tandem",
+    ]
+    assert view["nodes"][2]["event"]["id"] == "missing_school_registration"
+    assert view["nodes"][2]["attractors"] == ["cashflow-stress-attractor"]
+    assert view["nodes"][2]["state_after"]["money"] == 0
+    assert view["nodes"][2]["state_after"]["stress"] == 82
+    assert view["branch_semantics"] == {
+        "event_choices": "legal-options-not-executed-unless-selected",
+        "available_actions": "legal-actions-not-future-state-branches",
+        "projected_counterfactual_states": False,
+    }
+
+
+def test_cell_view_rejects_tampered_raw_trace(tmp_path: Path) -> None:
+    manifest = CampaignManifest.model_validate_json(
+        (CAMPAIGN / "campaign_manifest.json").read_text(encoding="utf-8")
+    )
+    cell_dir = CAMPAIGN / "cells/money-seed-42-0814df41bd32"
+    result = CampaignCellResult.model_validate_json(
+        (cell_dir / "cell_result.json").read_text(encoding="utf-8")
+    )
+    tampered = tmp_path / "playthrough.jsonl"
+    tampered.write_bytes((cell_dir / "playthrough.jsonl").read_bytes() + b"\n")
+
+    with pytest.raises(PlaythroughViewError, match="raw trace hash mismatch"):
+        build_cell_view(
+            manifest=manifest,
+            result=result,
+            trace_path=tampered,
+            summary_path=cell_dir / "playthrough_summary.md",
+        )
+
+
+def test_cell_view_accepts_an_intentional_empty_action_plan(tmp_path: Path) -> None:
+    manifest = CampaignManifest.model_validate_json(
+        (CAMPAIGN / "campaign_manifest.json").read_text(encoding="utf-8")
+    )
+    source_dir = CAMPAIGN / "cells/money-seed-42-0814df41bd32"
+    result = CampaignCellResult.model_validate_json(
+        (source_dir / "cell_result.json").read_text(encoding="utf-8")
+    )
+    rows = [
+        json.loads(line)
+        for line in (source_dir / "playthrough.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    rows[0]["chosen_actions"] = []
+    rows[0]["decision"]["actions"] = []
+    trace = tmp_path / "playthrough.jsonl"
+    trace.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+    artifacts = [
+        item.model_copy(update={"sha256": hashlib.sha256(trace.read_bytes()).hexdigest()})
+        if item.path.endswith("playthrough.jsonl")
+        else item
+        for item in result.artifacts
+    ]
+    citations = list(result.citations)
+    citations[0] = citations[0].model_copy(update={"record_sha256": canonical_sha256(rows[0])})
+    result = result.model_copy(update={"artifacts": artifacts, "citations": citations})
+
+    view = build_cell_view(
+        manifest=manifest,
+        result=result,
+        trace_path=trace,
+        summary_path=source_dir / "playthrough_summary.md",
+    )
+
+    assert view["nodes"][0]["selected_action_ids"] == []
+
+
+def test_focus_selection_is_an_audited_pre_decision_transition() -> None:
+    previous = {
+        "week": 5,
+        "money": 500,
+        "focus_id": "focus_none",
+        "focus_start_week": 1,
+        "focus_expires_week": 4,
+        "focus_selection_counts": {"admin_stability": 1},
+        "semester_focus_selection_counts": {"admin_stability": 1},
+    }
+    current = {
+        **previous,
+        "focus_id": "mental_recovery",
+        "focus_start_week": 5,
+        "focus_expires_week": 8,
+        "focus_selection_counts": {
+            "admin_stability": 1,
+            "mental_recovery": 1,
+        },
+        "semester_focus_selection_counts": {
+            "admin_stability": 1,
+            "mental_recovery": 1,
+        },
+    }
+
+    transition = _focus_selection_transition(
+        previous, current, {"active_focus_id": "mental_recovery"}, 5
+    )
+
+    assert transition == {
+        "kind": "focus_selection",
+        "focus_id": "mental_recovery",
+        "start_week": 5,
+        "expires_week": 8,
+        "changed_fields": [
+            "focus_expires_week",
+            "focus_id",
+            "focus_selection_counts",
+            "focus_start_week",
+            "semester_focus_selection_counts",
+        ],
+    }
+
+
+def test_focus_transition_rejects_an_unexplained_selection_count_jump() -> None:
+    previous = {
+        "focus_id": "focus_none",
+        "focus_start_week": 1,
+        "focus_expires_week": 4,
+        "focus_selection_counts": {"mental_recovery": 1},
+        "semester_focus_selection_counts": {"mental_recovery": 1},
+    }
+    current = {
+        **previous,
+        "focus_id": "mental_recovery",
+        "focus_start_week": 5,
+        "focus_expires_week": 8,
+        "focus_selection_counts": {"mental_recovery": 3},
+        "semester_focus_selection_counts": {"mental_recovery": 3},
+    }
+
+    assert (
+        _focus_selection_transition(
+            previous, current, {"active_focus_id": "mental_recovery"}, 5
+        )
+        is None
+    )
+
+
+def test_focus_transition_cannot_hide_a_numeric_state_jump() -> None:
+    previous = {"money": 500, "focus_id": "focus_none"}
+    current = {
+        "money": 900,
+        "focus_id": "mental_recovery",
+        "focus_start_week": 5,
+        "focus_expires_week": 8,
+    }
+
+    assert (
+        _focus_selection_transition(
+            previous, current, {"active_focus_id": "mental_recovery"}, 5
+        )
+        is None
+    )
+
+
+def test_builder_emits_hash_bound_cell_index_for_lazy_review(tmp_path: Path) -> None:
+    output = tmp_path / "playthrough"
+
+    manifest = build_playthrough_views(
+        source_root=SOURCE,
+        campaign_manifest_path=CAMPAIGN / "campaign_manifest.json",
+        failure_clusters_path=SOURCE / "public/failure_clusters.json",
+        public_gate_path=SOURCE / "public/gate_report.json",
+        personas_path=SOURCE / "config/player_personas.yaml",
+        action_catalog_path=SOURCE / "demo/study-in-germany/data/actions/generated_actions.json",
+        output_dir=output,
+    )
+    index = __import__("json").loads((output / "index.json").read_text(encoding="utf-8"))
+
+    assert manifest["cell_index"]["path"] == "index.json"
+    assert index["cell_count"] == 18
+    assert len(index["cells"]) == 18
+    assert {
+        "persona": "money",
+        "seed": 42,
+        "path": "cells/money-seed-42.json",
+        "final_ending": "cashflow_collapse",
+    }.items() <= next(
+        cell.items() for cell in index["cells"] if cell["persona"] == "money" and cell["seed"] == 42
+    )
+    assert verify_playthrough_evidence(output, source_root=SOURCE)["cells"] == 18

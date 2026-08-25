@@ -1,0 +1,2531 @@
+{
+	"items": [
+		{
+			"body": "你到了教室门口才发现账号、选课和课程材料都卡在注册状态。学期费花了时间和精力，学业却开始空转。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -8.0,
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"flag": "testdaf_passed"
+					},
+					"set_flag": "school_registered",
+					"success_effects": {
+						"academic_progress": -4.0,
+						"money": -320.0,
+						"stress": 8.0,
+						"visa_progress": 4.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.82,
+					"text": "当天补注册"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -7.0,
+						"stress": 8.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "school_registered",
+					"success_effects": {
+						"academic_progress": -3.0,
+						"stress": 4.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.72,
+					"text": "先找 International Office"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -6.0,
+						"hunger": 5.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "只靠自学顶一周"
+				},
+				{
+					"failure_effects": {
+						"money": -80.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -10.0,
+						"money": -80.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "继续拖延"
+				}
+			],
+			"event_type": "fixed",
+			"id": "missing_school_registration",
+			"repeatable": false,
+			"source_order": 10,
+			"title": "注册没完成，上不了课",
+			"trigger": {
+				"missing_flag": "school_registered",
+				"week": 3.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "学校提醒非欧盟学生：打工通常不能超过每年 140 个全天或 280 个半天，学期内每周超过 20 小时会让居留和学业状态变得危险。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "work_law_briefed",
+					"success_effects": {
+						"stress": 2.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "把工时记进日历"
+				},
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"money": -40.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "work_law_briefed",
+					"success_effects": {
+						"career_progress": 3.0,
+						"money": -40.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "只接合同清楚的班"
+				},
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"stress": 4.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "work_law_briefed",
+					"success_effects": {
+						"language": 2.0,
+						"stress": -1.0,
+						"visa_progress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "问 AStA/International Office"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": -2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "work_law_briefed",
+					"success_effects": {
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.6,
+					"text": "觉得自己不会超"
+				}
+			],
+			"event_type": "fixed",
+			"id": "legal_work_limit_notice",
+			"repeatable": false,
+			"source_order": 13,
+			"title": "学生打工时长说明",
+			"trigger": {
+				"week": 5.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "没有住址登记，后面的银行、保险、延签都会变得微妙。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -4.0,
+						"stress": 4.0,
+						"visa_progress": 7.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "立刻补材料"
+				},
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"stress": 4.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 1.0,
+						"stress": -2.0,
+						"visa_progress": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先问 International Office"
+				},
+				{
+					"failure_effects": {
+						"stress": 6.0,
+						"visa_progress": -2.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.002,
+						"social": 0.003
+					},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"stress": 1.0,
+						"visa_progress": 6.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.76,
+					"text": "请室友确认 Wohnungsgeberbestätigung"
+				},
+				{
+					"failure_effects": {
+						"money": -30.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "admin_avoidance",
+					"success_effects": {
+						"money": -30.0,
+						"stress": -5.0,
+						"visa_progress": -8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "把信封塞进抽屉"
+				}
+			],
+			"event_type": "fixed",
+			"id": "anmeldung_deadline",
+			"repeatable": false,
+			"source_order": 14,
+			"title": "Anmeldung 提醒",
+			"trigger": {
+				"week": 6.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "未来三个月都没有可预约时间。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 8.0,
+						"visa_progress": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "每天早上刷新"
+				},
+				{
+					"failure_effects": {
+						"stress": 6.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"visa_progress": 7.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "写邮件解释情况"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -2.0,
+						"visa_progress": 10.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.85,
+					"text": "找学校帮忙"
+				},
+				{
+					"failure_effects": {
+						"stress": 8.0,
+						"visa_progress": -10.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "deportation_warning",
+					"success_effects": {
+						"stress": -3.0,
+						"visa_progress": -8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.45,
+					"text": "只等系统放号"
+				}
+			],
+			"event_type": "conditional",
+			"id": "termin_missing",
+			"repeatable": false,
+			"source_order": 19,
+			"title": "Ausländerbehörde 没有 Termin",
+			"trigger": {
+				"max_visa": 45.0,
+				"min_week": 8.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "日历提醒你签证或居留许可快到期。系统里没有绿色进度条，只有 Termin、材料和一封封邮件。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 14.0,
+						"visa_progress": -3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "visa_valid",
+					"success_effects": {
+						"language": 2.0,
+						"stress": 9.0,
+						"visa_progress": 9.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.74,
+					"text": "立刻联系外管局和学校"
+				},
+				{
+					"failure_effects": {
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "visa_valid",
+					"success_effects": {
+						"stress": 7.0,
+						"visa_progress": 7.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.66,
+					"text": "补材料并申请 Fiktionsbescheinigung"
+				},
+				{
+					"failure_effects": {
+						"stress": 16.0,
+						"visa_progress": -4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "deportation_warning",
+					"success_effects": {
+						"stress": 10.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.42,
+					"text": "只在网页上继续刷 Termin"
+				},
+				{
+					"failure_effects": {
+						"stress": 8.0,
+						"visa_progress": -12.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "deportation_warning",
+					"success_effects": {
+						"stress": -2.0,
+						"visa_progress": -8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.35,
+					"text": "相信不会查到自己"
+				}
+			],
+			"event_type": "fixed",
+			"id": "visa_status_hidden_check",
+			"repeatable": false,
+			"source_order": 20,
+			"title": "居留期限临近",
+			"trigger": {
+				"missing_flag": "visa_valid",
+				"week": 14.0
+			},
+			"weight": 1.6
+		},
+		{
+			"body": "外管局来信要求你尽快说明身份状态。之前的拖延或不合规打工已经让风险从背景音变成了倒计时。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -120.0,
+						"stress": 18.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "visa_valid",
+					"success_effects": {
+						"money": -60.0,
+						"stress": 14.0,
+						"visa_progress": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.58,
+					"text": "带齐材料当面补救"
+				},
+				{
+					"failure_effects": {
+						"stress": 16.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "visa_valid",
+					"success_effects": {
+						"language": 2.0,
+						"stress": 10.0,
+						"visa_progress": 7.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.64,
+					"text": "请学校 International Office 介入"
+				},
+				{
+					"failure_effects": {
+						"money": -360.0,
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "visa_valid",
+					"success_effects": {
+						"money": -280.0,
+						"stress": 8.0,
+						"visa_progress": 6.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.72,
+					"text": "找律师咨询"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -12.0,
+						"stress": 24.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "deportation_order",
+					"success_effects": {
+						"academic_progress": -8.0,
+						"stress": 18.0,
+						"visa_progress": -15.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.45,
+					"text": "继续硬扛"
+				}
+			],
+			"event_type": "conditional",
+			"id": "deportation_risk_notice",
+			"repeatable": false,
+			"source_order": 21,
+			"title": "居留风险升级",
+			"trigger": {
+				"flag": "deportation_warning",
+				"min_week": 15.0
+			},
+			"weight": 2.0
+		},
+		{
+			"body": "你在柜台前听到了一个长句，灵魂短暂离线。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "请对方说慢一点"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.65,
+					"text": "改用英语"
+				},
+				{
+					"failure_effects": {
+						"language": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.0025,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "language_wall",
+			"repeatable": false,
+			"source_order": 26,
+			"title": "德语墙",
+			"trigger": {
+				"min_stress": 35.0,
+				"min_visa": 20.0,
+				"min_week": 4.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "这一周的合法工作时长已经超过 20 小时。钱确实进账了，但如果继续这样安排，雇主记录、工资单和居留身份都会变成风险点。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -220.0,
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "work_hours_corrected",
+					"success_effects": {
+						"money": -160.0,
+						"stress": 8.0,
+						"visa_progress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.78,
+					"text": "马上减少排班"
+				},
+				{
+					"failure_effects": {
+						"stress": 13.0,
+						"visa_progress": -2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "work_hours_corrected",
+					"success_effects": {
+						"language": 2.0,
+						"money": -40.0,
+						"stress": 7.0,
+						"visa_progress": 6.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.62,
+					"text": "向外管局/学校咨询许可"
+				},
+				{
+					"failure_effects": {
+						"career_progress": 2.0,
+						"stress": 9.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "work_hours_corrected",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"career_progress": 8.0,
+						"money": -90.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.64,
+					"text": "换成校内 HiWi 路线"
+				},
+				{
+					"failure_effects": {
+						"stress": 24.0,
+						"visa_progress": -12.0,
+						"work_hours": 6.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "work_law_violation",
+					"success_effects": {
+						"academic_progress": -8.0,
+						"energy": -24.0,
+						"stress": 18.0,
+						"work_hours": 12.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.48,
+					"text": "继续超时先赚钱"
+				}
+			],
+			"event_type": "conditional",
+			"id": "work_limit_exceeded_warning",
+			"repeatable": false,
+			"source_order": 28,
+			"title": "打工时长越线",
+			"trigger": {
+				"flag": "work_limit_exceeded",
+				"min_week": 7.0
+			},
+			"weight": 1.8
+		},
+		{
+			"body": "账户已经见底，饥饿和压力一起上升。有人说有现金工，当天结账、不问身份、不签合同。它能救这个月，也可能把你推向居留风险。",
+			"choices": [
+				{
+					"failure_effects": {
+						"hunger": -8.0,
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -18.0,
+						"money": 120.0,
+						"social": 2.0,
+						"stress": 6.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.62,
+					"text": "找学生会紧急援助"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 4.0,
+						"social": -6.0,
+						"stress": 14.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"min_social": 45.0
+					},
+					"set_flag": "",
+					"success_effects": {
+						"money": 320.0,
+						"reciprocity_debt": 2.0,
+						"social": -1.0,
+						"stress": 7.0
+					},
+					"success_modifiers": {
+						"social": 0.009,
+						"stress": -0.002
+					},
+					"success_rate": 0.32,
+					"text": "找朋友临时借钱"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 5.0,
+						"stress": 16.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -12.0,
+						"loneliness": -3.0,
+						"money": 260.0,
+						"stress": 9.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.006,
+						"stress": -0.003
+					},
+					"success_rate": 0.48,
+					"text": "向同学或父母借钱"
+				},
+				{
+					"failure_effects": {
+						"energy": -25.0,
+						"illegal_work_hours": 14.0,
+						"stress": 24.0,
+						"visa_progress": -8.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "illegal_work_taken",
+					"success_effects": {
+						"academic_progress": -9.0,
+						"energy": -34.0,
+						"hunger": -18.0,
+						"illegal_work_hours": 36.0,
+						"stress": 20.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.58,
+					"text": "接下现金黑工"
+				},
+				{
+					"failure_effects": {
+						"hunger": -18.0,
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -34.0,
+						"money": 20.0,
+						"social": -1.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.78,
+					"text": "去食物救助/低价食堂"
+				}
+			],
+			"event_type": "conditional",
+			"id": "desperate_illegal_work_offer",
+			"repeatable": false,
+			"source_order": 29,
+			"title": "没钱后的黑工诱惑",
+			"trigger": {
+				"max_money": 0.0,
+				"min_hunger": 55.0,
+				"min_week": 5.0
+			},
+			"weight": 2.0
+		},
+		{
+			"body": "有人介绍一份现金结算的活，不签合同、不报工时。钱来得快，但可能违反签证/居留和工作时长规则。",
+			"choices": [
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 4.0,
+						"stress": 3.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "拒绝并找合法 Minijob"
+				},
+				{
+					"failure_effects": {
+						"energy": -24.0,
+						"illegal_work_hours": 10.0,
+						"stress": 18.0,
+						"visa_progress": -6.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "illegal_work_taken",
+					"success_effects": {
+						"academic_progress": -6.0,
+						"energy": -30.0,
+						"hunger": -8.0,
+						"illegal_work_hours": 30.0,
+						"stress": 14.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.62,
+					"text": "接下黑工补现金流"
+				},
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 3.0,
+						"language": 2.0,
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.78,
+					"text": "先问学校法律建议"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 2.0,
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -2.0,
+						"money": 240.0,
+						"stress": 7.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "向父母借过这个月"
+				}
+			],
+			"event_type": "conditional",
+			"id": "illegal_cash_job_offer",
+			"repeatable": false,
+			"source_order": 31,
+			"title": "现金黑工邀请",
+			"trigger": {
+				"max_money": 900.0,
+				"min_week": 9.0
+			},
+			"weight": 1.4
+		},
+		{
+			"body": "现金工没有工资单，也没有清晰工时。你开始担心这件事会不会影响居留和学业。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -180.0,
+						"stress": 14.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": -120.0,
+						"stress": 9.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "立刻停止并保留记录"
+				},
+				{
+					"failure_effects": {
+						"stress": 10.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "visa_valid",
+					"success_effects": {
+						"language": 2.0,
+						"stress": 5.0,
+						"visa_progress": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.72,
+					"text": "找 ASTA 或法律咨询"
+				},
+				{
+					"failure_effects": {
+						"illegal_work_hours": 12.0,
+						"stress": 22.0,
+						"visa_progress": -10.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "deportation_warning",
+					"success_effects": {
+						"academic_progress": -7.0,
+						"energy": -22.0,
+						"illegal_work_hours": 24.0,
+						"stress": 16.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.5,
+					"text": "继续做，先把钱赚到"
+				},
+				{
+					"failure_effects": {
+						"stress": 14.0,
+						"visa_progress": -10.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "deportation_warning",
+					"success_effects": {
+						"stress": 6.0,
+						"visa_progress": -5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.42,
+					"text": "假装无事发生"
+				}
+			],
+			"event_type": "conditional",
+			"id": "illegal_work_followup",
+			"repeatable": false,
+			"source_order": 32,
+			"title": "黑工后续风险",
+			"trigger": {
+				"flag": "illegal_work_taken",
+				"min_week": 12.0
+			},
+			"weight": 1.6
+		},
+		{
+			"body": "信里每个词都重要，但你只确定 Beitragsnummer 很重要。",
+			"choices": [
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"stress": 2.0,
+						"visa_progress": 6.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "认真翻译"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"visa_progress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "拍给群友"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": 1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 1.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0015,
+						"stress": -0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"stress": -2.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"language": 0.0015,
+						"loneliness": -0.001,
+						"social": 0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "health_insurance_letter",
+			"repeatable": false,
+			"source_order": 35,
+			"title": "保险来信",
+			"trigger": {
+				"max_visa": 55.0,
+				"min_week": 5.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你翻开账单，发现这段关系已经不只是浪漫问题，而是现金流问题。下个月房租和保险都在等你。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -40.0,
+						"stress": 16.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "relationship_boundaries",
+					"success_effects": {
+						"loneliness": 8.0,
+						"money": 80.0,
+						"stress": 10.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "停止高消费约会"
+				},
+				{
+					"failure_effects": {
+						"social": -6.0,
+						"stress": 14.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "relationship_boundaries",
+					"success_effects": {
+						"money": 30.0,
+						"social": 3.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.62,
+					"text": "和对方谈清预算"
+				},
+				{
+					"failure_effects": {
+						"energy": -28.0,
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -7.0,
+						"energy": -28.0,
+						"stress": 12.0,
+						"work_hours": 22.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "接更多班补窟窿"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 8.0,
+						"money": -520.0,
+						"stress": 24.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "romance_bankrupt",
+					"success_effects": {
+						"academic_progress": -8.0,
+						"money": -380.0,
+						"stress": 18.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.34,
+					"text": "继续刷卡维持体面"
+				}
+			],
+			"event_type": "conditional",
+			"id": "romance_bankruptcy_warning",
+			"repeatable": false,
+			"source_order": 46,
+			"title": "感情开销失控",
+			"trigger": {
+				"flag": "romance_financial_pressure",
+				"max_money": 250.0,
+				"min_week": 13.0
+			},
+			"weight": 1.4
+		},
+		{
+			"body": "信箱里躺着一封看起来很正式的信。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 2.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "马上拆开"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "晚上再说"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": 1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 1.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0015,
+						"stress": -0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"stress": -2.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"language": 0.0015,
+						"loneliness": -0.001,
+						"social": 0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "mailbox_shock",
+			"repeatable": false,
+			"source_order": 49,
+			"title": "信箱惊吓",
+			"trigger": {
+				"min_week": 4.0
+			},
+			"weight": 1.1
+		},
+		{
+			"body": "一封少见的好消息：Steuer-ID 到了。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -2.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "归档收好"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "随手一放"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": 1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 1.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0015,
+						"stress": -0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"stress": -2.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"language": 0.0015,
+						"loneliness": -0.001,
+						"social": 0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "tax_id_letter",
+			"repeatable": false,
+			"source_order": 61,
+			"title": "税号到了",
+			"trigger": {
+				"min_week": 6.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "冻结账户已激活，但 Girocard/借记卡还在路上；每个付款场景都像考试。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 3.0,
+						"visa_progress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "联系银行"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 3.0,
+						"social": -4.0,
+						"stress": 8.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"min_social": 35.0
+					},
+					"set_flag": "",
+					"success_effects": {
+						"money": 90.0,
+						"reciprocity_debt": 1.0,
+						"social": -1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.008,
+						"stress": -0.003
+					},
+					"success_rate": 0.35,
+					"text": "先借朋友现金"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": 1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 1.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0015,
+						"stress": -0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"stress": -2.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"language": 0.0015,
+						"loneliness": -0.001,
+						"social": 0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "bank_card_delay",
+			"repeatable": false,
+			"source_order": 66,
+			"title": "银行卡还没到",
+			"trigger": {
+				"max_visa": 60.0,
+				"min_week": 4.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "队伍移动得很慢，但每个人手里都拿着一叠命运。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 3.0,
+						"visa_progress": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "耐心排完"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -2.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先回去补材料"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": 1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 1.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0015,
+						"stress": -0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"stress": -2.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"language": 0.0015,
+						"loneliness": -0.001,
+						"social": 0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "registration_queue",
+			"repeatable": false,
+			"source_order": 76,
+			"title": "注册办公室排队",
+			"trigger": {
+				"max_week": 8.0,
+				"min_week": 2.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "机器吐回了两个瓶子，你开始怀疑瓶子也需要签证。",
+			"choices": [
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 1.0,
+						"money": 25.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "研究规则"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "下次再说"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "pfand_machine",
+			"repeatable": false,
+			"source_order": 79,
+			"title": "押金瓶机器",
+			"trigger": {
+				"min_week": 3.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "学期票不是自动出现在手机里的，你又学到一件事。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 30.0,
+						"visa_progress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "立刻激活"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先截图问同学"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": 1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 1.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0015,
+						"stress": -0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"stress": -2.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"language": 0.0015,
+						"loneliness": -0.001,
+						"social": 0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "semester_ticket",
+			"repeatable": false,
+			"source_order": 81,
+			"title": "学期票激活",
+			"trigger": {
+				"max_visa": 50.0,
+				"min_week": 2.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "考试不是上课就自动报名，系统静静等你犯错。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 4.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "exam_registered",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"exam_readiness": 4.0,
+						"stress": -3.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "马上报名"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "exam_registered",
+					"success_effects": {
+						"academic_progress": 1.0,
+						"exam_readiness": 7.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "报名后顺手查考纲"
+				},
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"social": 0.003
+					},
+					"set_flag": "exam_registered",
+					"success_effects": {
+						"exam_readiness": 3.0,
+						"social": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.82,
+					"text": "先问同学报名流程"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"exam_readiness": -4.0,
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "晚点再说"
+				}
+			],
+			"event_type": "fixed",
+			"id": "exam_registration",
+			"repeatable": false,
+			"source_order": 87,
+			"title": "考试报名",
+			"trigger": {
+				"week": 9.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你突然想起考试报名截止就在今天。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"visa_progress": 0.002
+					},
+					"set_flag": "exam_registered",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"exam_readiness": 2.0,
+						"stress": 7.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.85,
+					"text": "立刻补救"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -4.0,
+						"exam_readiness": -6.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.004
+					},
+					"set_flag": "",
+					"success_effects": {
+						"exam_readiness": 1.0,
+						"language": 2.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.002
+					},
+					"success_rate": 0.6,
+					"text": "写邮件求助"
+				},
+				{
+					"failure_effects": {
+						"exam_readiness": -4.0,
+						"stress": 10.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"social": 0.004
+					},
+					"set_flag": "exam_registered",
+					"success_effects": {
+						"exam_readiness": 2.0,
+						"social": 4.0,
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.72,
+					"text": "请同学现场带路"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "needs_retake",
+					"success_effects": {
+						"academic_progress": -10.0,
+						"exam_readiness": -14.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "认了，下学期再说"
+				}
+			],
+			"event_type": "conditional",
+			"id": "missed_exam_registration",
+			"repeatable": false,
+			"source_order": 88,
+			"title": "差点错过考试报名",
+			"trigger": {
+				"max_academic": 55.0,
+				"min_week": 10.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "合同里有一段 Nebenkosten，你读完更不确定了。",
+			"choices": [
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"visa_progress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "请室友解释"
+				},
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "自己查"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": 1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 1.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0015,
+						"stress": -0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"stress": -2.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"language": 0.0015,
+						"loneliness": -0.001,
+						"social": 0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "room_contract_clause",
+			"repeatable": false,
+			"source_order": 94,
+			"title": "租房合同条款",
+			"trigger": {
+				"max_visa": 55.0,
+				"min_week": 4.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "2026 年学生签证常见资金证明是 11,904 EUR/年。钱不是一次性可用，激活后通常每月最多释放 992 EUR。",
+			"choices": [
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "按 992 EUR/月重做预算"
+				},
+				{
+					"failure_effects": {
+						"money": -180.0,
+						"stress": 10.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": -120.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.35,
+					"text": "误以为能一次取出"
+				},
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"stress": 2.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "问银行客服确认释放日"
+				},
+				{
+					"failure_effects": {
+						"energy": -16.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -16.0,
+						"stress": 4.0,
+						"work_hours": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先打工补现金流"
+				}
+			],
+			"event_type": "conditional",
+			"id": "blocked_account_notice",
+			"repeatable": false,
+			"source_order": 114,
+			"title": "冻结账户提醒",
+			"trigger": {
+				"max_money": 900.0,
+				"min_week": 6.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "学生公保和护理保险按月扣费。2026 年 TK 等公保学生费率常见约 141-146 EUR/月。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -145.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": -145.0,
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "记入月度预算"
+				},
+				{
+					"failure_effects": {
+						"money": -145.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": -145.0,
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "假装没看见"
+				},
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.72,
+					"text": "核对年龄和护理保险费率"
+				},
+				{
+					"failure_effects": {
+						"stress": 6.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 3.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.68,
+					"text": "联系保险公司改扣款账户"
+				}
+			],
+			"event_type": "random",
+			"id": "insurance_payment",
+			"repeatable": false,
+			"source_order": 115,
+			"title": "保险扣费",
+			"trigger": {
+				"min_week": 5.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "信不长，但你读了三遍才确定它不是坏消息。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -2.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "归档"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "问室友确认"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": 1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 1.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0015,
+						"stress": -0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 2.0,
+						"stress": -2.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"language": 0.0015,
+						"loneliness": -0.001,
+						"social": 0.002,
+						"visa_progress": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "city_registration_letter",
+			"repeatable": false,
+			"source_order": 118,
+			"title": "市政厅来信",
+			"trigger": {
+				"min_week": 7.0
+			},
+			"weight": 0.8
+		}
+	]
+}

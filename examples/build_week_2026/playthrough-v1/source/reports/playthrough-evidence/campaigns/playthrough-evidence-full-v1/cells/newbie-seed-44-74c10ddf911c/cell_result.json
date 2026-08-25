@@ -1,0 +1,235 @@
+{
+  "artifacts": [
+    {
+      "media_type": "application/x-ndjson",
+      "path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "record_count": 19,
+      "sha256": "69e9f752ea9d67e1ef1dfe17b228d4c282f4581d8130763cdb9e3b24a2b26082"
+    }
+  ],
+  "citations": [
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 1,
+      "persona": "newbie",
+      "record_sha256": "e059a38a29d4b4ba7c646b57af6b17e99c9d636ed3a7bf64f282a79064bd30cb",
+      "seed": 44,
+      "week": 1
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 2,
+      "persona": "newbie",
+      "record_sha256": "c2272fadc6f7d45d020ae978d4db81b91b21c65e835bfb120fd7b89f16c60a21",
+      "seed": 44,
+      "week": 2
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 3,
+      "persona": "newbie",
+      "record_sha256": "c56d3b166048dc14c5ef646778a4059827451a0053d17f07467c1cdc7921abdf",
+      "seed": 44,
+      "week": 3
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 4,
+      "persona": "newbie",
+      "record_sha256": "abd37c509c2250389cbb6f0edd0c37735b1f76949a36338cdbcb0b4929342368",
+      "seed": 44,
+      "week": 4
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 5,
+      "persona": "newbie",
+      "record_sha256": "1d9c9a2d7e0ad10d01165628efd6c06cc837b021ac9df922c56a6df3fad15789",
+      "seed": 44,
+      "week": 5
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 6,
+      "persona": "newbie",
+      "record_sha256": "c46a96162086576c824a240e935c7167bfce6380537e2de29214d4e42f8f7d36",
+      "seed": 44,
+      "week": 6
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 7,
+      "persona": "newbie",
+      "record_sha256": "d77c771e59e77142405e2e26f5498d7a713db63b8354002f7793ea7480bcd444",
+      "seed": 44,
+      "week": 7
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 8,
+      "persona": "newbie",
+      "record_sha256": "c1d9fc17ef6726e65aa4d486b2a3bd66fbeef9d03f114af9b80a892f9f84149a",
+      "seed": 44,
+      "week": 8
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 9,
+      "persona": "newbie",
+      "record_sha256": "b4b463a2cc550f5b015facaa9836a1420c16a4e557cc02b065772182a78f1d8d",
+      "seed": 44,
+      "week": 9
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 10,
+      "persona": "newbie",
+      "record_sha256": "195d9ece3bed036fac4de0facc3bcf9f3c7e53b2cccae61dfc09cc746fccc5be",
+      "seed": 44,
+      "week": 10
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 11,
+      "persona": "newbie",
+      "record_sha256": "fee56b2970d24bed99bafa7e153be4246cd1bef591f638817cd8ad1a5625373d",
+      "seed": 44,
+      "week": 11
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 12,
+      "persona": "newbie",
+      "record_sha256": "1d48f41362626b66684c04c47310cb81844e609b2ffd371840a8ec67daa5b75a",
+      "seed": 44,
+      "week": 12
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 13,
+      "persona": "newbie",
+      "record_sha256": "ba555ac850a26034603422c98873349dbdfec175560501a6539b45e418402cf0",
+      "seed": 44,
+      "week": 13
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 14,
+      "persona": "newbie",
+      "record_sha256": "86b3048aab3678597f049d03edadc8b3cf5a26d3a4118fb305a6cb873823c6a9",
+      "seed": 44,
+      "week": 14
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 15,
+      "persona": "newbie",
+      "record_sha256": "5aa9f6ba9127255bdc222964db98b557ae18499148eab9141c0251dc874545a2",
+      "seed": 44,
+      "week": 15
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 16,
+      "persona": "newbie",
+      "record_sha256": "ac96a1b46c669c20d98459c4e3ff2e6c035ae5cb15fcc189a846e5041cceb9a1",
+      "seed": 44,
+      "week": 16
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 17,
+      "persona": "newbie",
+      "record_sha256": "5bc65ec484938221dfb6e67c5136ee9d2838adccb86b0e9e6801eb7a41992ded",
+      "seed": 44,
+      "week": 17
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 18,
+      "persona": "newbie",
+      "record_sha256": "0fb93336cccf261b72db8857e0b40d01d78001a872b4e29f5a0fe77e1279737c",
+      "seed": 44,
+      "week": 18
+    },
+    {
+      "artifact_path": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c/playthrough.jsonl",
+      "campaign_id": "playthrough-evidence-full-v1",
+      "cell_id": "newbie-seed-44-74c10ddf911c",
+      "line_number": 19,
+      "persona": "newbie",
+      "record_sha256": "59ac738968de9c269b0749134fc09290a39a0e9877b49704c7cb2fe52ab2a0fb",
+      "seed": 44,
+      "week": 19
+    }
+  ],
+  "completed_at": "2026-07-16T21:49:58.859855Z",
+  "completed_weeks": 19,
+  "error": "",
+  "request": {
+    "campaign_fingerprint": "41680ccc097fd9c9088b8526b9254cdf1a9c2b363481a66439d9825a70dfd110",
+    "campaign_id": "playthrough-evidence-full-v1",
+    "cell_id": "newbie-seed-44-74c10ddf911c",
+    "difficulty": "normal",
+    "max_weeks": 20,
+    "output_dir": "reports/playthrough-evidence/campaigns/playthrough-evidence-full-v1/cells/newbie-seed-44-74c10ddf911c",
+    "persona": "newbie",
+    "provider": "replay",
+    "scenario": "default_first_semester",
+    "seed": 44
+  },
+  "request_fingerprint": "71da7a590b17a26b3fc6c2f9b04e31dcf81c59dcf05c445d1cd3cd132571648a",
+  "schema_version": "persona-campaign-cell-result-v1",
+  "source": {
+    "agent_commit": "c96f2ed3595162a174e680b563337f6215f6eace",
+    "agent_dirty": false,
+    "agent_tree": "a3a90bf687512ac8f3a4a63ab3ebe052347b8c84",
+    "campaign_config_sha256": "b4201753f6788b54580979eb762b9f0c25deacb732f36ed330cf198e0d132c22",
+    "game_archive_sha256": "2ee8ed13121a35597cad69f6fa5b03c57bfe2c3565d0dfb9f0def284110f610d",
+    "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "game_tree": "225cd5451d09bb92da674234a79ecaf8db4beb3a",
+    "provider": "replay",
+    "provider_mode": "replay",
+    "provider_revision": "fixture:865f4fb83028f7ada18b581462adef3cbb15f2b06ed4c59cb0601f97b0d5f590"
+  },
+  "source_fingerprint": "63d7625a6e17c3517941589369f318673664a2cfb48fb843d8d304a0af47f10b",
+  "started_at": "2026-07-16T21:49:15.048343Z",
+  "state": "completed",
+  "stop_reason": "game_finished"
+}

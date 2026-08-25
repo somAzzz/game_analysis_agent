@@ -236,7 +236,9 @@ func _choice_records(event, choices: Array) -> Array:
 		var index := _choice_index(event, choice)
 		records.append({
 			"choice_id": _choice_id(event, choice, index),
-			"text": choice.text,
+			"text": choice.localized_text("en"),
+			"text_en": choice.localized_text("en"),
+			"text_zh": choice.localized_text("zh"),
 			"success_rate": EventResolverScript.get_success_rate(choice, game_state),
 			"requirements": choice.requirements,
 			"success_effects": choice.success_effects,
@@ -261,7 +263,7 @@ func _choice_index(event, choice) -> int:
 	return -1
 
 func _choice_id(event, choice, index: int) -> String:
-	var safe_text := str(choice.text).to_lower().replace(" ", "_")
+	var safe_text := str(choice.localized_text("en")).to_lower().replace(" ", "_")
 	return "%s.choice_%02d_%s" % [event.id, index + 1, safe_text]
 
 func _load_scenario(scenario_id: String) -> Dictionary:

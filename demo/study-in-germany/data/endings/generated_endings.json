@@ -1,0 +1,201 @@
+{
+	"items": [
+		{
+			"conditions": {
+				"flag": "deportation_order"
+			},
+			"description": "居留风险没有及时补救，第一学期被行政程序直接打断。钱、成绩和社交都来不及结算，下一步只能先处理身份后果。",
+			"id": "forced_departure",
+			"priority": 120,
+			"title": "被迫离境"
+		},
+		{
+			"conditions": {
+				"flag": "cashflow_crisis",
+				"min_arrears": 1000,
+				"min_hunger": 65,
+				"min_stress": 65
+			},
+			"description": "账户不是紧张，而是已经断裂。饥饿、欠款和压力一起把学习计划挤到桌角，你这学期最重要的任务变成了先活下来。",
+			"id": "cashflow_collapse",
+			"priority": 118,
+			"title": "现金流断裂"
+		},
+		{
+			"conditions": {
+				"max_energy": 35,
+				"min_cash_shortfall_count": 1,
+				"min_hunger": 95
+			},
+			"description": "你不是没有努力，只是基本生活已经失衡：吃饭、睡眠、现金流和课程全都互相拖拽。下学期要先重建生活秩序。",
+			"id": "living_imbalance",
+			"priority": 116,
+			"title": "生活失衡"
+		},
+		{
+			"conditions": {
+				"max_academic": 60,
+				"min_stress": 95
+			},
+			"description": "你把很多事扛到了最后，但压力已经超过学习能承受的范围。你决定暂停冲刺，先把人从系统里救出来。",
+			"id": "burnout_pause",
+			"priority": 114,
+			"title": "高压休整"
+		},
+		{
+			"conditions": {
+				"missing_flag": "school_registered"
+			},
+			"description": "学校注册没有及时完成，课程、考试报名和学生身份都被卡住。你花了生活费，却没真正进入学习循环。",
+			"id": "registration_failure",
+			"priority": 110,
+			"title": "注册失败"
+		},
+		{
+			"conditions": {
+				"min_failed_courses": 1
+			},
+			"description": "你撑到了考试周，但平时进度、备考掌握度和状态没有形成闭环。第一学期最重要的反馈不是你不适合读书，而是学习系统需要重建。",
+			"id": "academic_failure",
+			"priority": 109,
+			"title": "考试失利"
+		},
+		{
+			"conditions": {
+				"flag": "work_law_violation"
+			},
+			"description": "为了现金流，你多次把打工时长或现金工风险推过合规边界。第一学期没有败给考试，而是败给了工时记录、居留解释和持续的法律焦虑。",
+			"id": "work_law_trouble",
+			"priority": 108,
+			"title": "打工违规风险"
+		},
+		{
+			"conditions": {
+				"flag": "romance_bankrupt"
+			},
+			"description": "你不是没有获得陪伴，而是为了维持一段失衡关系把现金流、学业节奏和自尊都透支了。下一步要先止损，再重建边界。",
+			"id": "romance_bankrupt",
+			"priority": 105,
+			"title": "感情破产"
+		},
+		{
+			"conditions": {
+				"max_visa": 45
+			},
+			"description": "手续拖延滚成雪球，你的第一学期主线变成了和各个办公室通信。下学期还能救，但必须先把注册、保险、住址和居留链补上。",
+			"id": "admin_collapse",
+			"priority": 100,
+			"title": "行政崩盘"
+		},
+		{
+			"conditions": {
+				"min_loneliness": 70,
+				"min_stress": 85
+			},
+			"description": "你撑过了很多事，但压力和孤独已经压过了成长感。你决定先调整节奏，而不是继续硬扛。",
+			"id": "mental_crash",
+			"priority": 95,
+			"title": "心态爆炸"
+		},
+		{
+			"conditions": {
+				"flag": "school_registered",
+				"max_academic": 65,
+				"max_arrears": 200,
+				"max_failed_courses": 0,
+				"max_hunger": 90,
+				"min_annual_work_half_days": 20,
+				"min_career": 70,
+				"min_money": 1200
+			},
+			"description": "账户余额稳住了，但课程进度开始危险。你很会生存，可下学期需要重新夺回学习时间。",
+			"id": "work_warrior",
+			"priority": 115,
+			"title": "打工战神"
+		},
+		{
+			"conditions": {
+				"flag": "school_registered",
+				"max_arrears": 300,
+				"max_failed_courses": 0,
+				"max_hunger": 70,
+				"max_stress": 80,
+				"min_career": 80,
+				"min_money": -500,
+				"min_visa": 55
+			},
+			"description": "你没有只盯着考试，也没有只顾眼前生存。简历、邮件、项目和人脉开始连成一条职业路线。",
+			"id": "career_launch",
+			"priority": 78,
+			"title": "职业起步"
+		},
+		{
+			"conditions": {
+				"flag": "registration_delayed"
+			},
+			"description": "你最终把注册链路接上了，但错过窗口让本学期变成昂贵的缓冲期。下学期可以重新开始，只是钱包、心态和学业节奏都已经被拉长。",
+			"id": "delayed_enrollment",
+			"priority": 74,
+			"title": "延迟入学"
+		},
+		{
+			"conditions": {
+				"flag": "school_registered",
+				"max_arrears": 300,
+				"max_failed_courses": 0,
+				"max_hunger": 75,
+				"max_stress": 89,
+				"min_academic": 78,
+				"min_exam_readiness": 65,
+				"min_money": -500,
+				"min_stress": 65
+			},
+			"description": "成绩很好，笔记很厚，黑眼圈也很德国。你证明了自己能学，但也该学会恢复。",
+			"id": "high_pressure_top_student",
+			"priority": 70,
+			"title": "学霸高压"
+		},
+		{
+			"conditions": {
+				"flag": "school_registered",
+				"max_arrears": 300,
+				"max_failed_courses": 0,
+				"max_hunger": 70,
+				"max_stress": 80,
+				"min_academic": 35,
+				"min_exam_readiness": 40,
+				"min_language": 45,
+				"min_money": -500,
+				"min_social": 90
+			},
+			"description": "你不只活下来了，还在这座城市里建立了一点关系网。语言、朋友和机会开始互相推动。",
+			"id": "social_connector",
+			"priority": 60,
+			"title": "社牛开局"
+		},
+		{
+			"conditions": {
+				"flag": "school_registered",
+				"max_arrears": 300,
+				"max_failed_courses": 0,
+				"max_hunger": 75,
+				"max_stress": 84,
+				"min_academic": 45,
+				"min_exam_readiness": 42,
+				"min_money": -500,
+				"min_visa": 50
+			},
+			"description": "你没有把每件事都做到完美，但学业、签证、金钱和心态都还在可控范围里。这是一个扎实的留德开局。",
+			"id": "stable_start",
+			"priority": 10,
+			"title": "稳定开局"
+		},
+		{
+			"conditions": {},
+			"description": "你撑到了学期末，但代价很清楚：课程、现金流或心态至少有一条线已经被拉到极限。下学期不是简单继续，而是先止血。",
+			"id": "survival_struggle",
+			"priority": 1,
+			"title": "勉强撑住"
+		}
+	]
+}

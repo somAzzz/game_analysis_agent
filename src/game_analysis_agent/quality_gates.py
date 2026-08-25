@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import math
+import os
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from pathlib import Path
@@ -12,7 +13,11 @@ from typing import Any
 
 import yaml
 
+from .report_archive import ReportArchiveError, iter_jsonl_rows, jsonl_artifact_exists
+
 Cell = tuple[str, str, str]
+SUPPORTED_DIFFICULTIES = ("easy", "normal", "hard", "realistic")
+DIFFICULTY_THRESHOLD_FALLBACK = {"easy": "normal", "hard": "realistic"}
 
 _ALLOWED_TOP_LEVEL = {"critical_fail", "balance", "outcomes", "design"}
 _ALLOWED_KEYS: dict[str, set[str]] = {
@@ -35,13 +40,17 @@ _ALLOWED_KEYS: dict[str, set[str]] = {
         "aps_pass_with_low_aps_knowledge",
     },
     "balance": {
+        "max_single_ending_rate_easy",
         "max_single_ending_rate_normal",
+        "max_single_ending_rate_hard",
         "max_single_ending_rate_realistic",
         "max_action_rate_per_run",
         "max_action_pick_share",
         "max_recovery_group_rate_per_run",
         "max_escape_group_rate_per_run",
+        "min_distinct_endings_easy",
         "min_distinct_endings_normal",
+        "min_distinct_endings_hard",
         "min_distinct_endings_realistic",
         "min_study_group_rate_per_run",
         "min_work_group_rate_per_run",
@@ -53,7 +62,9 @@ _ALLOWED_KEYS: dict[str, set[str]] = {
         "success_endings",
         "invalid_endings",
         "require_designed_failure_coverage",
+        "min_designed_failure_types_easy",
         "min_designed_failure_types_normal",
+        "min_designed_failure_types_hard",
         "min_designed_failure_types_realistic",
         "max_single_designed_failure_rate_play",
     },
@@ -159,10 +170,9 @@ def evaluate_report_dir(report_dir: Path, gates_path: Path) -> dict[str, Any]:
     _eval_critical(report_dir, critical, defaults, failures)
 
     ending_gates = {
-        "max_single_ending_rate_normal",
-        "max_single_ending_rate_realistic",
-        "min_distinct_endings_normal",
-        "min_distinct_endings_realistic",
+        f"{base}_{difficulty}"
+        for base in ("max_single_ending_rate", "min_distinct_endings")
+        for difficulty in SUPPORTED_DIFFICULTIES
     }
     action_gates = {
         "max_action_rate_per_run",
@@ -292,9 +302,7 @@ def _validate_gate_config(
             if key not in _ALLOWED_KEYS[section]:
                 continue
             if full in _LIST_KEYS:
-                if not isinstance(value, list) or any(
-                    not isinstance(item, str) for item in value
-                ):
+                if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
                     _config_failure(failures, full, "must be a list of strings")
                 continue
             if full in _BOOL_KEYS:
@@ -335,10 +343,7 @@ def _validate_gate_config(
                     _config_failure(
                         failures,
                         f"outcomes.{key}",
-                        (
-                            f"ending {ending!r} is also classified in "
-                            f"outcomes.{previous}"
-                        ),
+                        (f"ending {ending!r} is also classified in outcomes.{previous}"),
                     )
                 classifications[ending] = key
 
@@ -416,8 +421,7 @@ def _eval_critical(
                     "threshold": int(allowed),
                     **_cell_payload(cell),
                     "message": (
-                        f"{kind} count {actual} exceeds {int(allowed)} "
-                        f"in {_cell_label(cell)}"
+                        f"{kind} count {actual} exceeds {int(allowed)} in {_cell_label(cell)}"
                     ),
                 }
             )
@@ -439,12 +443,8 @@ def _read_ending_rows(
     parsed: list[dict[str, Any]] = []
     for line, row in rows or []:
         ending_id = str(row.get("ending_id") or "").strip()
-        count = _row_number(
-            row, "count", line, "ending_distribution.csv", failures
-        )
-        rate = _row_number(
-            row, "rate", line, "ending_distribution.csv", failures
-        )
+        count = _row_number(row, "count", line, "ending_distribution.csv", failures)
+        rate = _row_number(row, "rate", line, "ending_distribution.csv", failures)
         cell = _row_cell(
             row,
             defaults,
@@ -479,12 +479,7 @@ def _read_ending_rows(
                 "input.ending_distribution",
             )
             rate = None
-        if (
-            ending_id
-            and count is not None
-            and rate is not None
-            and cell is not None
-        ):
+        if ending_id and count is not None and rate is not None and cell is not None:
             parsed.append(
                 {
                     "cell": cell,
@@ -514,12 +509,8 @@ def _read_action_rows(
     seen: set[tuple[Cell, str]] = set()
     for line, row in rows or []:
         action_id = str(row.get("action_id") or "").strip()
-        count = _row_number(
-            row, "count", line, "action_pick_rates.csv", failures
-        )
-        rate = _row_number(
-            row, "rate_per_run", line, "action_pick_rates.csv", failures
-        )
+        count = _row_number(row, "count", line, "action_pick_rates.csv", failures)
+        rate = _row_number(row, "rate_per_run", line, "action_pick_rates.csv", failures)
         cell = _row_cell(
             row,
             defaults,
@@ -560,20 +551,12 @@ def _read_action_rows(
                 failures,
                 "action_pick_rates.csv",
                 "invalid",
-                (
-                    f"line {line} duplicates action {action_id!r} "
-                    f"in {_cell_label(cell)}"
-                ),
+                (f"line {line} duplicates action {action_id!r} in {_cell_label(cell)}"),
                 "input.action_pick_rates",
             )
         if identity:
             seen.add(identity)
-        if (
-            action_id
-            and count is not None
-            and rate is not None
-            and cell is not None
-        ):
+        if action_id and count is not None and rate is not None and cell is not None:
             parsed.append(
                 {
                     "cell": cell,
@@ -599,10 +582,7 @@ def _validate_ending_rates(
                 failures,
                 "ending_distribution.csv",
                 "invalid",
-                (
-                    f"duplicate ending {row['ending_id']!r} "
-                    f"in {_cell_label(row['cell'])}"
-                ),
+                (f"duplicate ending {row['ending_id']!r} in {_cell_label(row['cell'])}"),
                 "input.ending_distribution",
             )
         seen.add(identity)
@@ -685,17 +665,13 @@ def _eval_balance(
             }
         )
 
-        max_threshold = _difficulty_threshold(
-            balance, "max_single_ending_rate", cell, failures
-        )
+        max_threshold = _difficulty_threshold(balance, "max_single_ending_rate", cell, failures)
         if max_threshold is not None and max_rate > max_threshold:
             target = warnings if _is_interactive_cell(cell) else failures
             target.append(
                 {
                     "gate": "balance.max_single_ending_rate",
-                    "configured_gate": (
-                        f"balance.max_single_ending_rate_{cell[1]}"
-                    ),
+                    "configured_gate": (f"balance.max_single_ending_rate_{cell[1]}"),
                     "actual": round(max_rate, 6),
                     "threshold": max_threshold,
                     **_cell_payload(cell),
@@ -706,9 +682,7 @@ def _eval_balance(
                     ),
                 }
             )
-        min_threshold = _difficulty_threshold(
-            balance, "min_distinct_endings", cell, failures
-        )
+        min_threshold = _difficulty_threshold(balance, "min_distinct_endings", cell, failures)
         if min_threshold is not None and distinct < int(min_threshold):
             target = warnings if _is_interactive_cell(cell) else failures
             target.append(
@@ -718,13 +692,9 @@ def _eval_balance(
                     "threshold": int(min_threshold),
                     **_cell_payload(cell),
                     "message": (
-                        "interactive persona ending variety is below "
-                        "Monte Carlo target"
+                        "interactive persona ending variety is below Monte Carlo target"
                         if _is_interactive_cell(cell)
-                        else (
-                            "ending variety is below target in "
-                            f"{_cell_label(cell)}"
-                        )
+                        else (f"ending variety is below target in {_cell_label(cell)}")
                     ),
                 }
             )
@@ -732,15 +702,13 @@ def _eval_balance(
     by_action_cell: dict[Cell, list[dict[str, Any]]] = defaultdict(list)
     for row in actions:
         by_action_cell[row["cell"]].append(row)
-    max_action_threshold = _configured_number(
-        balance, "max_action_rate_per_run"
-    )
+    max_action_threshold = _configured_number(balance, "max_action_rate_per_run")
     if max_action_threshold is not None:
         for cell, rows in sorted(by_action_cell.items()):
             top = max(rows, key=lambda row: row["rate"])
-            summary["cells"].setdefault(
-                _cell_key(cell), _cell_payload(cell)
-            )["max_action_rate_per_run"] = round(top["rate"], 6)
+            summary["cells"].setdefault(_cell_key(cell), _cell_payload(cell))[
+                "max_action_rate_per_run"
+            ] = round(top["rate"], 6)
             if top["rate"] > max_action_threshold:
                 target = warnings if _is_interactive_cell(cell) else failures
                 target.append(
@@ -750,16 +718,11 @@ def _eval_balance(
                         "threshold": max_action_threshold,
                         "action_id": top["action_id"],
                         **_cell_payload(cell),
-                        "message": (
-                            "one action is picked too often in "
-                            f"{_cell_label(cell)}"
-                        ),
+                        "message": (f"one action is picked too often in {_cell_label(cell)}"),
                     }
                 )
 
-    max_action_share_threshold = _configured_number(
-        balance, "max_action_pick_share"
-    )
+    max_action_share_threshold = _configured_number(balance, "max_action_pick_share")
     if max_action_share_threshold is not None:
         for cell, rows in sorted(by_action_cell.items()):
             total_picks = sum(row["count"] for row in rows)
@@ -768,9 +731,9 @@ def _eval_balance(
                 key=lambda row: row["count"] / max(1, total_picks),
             )
             top_share = top["count"] / max(1, total_picks)
-            summary["cells"].setdefault(
-                _cell_key(cell), _cell_payload(cell)
-            )["max_action_pick_share"] = round(top_share, 6)
+            summary["cells"].setdefault(_cell_key(cell), _cell_payload(cell))[
+                "max_action_pick_share"
+            ] = round(top_share, 6)
             if top_share > max_action_share_threshold:
                 target = warnings if _is_interactive_cell(cell) else failures
                 target.append(
@@ -781,8 +744,7 @@ def _eval_balance(
                         "action_id": top["action_id"],
                         **_cell_payload(cell),
                         "message": (
-                            "one action owns too much of all action picks in "
-                            f"{_cell_label(cell)}"
+                            f"one action owns too much of all action picks in {_cell_label(cell)}"
                         ),
                     }
                 )
@@ -806,9 +768,7 @@ def _eval_balance(
             gate="input.action_catalog",
         )
 
-    configured_group_gates = [
-        key for key in _GROUP_GATES if key in balance
-    ]
+    configured_group_gates = [key for key in _GROUP_GATES if key in balance]
     if configured_group_gates:
         all_action_ids = {row["action_id"] for row in actions}
         memberships = _action_group_memberships(
@@ -821,27 +781,18 @@ def _eval_balance(
             for row in rows:
                 for group in memberships.get(row["action_id"], set()):
                     group_rates[group] += row["rate"]
-            summary["cells"].setdefault(
-                _cell_key(cell), _cell_payload(cell)
-            )["group_rates_per_run"] = {
-                key: round(value, 6)
-                for key, value in sorted(group_rates.items())
-            }
+            summary["cells"].setdefault(_cell_key(cell), _cell_payload(cell))[
+                "group_rates_per_run"
+            ] = {key: round(value, 6) for key, value in sorted(group_rates.items())}
             for gate_key in configured_group_gates:
                 group, direction = _GROUP_GATES[gate_key]
                 threshold = _configured_number(balance, gate_key)
                 if threshold is None:
                     continue
                 actual = float(group_rates[group])
-                violated = (
-                    actual > threshold
-                    if direction == "max"
-                    else actual < threshold
-                )
+                violated = actual > threshold if direction == "max" else actual < threshold
                 if violated:
-                    target = (
-                        warnings if _is_interactive_cell(cell) else failures
-                    )
+                    target = warnings if _is_interactive_cell(cell) else failures
                     target.append(
                         {
                             "gate": f"balance.{gate_key}",
@@ -876,11 +827,7 @@ def _eval_balance(
             required=False,
             gate="input.coverage_report",
         )
-        regimes = (
-            coverage.get("state_regimes")
-            if isinstance(coverage, dict)
-            else None
-        )
+        regimes = coverage.get("state_regimes") if isinstance(coverage, dict) else None
         if regimes is not None and not isinstance(regimes, list):
             _input_failure(
                 failures,
@@ -894,8 +841,7 @@ def _eval_balance(
                 row.get("regime")
                 for row in regimes
                 if isinstance(row, dict)
-                and row.get("regime")
-                in {"low_money", "high_stress", "high_hunger"}
+                and row.get("regime") in {"low_money", "high_stress", "high_hunger"}
                 and _finite_number(row.get("run_count")) == 0
             ]
             if uncovered:
@@ -903,10 +849,7 @@ def _eval_balance(
                     {
                         "gate": "coverage.core_crisis_regimes",
                         "actual": uncovered,
-                        "message": (
-                            "important crisis regimes were not covered "
-                            "by this batch"
-                        ),
+                        "message": ("important crisis regimes were not covered by this batch"),
                     }
                 )
     return summary
@@ -921,10 +864,7 @@ def _action_group_memberships(
     tags_used = route.get("action_tags_used")
     if isinstance(tags_used, dict):
         for action_id, group in tags_used.items():
-            if (
-                str(action_id) in result
-                and str(group) in _GROUP_KEYWORDS
-            ):
+            if str(action_id) in result and str(group) in _GROUP_KEYWORDS:
                 result[str(action_id)].add(str(group))
     actions = catalog.get("actions")
     if isinstance(actions, list):
@@ -938,11 +878,7 @@ def _action_group_memberships(
                 item.get("type"),
                 item.get("group"),
                 item.get("cooldown_group"),
-                *(
-                    item.get("tags")
-                    if isinstance(item.get("tags"), list)
-                    else []
-                ),
+                *(item.get("tags") if isinstance(item.get("tags"), list) else []),
             ]
             for value in metadata:
                 text = str(value or "").lower()
@@ -953,11 +889,27 @@ def _action_group_memberships(
                 if text in {"rest", "mental_recovery"}:
                     result[action_id].add("recovery")
     for action_id in result:
-        lowered = action_id.lower()
+        result[action_id].update(classify_action_groups(action_id))
+    return result
+
+
+def classify_action_groups(action_id: str, metadata: Iterable[object] = ()) -> frozenset[str]:
+    """Classify one action with the same vocabulary used by quality gates."""
+
+    groups: set[str] = set()
+    values = (action_id, *tuple(str(item or "") for item in metadata))
+    for value in values:
+        lowered = str(value or "").lower()
+        if lowered in _GROUP_KEYWORDS:
+            groups.add(lowered)
+        if lowered == "avoidance":
+            groups.add("escape")
+        if lowered in {"rest", "mental_recovery"}:
+            groups.add("recovery")
         for group, keywords in _GROUP_KEYWORDS.items():
             if any(keyword in lowered for keyword in keywords):
-                result[action_id].add(group)
-    return result
+                groups.add(group)
+    return frozenset(groups)
 
 
 def _eval_route_distance(
@@ -1011,10 +963,7 @@ def _eval_route_distance(
                         "actual": round(item["distance"], 6),
                         "threshold": threshold,
                         **_cell_payload(cell),
-                        "message": (
-                            "route distance is below target in "
-                            f"{_cell_label(cell)}"
-                        ),
+                        "message": (f"route distance is below target in {_cell_label(cell)}"),
                     }
                 )
         return [
@@ -1031,11 +980,7 @@ def _eval_route_distance(
         for finding in findings:
             if not isinstance(finding, dict):
                 continue
-            target_id = str(
-                finding.get("target_id")
-                or defaults.get("policy")
-                or "unknown"
-            )
+            target_id = str(finding.get("target_id") or defaults.get("policy") or "unknown")
             policy = target_id.split(":", 1)[0]
             cell = (
                 policy,
@@ -1048,10 +993,7 @@ def _eval_route_distance(
                     "actual": f"less than {threshold}",
                     "threshold": threshold,
                     **_cell_payload(cell),
-                    "message": str(
-                        finding.get("description")
-                        or "route separation finding"
-                    ),
+                    "message": str(finding.get("description") or "route separation finding"),
                 }
             )
             emitted.append(
@@ -1110,7 +1052,11 @@ def _validation_prerequisite_paths(
         raw_path = item.get("path")
         if not logical.endswith(".jsonl") or not isinstance(raw_path, str):
             continue
-        candidate = Path(raw_path)
+        if raw_path.startswith("<game>/"):
+            game_root = Path(os.environ.get("GAME_PROJECT_PATH", ""))
+            candidate = game_root / raw_path.removeprefix("<game>/")
+        else:
+            candidate = Path(raw_path)
         if candidate.is_file():
             paths.append(candidate)
     return paths
@@ -1130,19 +1076,14 @@ def _route_distances_from_runs(
         "admin": "visa_progress",
         "slacker": "stress",
     }
-    values: dict[Cell, dict[str, list[float]]] = defaultdict(
-        lambda: defaultdict(list)
-    )
+    values: dict[Cell, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
     for index, run in enumerate(runs, start=1):
         cell = _payload_cell(run, defaults, require_difficulty=False)
         state = run.get("final_state")
         if not isinstance(state, dict):
             log = run.get("weekly_log")
             if isinstance(log, list) and log and isinstance(log[-1], dict):
-                state = (
-                    log[-1].get("after_state")
-                    or log[-1].get("state_after")
-                )
+                state = log[-1].get("after_state") or log[-1].get("state_after")
         if not isinstance(state, dict):
             _input_failure(
                 failures,
@@ -1201,10 +1142,7 @@ def _route_distances_from_runs(
                     continue
                 ours_mean = sum(ours) / len(ours)
                 ref_mean = sum(reference) / len(reference)
-                distances.append(
-                    abs(ours_mean - ref_mean)
-                    / max(1.0, abs(ref_mean))
-                )
+                distances.append(abs(ours_mean - ref_mean) / max(1.0, abs(ref_mean)))
             if not distances:
                 _input_failure(
                     failures,
@@ -1230,10 +1168,7 @@ def _route_distances_from_runs(
                         "actual": round(distance, 6),
                         "threshold": threshold,
                         **_cell_payload(cell),
-                        "message": (
-                            "route distance is below target in "
-                            f"{_cell_label(cell)}"
-                        ),
+                        "message": (f"route distance is below target in {_cell_label(cell)}"),
                     }
                 )
     if not comparison_count and not by_context:
@@ -1254,10 +1189,7 @@ def _explicit_route_distances(
 ) -> list[dict[str, Any]]:
     payload = route.get("route_distances", route.get("distances"))
     if isinstance(payload, dict):
-        payload = [
-            {"policy": policy, "distance": value}
-            for policy, value in payload.items()
-        ]
+        payload = [{"policy": policy, "distance": value} for policy, value in payload.items()]
     if not isinstance(payload, list):
         return []
     result = []
@@ -1271,9 +1203,7 @@ def _explicit_route_distances(
                 "input.route_report",
             )
             continue
-        distance = _finite_number(
-            item.get("distance", item.get("value"))
-        )
+        distance = _finite_number(item.get("distance", item.get("value")))
         if distance is None or distance < 0:
             _input_failure(
                 failures,
@@ -1331,9 +1261,7 @@ def _eval_outcomes(
                         "gate": "outcomes.invalid_endings",
                         "actual": ending_id,
                         **_cell_payload(cell),
-                        "message": (
-                            f"{ending_id} is not a valid designed ending"
-                        ),
+                        "message": (f"{ending_id} is not a valid designed ending"),
                     }
                 )
             elif ending_id in designed:
@@ -1362,20 +1290,13 @@ def _eval_outcomes(
             **cell_summary,
         }
 
-        max_failure = _configured_number(
-            outcomes, "max_single_designed_failure_rate_play"
-        )
+        max_failure = _configured_number(outcomes, "max_single_designed_failure_rate_play")
         if max_failure is not None:
-            for ending_id, payload in cell_summary[
-                "designed_failure_endings"
-            ].items():
+            for ending_id, payload in cell_summary["designed_failure_endings"].items():
                 if payload["rate"] > max_failure:
                     warnings.append(
                         {
-                            "gate": (
-                                "outcomes."
-                                "max_single_designed_failure_rate_play"
-                            ),
+                            "gate": ("outcomes.max_single_designed_failure_rate_play"),
                             "actual": payload["rate"],
                             "threshold": max_failure,
                             "ending_id": ending_id,
@@ -1394,9 +1315,7 @@ def _eval_outcomes(
                 cell,
                 failures,
             )
-            actual_types = len(
-                cell_summary["designed_failure_endings"]
-            )
+            actual_types = len(cell_summary["designed_failure_endings"])
             if min_types is not None and actual_types < int(min_types):
                 warnings.append(
                     {
@@ -1411,9 +1330,7 @@ def _eval_outcomes(
                     }
                 )
 
-    aggregate_total = sum(
-        sum(counter.values()) for counter in aggregates.values()
-    )
+    aggregate_total = sum(sum(counter.values()) for counter in aggregates.values())
     for category, counter in aggregates.items():
         summary[category] = {
             ending_id: {
@@ -1505,16 +1422,10 @@ def _eval_design(
             required=True,
             gate="input.event_graph",
         )
-    key_events = (
-        _key_events(event_graph or {}, failures)
-        if event_graph is not None
-        else []
-    )
+    key_events = _key_events(event_graph or {}, failures) if event_graph is not None else []
 
     if "max_generated_choice_ratio_key_events" in design:
-        threshold = _configured_number(
-            design, "max_generated_choice_ratio_key_events"
-        )
+        threshold = _configured_number(design, "max_generated_choice_ratio_key_events")
         actual = _first_metric(
             [content or {}, event_graph or {}],
             (
@@ -1529,10 +1440,7 @@ def _eval_design(
                 failures,
                 "content_validation.json/event_graph.json",
                 "incomplete",
-                (
-                    "no generated-choice markers or aggregate metric "
-                    "for key events"
-                ),
+                ("no generated-choice markers or aggregate metric for key events"),
                 "input.design.generated_choice_ratio",
             )
         elif threshold is not None:
@@ -1540,22 +1448,15 @@ def _eval_design(
             if actual > threshold:
                 failures.append(
                     {
-                        "gate": (
-                            "design."
-                            "max_generated_choice_ratio_key_events"
-                        ),
+                        "gate": ("design.max_generated_choice_ratio_key_events"),
                         "actual": round(actual, 6),
                         "threshold": threshold,
-                        "message": (
-                            "generated choices exceed the key-event limit"
-                        ),
+                        "message": ("generated choices exceed the key-event limit"),
                     }
                 )
 
     if "min_key_event_tradeoff_score" in design:
-        threshold = _configured_number(
-            design, "min_key_event_tradeoff_score"
-        )
+        threshold = _configured_number(design, "min_key_event_tradeoff_score")
         actual = _first_metric(
             [content or {}, event_graph or {}],
             (
@@ -1570,10 +1471,7 @@ def _eval_design(
                 failures,
                 "content_validation.json/event_graph.json",
                 "incomplete",
-                (
-                    "no key-event tradeoff score and event choices "
-                    "cannot be scored"
-                ),
+                ("no key-event tradeoff score and event choices cannot be scored"),
                 "input.design.tradeoff_score",
             )
         elif threshold is not None:
@@ -1584,26 +1482,19 @@ def _eval_design(
                         "gate": "design.min_key_event_tradeoff_score",
                         "actual": round(actual, 6),
                         "threshold": threshold,
-                        "message": (
-                            "key-event choice tradeoffs are below target"
-                        ),
+                        "message": ("key-event choice tradeoffs are below target"),
                     }
                 )
 
     if "min_event_trigger_rate_for_key_events" in design:
-        threshold = _configured_number(
-            design, "min_event_trigger_rate_for_key_events"
-        )
+        threshold = _configured_number(design, "min_event_trigger_rate_for_key_events")
         event_rows = _read_event_rate_rows(
             report_dir,
             defaults,
             difficulty_candidates,
             failures,
         )
-        event_ids = {
-            str(event.get("id") or event.get("event_id") or "")
-            for event in key_events
-        }
+        event_ids = {str(event.get("id") or event.get("event_id") or "") for event in key_events}
         event_ids.discard("")
         if not event_ids:
             _input_failure(
@@ -1615,16 +1506,12 @@ def _eval_design(
             )
         elif threshold is not None and event_rows:
             rates: dict[tuple[Cell, str], float] = {
-                (row["cell"], row["event_id"]): row["rate"]
-                for row in event_rows
+                (row["cell"], row["event_id"]): row["rate"] for row in event_rows
             }
             cells = sorted({row["cell"] for row in event_rows})
             cell_summary = {}
             for cell in cells:
-                minimum = min(
-                    rates.get((cell, event_id), 0.0)
-                    for event_id in event_ids
-                )
+                minimum = min(rates.get((cell, event_id), 0.0) for event_id in event_ids)
                 cell_summary[_cell_key(cell)] = {
                     **_cell_payload(cell),
                     "minimum_key_event_trigger_rate": round(minimum, 6),
@@ -1632,22 +1519,16 @@ def _eval_design(
                 for event_id in sorted(event_ids):
                     actual = rates.get((cell, event_id), 0.0)
                     if actual < threshold:
-                        target = (
-                            warnings if _is_interactive_cell(cell) else failures
-                        )
+                        target = warnings if _is_interactive_cell(cell) else failures
                         target.append(
                             {
-                                "gate": (
-                                    "design."
-                                    "min_event_trigger_rate_for_key_events"
-                                ),
+                                "gate": ("design.min_event_trigger_rate_for_key_events"),
                                 "actual": round(actual, 6),
                                 "threshold": threshold,
                                 "event_id": event_id,
                                 **_cell_payload(cell),
                                 "message": (
-                                    "key event trigger rate is below "
-                                    f"target in {_cell_label(cell)}"
+                                    f"key event trigger rate is below target in {_cell_label(cell)}"
                                 ),
                             }
                         )
@@ -1661,7 +1542,7 @@ def _eval_design(
     }
     agent_eval = None
     agent_eval_path = report_dir / "agent_eval.json"
-    play_paths = sorted(report_dir.rglob("playthrough.jsonl"))
+    play_paths = _discover_logical_jsonl(report_dir, "playthrough.jsonl")
     has_play_evidence = agent_eval_path.exists() or bool(play_paths)
     configured_eval = eval_keys.intersection(design)
     if configured_eval and has_play_evidence:
@@ -1733,10 +1614,7 @@ def _eval_design(
         warnings.append(
             {
                 "gate": "design.agent_eval_not_applicable",
-                "message": (
-                    "Agent decision metrics are not applicable to this "
-                    "Monte Carlo report"
-                ),
+                "message": ("Agent decision metrics are not applicable to this Monte Carlo report"),
             }
         )
 
@@ -1769,21 +1647,14 @@ def _eval_design(
             eval_summary[metric_names[0]] = round(actual, 6)
             if threshold is None:
                 continue
-            violated = (
-                actual < threshold
-                if direction == "min"
-                else actual > threshold
-            )
+            violated = actual < threshold if direction == "min" else actual > threshold
             if violated:
                 failures.append(
                     {
                         "gate": f"design.{gate_key}",
                         "actual": round(actual, 6),
                         "threshold": threshold,
-                        "message": (
-                            "agent evaluation "
-                            f"{metric_names[0]} is outside target"
-                        ),
+                        "message": (f"agent evaluation {metric_names[0]} is outside target"),
                     }
                 )
         if eval_summary:
@@ -1806,32 +1677,22 @@ def _eval_design(
                     failures,
                     "agent_eval.json/playthrough.jsonl",
                     "missing_or_incomplete",
-                    (
-                        "no anomaly_rate_per_5_weeks metric or usable "
-                        "playthrough trace"
-                    ),
+                    ("no anomaly_rate_per_5_weeks metric or usable playthrough trace"),
                     "input.design.playthrough_anomalies",
                 )
         else:
-            play_rates = [
-                {"source": "agent_eval.json", "rate": anomaly_rate}
-            ]
+            play_rates = [{"source": "agent_eval.json", "rate": anomaly_rate}]
         summary["playthrough_anomaly_rates"] = play_rates
         if threshold is not None:
             for item in play_rates:
                 if item["rate"] > threshold:
                     failures.append(
                         {
-                            "gate": (
-                                "design."
-                                "max_playthrough_anomalies_per_5_weeks"
-                            ),
+                            "gate": ("design.max_playthrough_anomalies_per_5_weeks"),
                             "actual": round(item["rate"], 6),
                             "threshold": threshold,
                             "source": item["source"],
-                            "message": (
-                                "playthrough anomaly rate exceeds target"
-                            ),
+                            "message": ("playthrough anomaly rate exceeds target"),
                         }
                     )
     elif anomaly_gate in design:
@@ -1839,8 +1700,7 @@ def _eval_design(
             {
                 "gate": "design.playthrough_anomalies_not_applicable",
                 "message": (
-                    "Playthrough anomaly metrics are not applicable to this "
-                    "Monte Carlo report"
+                    "Playthrough anomaly metrics are not applicable to this Monte Carlo report"
                 ),
             }
         )
@@ -1865,11 +1725,7 @@ def _key_events(
     explicit = [
         event
         for event in valid
-        if (
-            "is_key_event" in event
-            or "key_event" in event
-            or "key" in event
-        )
+        if ("is_key_event" in event or "key_event" in event or "key" in event)
     ]
     if explicit:
         return [
@@ -1886,16 +1742,8 @@ def _key_events(
         event
         for event in valid
         if (
-            str(
-                event.get("event_type") or event.get("type") or ""
-            ).lower()
-            == "fixed"
-            or "key"
-            in {
-                str(tag).lower()
-                for tag in event.get("tags", [])
-                if isinstance(tag, str)
-            }
+            str(event.get("event_type") or event.get("type") or "").lower() == "fixed"
+            or "key" in {str(tag).lower() for tag in event.get("tags", []) if isinstance(tag, str)}
         )
     ]
 
@@ -1907,15 +1755,9 @@ def _generated_choice_ratio(
     total = 0
     marker_seen = False
     for event in events:
-        explicit_count = _finite_number(
-            event.get("generated_choice_count")
-        )
+        explicit_count = _finite_number(event.get("generated_choice_count"))
         choice_count = _finite_number(event.get("choice_count"))
-        if (
-            explicit_count is not None
-            and choice_count is not None
-            and choice_count >= 0
-        ):
+        if explicit_count is not None and choice_count is not None and choice_count >= 0:
             marker_seen = True
             generated += int(explicit_count)
             total += int(choice_count)
@@ -1974,15 +1816,10 @@ def _derived_tradeoff_score(
         choices = event.get("choices")
         if not isinstance(choices, list) or not choices:
             continue
-        scored = [
-            choice for choice in choices if isinstance(choice, dict)
-        ]
+        scored = [choice for choice in choices if isinstance(choice, dict)]
         if not scored:
             continue
-        scores.append(
-            sum(_choice_has_tradeoff(choice) for choice in scored)
-            / len(scored)
-        )
+        scores.append(sum(_choice_has_tradeoff(choice) for choice in scored) / len(scored))
     return sum(scores) / len(scores) if scores else None
 
 
@@ -2004,21 +1841,12 @@ def _choice_has_tradeoff(choice: dict[str, Any]) -> bool:
             cost |= number > 0
     success_rate = _finite_number(choice.get("success_rate"))
     failure_effects = choice.get("failure_effects")
-    if (
-        success_rate is not None
-        and success_rate < 1
-        and isinstance(failure_effects, dict)
-    ):
+    if success_rate is not None and success_rate < 1 and isinstance(failure_effects, dict):
         for key, value in failure_effects.items():
             number = _finite_number(value)
             if number is None:
                 continue
-            if (
-                key in _GOOD_EFFECT_KEYS
-                and number < 0
-                or key in _BAD_EFFECT_KEYS
-                and number > 0
-            ):
+            if key in _GOOD_EFFECT_KEYS and number < 0 or key in _BAD_EFFECT_KEYS and number > 0:
                 cost = True
     return benefit and cost
 
@@ -2040,12 +1868,8 @@ def _read_event_rate_rows(
     seen: set[tuple[Cell, str]] = set()
     for line, row in rows or []:
         event_id = str(row.get("event_id") or "").strip()
-        count = _row_number(
-            row, "count", line, "event_trigger_rates.csv", failures
-        )
-        rate = _row_number(
-            row, "rate_per_run", line, "event_trigger_rates.csv", failures
-        )
+        count = _row_number(row, "count", line, "event_trigger_rates.csv", failures)
+        rate = _row_number(row, "rate_per_run", line, "event_trigger_rates.csv", failures)
         cell = _row_cell(
             row,
             defaults,
@@ -2068,10 +1892,7 @@ def _read_event_rate_rows(
                 failures,
                 "event_trigger_rates.csv",
                 "invalid",
-                (
-                    f"line {line} has a negative or "
-                    "non-integral count/rate"
-                ),
+                (f"line {line} has a negative or non-integral count/rate"),
                 "input.event_trigger_rates",
             )
             continue
@@ -2081,10 +1902,7 @@ def _read_event_rate_rows(
                 failures,
                 "event_trigger_rates.csv",
                 "invalid",
-                (
-                    f"line {line} duplicates event {event_id!r} "
-                    f"in {_cell_label(cell)}"
-                ),
+                (f"line {line} duplicates event {event_id!r} in {_cell_label(cell)}"),
                 "input.event_trigger_rates",
             )
             continue
@@ -2104,7 +1922,7 @@ def _playthrough_anomaly_rates(
     report_dir: Path,
     failures: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    paths = sorted(report_dir.rglob("playthrough.jsonl"))
+    paths = _discover_logical_jsonl(report_dir, "playthrough.jsonl")
     results = []
     for path in paths:
         rows = _read_jsonl(
@@ -2135,20 +1953,14 @@ def _playthrough_anomaly_rates(
             for anomaly in payload:
                 if not isinstance(anomaly, dict):
                     continue
-                severity = str(
-                    anomaly.get("severity") or "warning"
-                ).lower()
+                severity = str(anomaly.get("severity") or "warning").lower()
                 if severity in {"debug", "info"}:
                     continue
                 anomaly_week = _finite_number(anomaly.get("week"))
                 anomalies.add(
                     (
                         str(anomaly.get("kind") or "unknown"),
-                        (
-                            int(anomaly_week)
-                            if anomaly_week is not None
-                            else -1
-                        ),
+                        (int(anomaly_week) if anomaly_week is not None else -1),
                         severity,
                         str(anomaly.get("message") or ""),
                     )
@@ -2219,18 +2031,13 @@ def _read_csv(
                     failures,
                     path.name,
                     "invalid",
-                    (
-                        "missing required columns: "
-                        f"{', '.join(missing)}"
-                    ),
+                    (f"missing required columns: {', '.join(missing)}"),
                     gate,
                 )
                 return None
             rows = []
             for line, row in enumerate(reader, start=2):
-                if None in row or any(
-                    value is None for value in row.values()
-                ):
+                if None in row or any(value is None for value in row.values()):
                     _input_failure(
                         failures,
                         path.name,
@@ -2297,7 +2104,7 @@ def _read_jsonl(
     allow_empty: bool,
     gate: str,
 ) -> list[tuple[int, dict[str, Any]]] | None:
-    if not path.exists():
+    if not jsonl_artifact_exists(path):
         if required:
             _input_failure(
                 failures,
@@ -2309,33 +2116,11 @@ def _read_jsonl(
         return None
     rows = []
     try:
-        lines = path.read_text(encoding="utf-8").splitlines()
-    except (OSError, UnicodeError) as exc:
+        parsed_rows = list(iter_jsonl_rows(path))
+    except (OSError, UnicodeError, ReportArchiveError) as exc:
         _input_failure(failures, path.name, "invalid", str(exc), gate)
         return None
-    for line, raw in enumerate(lines, start=1):
-        if not raw.strip():
-            continue
-        try:
-            payload = json.loads(raw)
-        except json.JSONDecodeError as exc:
-            _input_failure(
-                failures,
-                path.name,
-                "invalid",
-                f"line {line}: {exc}",
-                gate,
-            )
-            continue
-        if not isinstance(payload, dict):
-            _input_failure(
-                failures,
-                path.name,
-                "invalid",
-                f"line {line} must contain a JSON object",
-                gate,
-            )
-            continue
+    for line, payload in parsed_rows:
         rows.append((line, payload))
     if not rows and not allow_empty:
         _input_failure(
@@ -2347,6 +2132,15 @@ def _read_jsonl(
         )
         return None
     return rows
+
+
+def _discover_logical_jsonl(report_dir: Path, name: str) -> list[Path]:
+    """Find hot and cold copies while returning one logical JSONL path each."""
+
+    paths = set(report_dir.rglob(name))
+    for archive in report_dir.rglob(f"{name}.zst"):
+        paths.add(archive.with_name(name))
+    return sorted(paths)
 
 
 def _manifest_defaults(manifest: dict[str, Any]) -> dict[str, str]:
@@ -2382,27 +2176,17 @@ def _row_cell(
     filename: str,
     line: int,
 ) -> Cell | None:
-    policy = str(
-        row.get("policy") or defaults.get("policy") or ""
-    ).strip()
-    difficulty = str(
-        row.get("difficulty") or defaults.get("difficulty") or ""
-    ).strip()
+    policy = str(row.get("policy") or defaults.get("policy") or "").strip()
+    difficulty = str(row.get("difficulty") or defaults.get("difficulty") or "").strip()
     scenario = str(
-        row.get("scenario")
-        or row.get("scenario_id")
-        or defaults.get("scenario")
-        or "default"
+        row.get("scenario") or row.get("scenario_id") or defaults.get("scenario") or "default"
     ).strip()
     if not policy:
         _input_failure(
             failures,
             filename,
             "incomplete",
-            (
-                f"line {line} has no policy and manifest supplies "
-                "no policy"
-            ),
+            (f"line {line} has no policy and manifest supplies no policy"),
             "input.cell_dimension",
         )
     if not difficulty:
@@ -2413,33 +2197,21 @@ def _row_cell(
                 failures,
                 filename,
                 "incomplete",
-                (
-                    f"line {line} needs difficulty because normal "
-                    "and realistic thresholds differ"
-                ),
+                (f"line {line} needs difficulty because normal and realistic thresholds differ"),
                 "input.cell_dimension",
             )
         else:
             difficulty = "unspecified"
-    if (
-        difficulty_candidates
-        and difficulty not in difficulty_candidates
-    ):
+    threshold_difficulty = DIFFICULTY_THRESHOLD_FALLBACK.get(difficulty, difficulty)
+    if difficulty_candidates and threshold_difficulty not in difficulty_candidates:
         _input_failure(
             failures,
             filename,
             "invalid",
-            (
-                f"line {line} difficulty {difficulty!r} has no "
-                "configured difficulty threshold"
-            ),
+            (f"line {line} difficulty {difficulty!r} has no configured difficulty threshold"),
             "input.cell_dimension",
         )
-    return (
-        (policy, difficulty, scenario or "default")
-        if policy and difficulty
-        else None
-    )
+    return (policy, difficulty, scenario or "default") if policy and difficulty else None
 
 
 def _payload_cell(
@@ -2482,10 +2254,10 @@ def _difficulty_candidates(
 ) -> set[str]:
     result = set()
     for key in (*balance, *outcomes):
-        if key.endswith("_normal"):
-            result.add("normal")
-        elif key.endswith("_realistic"):
-            result.add("realistic")
+        for difficulty in SUPPORTED_DIFFICULTIES:
+            if key.endswith(f"_{difficulty}"):
+                result.add(difficulty)
+                break
     return result
 
 
@@ -2498,9 +2270,13 @@ def _difficulty_threshold(
     key = f"{base}_{cell[1]}"
     if key in section:
         return _configured_number(section, key)
+    inherited = DIFFICULTY_THRESHOLD_FALLBACK.get(cell[1])
+    inherited_key = f"{base}_{inherited}" if inherited else ""
+    if inherited_key in section:
+        return _configured_number(section, inherited_key)
     available = [
         name
-        for name in (f"{base}_normal", f"{base}_realistic")
+        for name in (f"{base}_{difficulty}" for difficulty in SUPPORTED_DIFFICULTIES)
         if name in section
     ]
     if available:
@@ -2508,10 +2284,7 @@ def _difficulty_threshold(
             failures,
             "report cell",
             "unsupported",
-            (
-                f"{_cell_label(cell)} has no matching threshold "
-                f"for {base}"
-            ),
+            (f"{_cell_label(cell)} has no matching threshold for {base}"),
             "input.cell_dimension",
         )
     return None
@@ -2591,11 +2364,7 @@ def _metric_from_mapping(
 def _string_list(value: Any) -> list[str]:
     if not isinstance(value, list):
         return []
-    return [
-        item
-        for item in value
-        if isinstance(item, str) and item
-    ]
+    return [item for item in value if isinstance(item, str) and item]
 
 
 def _cell_payload(cell: Cell) -> dict[str, str]:
@@ -2611,18 +2380,16 @@ def _cell_key(cell: Cell) -> str:
 
 
 def _cell_label(cell: Cell) -> str:
-    return (
-        f"policy={cell[0]}, difficulty={cell[1]}, "
-        f"scenario={cell[2]}"
-    )
+    return f"policy={cell[0]}, difficulty={cell[1]}, scenario={cell[2]}"
 
 
 def _is_interactive_cell(cell: Cell) -> bool:
     policy = cell[0].lower()
-    return (
-        policy in {"interactive_personas", "interactive_player"}
-        or policy.startswith("persona:")
-    )
+    return policy in {"interactive_personas", "interactive_player"} or policy.startswith("persona:")
 
 
-__all__ = ["evaluate_report_dir", "write_gate_report"]
+__all__ = [
+    "classify_action_groups",
+    "evaluate_report_dir",
+    "write_gate_report",
+]

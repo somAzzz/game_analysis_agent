@@ -11,6 +11,7 @@ from typing import Any
 from game_analysis_agent.agents.base import Agent, render_prompt_text
 from game_analysis_agent.analytics import load_runs
 from game_analysis_agent.anomaly_detector import write_anomalies_jsonl
+from game_analysis_agent.report_archive import jsonl_artifact_exists
 from game_analysis_agent.schemas import Anomaly
 
 
@@ -38,8 +39,7 @@ class BugHunterAgent(Agent):
             "## Auto-detected Anomalies (machine-readable)\n\n"
             + self._render_anomaly_samples(self.anomalies)
             + "\n\n"
-            "## Anomaly Distribution\n\n"
-            + self.summary_text
+            "## Anomaly Distribution\n\n" + self.summary_text
         )
         # We rebuild the bundle so the model sees the canonical files + extras.
         from game_analysis_agent.report_bundle import (
@@ -61,20 +61,12 @@ class BugHunterAgent(Agent):
             f"Showing {len(samples)} of {len(anomalies)} anomalies; "
             f"{omitted} omitted after deterministic sampling."
         )
-        return (
-            header
-            + "\n\n"
-            "```jsonl\n"
-            + "\n".join(a.model_dump_json() for a in samples)
-            + "\n```"
-        )
+        return header + "\n\n```jsonl\n" + "\n".join(a.model_dump_json() for a in samples) + "\n```"
 
-    def _ensure_anomalies(
-        self, raw_path: Path, anomalies_path: Path
-    ) -> list[Anomaly]:
+    def _ensure_anomalies(self, raw_path: Path, anomalies_path: Path) -> list[Anomaly]:
         # anomalies.jsonl is derived evidence. Recompute it whenever the raw
         # trace exists so detector fixes cannot leave QA reading stale rows.
-        if raw_path.exists():
+        if jsonl_artifact_exists(raw_path):
             runs = load_runs(raw_path)
             from game_analysis_agent.anomaly_detector import detect_anomalies
 

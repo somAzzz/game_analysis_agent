@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from game_analysis_agent.agents.base import Agent
+from game_analysis_agent.report_archive import ReportArchiveError, iter_jsonl_rows
 
 
 class EventGraphAgent(Agent):
@@ -75,9 +76,7 @@ def _count_event_triggers(raw_runs: list[dict[str, Any]]) -> Counter[str]:
         for week in run.get("weekly_log", []) or []:
             if not isinstance(week, dict):
                 continue
-            event_id = str(
-                week.get("triggered_event_id") or week.get("event_id") or ""
-            ).strip()
+            event_id = str(week.get("triggered_event_id") or week.get("event_id") or "").strip()
             if event_id:
                 counts[event_id] += 1
     return counts
@@ -151,19 +150,10 @@ def _load_json(path: Path) -> dict[str, Any]:
 
 
 def _load_jsonl(path: Path) -> list[dict[str, Any]]:
-    if not path.exists():
+    try:
+        return [payload for _, payload in iter_jsonl_rows(path)]
+    except ReportArchiveError:
         return []
-    rows: list[dict[str, Any]] = []
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        try:
-            payload = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if isinstance(payload, dict):
-            rows.append(payload)
-    return rows
 
 
 __all__ = [

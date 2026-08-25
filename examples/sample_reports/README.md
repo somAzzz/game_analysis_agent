@@ -6,7 +6,7 @@ inspect the dashboard without running Godot or an LLM.
 Build the static dashboard from these samples:
 
 ```bash
-uv run python tools/build_dashboard.py all --reports examples/sample_reports
+uv run python tools/dashboard/build_dashboard.py all --reports examples/sample_reports
 ```
 
 Then open:

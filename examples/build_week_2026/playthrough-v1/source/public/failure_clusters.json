@@ -1,0 +1,496 @@
+{
+  "campaign_id": "playthrough-evidence-full-v1",
+  "clusters": [
+    {
+      "cell_rate": 1.0,
+      "cluster_id": "cashflow-stress-attractor",
+      "label": "Cashflow and stress attractor",
+      "member_count": 18,
+      "members": [
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-42-0814df41bd32",
+          "line_number": 117,
+          "persona": "money",
+          "record_sha256": "0ff5c93e9f139414baf22396c658ebb536d80e3f08c2a425bb54f9c910275008",
+          "seed": 42,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-43-19fc7eb327d9",
+          "line_number": 136,
+          "persona": "money",
+          "record_sha256": "d39f7e0643e6a10e3cffef91a5290367ca188fd1f88e65e78678996f6cfc4ec8",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-44-ef5f7a6f072c",
+          "line_number": 158,
+          "persona": "money",
+          "record_sha256": "85d6c977ec91bec006dd85f445b5b9e6f1ec76ce3e6e0c79e7fe20d0ae4db593",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "newbie-seed-42-800280af3dc4",
+          "line_number": 6,
+          "persona": "newbie",
+          "record_sha256": "716f13e565797b269731cfb3693a21860d4c83d08ef4f485412c29677b8e3e09",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "newbie-seed-43-b99ca186823f",
+          "line_number": 25,
+          "persona": "newbie",
+          "record_sha256": "4068fb25df06a91a0a0ad0f28472751f12df6ff93789a2ffa680805d750dd7e7",
+          "seed": 43,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "newbie-seed-44-74c10ddf911c",
+          "line_number": 52,
+          "persona": "newbie",
+          "record_sha256": "aca063321f72eb6f7a8396f823df666dc2f0084121bf77021f5fc98db1dfc096",
+          "seed": 44,
+          "week": 14
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "slacker-seed-42-40927837a583",
+          "line_number": 291,
+          "persona": "slacker",
+          "record_sha256": "a340201d3957fccf9247bdae76c2073a5948d7939660f8d4aac7b14883cb8514",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "slacker-seed-43-f26905951cff",
+          "line_number": 307,
+          "persona": "slacker",
+          "record_sha256": "e8e3c09c5ee87d3af13119e30db5033d00ade0a2ad83eed3bc36b6dc9f969369",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "slacker-seed-44-16886c02c0a3",
+          "line_number": 329,
+          "persona": "slacker",
+          "record_sha256": "b8dd2d9a6d1a25ec88125b70a0eb25b15b36247b4556e7a33b3e6bfe891bc9d8",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "social-seed-42-3e0651d2a124",
+          "line_number": 174,
+          "persona": "social",
+          "record_sha256": "5f33892bddc3cfc757adae5a36da585f6b01f1ea00566a9e3f1af26548e9aec0",
+          "seed": 42,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "social-seed-43-68645c459b97",
+          "line_number": 196,
+          "persona": "social",
+          "record_sha256": "1d60388303601206b75c41fc14263279f05ed576a2098853dacd09c6bdbb6b80",
+          "seed": 43,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "social-seed-44-70c95eebf532",
+          "line_number": 215,
+          "persona": "social",
+          "record_sha256": "4f4382701c7d32bf19d0e435192d4a88507775cdc5657ec7fafab9f3c767c276",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "study-seed-42-f9980b3d5bc8",
+          "line_number": 63,
+          "persona": "study",
+          "record_sha256": "62d045d23fd6d4799893ffb48c0dbc1c1f9508921cd26198a5bc3335d158bcf1",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "study-seed-43-a0be562b0f29",
+          "line_number": 79,
+          "persona": "study",
+          "record_sha256": "9609e050a91482b797522e53e4b5cd1cea0de38766d188019d451249e1fa3a87",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "study-seed-44-559809e534ec",
+          "line_number": 101,
+          "persona": "study",
+          "record_sha256": "0e0a9358661f1f49affeb173a96afd64c6d4a9cd66dcd9c1fa1c333eb430609c",
+          "seed": 44,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "visa-seed-42-88dd8348830c",
+          "line_number": 234,
+          "persona": "visa",
+          "record_sha256": "6f243e6839f7e0f33216e83fa3197542e4a2dd70953a4a1e98af3a91a0428802",
+          "seed": 42,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "visa-seed-43-da3b18bf94b1",
+          "line_number": 253,
+          "persona": "visa",
+          "record_sha256": "d0c5a903d05ebad26f6f9f4c8dcf27f28a0e81c05177946c15fb4a2990492afe",
+          "seed": 43,
+          "week": 6
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "visa-seed-44-7e68c349c083",
+          "line_number": 276,
+          "persona": "visa",
+          "record_sha256": "efa04885f434b56d9d1a9c488a2b4bf461fec0580371f300b79f8bb4c09079a9",
+          "seed": 44,
+          "week": 10
+        }
+      ],
+      "persona_counts": {
+        "money": 3,
+        "newbie": 3,
+        "slacker": 3,
+        "social": 3,
+        "study": 3,
+        "visa": 3
+      },
+      "representatives": [
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-42-0814df41bd32",
+          "line_number": 117,
+          "persona": "money",
+          "record_sha256": "0ff5c93e9f139414baf22396c658ebb536d80e3f08c2a425bb54f9c910275008",
+          "seed": 42,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-43-19fc7eb327d9",
+          "line_number": 136,
+          "persona": "money",
+          "record_sha256": "d39f7e0643e6a10e3cffef91a5290367ca188fd1f88e65e78678996f6cfc4ec8",
+          "seed": 43,
+          "week": 3
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-44-ef5f7a6f072c",
+          "line_number": 158,
+          "persona": "money",
+          "record_sha256": "85d6c977ec91bec006dd85f445b5b9e6f1ec76ce3e6e0c79e7fe20d0ae4db593",
+          "seed": 44,
+          "week": 6
+        }
+      ],
+      "rule": {
+        "cluster_id": "cashflow-stress-attractor",
+        "consecutive_weeks": 2,
+        "fallback_used": null,
+        "label": "Cashflow and stress attractor",
+        "money_lte": 0.0,
+        "stress_gte": 80.0
+      }
+    },
+    {
+      "cell_rate": 1.0,
+      "cluster_id": "burnout-risk",
+      "label": "Sustained burnout risk",
+      "member_count": 18,
+      "members": [
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-42-0814df41bd32",
+          "line_number": 118,
+          "persona": "money",
+          "record_sha256": "214bc88d4e6b15480ae1b5cc312b3cbb476034fe167b6b9f0eb49fcbe0143a24",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-43-19fc7eb327d9",
+          "line_number": 137,
+          "persona": "money",
+          "record_sha256": "1da0a3946b3c7db97d82ccb30010f8df2aafd19d775515136d4bb255aaf21219",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-44-ef5f7a6f072c",
+          "line_number": 156,
+          "persona": "money",
+          "record_sha256": "65efc978258f58d29877b04694459ee3150384dc4906729130e7f0a2ba894b77",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "newbie-seed-42-800280af3dc4",
+          "line_number": 4,
+          "persona": "newbie",
+          "record_sha256": "275b9e8dfae1c7fe41b4d950fdadd21bbbf6979b2be3e1260d8c28c56f8f7cf1",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "newbie-seed-43-b99ca186823f",
+          "line_number": 23,
+          "persona": "newbie",
+          "record_sha256": "06892c255b0bb641363dde0a704e600590a59a0eca314f71c6777f8bb323f433",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "newbie-seed-44-74c10ddf911c",
+          "line_number": 42,
+          "persona": "newbie",
+          "record_sha256": "8b72ae802df1fa159aaa61c5478493c42d0cd9a4563b9cf510b9d6de5ddb999e",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "slacker-seed-42-40927837a583",
+          "line_number": 289,
+          "persona": "slacker",
+          "record_sha256": "6d014201157c49cc74da2cc006e08cc15187454b82ae793e8b5ec0b26ea6949a",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "slacker-seed-43-f26905951cff",
+          "line_number": 308,
+          "persona": "slacker",
+          "record_sha256": "002c2f46749ef6633b7e0a6817702f4f7b336544cf10f851db4aea682c0049d9",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "slacker-seed-44-16886c02c0a3",
+          "line_number": 327,
+          "persona": "slacker",
+          "record_sha256": "de34b62561232e0ac2e1ee8a84baf80f0633d641b05978d74cb03f621b36e9d2",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "social-seed-42-3e0651d2a124",
+          "line_number": 175,
+          "persona": "social",
+          "record_sha256": "e700d12a06c18b28d6f2979c819225291cf6d3124e61c4c595b9482949cb2b6c",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "social-seed-43-68645c459b97",
+          "line_number": 194,
+          "persona": "social",
+          "record_sha256": "a84d903f653c2df9936724f54a8021980d2eb995b7490e090fd721c44125bf58",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "social-seed-44-70c95eebf532",
+          "line_number": 213,
+          "persona": "social",
+          "record_sha256": "7947d169c55c0d0e6959d31f1aad7d54e762b348077cebab6cc3f8359c32b893",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "study-seed-42-f9980b3d5bc8",
+          "line_number": 61,
+          "persona": "study",
+          "record_sha256": "e5b39e44f26e4190b075cccb6d1f621b908690b12b2a83d2da524e1522713d6f",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "study-seed-43-a0be562b0f29",
+          "line_number": 80,
+          "persona": "study",
+          "record_sha256": "2b23a718d0253f94d170cbd6d010cb71bc87346febad7cfdb36b85bd057b5fa9",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "study-seed-44-559809e534ec",
+          "line_number": 99,
+          "persona": "study",
+          "record_sha256": "b8124d8aac5f8687a7e2a5216b66b82d635fd1e12c8f37a89fe6a81a84e14445",
+          "seed": 44,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "visa-seed-42-88dd8348830c",
+          "line_number": 232,
+          "persona": "visa",
+          "record_sha256": "1fcc761a69806a6534d4c1e1827c7986db2a9e8d9762978e678f37e620ac89d6",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "visa-seed-43-da3b18bf94b1",
+          "line_number": 251,
+          "persona": "visa",
+          "record_sha256": "e77f6bb84e23d972a5d86fa4c2be72662cd183f0fbcdc0810c031c503fa41f00",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "visa-seed-44-7e68c349c083",
+          "line_number": 270,
+          "persona": "visa",
+          "record_sha256": "f6f9a36dea6c58edbf7e62590ae6623e743a7a5b5ab77fb5de2001d6dc91df66",
+          "seed": 44,
+          "week": 4
+        }
+      ],
+      "persona_counts": {
+        "money": 3,
+        "newbie": 3,
+        "slacker": 3,
+        "social": 3,
+        "study": 3,
+        "visa": 3
+      },
+      "representatives": [
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-42-0814df41bd32",
+          "line_number": 118,
+          "persona": "money",
+          "record_sha256": "214bc88d4e6b15480ae1b5cc312b3cbb476034fe167b6b9f0eb49fcbe0143a24",
+          "seed": 42,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-43-19fc7eb327d9",
+          "line_number": 137,
+          "persona": "money",
+          "record_sha256": "1da0a3946b3c7db97d82ccb30010f8df2aafd19d775515136d4bb255aaf21219",
+          "seed": 43,
+          "week": 4
+        },
+        {
+          "artifact_path": "persona_runs.jsonl",
+          "campaign_id": "playthrough-evidence-full-v1",
+          "cell_id": "money-seed-44-ef5f7a6f072c",
+          "line_number": 156,
+          "persona": "money",
+          "record_sha256": "65efc978258f58d29877b04694459ee3150384dc4906729130e7f0a2ba894b77",
+          "seed": 44,
+          "week": 4
+        }
+      ],
+      "rule": {
+        "cluster_id": "burnout-risk",
+        "consecutive_weeks": 2,
+        "fallback_used": null,
+        "label": "Sustained burnout risk",
+        "money_lte": null,
+        "stress_gte": 90.0
+      }
+    },
+    {
+      "cell_rate": 0.0,
+      "cluster_id": "provider-fallback",
+      "label": "Persona provider fallback",
+      "member_count": 0,
+      "members": [],
+      "persona_counts": {},
+      "representatives": [],
+      "rule": {
+        "cluster_id": "provider-fallback",
+        "consecutive_weeks": 1,
+        "fallback_used": true,
+        "label": "Persona provider fallback",
+        "money_lte": null,
+        "stress_gte": null
+      }
+    }
+  ],
+  "rules_fingerprint": "7de01b76e52d72c9472f9e8fe66fd78ef00b6299f29b8ee013bd6736586ac61b",
+  "schema_version": "public-failure-clusters-v1"
+}

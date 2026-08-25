@@ -1,72 +1,83 @@
 # Docker setup
 
-The pipeline comes with a `docker-compose.yml` that orchestrates three
-services: a vLLM inference server (GPU), a persistent headless Godot tool
-sidecar (CPU-only), and an opt-in agent analysis CLI container (CPU-only).
-Everything wires together through
-`docker-compose.yml` + `.env`, mirroring the well-tested setup in
-[fintext_llm/docker-compose.yml](../../fintext_llm/docker-compose.yml)
-so the two projects can share a machine without port collisions.
+The default Compose path is a CPU-only, read-only dashboard. Godot tooling, the
+legacy CLI, and NVIDIA inference are separate opt-in profiles, so a dashboard
+user never downloads a model or reserves a GPU by running bare
+`docker compose up`.
 
 ## 1. Prerequisites
 
-- Docker Engine 24+ with the `nvidia-container-toolkit` installed.
-- An NVIDIA Blackwell card (RTX PRO 6000 / RTX 5070 / B200). NVFP4
+- Docker Engine 24+ for the dashboard image.
+- NVIDIA Container Toolkit and a Blackwell card only for the optional
+  `local-nvidia` profile. NVFP4
   requires `sm_100` or `sm_120` — it **will not** run on H100 / A100 /
   older.
 - ~70 GB of free disk for the Qwen3.6 27B NVFP4 weights (cached under
   `~/.cache/huggingface/`).
-- A working `study-in-germany` Godot project for `sim`, `probe`, `export`,
-  `validate`, `interactive-probe`, or `play`. Pure `analyze`, recorded `eval`,
-  and report QA do not invoke Godot.
+- The embedded `study-in-germany` demo is included. Godot commands prepare a
+  writable copy under `reports/`; pure `analyze`, recorded `eval`, and report
+  QA do not invoke Godot.
 
-## 2. One-time setup
+## 2. CPU-only dashboard
+
+```bash
+docker compose up -d dashboard
+```
+
+The dashboard listens on `http://127.0.0.1:8080` by default. It runs read-only
+as an unprivileged user and needs no API key for recorded evidence. The image
+source is `Dockerfile.dashboard`; its official Python base is pinned by
+image-index digest and does not force an amd64 platform on Apple Silicon.
+
+## 3. Optional local game and model setup
 
 ```bash
 cp .env.example .env
 # Edit .env:
 #   - HF_TOKEN (if your model is auth-gated — the official NVFP4 quant
 #     does not require a token at the moment).
-#   - GAME_PROJECT_PATH=/abs/path/to/study-in-germany
-#   - GODOT_DOCKER_MOUNT_ROOT=/shared/parent/of/both/checkouts
-#   - VLLM_BIND_PORT=8000 (already the default).
+#   - GODOT_DOCKER_MOUNT_ROOT=/absolute/parent/of/this/repository
+#   - SGLANG_BIND_PORT=30000 (already the default).
 ```
 
-## 3. Start vLLM and Godot
+## 4. Start the primary SGLang backend and Godot
 
 ```bash
-docker compose up -d vllm godot
-docker compose logs -f vllm     # tail the server boot
-docker compose ps                # confirm ``vllm`` and ``godot`` are healthy
+docker compose --profile local-nvidia --profile game-tools up -d sglang godot
+docker compose logs -f sglang   # tail the server boot
+docker compose ps               # confirm ``sglang`` and ``godot`` are healthy
 ```
 
 The Godot service is an idle tool sidecar; the repository wrapper executes
 commands inside it. To use only Godot without reserving the GPU, run
-`docker compose up -d godot`.
+`docker compose --profile game-tools up -d godot`.
 
-Once the container reports `Application startup complete`, the
-endpoint is `http://localhost:8000/v1`. Sanity check:
+Once the container is healthy, the endpoint is
+`http://localhost:30000/v1`. Sanity check:
 
 ```bash
-curl http://localhost:8000/v1/models \
+curl http://localhost:30000/v1/models \
   -H "Authorization: Bearer local-dev-token"
 ```
 
-You should see `nvidia/Qwen3.6-27B-NVFP4` (or whatever you set
-`LLM_MODEL=` to).
+You should see the stable alias `qwen3.6-27b-nvfp4`. To use the retained vLLM
+baseline instead, run `docker compose --profile local-vllm up -d vllm` and set
+`LLM_PROVIDER=vllm`.
 
-## 4. Run the agent CLI
+## 5. Run the agent CLI
 
 Run gameplay commands from the host and point `GODOT_BIN` at the wrapper. It
-reuses the compose sidecar and reaches vLLM through the published host port:
+reuses the compose sidecar and reaches SGLang through the published host port:
 
 ```bash
-export GAME_PROJECT_PATH=/abs/path/to/study-in-germany
+uv run python tools/build_week/prepare_embedded_demo.py \
+  --output reports/docker-game-runtime --replace --json
+export GAME_PROJECT_PATH="$PWD/reports/docker-game-runtime"
 export GODOT_BIN="$PWD/scripts/godot-docker-wrapper"
 
-uv run python tools/run_gameplay_agent.py interactive-probe \
+uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
   --report-dir reports/interactive/compose-smoke
-uv run python tools/run_gameplay_agent.py play \
+uv run python tools/gameplay/run_gameplay_agent.py play \
   --report-dir reports/play/compose-live
 ```
 
@@ -85,58 +96,99 @@ docker compose --profile cli run --rm agent \
 The agent container binds `./reports` back to the host so artifacts
 land under `reports/<subdir>/` on your machine for inspection.
 
-## 5. Without Docker (host-native)
+## 6. Without Docker (host-native)
 
 The pipeline still runs natively if you have the Python deps installed
-and a vLLM server reachable at `VLLM_BASE_URL`:
+and the selected OpenAI-compatible server reachable at its configured base URL:
 
 ```bash
-python3 tools/run_gameplay_agent.py all --runs 100 --policy balanced
+python3 tools/gameplay/run_gameplay_agent.py all --runs 100 --policy balanced
 ```
 
 The Docker setup keeps both external runtimes available while the Python CLI
 remains easy to run and debug on the host.
 
-## 6. Configurable knobs
+## 7. Dashboard and Codex communication model
+
+The supported development topology is deliberately hybrid:
+
+- GitHub Pages and the dashboard image are evidence surfaces; they need no model,
+  game checkout, API key, or Docker socket.
+- Codex runs on the host, discovers `.agents/skills/playtest-forge`, and calls
+  the repository services/scripts through its shell tool. MCP is not required.
+- The Godot wrapper communicates with the `godot` sidecar through
+  `docker compose exec`; if the sidecar is absent it uses a bounded one-shot
+  container with identical absolute mounts.
+- Local SGLang (or the vLLM fallback) is reached through its published
+  OpenAI-compatible host endpoint.
+  The OpenAI provider uses the same campaign request, progress, aggregation, and
+  experiment-registry contracts, with the key retained server-side.
+
+The dashboard image contains `game-overlays/` plus curated deterministic static
+experiment fixtures. Raw local-model logs are excluded from both the image and
+Git. `Dockerfile.dashboard` packages only the public fixture set. The `agent`
+container is not a controller for sibling containers.
+
+## 8. Configurable knobs
 
 All knobs live in `.env`:
 
 | Env var | Purpose | Default |
 |---|---|---|
-| `LLM_MODEL` | HF repo id or local path served by vLLM | `nvidia/Qwen3.6-27B-NVFP4` |
-| `LLM_MAX_MODEL_LEN` | Context length passed to vLLM | `32768` |
-| `LLM_ENABLE_MTP` | Qwen3.6 ships with MTP weights; keep `1`, set `0` only for checkpoints without them | `1` |
+| `LLM_PROVIDER` | Active local/cloud provider | `sglang` |
+| `LLM_MODEL` | HF repo id or local path served by the local engine | `nvidia/Qwen3.6-27B-NVFP4` |
+| `LLM_MAX_MODEL_LEN` | Operational prompt + output context limit | `65536` |
+| `LLM_MAX_NUM_SEQS` | Maximum continuously batched sequences per scheduler iteration | `4` |
+| `LLM_MAX_NUM_BATCHED_TOKENS` | Optional tokens processed per scheduler iteration; blank uses vLLM tuning | (empty) |
+| `LLM_ENABLE_PREFIX_CACHING` | Reuse exact shared prefixes during prefill | `1` |
+| `LLM_MAMBA_CACHE_MODE` | Hybrid GDN/Mamba cache coordination mode | `align` |
+| `LLM_PREFIX_MATCH_UNIT` | Fine-grained hybrid prefix match boundary in tokens | `16` |
+| `LLM_ENABLE_MTP` | Opt in to three-token MTP speculative decoding for bounded long-output tests | `0` |
+| `SGLANG_BIND_PORT` | Host port for the primary SGLang server | `30000` |
+| `SGLANG_MAMBA_CACHE_STRATEGY` | Hybrid Mamba radix-cache scheduler | `extra_buffer` |
+| `SGLANG_PAGE_SIZE` | Radix cache page size | `64` |
+| `SGLANG_ENABLE_MTP` | Enable Qwen3.6 native MTP/NEXTN | `1` |
+| `SGLANG_SPEC_NUM_STEPS` | MTP draft depth | `3` |
+| `SGLANG_SPEC_TOPK` | MTP branching factor | `1` |
+| `SGLANG_SPEC_NUM_DRAFT_TOKENS` | MTP verification capacity | `4` |
 | `HF_TOKEN` | Auth to gated HuggingFace repos | (empty) |
 | `VLLM_BIND_PORT` | Host port the container binds to | `8000` |
 | `CUDA_VISIBLE_DEVICES` | GPU index (or `all`) | `0` |
 | `GODOT_DOCKER_IMAGE` | Godot sidecar/fallback image | `barichello/godot-ci:4.4` |
-| `GAME_PROJECT_PATH` | Absolute checkout mounted at the identical container path | `/home/bo/projects/python/study-in-germany` |
-| `GODOT_DOCKER_MOUNT_ROOT` | Shared parent of Agent and game checkouts, mounted at the same path | `/home/bo/projects/python` |
+| `GAME_PROJECT_PATH` | Writable prepared demo runtime mounted at the identical container path | `reports/docker-game-runtime` after preparation |
+| `GODOT_DOCKER_MOUNT_ROOT` | Parent of this repository, mounted at the same absolute path | wrapper-detected repository parent |
 
-## 7. Version pinning
+## 9. Version pinning
 
-`vllm/vllm-openai:v0.25.0` is the latest stable tag (as of 2026-07-13)
-with NVFP4 + MTP validated against Qwen3.6 27B NVFP4. Bump quarterly;
-see fintext_llm for the same pinning rationale.
+`lmsysorg/sglang:v0.5.16-cu130-runtime` is the primary pin. Qwen3.6 uses
+ModelOpt FP4, Radix cache with `extra_buffer`, and optional NEXTN/MTP. The
+fallback `vllm/vllm-openai:v0.26.0` remains pinned as of 2026-07-31 and adds fine-grained
+prefix-cache hits for aligned attention/Mamba hybrid models. Hybrid APC is
+still experimental: treat it only as a prefill optimization, never as a
+correctness or context-capacity guarantee.
 
-## 8. Troubleshooting
+## 10. Troubleshooting
 
-**`error: failed to inspect docker image`** — your `vllm/vllm-openai`
-image isn't pulled yet. Run `docker compose pull vllm` first.
+**`error: failed to inspect docker image`** — pull the selected engine first:
+`docker compose pull sglang` or `docker compose pull vllm`.
 
-**`CUDA out of memory`** — drop `--gpu-memory-utilization 0.9` to
-`0.8` in the compose file's `command:` (or set `LLM_GPU_MEMORY_UTILIZATION`
-if you wire it through). For Qwen3.6 27B NVFP4, 24-32 GB of VRAM is
-the recommended floor.
+**`CUDA out of memory`** — lower `SGLANG_MEM_FRACTION_STATIC`, reduce
+`LLM_MAX_NUM_SEQS`, or temporarily set `SGLANG_ENABLE_MTP=0`. On WSL2,
+Blackwell GPU passthrough may reserve substantial memory outside PyTorch.
 
 **`--speculative-config` complains about missing MTP weights** —
-your checkpoint is Qwen3.5 or earlier; set `LLM_ENABLE_MTP=0` in
-`.env`.
+disable the opt-in with `LLM_ENABLE_MTP=0`. The project default is already
+APC-only.
 
-**`HF_TOKEN` not set on a gated repo** — fix the env var, then
-`docker compose restart vllm`. The token is forwarded only for
+**Need to isolate APC or MTP behavior** — keep all other flags fixed and set
+exactly one of `LLM_ENABLE_PREFIX_CACHING=1` or `LLM_ENABLE_MTP=1`. Re-run
+the same serialized requests and compare validity plus latency; never infer a
+game result from whether a prefix-cache hit occurred.
+
+**`HF_TOKEN` not set on a gated repo** — fix the env var, then restart the
+selected backend. The token is forwarded only for
 authenticated model downloads.
 
 **Godot sidecar is not running** — start it with
-`docker compose up -d godot`. The wrapper automatically falls back to a
+`docker compose --profile game-tools up -d godot`. The wrapper automatically falls back to a
 one-shot `docker run --rm` when the compose service is absent.

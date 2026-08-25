@@ -4,6 +4,14 @@ import {
   fetchDecisionGraphManifest,
   fetchFrontManifest,
   fetchIssueManifest,
+  createJudgeCampaign,
+  fetchJudgeCampaign,
+  fetchJudgeExperiment,
+  fetchJudgeExperiments,
+  fetchJudgeProviderStatus,
+  fetchStaticJudgeExperiment,
+  submitHumanReview,
+  testJudgeProvider,
 } from "@/lib/api";
 import type {
   DecisionGraphManifest,
@@ -176,4 +184,73 @@ describe("manifest API", () => {
       "invalid decision graph manifest: event_graph must be object",
     );
   });
+
+  it("uses the bounded same-origin Judge API without browser credentials", async () => {
+    const status = { schema_version: "judge-provider-status-v1", providers: {} };
+    const job = { campaign_id: "judge-abc", status: "completed" };
+    const experiment = { schema_version: "judge-public-experiment-v1", decision: "rejected" };
+    const experimentIndex = { schema_version: "judge-experiment-index-v1", experiments: [] };
+    fetchMock
+      .mockResolvedValueOnce(responseWith(status))
+      .mockResolvedValueOnce(responseWith({ status: "passed" }))
+      .mockResolvedValueOnce(responseWith(job))
+      .mockResolvedValueOnce(responseWith(job))
+      .mockResolvedValueOnce(responseWith(experimentIndex))
+      .mockResolvedValueOnce(responseWith(experiment));
+
+    await fetchJudgeProviderStatus();
+    await testJudgeProvider("replay");
+    await createJudgeCampaign("openai");
+    await fetchJudgeCampaign("judge-abc");
+    await fetchJudgeExperiments();
+    await fetchJudgeExperiment();
+
+    expect(fetchMock.mock.calls.map((call) => call[0])).toEqual([
+      "/api/provider-status", "/api/provider-test", "/api/campaigns",
+      "/api/campaigns/judge-abc", "/api/experiments", "/api/experiments/localization-choice-identity-v1",
+    ]);
+    const createBody = String(fetchMock.mock.calls[2]?.[1]?.body);
+    expect(createBody).toBe('{"provider":"openai"}');
+    expect(createBody).not.toContain("api_key");
+  });
+
+  it("loads the frozen Judge experiment for static evaluator hosting", async () => {
+    const experiment = { schema_version: "judge-public-experiment-v1", decision: "rejected" };
+    fetchMock.mockResolvedValue(responseWith(experiment));
+
+    await expect(fetchStaticJudgeExperiment()).resolves.toEqual(experiment);
+    expect(fetchMock).toHaveBeenCalledWith("/experiments/localization-choice-identity-v1/judge-experiment.json", {
+      headers: { Accept: "application/json" },
+    });
+  });
+});
+
+
+it("submits a bounded human review without any merge instruction", async () => {
+  const fetchMock = vi.fn().mockResolvedValue(responseWith({
+    schema_version: "judge-human-review-v1",
+    human_decision: "approve",
+    merge_performed: false,
+  }));
+  vi.stubGlobal("fetch", fetchMock);
+
+  await submitHumanReview(
+    "cashflow-drift-repair-v1",
+    "a".repeat(64),
+    "approve",
+    "Evidence supports a human approval.",
+  );
+
+  expect(fetchMock).toHaveBeenCalledWith(
+    "/api/experiments/cashflow-drift-repair-v1/human-review",
+    expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({
+        evidence_fingerprint: "a".repeat(64),
+        decision: "approve",
+        reviewer_note: "Evidence supports a human approval.",
+      }),
+    }),
+  );
+  expect(String(fetchMock.mock.calls[0]?.[1]?.body)).not.toContain("merge");
 });

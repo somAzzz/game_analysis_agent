@@ -33,8 +33,8 @@ interfaces are present.
 --out=res://path.jsonl   output file (Godot res:// or absolute)
 ```
 
-`game_analysis_agent/tools/run_balance_sim.sh` and
-`tools/run_gameplay_agent.py sim` both shell out to it with these
+`game_analysis_agent/tools/gameplay/run_balance_sim.sh` and
+`tools/gameplay/run_gameplay_agent.py sim` both shell out to it with these
 arguments. The shell script copies the resulting file from
 `${HOME}/.local/share/godot/app_userdata/<project_name>/` into the
 agent's `reports/balance/<run_id>/raw_runs.jsonl`.

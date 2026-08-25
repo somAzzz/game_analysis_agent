@@ -1,0 +1,208 @@
+schema_version: inference-ab-v1
+experiment_id: qwen36-apc-vs-mtp3
+question: Which mutually exclusive optimization produces the better governed persona workload?
+
+common_server:
+  image: vllm/vllm-openai:v0.26.0
+  model: nvidia/Qwen3.6-27B-NVFP4
+  served_model_name: qwen3.6-27b-nvfp4
+  max_model_len: 65536
+  max_num_seqs: 4
+  max_num_batched_tokens: null
+  gpu_memory_utilization: 0.9
+  tensor_parallel_size: 1
+  pipeline_parallel_size: 1
+  data_parallel_size: 1
+  dtype: bfloat16
+  quantization: modelopt
+  temperature:
+    diagnostic: 0.0
+    long_horizon_campaign: 0.3
+    frozen_trace_replay: 0.3
+
+variants:
+  apc_only:
+    env_file: config/inference_ab/apc_only.env
+    prefix_caching: true
+    mamba_cache_mode: align
+    prefix_match_unit: 16
+    mtp_enabled: false
+    num_speculative_tokens: 0
+  mtp3_only:
+    env_file: config/inference_ab/mtp3_only.env
+    prefix_caching: false
+    mamba_cache_mode: none
+    prefix_match_unit: null
+    mtp_enabled: true
+    num_speculative_tokens: 3
+
+execution:
+  repetitions_per_scenario_arm: 3
+  scenario_arm_order:
+    - repetition: 1
+      same_persona_multi_seed: [apc_only, mtp3_only]
+      different_personas_single_seed: [mtp3_only, apc_only]
+    - repetition: 2
+      same_persona_multi_seed: [mtp3_only, apc_only]
+      different_personas_single_seed: [apc_only, mtp3_only]
+    - repetition: 3
+      same_persona_multi_seed: [apc_only, mtp3_only]
+      different_personas_single_seed: [mtp3_only, apc_only]
+  restart_server_before_every_scenario_arm: true
+  exclusive_gpu: true
+  warmup_requests: 20
+  warmup_prefix_must_be_disjoint_from_measured_prompts: true
+  warmup_excluded_from_results: true
+  request_timeout_seconds: 180
+  health_timeout_seconds: 900
+  prometheus_sample_interval_seconds: 1
+  gpu_sample_interval_seconds: 1
+
+workloads:
+  long_horizon_campaigns:
+    purpose: Decide the default from fresh local-model playthroughs against real Godot.
+    provider: vllm
+    provider_truth_label: local-vllm-real-godot
+    runtime: real_godot
+    semester:
+      max_weeks: 20
+      minimum_completed_weeks: 18
+      note: The project defines a complete first-semester cap as week 20, often after 19 decisions.
+    scenarios:
+      same_persona_multi_seed:
+        purpose: Measure within-persona prefix reuse while game paths diverge by seed.
+        personas: [newbie]
+        seeds: [42, 43, 44, 45]
+        concurrency: 4
+        physical_cells_per_arm: 4
+      different_personas_single_seed:
+        purpose: Measure cross-persona reuse under the same game randomness.
+        personas: [newbie, study, money, social]
+        seeds: [42]
+        concurrency: 4
+        physical_cells_per_arm: 4
+    logical_unique_persona_seed_pairs_per_arm: 7
+    physical_cells_per_arm: 8
+    physical_cells_both_arms_per_repetition: 16
+    worst_case_model_calls_both_arms_per_repetition: 640
+    worst_case_model_calls_full_experiment: 1920
+    preserve_per_cell_order: true
+    require_all_cells_completed: true
+    reject_partial_or_fallback_cells: true
+    rerun_overlapping_newbie_seed_42_per_scenario: true
+  frozen_trace_replay:
+    purpose: Isolate engine performance from model-driven gameplay divergence.
+    source: reports/inference-ab/fixtures/persona-chat-trace.jsonl
+    require_trace_sha256: true
+    capture_from: long_horizon_campaigns
+    personas: [newbie, study, money, social]
+    minimum_weeks: 18
+    semester_cap: 20
+    concurrency: [1, 4]
+    passes:
+      - id: cold
+        ordinal: 1
+      - id: warm
+        ordinal: 2
+    preserve_per_cell_order: true
+    reuse_identical_serialized_requests_across_arms: true
+  diagnostic_sweep:
+    purpose: Explain whether a result comes from prefill or decode.
+    prompt_tokens: [512, 2048, 4096]
+    output_tokens: [32, 96, 256, 768]
+    concurrency: [1, 4]
+    requests_per_cell: 20
+    ignore_eos: true
+    seed: 42
+  optional_expansions:
+    full_factorial_confirmation:
+      trigger: Core scenario winners disagree or the practical-effect interval includes zero.
+      personas: [newbie, study, money, social]
+      seeds: [42, 43, 44, 45]
+      concurrency: 4
+      physical_cells_per_arm: 16
+      physical_cells_both_arms: 32
+      worst_case_model_calls: 1280
+      repetitions: 1
+    edge_persona_holdout:
+      trigger: A candidate repository default exists after the core and frozen-trace gates.
+      personas: [visa, slacker]
+      seeds: [1042, 2042]
+      concurrency: 4
+      physical_cells_per_arm: 4
+      physical_cells_both_arms: 8
+      worst_case_model_calls: 320
+      repetitions: 1
+
+primary_decision:
+  metric: long_horizon_completed_weeks_per_wall_clock_hour
+  pairing_key: [scenario, persona, seed, repetition]
+  report_separate_results_by_scenario: true
+  interaction_effect: same_persona_speedup_minus_different_persona_speedup
+  minimum_practical_improvement_percent: 5.0
+  confidence_level: 0.95
+  confidence_method: hierarchical_paired_bootstrap
+  winner_requires_interval_excluding_zero: true
+
+percentiles: [50, 90, 95, 99]
+
+request_metrics:
+  - ttft_ms
+  - tpot_ms
+  - inter_token_latency_ms
+  - e2e_latency_ms
+  - prompt_tokens
+  - cached_prompt_tokens
+  - completion_tokens
+  - requests_per_second
+  - prompt_tokens_per_second
+  - generation_tokens_per_second
+
+server_metrics:
+  - vllm:prefix_cache_queries_total
+  - vllm:prefix_cache_hits_total
+  - vllm:prompt_tokens_by_source_total
+  - vllm:kv_cache_usage_perc
+  - vllm:num_requests_running
+  - vllm:num_requests_waiting
+  - vllm:num_preemptions_total
+  - vllm:spec_decode_num_accepted_tokens_total
+  - vllm:spec_decode_num_draft_tokens_total
+  - vllm:spec_decode_num_drafts
+
+gpu_metrics:
+  - utilization_gpu_percent
+  - memory_used_mib
+  - power_draw_watts
+  - sm_clock_mhz
+  - energy_wh
+
+quality_guardrails:
+  request_success_rate_min: 1.0
+  final_valid_rate_min: 1.0
+  completed_cell_rate_min: 1.0
+  minimum_completed_weeks_per_cell: 18
+  provider_error_rate_max: 0.0
+  fallback_rate_max: 0.0
+  schema_repair_rate_max: 0.0
+  length_finish_rate_max: 0.005
+  legal_action_violation_rate_max: 0.0
+
+artifacts:
+  root: reports/inference-ab
+  required:
+    - manifest.json
+    - requests.jsonl
+    - server-metrics.jsonl
+    - gpu-metrics.csv
+    - summary.json
+    - summary.csv
+    - comparison.html
+    - charts/latency-percentiles.svg
+    - charts/campaign-throughput-by-scenario.svg
+    - charts/week-latency-trend.svg
+    - charts/paired-cell-effects.svg
+    - charts/stage-decomposition.svg
+    - charts/workload-heatmap.svg
+    - charts/mechanism-utilization.svg
+    - charts/quality-guardrails.svg

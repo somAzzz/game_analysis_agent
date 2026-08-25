@@ -1,0 +1,32 @@
+ARG SGLANG_BASE_IMAGE=lmsysorg/sglang@sha256:febfb971c7352570fc445c466ebd6ffc9d896024958e544a60f2137fd85856b1
+FROM ${SGLANG_BASE_IMAGE}
+
+ARG SGLANG_DFLASH2_REPOSITORY=https://github.com/Jiminator/sglang.git
+ARG SGLANG_DFLASH2_REF=feat/dflash2-quantized-lm-head
+ARG SGLANG_DFLASH2_COMMIT=28198c8289f6ad59775f37d3bd9c9de67732c368
+
+RUN git clone --filter=blob:none --single-branch --branch "${SGLANG_DFLASH2_REF}" \
+      "${SGLANG_DFLASH2_REPOSITORY}" /opt/sglang-dflash2 \
+    && cd /opt/sglang-dflash2 \
+    && test "$(git rev-parse HEAD)" = "${SGLANG_DFLASH2_COMMIT}" \
+    && git checkout --detach "${SGLANG_DFLASH2_COMMIT}"
+
+# Keep the Qwen3.8 Day-0 image's tested CUDA, FlashInfer and sglang-kernel
+# binaries. Only the pinned SGLang Python tree comes from the DFlash2 PR.
+ENV PYTHONPATH=/opt/sglang-dflash2/python
+ENV SGLANG_DFLASH2_COMMIT=${SGLANG_DFLASH2_COMMIT}
+
+LABEL org.opencontainers.image.title="SGLang Qwen3.8 NVFP4 + DFlash2"
+LABEL org.opencontainers.image.revision="${SGLANG_DFLASH2_COMMIT}"
+LABEL ai.sglang.dflash2.pr="35496"
+
+RUN python3 - <<'PY'
+import pathlib
+import sglang
+
+expected = pathlib.Path("/opt/sglang-dflash2/python/sglang").resolve()
+actual = pathlib.Path(sglang.__file__).resolve()
+if expected not in actual.parents:
+    raise SystemExit(f"unexpected sglang import: {actual}")
+print(actual)
+PY

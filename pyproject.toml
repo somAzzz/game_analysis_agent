@@ -4,7 +4,7 @@ version = "0.2.0"
 description = "Development-side local LLM agent pipeline for Godot balance / boundary / bug / value analysis."
 requires-python = ">=3.10"
 dependencies = [
-    "openai>=1.0.0",
+    "openai>=2.44.0",
     "pydantic>=2.0.0",
     "PyYAML>=6.0",
 ]
@@ -24,12 +24,12 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 ignore = ["B007", "SIM108", "E501"]
 
 [tool.ruff.lint.per-file-ignores]
-"tools/generate_agent_prompt.py" = ["E402"]
-"tools/run_agent.py" = ["E402"]
+"tools/llm_runtime/generate_agent_prompt.py" = ["E402"]
+"tools/gameplay/run_agent.py" = ["E402"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src", "."]
 markers = [
-    "game_contract: requires a real study-in-germany checkout and generated artifacts",
+    "game_contract: requires Godot and generated artifacts from a writable Study in Germany runtime",
 ]

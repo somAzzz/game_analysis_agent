@@ -43,6 +43,11 @@ from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import Any
 
+from game_analysis_agent.report_archive import (
+    ReportArchiveError,
+    iter_jsonl_rows,
+    jsonl_artifact_exists,
+)
 from game_analysis_agent.schemas import ValueFinding
 
 DOMINANT_PICK_RATE = 0.80
@@ -351,23 +356,17 @@ def load_action_tags(
 
     # Heuristic fallback: scan raw_runs to collect every action id we see
     # and tag each via :func:`_infer_action_group`.
-    if raw_runs_path is not None and raw_runs_path.exists():
+    if raw_runs_path is not None and jsonl_artifact_exists(raw_runs_path):
         try:
-            runs = [
-                json.loads(line)
-                for line in raw_runs_path.read_text(encoding="utf-8").splitlines()
-                if line.strip()
-            ]
-        except json.JSONDecodeError:
+            runs = [row for _, row in iter_jsonl_rows(raw_runs_path)]
+        except ReportArchiveError:
             runs = []
         seen: dict[str, str] = {}
         for run in runs:
             for week in run.get("weekly_log", []) or []:
                 if not isinstance(week, dict):
                     continue
-                for action_id in (
-                    week.get("selected_action_ids") or week.get("actions") or []
-                ):
+                for action_id in week.get("selected_action_ids") or week.get("actions") or []:
                     action_id = str(action_id)
                     if action_id not in seen:
                         seen[action_id] = _infer_action_group(action_id)
@@ -424,11 +423,7 @@ def analyze_action_groups(
         for group in groups_to_check:
             count = group_counts.get(group, 0)
             rate = count / run_count
-            if (
-                group == "recovery"
-                and rate > recovery_threshold
-                and count > 0
-            ):
+            if group == "recovery" and rate > recovery_threshold and count > 0:
                 findings.append(
                     ValueFinding(
                         finding_id=f"group_dominant-{len(findings) + 1:04d}",
@@ -444,11 +439,7 @@ def analyze_action_groups(
                         ),
                     )
                 )
-            elif (
-                group == "escape"
-                and rate > escape_threshold
-                and count > 0
-            ):
+            elif group == "escape" and rate > escape_threshold and count > 0:
                 findings.append(
                     ValueFinding(
                         finding_id=f"group_dominant-{len(findings) + 1:04d}",
@@ -546,9 +537,7 @@ def analyze_crisis_response(
             by_policy[policy][crisis]["total"] += 1
             chosen = [
                 action_tags.get(str(a), "other")
-                for a in (
-                    week.get("selected_action_ids") or week.get("actions") or []
-                )
+                for a in (week.get("selected_action_ids") or week.get("actions") or [])
             ]
             expected = crisis_to_group[crisis]
             if any(group in expected for group in chosen):
@@ -592,10 +581,7 @@ def analyze_ending_contradictions(
     for run in runs:
         policy = str(run.get("policy", "unknown"))
         ending_id = str(
-            run.get("final_ending_id")
-            or run.get("last_ending_id")
-            or run.get("ending_id")
-            or ""
+            run.get("final_ending_id") or run.get("last_ending_id") or run.get("ending_id") or ""
         )
         if not ending_id:
             continue
@@ -608,19 +594,15 @@ def analyze_ending_contradictions(
         money = last_state.get("money") if isinstance(last_state, dict) else None
         stress = last_state.get("stress") if isinstance(last_state, dict) else None
         hunger = last_state.get("hunger") if isinstance(last_state, dict) else None
-        academic = (
-            last_state.get("academic_progress")
-            if isinstance(last_state, dict)
-            else None
-        )
+        academic = last_state.get("academic_progress") if isinstance(last_state, dict) else None
 
         def _num(value: Any) -> float | None:
             return float(value) if isinstance(value, (int, float)) else None
 
         score = 0.0
         score += max(0.0, -(_num(money) or 0.0))
-        score += (_num(stress) or 0.0)
-        score += (_num(hunger) or 0.0)
+        score += _num(stress) or 0.0
+        score += _num(hunger) or 0.0
         score += max(0.0, 50 - (_num(academic) or 0.0))
 
         is_success = ending_id.endswith("_success") or ending_id in {
@@ -628,9 +610,11 @@ def analyze_ending_contradictions(
             "smooth_first_semester",
             "schengen_granted",
         }
-        is_failure = ending_id in {"burnout", "cashflow_collapse", "evicted"} or ending_id.startswith(
-            "fail"
-        )
+        is_failure = ending_id in {
+            "burnout",
+            "cashflow_collapse",
+            "evicted",
+        } or ending_id.startswith("fail")
         if is_success and score >= success_score_high:
             findings.append(
                 ValueFinding(
@@ -748,14 +732,10 @@ def analyze_route_metrics(
 ) -> dict[str, Any]:
     """Combine all T06 analyses into a single ``route_report.json`` payload."""
     runs: list[dict[str, Any]] = []
-    if raw_runs_path is not None and raw_runs_path.exists():
+    if raw_runs_path is not None and jsonl_artifact_exists(raw_runs_path):
         try:
-            runs = [
-                json.loads(line)
-                for line in raw_runs_path.read_text(encoding="utf-8").splitlines()
-                if line.strip()
-            ]
-        except json.JSONDecodeError:
+            runs = [row for _, row in iter_jsonl_rows(raw_runs_path)]
+        except ReportArchiveError:
             runs = []
     action_tags = load_action_tags(raw_runs_path, action_catalog_path)
     groups = analyze_action_groups(runs, action_tags)

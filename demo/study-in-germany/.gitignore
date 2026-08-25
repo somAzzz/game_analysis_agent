@@ -1,0 +1,23 @@
+# Godot 4+ specific ignores
+.godot/
+/export_presets.cfg
+/android/
+
+# Runtime reports and generated audit snapshots.
+reports/**
+!reports/.gitkeep
+action_pick_rates.csv
+ending_distribution.csv
+event_trigger_rates.csv
+weekly_states.csv
+summary.json
+event_graph.json
+action_catalog.json
+
+# Local caches and temporary files.
+.tmp-home/
+.mono/
+.import/
+*.tmp
+*.log
+.DS_Store

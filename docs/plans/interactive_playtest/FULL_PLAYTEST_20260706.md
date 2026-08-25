@@ -91,7 +91,7 @@ uv run pytest tests/ -q
 Result: `133 passed`.
 
 ```bash
-uv run python tools/run_gameplay_agent.py validate \
+uv run python tools/gameplay/run_gameplay_agent.py validate \
   --check content \
   --check json-content \
   --check economy \

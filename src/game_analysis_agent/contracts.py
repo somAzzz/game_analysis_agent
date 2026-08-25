@@ -16,6 +16,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
+from .report_archive import ReportArchiveError, iter_jsonl_rows
+
 CONTRACT_VERSION = "1.0"
 SUPPORTED_CONTRACT_VERSIONS = frozenset({CONTRACT_VERSION})
 
@@ -29,10 +31,10 @@ CORE_STATE_FIELDS = frozenset(
         "academic_progress",
         "language",
         "social",
-        "visa_progress",
         "career_progress",
     }
 )
+RESIDENCE_STATE_FIELDS = frozenset({"visa_progress", "has_valid_stay"})
 
 
 class ContractKind(str, Enum):
@@ -62,6 +64,9 @@ def _require_state_fields(state: Mapping[str, Any], *, location: str) -> None:
     missing = sorted(CORE_STATE_FIELDS.difference(state))
     if missing:
         raise ValueError(f"{location} is missing core state fields: {', '.join(missing)}")
+    if RESIDENCE_STATE_FIELDS.isdisjoint(state):
+        alternatives = " or ".join(sorted(RESIDENCE_STATE_FIELDS))
+        raise ValueError(f"{location} must include {alternatives}")
 
 
 class WeeklyTrace(ContractModel):
@@ -171,6 +176,29 @@ class EventChoiceRecord(ContractModel):
     requirements: dict[str, Any]
     set_flag: str
     next_event_id: str
+    choice_id: str | None = None
+
+
+def canonical_event_choice_id(
+    event_id: str,
+    choice_id: str | None,
+    index: int,
+    text: str,
+) -> str:
+    """Return the canonical trace identity for one exported event choice.
+
+    An exported ``choice_id`` already qualified for this event
+    (``<event_id>.<choice_id>``) is kept as-is; a short id (e.g.
+    ``choice_01``) is qualified with the event id; when no id is exported the
+    legacy ``<event_id>.choice_NN_<lowercased text, spaces as underscores>``
+    fallback is preserved.
+    """
+    if choice_id:
+        prefix = f"{event_id}."
+        if choice_id.startswith(prefix):
+            return choice_id
+        return f"{event_id}.{choice_id}"
+    return f"{event_id}.choice_{index:02d}_{text.lower().replace(' ', '_')}"
 
 
 class EventRecord(ContractModel):
@@ -361,18 +389,11 @@ def validate_contract_file(
     """Load and validate a JSON artifact or every row in a JSONL artifact."""
 
     artifact_path = Path(path)
-    if artifact_path.suffix == ".jsonl":
+    if artifact_path.name.endswith((".jsonl", ".jsonl.zst")):
         validated: list[ContractArtifact] = []
-        with artifact_path.open(encoding="utf-8") as handle:
-            for line_number, raw_line in enumerate(handle, start=1):
-                if not raw_line.strip():
-                    continue
-                try:
-                    payload = json.loads(raw_line)
-                except json.JSONDecodeError as exc:
-                    raise ContractValidationError(
-                        f"{artifact_path}:{line_number}: invalid JSON: {exc.msg}"
-                    ) from exc
+        try:
+            rows = iter_jsonl_rows(artifact_path)
+            for line_number, payload in rows:
                 try:
                     validated.append(
                         validate_contract(
@@ -384,6 +405,8 @@ def validate_contract_file(
                     )
                 except ContractValidationError as exc:
                     raise ContractValidationError(f"{artifact_path}:{line_number}: {exc}") from exc
+        except ReportArchiveError as exc:
+            raise ContractValidationError(str(exc)) from exc
         if not validated:
             raise ContractValidationError(f"{artifact_path}: JSONL artifact is empty")
         return validated
@@ -419,7 +442,7 @@ def validate_trace_catalog_consistency(
     action_ids = {action.id for action in catalog.actions}
     event_choices = {
         event.id: {
-            f"{event.id}.choice_{index:02d}_{choice.text.lower().replace(' ', '_')}"
+            canonical_event_choice_id(event.id, choice.choice_id, index, choice.text)
             for index, choice in enumerate(event.choices, start=1)
         }
         for event in graph.events

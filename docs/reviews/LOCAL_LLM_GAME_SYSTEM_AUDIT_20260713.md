@@ -63,7 +63,7 @@ seed:                42
 ### 3.1 游戏契约预检
 
 ```bash
-uv run python tools/run_gameplay_agent.py interactive-probe \
+uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
   --report-dir reports/interactive/local-llm-audit-20260713 \
   --difficulty normal \
   --scenario default_first_semester \
@@ -85,7 +85,7 @@ uv run python tools/run_gameplay_agent.py interactive-probe \
 
 ```bash
 LLM_SERVED_MODEL_NAME=qwen3.6-27b-nvfp4 \
-  uv run python tools/run_gameplay_agent.py play ...
+  uv run python tools/gameplay/run_gameplay_agent.py play ...
 ```
 
 ### 3.3 Monte Carlo、QA 和规则验证

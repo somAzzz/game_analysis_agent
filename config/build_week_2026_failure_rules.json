@@ -1,0 +1,24 @@
+{
+  "schema_version": "campaign-failure-rules-v1",
+  "rules": [
+    {
+      "cluster_id": "cashflow-stress-attractor",
+      "label": "Cashflow and stress attractor",
+      "money_lte": 0,
+      "stress_gte": 80,
+      "consecutive_weeks": 2
+    },
+    {
+      "cluster_id": "burnout-risk",
+      "label": "Sustained burnout risk",
+      "stress_gte": 90,
+      "consecutive_weeks": 2
+    },
+    {
+      "cluster_id": "provider-fallback",
+      "label": "Persona provider fallback",
+      "fallback_used": true,
+      "consecutive_weeks": 1
+    }
+  ]
+}

@@ -1,14 +1,14 @@
 # Reviews
 
-Date-sorted audit and feedback material. Every file in this folder has YAML
-frontmatter (`status`, `date`, `audience`, `scope`).
+Date-sorted engineering audit and feedback material. Markdown audits normally
+use YAML frontmatter.
 
 Read in date order, not position order. Newest first.
 
 ## 2026-07-13
 
 - [LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md](LOCAL_LLM_GAME_SYSTEM_AUDIT_20260713.md) — *active* — baseline audit of real-game + local vLLM end-to-end path
-- [REAL_TEST_GAP_ANALYSIS.md](REAL_TEST_GAP_ANALYSIS.md) — *active* — current test-system boundary with `study-in-germany`
+- [REAL_TEST_GAP_ANALYSIS.md](REAL_TEST_GAP_ANALYSIS.md) — *superseded* — pre-embedded-game test-system snapshot
 
 ## 2026-07-06 (initial review remediation cycle)
 
@@ -19,6 +19,7 @@ Read in date order, not position order. Newest first.
 
 ## How to use this folder
 
-- Start with the newest `active` audit for the current state of the system.
+- Start with the newest `active` or `passed` audit for the current state of the system.
 - `superseded` documents describe earlier points in time and should not be used to judge the current codebase.
+- Reviews should identify exact commands, machine-readable evidence, fail-closed criteria, and any non-blocking limitation.
 - The implementation log lives in [REVIEW_FEEDBACK.md](REVIEW_FEEDBACK.md) ("落实日志" section); the structured task list lives in [ACTION_PLAN.md](ACTION_PLAN.md).

@@ -55,6 +55,10 @@ class LLMCall(BaseModel):
     model: str
     prompt_text: str = ""
     response_text: str = ""
+    reasoning_present: bool = False
+    reasoning_chars: int = Field(default=0, ge=0)
+    reasoning_sha256: str = Field(default="", pattern=r"^$|^[0-9a-f]{64}$")
+    finish_reason: str = ""
     prompt_tokens: int | None = None
     completion_tokens: int | None = None
     total_tokens: int | None = None
@@ -211,6 +215,9 @@ class ActionBrief(BaseModel):
     requirements: dict[str, Any] = Field(default_factory=dict)
     tags: list[str] = Field(default_factory=list)
     risk_tags: list[str] = Field(default_factory=list)
+    keywords: list[str] = Field(default_factory=list)
+    supply: dict[str, Any] = Field(default_factory=dict)
+    offer: dict[str, Any] = Field(default_factory=dict)
     cooldown_group: str | None = None
     max_per_week: int | None = None
 
@@ -262,8 +269,11 @@ class WeekMemory(BaseModel):
     week: int
     actions: list[str] = Field(default_factory=list)
     event: str = ""
+    event_choice_id: str = ""
     rationale: str = ""
     delta: dict[str, int] = Field(default_factory=dict)
+    state_before: dict[str, Any] = Field(default_factory=dict)
+    state_after: dict[str, Any] = Field(default_factory=dict)
 
 
 class PlayMemory(BaseModel):
@@ -278,6 +288,7 @@ class PlayMemory(BaseModel):
     unresolved_risks: list[str] = Field(default_factory=list)
     important_flags: dict[str, bool] = Field(default_factory=dict)
     repeated_actions: dict[str, int] = Field(default_factory=dict)
+    history: list[WeekMemory] = Field(default_factory=list, max_length=52)
     last_5_weeks: list[WeekMemory] = Field(default_factory=list)
     mistakes: list[str] = Field(default_factory=list)
     successful_patterns: list[str] = Field(default_factory=list)
@@ -293,12 +304,18 @@ class WeekContext(BaseModel):
     difficulty: str
     scenario: str
     max_action_slots: int = 4
+    action_slot_policy: Literal["at_most_count", "exact_cost_sum"] = "at_most_count"
     persona: str
     persona_strategy: dict[str, Any] = Field(default_factory=dict)
     state: StateSummary
     top_risks: list[RiskBrief] = Field(default_factory=list)
     risk_guidance: RiskGuidanceMetadata
     available_actions: list[ActionBrief] = Field(default_factory=list)
+    active_focus_id: str = ""
+    focus_choices: list[dict[str, Any]] = Field(default_factory=list)
+    growth_options: list[dict[str, Any]] = Field(default_factory=list)
+    disposition_options: list[dict[str, Any]] = Field(default_factory=list)
+    term_maintenance_options: list[dict[str, Any]] = Field(default_factory=list)
     current_event_id: str = ""
     event_choices: list[EventChoiceBrief] = Field(default_factory=list)
     memory: PlayMemory
@@ -312,7 +329,11 @@ class PlayerDecision(BaseModel):
     week: int
     persona: str
     strategic_goal: str = Field(default="", max_length=160)
-    actions: list[str] = Field(min_length=1, max_length=4)
+    actions: list[str] = Field(default_factory=list, max_length=4)
+    growth_decisions: list[dict[str, Any]] = Field(default_factory=list, max_length=4)
+    opportunity_disposition: dict[str, Any] = Field(default_factory=dict)
+    term_maintenance: dict[str, Any] = Field(default_factory=dict)
+    normalization_notes: list[str] = Field(default_factory=list, max_length=8)
     event_choice_id: str = ""
     risk_awareness: list[str] = Field(default_factory=list, max_length=5)
     expected_tradeoff: str = Field(default="", max_length=240)

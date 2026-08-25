@@ -1,0 +1,62 @@
+{
+  "schema_version": "build-week-repair-target-v1",
+  "campaign_id": "openai-all-six-seed-42-20w",
+  "campaign_request_fingerprint": "c0a87546ee72d96251beac8c0587d40b8431392673cc987d634bb430486107b4",
+  "campaign_source_fingerprint": "113c7f4438c324992bda241a7f01863feb033e014eee1a1a68385773e500fc74",
+  "selected_before_patch": true,
+  "selected_cluster_id": "cashflow-stress-attractor",
+  "label": "Cashflow and stress attractor",
+  "hypothesis": "A single survival-economy pressure mechanism repeatedly pushes distinct player intents into the selected attractor; a constrained change should reduce first entry without erasing designed persona differences.",
+  "member_count": 6,
+  "persona_count": 6,
+  "fixed_seeds": [
+    42
+  ],
+  "holdout_seeds": [
+    1042,
+    1043,
+    1044
+  ],
+  "evidence_bundle": "reports/persona-campaigns/openai-all-six-seed-42-20w/public",
+  "rubric": {
+    "reproducible": true,
+    "cross_persona": true,
+    "causally_plausible": true,
+    "user_relevant": true,
+    "one_mechanism_repairable": true,
+    "invariant_safe_candidate": true,
+    "visually_explainable": true
+  },
+  "evidence": [
+    {
+      "campaign_id": "openai-all-six-seed-42-20w",
+      "cell_id": "money-seed-42-b965cd87a14f",
+      "persona": "money",
+      "seed": 42,
+      "week": 18,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 56,
+      "record_sha256": "a354a9a96b2adf2107339e036b8bdbcc27006a646d3562927afc4e1d3d4ff00a"
+    },
+    {
+      "campaign_id": "openai-all-six-seed-42-20w",
+      "cell_id": "newbie-seed-42-b3fd42b3bc17",
+      "persona": "newbie",
+      "seed": 42,
+      "week": 18,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 18,
+      "record_sha256": "a0829c7babf62e74dd172e855910e6dc3648a4a877c787de81a01e9f9c0c6512"
+    },
+    {
+      "campaign_id": "openai-all-six-seed-42-20w",
+      "cell_id": "slacker-seed-42-0887a1172174",
+      "persona": "slacker",
+      "seed": 42,
+      "week": 14,
+      "artifact_path": "persona_runs.jsonl",
+      "line_number": 109,
+      "record_sha256": "545e228e4e38569dd4adf28b55052b7eecf21d8d2560763f5755f7134839961e"
+    }
+  ]
+}

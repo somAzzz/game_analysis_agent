@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from game_analysis_agent.agents.base import Agent, render_prompt_text
+from game_analysis_agent.report_archive import iter_jsonl_rows, jsonl_artifact_exists
 from game_analysis_agent.report_bundle import DEFAULT_REPORT_FILES, read_report_bundle
 
 
@@ -24,8 +25,8 @@ class BoundaryProberAgent(Agent):
         boundary_runs_path = report_dir / "boundary_runs.jsonl"
         boundary_text = (
             self._render_boundary_runs(boundary_runs_path)
-            if boundary_runs_path.exists()
-            else "(no boundary_runs.jsonl — please run `tools/run_gameplay_agent.py probe` first)"
+            if jsonl_artifact_exists(boundary_runs_path)
+            else "(no boundary_runs.jsonl — please run `tools/gameplay/run_gameplay_agent.py probe` first)"
         )
 
         files = list(DEFAULT_REPORT_FILES) + list(self.extra_files) + ["boundary_runs.jsonl"]
@@ -41,7 +42,7 @@ class BoundaryProberAgent(Agent):
 
     @staticmethod
     def _render_boundary_runs(path: Path) -> str:
-        runs = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        runs = [row for _, row in iter_jsonl_rows(path)]
         by_extreme: dict[str, list[dict]] = {}
         for run in runs:
             by_extreme.setdefault(str(run.get("extreme", "unknown")), []).append(run)
@@ -61,28 +62,21 @@ class BoundaryProberAgent(Agent):
             lines.append("")
             lines.append(f"- Average final week: `{avg_week:.1f}`")
             if ending_counts:
-                ending_str = ", ".join(
-                    f"`{k}` = {v}" for k, v in sorted(ending_counts.items())
-                )
+                ending_str = ", ".join(f"`{k}` = {v}" for k, v in sorted(ending_counts.items()))
                 lines.append(f"- Ending distribution: {ending_str}")
             if anomaly_kinds:
                 from collections import Counter
 
                 top = Counter(anomaly_kinds).most_common(3)
-                lines.append("- Top anomalies: " + ", ".join(
-                    f"`{k}` × {v}" for k, v in top
-                ))
+                lines.append("- Top anomalies: " + ", ".join(f"`{k}` × {v}" for k, v in top))
             lines.append("")
         return "\n".join(lines) if lines else "(no boundary runs yet)"
 
     @staticmethod
     def _head_jsonl(path: Path, limit: int) -> str:
-        if not path.exists():
+        if not jsonl_artifact_exists(path):
             return "(missing)"
-        lines = [
-            line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
-        ]
-        head = lines[:limit]
+        head = [json.dumps(row, ensure_ascii=False) for _, row in iter_jsonl_rows(path)][:limit]
         return "```jsonl\n" + "\n".join(head) + "\n```"
 
 

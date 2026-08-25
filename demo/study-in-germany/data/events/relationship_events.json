@@ -1,0 +1,911 @@
+{
+	"items": [
+		{
+			"body": "视频电话里，父母问你毕业以后留德国还是回国。",
+			"choices": [
+				{
+					"failure_effects": {
+						"loneliness": 2.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -3.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "说还没想好"
+				},
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 4.0,
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "说想留德国"
+				},
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "说回国也不错"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				}
+			],
+			"event_type": "conditional",
+			"id": "parents_future",
+			"repeatable": false,
+			"source_order": 33,
+			"title": "父母问未来",
+			"trigger": {
+				"min_stress": 45.0,
+				"min_week": 13.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你在活动和约会 App 之间认识了几个人。留学生活已经很难，亲密关系可能是支撑，也可能是新的风险。",
+			"choices": [
+				{
+					"failure_effects": {
+						"loneliness": 4.0,
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "partner_cook",
+					"success_effects": {
+						"hunger": -10.0,
+						"loneliness": -10.0,
+						"social": 5.0,
+						"stress": -3.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.74,
+					"text": "选择会一起做饭的对象"
+				},
+				{
+					"failure_effects": {
+						"money": -130.0,
+						"stress": 6.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "partner_spender",
+					"success_effects": {
+						"loneliness": -12.0,
+						"money": -90.0,
+						"social": 9.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.68,
+					"text": "选择很会玩但花钱多的对象"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 6.0,
+						"stress": 8.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "partner_unstable",
+					"success_effects": {
+						"loneliness": -14.0,
+						"social": 7.0,
+						"stress": -5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.55,
+					"text": "被热烈追求打动"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 2.0,
+						"social": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "romance_slow",
+					"success_effects": {
+						"loneliness": -2.0,
+						"social": 3.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "慢慢观察，不急着确定"
+				}
+			],
+			"event_type": "conditional",
+			"id": "romance_crossroads",
+			"repeatable": false,
+			"source_order": 42,
+			"title": "感情支线开端",
+			"trigger": {
+				"min_social": 35.0,
+				"min_week": 9.0,
+				"missing_flags": [
+					"partner_cook",
+					"partner_spender",
+					"partner_unstable",
+					"romance_slow"
+				]
+			},
+			"weight": 1.2
+		},
+		{
+			"body": "对方发来餐厅、演出和邻城旅行链接，每一项都很心动，每一项都在烧钱。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -90.0,
+						"stress": 7.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -7.0,
+						"money": -55.0,
+						"social": 5.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.72,
+					"text": "AA 但设预算上限"
+				},
+				{
+					"failure_effects": {
+						"money": -300.0,
+						"stress": 14.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "romance_financial_pressure",
+					"success_effects": {
+						"academic_progress": -3.0,
+						"loneliness": -12.0,
+						"money": -220.0,
+						"social": 9.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.48,
+					"text": "硬着头皮全跟"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 6.0,
+						"social": -4.0,
+						"stress": 8.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "relationship_boundaries",
+					"success_effects": {
+						"money": 20.0,
+						"social": 2.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.68,
+					"text": "坦白说自己预算有限"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"loneliness": 5.0,
+						"money": 40.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "拒绝这个周末"
+				}
+			],
+			"event_type": "conditional",
+			"id": "expensive_partner_weekend",
+			"repeatable": false,
+			"source_order": 44,
+			"title": "高消费对象的周末计划",
+			"trigger": {
+				"flag": "partner_spender",
+				"min_week": 11.0
+			},
+			"weight": 1.2
+		},
+		{
+			"body": "对方开始频繁借钱、临时消失，又在你想退出时突然变得温柔。你意识到这可能不是普通矛盾。",
+			"choices": [
+				{
+					"failure_effects": {
+						"loneliness": 15.0,
+						"money": -90.0,
+						"stress": 18.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "heartbreak_recovered",
+					"success_effects": {
+						"loneliness": 10.0,
+						"money": -40.0,
+						"stress": 12.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.72,
+					"text": "立刻停止转账并拉开距离"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 8.0,
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "heartbreak_recovered",
+					"success_effects": {
+						"loneliness": 4.0,
+						"social": 4.0,
+						"stress": 6.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.76,
+					"text": "找朋友复盘聊天记录"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -8.0,
+						"loneliness": 18.0,
+						"money": -420.0,
+						"stress": 22.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "romance_scammed",
+					"success_effects": {
+						"academic_progress": -5.0,
+						"loneliness": -8.0,
+						"money": -260.0,
+						"stress": 10.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.38,
+					"text": "继续相信对方"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 12.0,
+						"money": -160.0,
+						"stress": 18.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "heartbreak_recovered",
+					"success_effects": {
+						"loneliness": 8.0,
+						"social": 2.0,
+						"stress": 10.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.58,
+					"text": "当面摊牌"
+				}
+			],
+			"event_type": "conditional",
+			"id": "romance_scam_risk",
+			"repeatable": false,
+			"source_order": 45,
+			"title": "被欺骗感情的风险",
+			"trigger": {
+				"flag": "partner_unstable",
+				"min_week": 12.0
+			},
+			"weight": 1.5
+		},
+		{
+			"body": "群里有人说这门课去年挂了一半。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "核实信息"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": 1.0,
+						"stress": -5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "停止看群"
+				},
+				{
+					"failure_effects": {
+						"social": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"social": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.0025
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "li_anxiety",
+			"repeatable": false,
+			"source_order": 59,
+			"title": "李同学转发群消息",
+			"trigger": {
+				"min_week": 9.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "里面有调料、药和一张写满叮嘱的纸。",
+			"choices": [
+				{
+					"failure_effects": {
+						"loneliness": 2.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -8.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "好好视频感谢"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "收到就行"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "parents_package",
+			"repeatable": false,
+			"source_order": 60,
+			"title": "家里寄来的包裹",
+			"trigger": {
+				"min_week": 7.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "Cem 提醒你一个手续可以线上办。",
+			"choices": [
+				{
+					"failure_effects": {
+						"loneliness": 2.0,
+						"social": -1.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -3.0,
+						"social": 4.0,
+						"visa_progress": 6.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "请他一起看"
+				},
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "自己研究"
+				},
+				{
+					"failure_effects": {
+						"social": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"social": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.0025
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "roommate_help",
+			"repeatable": false,
+			"source_order": 70,
+			"title": "室友帮忙",
+			"trigger": {
+				"flag": "housing_stable",
+				"min_week": 7.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "家里人转来一个同龄人已经工作的消息。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": 2.0,
+						"stress": -6.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "少看消息"
+				},
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 2.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "认真解释自己的节奏"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "family_compare",
+			"repeatable": false,
+			"source_order": 98,
+			"title": "亲戚比较",
+			"trigger": {
+				"min_stress": 45.0,
+				"min_week": 8.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "父母说最近汇率又变了，你听懂了没说出口的压力。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 120.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "做预算表给他们看"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 2.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -3.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先安慰他们"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "parents_money_hint",
+			"repeatable": false,
+			"source_order": 99,
+			"title": "父母暗示开销",
+			"trigger": {
+				"max_money": 1300.0,
+				"min_week": 7.0
+			},
+			"weight": 1.0
+		}
+	]
+}

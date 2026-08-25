@@ -8,7 +8,14 @@
 import type {
   DecisionGraphManifest,
   FrontManifest,
+  HumanReviewDecision,
+  HumanReviewRecord,
   IssueManifest,
+  JudgeCampaignJob,
+  JudgeExperimentIndex,
+  JudgeExperiment,
+  JudgeProvider,
+  JudgeProviderStatus,
 } from "@/types";
 
 const BASE_URL = import.meta.env.BASE_URL || "/";
@@ -86,10 +93,112 @@ function decodeManifest<T>(
   return value as T;
 }
 
-function assetPath(path: string): string {
+export function assetPath(path: string): string {
   const cleanBase = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
   return `${cleanBase}${cleanPath}`;
+}
+
+export class JudgeAPIError extends Error {
+  status?: number;
+  code?: string;
+  remediation?: string;
+}
+
+async function judgeJSON<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`/api/${path}`, {
+    ...init,
+    headers: { Accept: "application/json", ...init?.headers },
+  });
+  let value: unknown;
+  try {
+    value = await response.json();
+  } catch {
+    throw new JudgeAPIError(`/api/${path} returned non-JSON`);
+  }
+  if (!response.ok) {
+    const detail = value as { error?: { code?: string; message?: string; remediation?: string } };
+    const error = new JudgeAPIError(detail.error?.message ?? `/api/${path} → HTTP ${response.status}`);
+    error.status = response.status;
+    error.code = detail.error?.code;
+    error.remediation = detail.error?.remediation;
+    throw error;
+  }
+  return value as T;
+}
+
+export function fetchJudgeProviderStatus(): Promise<JudgeProviderStatus> {
+  return judgeJSON<JudgeProviderStatus>("provider-status");
+}
+
+export function testJudgeProvider(provider: JudgeProvider): Promise<Record<string, unknown>> {
+  return judgeJSON<Record<string, unknown>>("provider-test", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ provider }),
+  });
+}
+
+export function createJudgeCampaign(provider: JudgeProvider): Promise<JudgeCampaignJob> {
+  return judgeJSON<JudgeCampaignJob>("campaigns", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ provider }),
+  });
+}
+
+export function fetchJudgeCampaign(campaignId: string): Promise<JudgeCampaignJob> {
+  return judgeJSON<JudgeCampaignJob>(`campaigns/${encodeURIComponent(campaignId)}`);
+}
+
+export function fetchJudgeExperiments(): Promise<JudgeExperimentIndex> {
+  return judgeJSON<JudgeExperimentIndex>("experiments");
+}
+
+export function fetchJudgeExperiment(experimentId = "localization-choice-identity-v1"): Promise<JudgeExperiment> {
+  return judgeJSON<JudgeExperiment>("experiments/" + encodeURIComponent(experimentId));
+}
+
+export function submitHumanReview(
+  experimentId: string,
+  evidenceFingerprint: string,
+  decision: HumanReviewDecision,
+  reviewerNote: string,
+): Promise<HumanReviewRecord> {
+  return judgeJSON<HumanReviewRecord>(
+    `experiments/${encodeURIComponent(experimentId)}/human-review`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        evidence_fingerprint: evidenceFingerprint,
+        decision,
+        reviewer_note: reviewerNote,
+      }),
+    },
+  );
+}
+
+export async function fetchStaticJudgeExperiments(): Promise<JudgeExperimentIndex> {
+  const path = assetPath("experiment-index.json");
+  const response = await fetch(path, { headers: { Accept: "application/json" } });
+  if (!response.ok) {
+    throw new ManifestError(`${path} → HTTP ${response.status}`, response.status);
+  }
+  return response.json() as Promise<JudgeExperimentIndex>;
+}
+
+export async function fetchStaticJudgeExperiment(
+  experimentId = "localization-choice-identity-v1",
+): Promise<JudgeExperiment> {
+  const path = experimentId === "cashflow-drift-repair-v1"
+    ? assetPath("judge-demo.json")
+    : assetPath(`experiments/${encodeURIComponent(experimentId)}/judge-experiment.json`);
+  const response = await fetch(path, { headers: { Accept: "application/json" } });
+  if (!response.ok) {
+    throw new ManifestError(`${path} → HTTP ${response.status}`, response.status);
+  }
+  return response.json() as Promise<JudgeExperiment>;
 }
 
 export class ManifestError extends Error {

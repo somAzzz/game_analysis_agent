@@ -21,6 +21,7 @@ from copy import deepcopy
 from datetime import UTC, datetime
 from typing import Any
 
+from game_analysis_agent.llm_client import completion_token_limit_kwargs
 from game_analysis_agent.schemas import (
     LLMCall,
     ToolBudgetUsage,
@@ -430,13 +431,14 @@ class OpenAICompatibleToolLoop:
             kwargs: dict[str, Any] = {}
             if merged_extra:
                 kwargs["extra_body"] = merged_extra
+            token_budget = max_tokens if max_tokens is not None else self.max_tokens
+            kwargs.update(completion_token_limit_kwargs(self.provider, token_budget))
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=deepcopy(transcript),
                 tools=tools,
                 tool_choice=request_tool_choice,
                 temperature=temperature if temperature is not None else self.temperature,
-                max_tokens=max_tokens if max_tokens is not None else self.max_tokens,
                 **kwargs,
             )
             message = response.choices[0].message
@@ -501,11 +503,12 @@ class OpenAICompatibleToolLoop:
         kwargs = {}
         if merged_extra:
             kwargs["extra_body"] = merged_extra
+        token_budget = max_tokens if max_tokens is not None else self.max_tokens
+        kwargs.update(completion_token_limit_kwargs(self.provider, token_budget))
         response = self.client.chat.completions.create(
             model=self.model,
             messages=deepcopy(transcript),
             temperature=temperature if temperature is not None else self.temperature,
-            max_tokens=max_tokens if max_tokens is not None else self.max_tokens,
             **kwargs,
         )
         message = response.choices[0].message

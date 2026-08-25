@@ -1,0 +1,107 @@
+personas:
+  newbie:
+    description: "第一次玩，不知道最优解，倾向跟随 UI 提示。"
+    priorities:
+      - avoid_immediate_crisis
+      - follow_top_risks
+      - try_visible_actions
+    alignment_risk_guided: true
+    risk_tolerance: 0.35
+    exploration: 0.45
+    failure_intent: false
+    hard_avoid:
+      - hunger_above_85
+      - money_below_minus_1000
+
+  study:
+    description: "学霸路线，优先 APS/TestDaF/考试。"
+    priorities:
+      - academic_progress
+      - exam_readiness
+      - language
+      - aps_knowledge
+    alignment_action_tags:
+      - study
+      - language
+      - application
+      - exam
+    risk_tolerance: 0.4
+    exploration: 0.25
+    failure_intent: false
+    acceptable_costs:
+      - moderate_stress
+      - low_social
+    hard_avoid:
+      - hunger_above_85
+      - money_below_minus_500
+
+  money:
+    description: "打工路线，优先现金流和工作经验。"
+    priorities:
+      - money
+      - career_progress
+      - survival
+    alignment_action_tags:
+      - work
+      - career
+      - income
+    risk_tolerance: 0.65
+    exploration: 0.35
+    failure_intent: false
+    acceptable_costs:
+      - academic_delay
+      - stress_increase
+    hard_avoid:
+      - stress_above_95
+      - compliance_risk_above_90
+
+  social:
+    description: "社交路线，优先关系、人脉、信息。"
+    priorities:
+      - social
+      - loneliness_reduction
+      - language
+    alignment_action_tags:
+      - social
+      - language
+    risk_tolerance: 0.45
+    exploration: 0.55
+    failure_intent: false
+    hard_avoid:
+      - hunger_above_80
+      - money_below_minus_800
+
+  visa:
+    description: "行政稳健路线，优先注册、保险、银行、居留。"
+    priorities:
+      - visa_progress
+      - registration
+      - deadline_safety
+      - document_ready
+    alignment_action_tags:
+      - admin
+      - application
+      - visa
+    risk_tolerance: 0.25
+    exploration: 0.2
+    failure_intent: false
+    hard_avoid:
+      - visa_progress_below_30_after_week_10
+      - money_below_minus_500
+
+  slacker:
+    description: "摆烂路线，短期降低压力，故意忽略部分长期风险。"
+    priorities:
+      - stress_reduction
+      - energy_recovery
+      - short_term_comfort
+    alignment_action_tags:
+      - mental
+      - life
+      - recovery
+      - avoidance
+    risk_tolerance: 0.8
+    exploration: 0.65
+    failure_intent: true
+    hard_avoid:
+      - hunger_above_95

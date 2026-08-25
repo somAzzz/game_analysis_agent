@@ -14,6 +14,8 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+!frontend/dist/
+!frontend/dist/**
 
 # Tests + fixtures inside the image — they go to /app by default but
 # skipping them keeps the image smaller; the dev container rebuilds

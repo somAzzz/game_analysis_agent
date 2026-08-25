@@ -1,0 +1,94 @@
+schema_version: live-player-personas-v2
+personas:
+  newbie:
+    description: "第一次玩、不知道隐藏最优解，但会阅读 UI 的风险、卡牌成本和本周结果，逐步形成稳健计划。"
+    priorities:
+      - avoid_immediate_crisis
+      - keep_food_and_cash_buffer
+      - meet_visible_deadlines
+      - build_academic_progress
+      - recover_before_overload
+      - explore_one_visible_mechanic
+    alignment_risk_guided: true
+    risk_tolerance: 0.35
+    exploration: 0.35
+    failure_intent: false
+    background: self_regulation
+    focus_sequence:
+      - admin_stability
+      - mental_recovery
+      - study_sprint
+      - work_recovery
+      - study_sprint
+    planning_rules:
+      - "先处理会在一至两周内恶化的饥饿、现金、截止日期和负担牌，再推进长期路线。"
+      - "不要为了填满四槽而选择低价值行动；通常选择二至三张，压力高或资源不足时主动留白。"
+      - "支付行动成本后仍要保留生活现金和精力；不要把 money=0 当作安全状态。"
+      - "每周最多用一个槽探索新牌，其余行动应共同服务于一个可解释的阶段目标。"
+      - "检查最近五周；若同一行动没有改善对应风险，换一种手段，不要机械重复。"
+      - "优先处理未读邮件等负担；普通机会只有明确的下周价值才 Save，否则可 Skip，关键任务只在必要时 Delay。"
+      - "有成长点时优先选择能增强当前阶段常用牌的节点或升级，避免无关路线加点。"
+    phase_goals:
+      arrival: "先建立行政和基本生活安全线，同时保留现金。"
+      stabilization: "在饥饿、压力和现金可控后推进学业，避免连续满负荷周。"
+      exam: "考试前保持学习连续性，但不得用饥饿或压力崩溃换取短期进度。"
+    hard_avoid:
+      - hunger_above_85
+      - money_below_minus_1000
+
+  study:
+    description: "学霸路线，优先 APS/TestDaF/考试。"
+    priorities: [academic_progress, exam_readiness, language, aps_knowledge]
+    alignment_action_tags: [study, language, application, exam]
+    risk_tolerance: 0.4
+    exploration: 0.25
+    failure_intent: false
+    background: study_foundation
+    focus_sequence: [study_sprint]
+    acceptable_costs: [moderate_stress, low_social]
+    hard_avoid: [hunger_above_85, money_below_minus_500]
+
+  money:
+    description: "打工路线，优先现金流和工作经验。"
+    priorities: [money, career_progress, survival]
+    alignment_action_tags: [work, career, income]
+    risk_tolerance: 0.65
+    exploration: 0.35
+    failure_intent: false
+    background: work_study
+    focus_sequence: [work_recovery]
+    acceptable_costs: [academic_delay, stress_increase]
+    hard_avoid: [stress_above_95, compliance_risk_above_90]
+
+  social:
+    description: "社牛玩家，优先社交、关系和语言实践。"
+    priorities: [social, loneliness_reduction, language]
+    alignment_action_tags: [social, language]
+    risk_tolerance: 0.45
+    exploration: 0.55
+    failure_intent: false
+    background: social_network
+    focus_sequence: [social_integration]
+    hard_avoid: [hunger_above_80, money_below_minus_800]
+
+  visa:
+    description: "行政稳健路线，优先注册、保险、银行和居留。"
+    priorities: [visa_progress, registration, deadline_safety, document_ready]
+    alignment_action_tags: [admin, application, visa]
+    risk_tolerance: 0.25
+    exploration: 0.2
+    failure_intent: false
+    background: admin_prepared
+    focus_sequence: [admin_stability]
+    hard_avoid: [visa_progress_below_30_after_week_10, money_below_minus_500]
+
+  slacker:
+    description: "摆烂路线，短期降低压力，故意忽略部分长期风险。"
+    priorities: [stress_reduction, energy_recovery, short_term_comfort]
+    alignment_action_tags: [mental, life, recovery, avoidance]
+    risk_tolerance: 0.8
+    exploration: 0.65
+    failure_intent: true
+    background: easygoing
+    focus_sequence: [escape_buffer]
+    hard_avoid: [hunger_above_95]

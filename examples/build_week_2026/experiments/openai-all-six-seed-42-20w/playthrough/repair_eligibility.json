@@ -1,0 +1,6 @@
+{
+  "eligible": true,
+  "schema_version": "repair-target-eligibility-v1",
+  "target": "cashflow-stress-attractor",
+  "target_path": "reports/persona-campaigns/openai-all-six-seed-42-20w/public/repair_target.json"
+}

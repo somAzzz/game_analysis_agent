@@ -24,6 +24,7 @@ Outputs:
 
 from __future__ import annotations
 
+import inspect
 import json
 import re
 import time
@@ -40,7 +41,16 @@ from pydantic import ValidationError
 from game_analysis_agent.agents.base import Agent, AgentOutput, AgentRunResult
 from game_analysis_agent.contracts import ProbeRiskGuidance
 from game_analysis_agent.game_tools import InteractiveProbe
-from game_analysis_agent.llm_client import LLMRequestError, LocalLLMClient
+from game_analysis_agent.llm_client import LocalLLMClient
+from game_analysis_agent.local_persona_gateway import LocalChatPersonaGateway
+from game_analysis_agent.persona_gateway import (
+    PersonaDecisionGateway,
+    PersonaDecisionRequest,
+    PersonaDecisionValidator,
+    PersonaEventChoiceRequest,
+    PersonaResultStatus,
+    validate_player_decision,
+)
 from game_analysis_agent.schemas import (
     ActionBrief,
     AgentRunReport,
@@ -103,6 +113,7 @@ class PlaythroughStep:
     validation: dict[str, Any] = field(default_factory=dict)
     delta: dict[str, int] = field(default_factory=dict)
     llm_summary: str = ""
+    persona_calls: list[dict[str, Any]] = field(default_factory=list)
     anomalies: list[dict[str, Any]] = field(default_factory=list)
 
 
@@ -118,12 +129,12 @@ class InteractivePlayerAgent(Agent):
     name = "interactive_player"
     default_output_files = ("playthrough_summary.md",)
     default_temperature = 0.3
-    decision_max_tokens = 768
+    decision_max_tokens = 2048
 
     def __init__(
         self,
         *,
-        llm: LocalLLMClient,
+        llm: LocalLLMClient | None,
         prompts_root: Path,
         settings: Settings | None = None,
         tool_definitions: list[dict[str, Any]] | None = None,
@@ -140,9 +151,12 @@ class InteractivePlayerAgent(Agent):
         temperature: float | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
         cancellation_check: Callable[[], bool] | None = None,
+        persona_gateway: PersonaDecisionGateway | None = None,
     ) -> None:
+        if llm is None and persona_gateway is None:
+            raise ValueError("interactive player requires llm or persona_gateway")
         super().__init__(
-            llm=llm,
+            llm=llm,  # type: ignore[arg-type]
             prompts_root=prompts_root,
             settings=settings,
             output_files=output_files,
@@ -160,6 +174,22 @@ class InteractivePlayerAgent(Agent):
         self.seed = seed
         self.progress_callback = progress_callback
         self.cancellation_check = cancellation_check
+        self._gateway_llm_calls: list[LLMCall] = []
+        self._persona_call_records: list[dict[str, Any]] = []
+        self._last_plan_preview: dict[str, Any] | None = None
+        if persona_gateway is not None:
+            self.persona_gateway = persona_gateway
+        else:
+            assert llm is not None
+            self.persona_gateway = LocalChatPersonaGateway(
+                llm,
+                audit_sink=self._gateway_llm_calls.append,
+                decision_max_tokens=self.decision_max_tokens,
+                temperature=self.temperature,
+            )
+        set_audit_sink = getattr(self.persona_gateway, "set_audit_sink", None)
+        if callable(set_audit_sink):
+            set_audit_sink(self._gateway_llm_calls.append)
         self.persona_strategy = load_player_personas(prompts_root.parent).get(
             self.persona, PERSONAS[self.persona]
         )
@@ -238,6 +268,9 @@ class InteractivePlayerAgent(Agent):
         steps: list[PlaythroughStep] = []
         memory = _initial_memory(self.persona, self.persona_strategy)
         truncated = False
+        self._gateway_llm_calls.clear()
+        self._persona_call_records.clear()
+        self._last_plan_preview = None
 
         probe.seed = self.seed
         probe.difficulty = self.difficulty
@@ -258,8 +291,14 @@ class InteractivePlayerAgent(Agent):
                 }
             )
 
-            state_before = probe.get_state()
+            configure_week_strategy = getattr(probe, "configure_week_strategy", None)
+            if callable(configure_week_strategy):
+                configure_week_strategy(
+                    _focus_for_week(self.persona_strategy, week),
+                    str(self.persona_strategy.get("background", "")),
+                )
             catalog = probe.list_available_actions()
+            state_before = probe.get_state()
             context_pack = build_week_context(
                 week=week,
                 max_weeks=self.max_weeks,
@@ -275,6 +314,7 @@ class InteractivePlayerAgent(Agent):
                 seed=self.seed,
             )
             available_action_ids = [action.id for action in context_pack.available_actions]
+            persona_call_start = len(self._persona_call_records)
 
             decision, validation, decision_calls = self._decide_one_week(
                 week=week,
@@ -284,15 +324,10 @@ class InteractivePlayerAgent(Agent):
             )
             llm_calls.extend(decision_calls)
 
-            if not decision.actions:
-                # Model failed to produce a usable action; fall back to a
-                # no-op safe pick to keep the loop alive.
-                decision.actions = (
-                    [available_action_ids[0]] if available_action_ids else ["rest_at_home"]
-                )
-
             if hasattr(probe, "preview_step"):
-                preview = probe.preview_step(decision.actions)
+                preview = self._last_plan_preview
+                if preview is None:
+                    preview = _preview_probe_decision(probe, decision)
                 preview_choices = (
                     preview.get("event_choices", []) if isinstance(preview, dict) else []
                 )
@@ -328,10 +363,7 @@ class InteractivePlayerAgent(Agent):
                         fallback_used=validation.fallback_used or event_validation.fallback_used,
                     )
 
-            result = probe.step(
-                actions=decision.actions,
-                event_choice_id=decision.event_choice_id,
-            )
+            result = _submit_probe_decision(probe, decision)
 
             anomalies = [a.model_dump(mode="json") for a in probe.detect_anomalies()]
             state_after = result.get("state", {}) if isinstance(result, dict) else {}
@@ -351,6 +383,7 @@ class InteractivePlayerAgent(Agent):
                 validation=validation.model_dump(mode="json"),
                 delta=delta,
                 llm_summary=decision.strategic_goal,
+                persona_calls=self._persona_call_records[persona_call_start:],
                 anomalies=anomalies,
             )
             steps.append(step)
@@ -446,7 +479,12 @@ class InteractivePlayerAgent(Agent):
             f"- seed: {self.seed}\n"
             "\n"
             "You must output JSON matching PlayerDecision. Use only action ids from "
-            "WeekContext.available_actions. Explain strategic_goal, risk_awareness, "
+            "WeekContext.available_actions and follow WeekContext.action_slot_policy; "
+            "exact_cost_sum means selected cost.slots must total max_action_slots. "
+            "For at_most_count, zero to four actions are legal; unused slots reduce pressure, "
+            "so never fill slots only for completeness. Use only playable weekly decision "
+            "options and leave their fields empty when no option is useful. "
+            "Explain strategic_goal, risk_awareness, "
             "expected_tradeoff, and confidence every week.\n"
             "For interactive playtests, do not output hidden reasoning, markdown, "
             "or prose. Return exactly one compact JSON object and stop.\n"
@@ -460,82 +498,61 @@ class InteractivePlayerAgent(Agent):
         system_prompt: str,
         probe: InteractiveProbe,
     ) -> tuple[PlayerDecision, DecisionValidation, list[LLMCall]]:
-        user_prompt = self._build_user_prompt(context_pack)
-        calls: list[LLMCall] = []
-        errors: list[str] = []
-        attempt_errors: list[str] = []
-        for attempt in range(3):
-            prompt = user_prompt if attempt == 0 else _repair_prompt(context_pack, errors)
-            try:
-                messages = [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt},
-                ]
-                content, call = self._chat_decision(
-                    messages,
-                    agent=self.name,
-                    step_name=f"week-{week}" if attempt == 0 else f"week-{week}-repair-{attempt}",
-                    temperature=self.temperature,
-                )
-                calls.append(call)
-            except Exception as exc:
-                if isinstance(exc, LLMRequestError):
-                    calls.append(exc.call)
-                errors = [f"LLM error: {exc}"]
-                break
-            decision, errors = _parse_player_decision(
-                content,
-                context_pack,
+        del system_prompt
+        self._last_plan_preview = None
+        call_start = len(self._gateway_llm_calls)
+        request = PersonaDecisionRequest.from_context(
+            context_pack,
+            request_id=f"{self.persona}-{self.seed}-w{week}-decision",
+        )
+        validate_step = getattr(probe, "validate_step", None)
+        validator: PersonaDecisionValidator | None = None
+        if callable(validate_step):
+
+            def authoritative_validator(decision: PlayerDecision) -> list[str]:
+                preview = _validate_probe_decision(probe, decision)
+                valid = isinstance(preview, dict) and preview.get("valid") is True
+                self._last_plan_preview = preview if valid else None
+                if valid:
+                    return []
+                normalized = _drop_godot_rejected_actions(decision, preview)
+                if normalized:
+                    retry_preview = _validate_probe_decision(probe, decision)
+                    if isinstance(retry_preview, dict) and retry_preview.get("valid") is True:
+                        self._last_plan_preview = retry_preview
+                        return []
+                return [_authoritative_plan_error(preview)]
+
+            validator = authoritative_validator
+
+        result = (
+            self.persona_gateway.decide(request)
+            if validator is None
+            else self.persona_gateway.decide(request, validator=validator)
+        )
+        self._record_persona_result("decision", result)
+        calls = self._gateway_llm_calls[call_start:]
+        if result.status == PersonaResultStatus.COMPLETED and result.decision is not None:
+            return (
+                result.decision,
+                DecisionValidation(
+                    valid=True,
+                    repair_count=max(0, result.metadata.attempt_count - 1),
+                ),
+                list(calls),
             )
-            if not errors:
-                return (
-                    decision,
-                    DecisionValidation(
-                        valid=True,
-                        errors=attempt_errors,
-                        repair_count=attempt,
-                    ),
-                    list(calls),
-                )
-            attempt_errors.extend(errors)
+        errors = [_persona_error_text(result.error)]
         fallback = _fallback_decision(context_pack, errors)
         return (
             fallback,
             DecisionValidation(
                 valid=False,
                 errors=errors,
-                repair_count=max(0, len(calls) - 1),
+                repair_count=max(0, result.metadata.attempt_count - 1),
                 fallback_used=True,
             ),
             list(calls),
         )
-
-    def _chat_decision(
-        self,
-        messages: list[dict[str, str]],
-        *,
-        agent: str,
-        step_name: str,
-        temperature: float | None,
-        max_tokens: int | None = None,
-    ) -> tuple[str, LLMCall]:
-        try:
-            return self.llm.chat(
-                messages,
-                agent=agent,
-                step_name=step_name,
-                max_tokens=max_tokens or self.decision_max_tokens,
-                temperature=temperature,
-            )
-        except TypeError as exc:
-            if "max_tokens" not in str(exc):
-                raise
-            return self.llm.chat(
-                messages,
-                agent=agent,
-                step_name=step_name,
-                temperature=temperature,
-            )
 
     def _decide_event_choice(
         self,
@@ -544,85 +561,60 @@ class InteractivePlayerAgent(Agent):
         context_pack: WeekContext,
         selected_actions: list[str],
     ) -> tuple[str, DecisionValidation, list[LLMCall]]:
+        if self.cancellation_check is not None and self.cancellation_check():
+            raise RuntimeError(f"Playthrough cancelled during week {week} event")
         valid_choices = [choice.choice_id for choice in context_pack.event_choices]
-        compact_context = {
-            "week": week,
-            "persona": self.persona,
-            "priorities": context_pack.persona_strategy.get("priorities", []),
-            "selected_actions": selected_actions,
-            "state": context_pack.state.model_dump(mode="json"),
-            "top_risk_ids": [risk.id for risk in context_pack.top_risks],
-            "event_id": context_pack.current_event_id,
-            "event_choices": [
-                choice.model_dump(mode="json") for choice in context_pack.event_choices
-            ],
-        }
-        calls: list[LLMCall] = []
-        errors: list[str] = []
-        for attempt in range(2):
-            if self.cancellation_check is not None and self.cancellation_check():
-                raise RuntimeError(f"Playthrough cancelled during week {week} event")
-            prompt = "\n".join(
-                [
-                    "/no_think",
-                    "Choose exactly one event_choice_id from the JSON context.",
-                    json.dumps(compact_context, ensure_ascii=False, separators=(",", ":")),
-                    "Valid event_choice_id values:",
-                    json.dumps(valid_choices, ensure_ascii=False),
-                    (
-                        "Return only compact JSON: {\"event_choice_id\":\"...\"}."
-                        if attempt == 0
-                        else f"Previous errors: {errors}. Return one valid id as JSON only."
-                    ),
-                ]
+        if len(valid_choices) == 1:
+            return valid_choices[0], DecisionValidation(valid=True), []
+        if not valid_choices:
+            return (
+                "",
+                DecisionValidation(
+                    valid=False,
+                    errors=["event-choice phase has no legal choices"],
+                ),
+                [],
             )
-            try:
-                content, call = self._chat_decision(
-                    [
-                        {
-                            "role": "system",
-                            "content": "Select one game event option. Never invent an id.",
-                        },
-                        {"role": "user", "content": prompt},
-                    ],
-                    agent=self.name,
-                    step_name=(
-                        f"week-{week}-event"
-                        if attempt == 0
-                        else f"week-{week}-event-repair-{attempt}"
-                    ),
-                    temperature=self.temperature,
-                    max_tokens=192,
-                )
-                calls.append(call)
-            except Exception as exc:
-                if isinstance(exc, LLMRequestError):
-                    calls.append(exc.call)
-                errors = [f"LLM error: {exc}"]
-                break
-            parsed = _extract_json_object(content)
-            choice_id = str(parsed.get("event_choice_id") or "") if parsed else ""
-            if choice_id in valid_choices:
-                return (
-                    choice_id,
-                    DecisionValidation(
-                        valid=True,
-                        errors=errors,
-                        repair_count=attempt,
-                    ),
-                    calls,
-                )
-            errors = [f"Invalid event_choice_id: {choice_id or '(empty)'}"]
+        call_start = len(self._gateway_llm_calls)
+        request = PersonaEventChoiceRequest.from_context(
+            context_pack,
+            request_id=f"{self.persona}-{self.seed}-w{week}-event",
+            selected_actions=selected_actions,
+        )
+        result = self.persona_gateway.choose_event(request)
+        self._record_persona_result("event_choice", result)
+        calls = self._gateway_llm_calls[call_start:]
+        if result.status == PersonaResultStatus.COMPLETED and result.choice is not None:
+            return (
+                result.choice.event_choice_id,
+                DecisionValidation(
+                    valid=True,
+                    repair_count=max(0, result.metadata.attempt_count - 1),
+                ),
+                list(calls),
+            )
+        errors = [_persona_error_text(result.error)]
         fallback = valid_choices[0] if valid_choices else ""
         return (
             fallback,
             DecisionValidation(
                 valid=False,
                 errors=errors,
-                repair_count=max(0, len(calls) - 1),
+                repair_count=max(0, result.metadata.attempt_count - 1),
                 fallback_used=True,
             ),
-            calls,
+            list(calls),
+        )
+
+    def _record_persona_result(self, phase: str, result: Any) -> None:
+        self._persona_call_records.append(
+            {
+                "phase": phase,
+                "status": result.status.value,
+                "request_fingerprint": result.request_fingerprint,
+                "metadata": result.metadata.model_dump(mode="json"),
+                "error": result.error.model_dump(mode="json") if result.error else None,
+            }
         )
 
     def _build_user_prompt(self, context_pack: WeekContext) -> str:
@@ -661,12 +653,59 @@ class InteractivePlayerAgent(Agent):
 
 
 def load_player_personas(project_root: Path) -> dict[str, dict[str, Any]]:
-    path = project_root / "config" / "player_personas.yaml"
+    live_path = project_root / "config" / "live_player_personas_v2.yaml"
+    path = live_path if live_path.exists() else project_root / "config" / "player_personas.yaml"
     if not path.exists():
         return {}
     payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     personas = payload.get("personas", {}) if isinstance(payload, dict) else {}
     return personas if isinstance(personas, dict) else {}
+
+
+def _focus_for_week(persona_strategy: dict[str, Any], week: int) -> str:
+    sequence = persona_strategy.get("focus_sequence", [])
+    if not isinstance(sequence, list) or not sequence:
+        return ""
+    window = max(0, (week - 1) // 4)
+    return str(sequence[window % len(sequence)])
+
+
+def _dict_rows(value: Any) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, dict)]
+
+
+def _probe_decision_kwargs(decision: PlayerDecision) -> dict[str, Any]:
+    return {
+        "actions": decision.actions,
+        "event_choice_id": decision.event_choice_id,
+        "growth_decisions": decision.growth_decisions,
+        "opportunity_disposition": decision.opportunity_disposition,
+        "term_maintenance": decision.term_maintenance,
+    }
+
+
+def _call_probe_method(method: Callable[..., dict[str, Any]], decision: PlayerDecision):
+    parameters = inspect.signature(method).parameters
+    kwargs = {
+        key: value
+        for key, value in _probe_decision_kwargs(decision).items()
+        if key in parameters
+    }
+    return method(**kwargs)
+
+
+def _validate_probe_decision(probe: Any, decision: PlayerDecision) -> dict[str, Any]:
+    return _call_probe_method(probe.validate_step, decision)
+
+
+def _preview_probe_decision(probe: Any, decision: PlayerDecision) -> dict[str, Any]:
+    return _call_probe_method(probe.preview_step, decision)
+
+
+def _submit_probe_decision(probe: Any, decision: PlayerDecision) -> dict[str, Any]:
+    return _call_probe_method(probe.step, decision)
 
 
 def build_week_context(
@@ -686,7 +725,8 @@ def build_week_context(
 ) -> WeekContext:
     state = _state_summary(state_payload.get("state") or {}, week=week)
     top_risks, risk_guidance = _resolve_risk_guidance(state_payload, state, max_weeks=max_weeks)
-    actions = [_action_brief(action) for action in (action_catalog.get("actions") or [])]
+    raw_actions = action_catalog.get("actions") or []
+    actions = [_action_brief(action) for action in raw_actions]
     choices = [
         _event_choice_brief(choice, last_event_id, index)
         for index, choice in enumerate(event_choices)
@@ -698,12 +738,20 @@ def build_week_context(
         difficulty=difficulty,
         scenario=scenario,
         max_action_slots=4,
+        action_slot_policy="at_most_count",
         persona=persona,
         persona_strategy=persona_strategy,
         state=state,
         top_risks=top_risks,
         risk_guidance=risk_guidance,
         available_actions=actions[:80],
+        active_focus_id=str(state_payload.get("active_focus_id", "")),
+        focus_choices=_dict_rows(state_payload.get("focus_choices"))[:8],
+        growth_options=_dict_rows(state_payload.get("growth_options"))[:80],
+        disposition_options=_dict_rows(state_payload.get("disposition_options"))[:80],
+        term_maintenance_options=_dict_rows(
+            state_payload.get("term_maintenance_options")
+        )[:80],
         current_event_id=last_event_id or "",
         event_choices=choices[:8],
         memory=memory,
@@ -753,6 +801,9 @@ def _action_brief(action: Any) -> ActionBrief:
         else {},
         tags=tags,
         risk_tags=[str(tag) for tag in action.get("risk_tags", []) or []],
+        keywords=[str(keyword) for keyword in action.get("keywords", []) or []],
+        supply=action.get("supply", {}) if isinstance(action.get("supply"), dict) else {},
+        offer=action.get("offer", {}) if isinstance(action.get("offer"), dict) else {},
         cooldown_group=str(action.get("cooldown_group", "")) or None,
         max_per_week=_optional_int(action.get("max_per_week")),
     )
@@ -998,24 +1049,7 @@ def _parse_player_decision(
 
 
 def _validate_decision(decision: PlayerDecision, context_pack: WeekContext) -> list[str]:
-    errors: list[str] = []
-    valid_actions = {action.id for action in context_pack.available_actions}
-    for action_id in decision.actions:
-        if action_id not in valid_actions:
-            errors.append(f"Unknown action_id: {action_id}")
-    if len(decision.actions) > context_pack.max_action_slots:
-        errors.append(f"Too many actions: {len(decision.actions)}")
-    if context_pack.event_choices and not decision.event_choice_id:
-        errors.append("Missing event_choice_id")
-    if context_pack.event_choices and decision.event_choice_id:
-        valid_choices = {choice.choice_id for choice in context_pack.event_choices}
-        if decision.event_choice_id not in valid_choices:
-            errors.append(f"Invalid event_choice_id: {decision.event_choice_id}")
-    if not decision.strategic_goal.strip():
-        errors.append("Missing strategic_goal")
-    if not decision.expected_tradeoff.strip():
-        errors.append("Missing expected_tradeoff")
-    return errors
+    return validate_player_decision(decision, context_pack)
 
 
 def _repair_prompt(context_pack: WeekContext, errors: list[str]) -> str:
@@ -1053,6 +1087,105 @@ def _fallback_decision(context_pack: WeekContext, errors: list[str]) -> PlayerDe
         expected_tradeoff="fallback keeps the playthrough reproducible",
         confidence=0.0,
     )
+
+
+def _authoritative_plan_error(preview: object) -> str:
+    """Render only bounded contract fields for the model's one repair prompt."""
+
+    if not isinstance(preview, dict):
+        return "Authoritative plan rejected: error_code=invalid_probe_contract"
+    validation = preview.get("plan_validation") or preview.get("plan_submission")
+    validation = validation if isinstance(validation, dict) else {}
+    error_code = _safe_contract_token(
+        preview.get("error_code") or validation.get("code") or "invalid_probe_contract"
+    )
+    raw_proposed_ids = validation.get("proposed_action_ids") or validation.get(
+        "requested_action_ids"
+    )
+    proposed_ids = (
+        [_safe_contract_token(item) for item in raw_proposed_ids[:8]]
+        if isinstance(raw_proposed_ids, list)
+        else []
+    )
+    raw_ids = validation.get("selected_action_ids") or validation.get("accepted_action_ids")
+    accepted_ids = (
+        [_safe_contract_token(item) for item in raw_ids[:8]] if isinstance(raw_ids, list) else []
+    )
+    raw_rejections = validation.get("rejections")
+    explicit_rejected = (
+        [
+            _safe_contract_token(item.get("action_id", ""))
+            for item in raw_rejections[:8]
+            if isinstance(item, dict) and item.get("action_id")
+        ]
+        if isinstance(raw_rejections, list)
+        else []
+    )
+    rejected_ids = explicit_rejected or [
+        action_id for action_id in proposed_ids if action_id not in accepted_ids
+    ]
+    if not accepted_ids and rejected_ids:
+        accepted_ids = [action_id for action_id in proposed_ids if action_id not in rejected_ids]
+    used_slots = validation.get("used_slots")
+    maximum_slots = validation.get("maximum_slots", validation.get("required_slots"))
+    if type(maximum_slots) is not int and type(validation.get("idle_slots")) is int:
+        maximum_slots = (used_slots if type(used_slots) is int else 0) + validation["idle_slots"]
+    used_text = str(used_slots) if type(used_slots) is int else "unknown"
+    maximum_text = str(maximum_slots) if type(maximum_slots) is int else "unknown"
+    return (
+        f"Authoritative plan rejected: error_code={error_code}; "
+        f"proposed_action_ids={json.dumps(proposed_ids, ensure_ascii=False)}; "
+        f"accepted_action_ids={json.dumps(accepted_ids, ensure_ascii=False)}; "
+        f"rejected_action_ids={json.dumps(rejected_ids, ensure_ascii=False)}; "
+        f"used_slots={used_text}; maximum_slots={maximum_text}. "
+        "Keep accepted ids and remove or replace rejected ids with a different legal action."
+    )
+
+
+def _drop_godot_rejected_actions(decision: PlayerDecision, preview: object) -> bool:
+    """Remove only rejection-indexed actions, then require a fresh Godot preview."""
+
+    if not isinstance(preview, dict) or preview.get("error_code") != "invalid_plan":
+        return False
+    submission = preview.get("plan_submission")
+    if not isinstance(submission, dict):
+        return False
+    requested = submission.get("requested_action_ids")
+    rejections = submission.get("rejections")
+    if not isinstance(requested, list) or not isinstance(rejections, list):
+        return False
+    rejected: dict[int, tuple[str, str]] = {}
+    for item in rejections[:8]:
+        if not isinstance(item, dict) or type(item.get("index")) is not int:
+            continue
+        index = item["index"]
+        if 0 <= index < len(requested):
+            rejected[index] = (
+                _safe_contract_token(item.get("action_id", requested[index])),
+                _safe_contract_token(item.get("code", "rejected")),
+            )
+    if not rejected:
+        return False
+    normalized = [str(value) for index, value in enumerate(requested) if index not in rejected]
+    if normalized == decision.actions:
+        return False
+    decision.actions = normalized
+    for index in sorted(rejected):
+        action_id, code = rejected[index]
+        decision.normalization_notes.append(f"godot_rejected_action:{action_id}:{code}"[:120])
+    decision.normalization_notes = decision.normalization_notes[:8]
+    return True
+
+
+def _safe_contract_token(value: object) -> str:
+    token = re.sub(r"[^A-Za-z0-9_.:-]+", "_", str(value)).strip("_")
+    return token[:80] or "unknown"
+
+
+def _persona_error_text(error: Any) -> str:
+    if error is None:
+        return "persona provider failed without a typed error"
+    return f"{error.category.value}: {error.message}"
 
 
 def _best_fallback_action(context_pack: WeekContext) -> str:
@@ -1157,6 +1290,7 @@ def _append_step_jsonl(path: Path, step: PlaythroughStep, *, run_id: str) -> Non
                     "available_actions": step.available_actions,
                     "chosen_actions": step.chosen_actions,
                     "llm_summary": step.llm_summary,
+                    "persona_calls": step.persona_calls,
                     "anomalies": step.anomalies,
                 },
                 ensure_ascii=False,
@@ -1231,12 +1365,22 @@ def _update_memory(memory: PlayMemory, step: PlaythroughStep) -> PlayMemory:
     repeated = dict(memory.repeated_actions)
     for action_id in step.chosen_actions:
         repeated[action_id] = repeated.get(action_id, 0) + 1
+    before_payload = step.state_before.get("state", step.state_before)
+    before_payload = before_payload if isinstance(before_payload, dict) else {}
+    after_payload = step.state_after if isinstance(step.state_after, dict) else {}
     week_memory = WeekMemory(
         week=step.week,
         actions=step.chosen_actions,
         event=step.triggered_event_id,
+        event_choice_id=step.event_choice_id,
         rationale=str(step.decision.get("strategic_goal", "")),
         delta=step.delta,
+        state_before=_state_summary(before_payload, week=step.week).model_dump(
+            mode="json", exclude_none=True
+        ),
+        state_after=_state_summary(after_payload, week=step.week).model_dump(
+            mode="json", exclude_none=True
+        ),
     )
     state = step.state_after or {}
     flags = state.get("flags") if isinstance(state.get("flags"), dict) else {}
@@ -1251,6 +1395,7 @@ def _update_memory(memory: PlayMemory, step: PlaythroughStep) -> PlayMemory:
         update={
             "important_flags": {str(key): bool(value) for key, value in flags.items()},
             "repeated_actions": repeated,
+            "history": [*memory.history, week_memory][-52:],
             "unresolved_risks": unresolved[-8:],
             "last_5_weeks": [*memory.last_5_weeks, week_memory][-5:],
         }

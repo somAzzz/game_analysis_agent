@@ -1,0 +1,164 @@
+---
+name: playtest-forge
+description: Turn automated game tests and persona/subagent playthrough evidence into bounded, auditable game changes, then accept or reject them with fixed and unseen-holdout proof. Use when Codex needs to review game balance, economy, progression, content routes, choices, endings, boundary behavior, invariants, player-persona divergence, parameter tuning, causal repair experiments, or migration of the testing-and-repair workflow to another game or engine.
+---
+
+# Playtest Forge
+
+Act as the main game-review and repair agent. Let automated tests establish
+state truth, let persona workers expose behavioral intent, and let deterministic
+gates decide whether a change survives. Never optimize toward acceptance.
+
+## Route the task
+
+Read only the references required for the request:
+
+- Start an interactive Codex-guided campaign session: `references/codex-session-orchestration.md`.
+- Choose test layers or distinguish Replay/live evidence: `references/test-strategy.md`.
+- Run deterministic matrices, simulations, sweeps, or regression tests:
+  `references/automated-testing.md`.
+- Run local vLLM/SGLang or live OpenAI/DeepSeek persona playthroughs: `references/subagent-playthrough.md`.
+- Convert observed metrics into a parameter or mechanism change:
+  `references/evidence-to-parameters.md`.
+- Review economy, resource pressure, difficulty, or progression:
+  `references/scenario-balance-economy.md`.
+- Review events, choices, routes, quests, or endings:
+  `references/scenario-content-flow.md`.
+- Review limits, invalid state, exploit, or invariant behavior:
+  `references/scenario-boundary-robustness.md`.
+- Plan and verify a source/parameter change: `references/repair-protocol.md`.
+- Define citations, artifacts, schemas, and public evidence:
+  `references/evidence-contract.md`.
+- Adapt the Skill to another project or engine: `references/migration-guide.md`.
+- Work on this repository's retained reference case: `references/design-contract.md`.
+- Explain the retained cashflow repair example: `references/session-case-study.md`.
+
+## Codex-guided session entrypoint
+
+When the user asks to start testing, use the frozen orchestration in
+`references/codex-session-orchestration.md`. This is mandatory for this
+repository's interactive path:
+
+1. Run `scripts/preflight` and `scripts/session-options --choices-only --json`
+   without making a model call or starting Godot.
+2. Immediately stage the committed public evidence and start only the Vite
+   viewer. Give the user
+   `http://127.0.0.1:5173/#/playthrough-inspector` before asking for runtime or
+   provider. This read-only stage must not start the Judge API, select Godot, or
+   call a model; provider-backed actions remain unavailable.
+3. Unless the user overrides a value, freeze the checked-in defaults without
+   pausing: difficulty `normal`, `docker-godot`, `local-sglang`,
+   `no-thinking-2048`, and `six-strategy` (all six personas, seed 42, 20
+   weeks). The selectable repair difficulties are `easy`, `normal`, `hard`,
+   and `realistic`; never mix them within one repair experiment. Announce the
+   defaults before probing or execution. Explicit user choices always win;
+   never infer an override from installed tools, `.env`, or prior sessions.
+4. Probe only the selected paths. For local Godot, resolve the exact executable
+   and require Godot 4.4. For Docker Godot, require Docker plus the repository
+   wrapper and verify its Godot 4.4 version. When starting the sidecar, set
+   `GODOT_DOCKER_MOUNT_ROOT` to the absolute parent of the repository. Check
+   provider readiness by field presence and health only; never print secrets
+   or make a model call.
+5. If the user selects `none`, keep the static viewer open and route to
+   deterministic automation plus committed Replay. Read
+   `references/automated-testing.md`, state that model calls are zero and no
+   fresh persona evidence will be created, then ask for the automated test
+   scope. Do not show persona campaign profiles or relabel Replay as live
+   evidence.
+6. For local SGLang or vLLM, use `no-thinking-2048` unless the user selects
+   `thinking-5120`. Do not combine their environment values. API providers
+   do not expose this local choice.
+7. Use `six-strategy` unless the user selects `one-strategy` or
+   `repair-evidence`. Explain calls/cells/duration/eligibility before execution,
+   and ask for a persona only when `one-strategy` was explicitly selected.
+8. Do not start a provider, spend API credit, or launch a campaign until Godot,
+   LLM, generation profile when local, campaign profile, and any required
+   persona are all confirmed. Recommend local
+   SGLang first, then local vLLM before OpenAI, only as guidance; preserve the
+   user's explicit choice.
+9. After every required choice is frozen, start the governed Judge API with the
+   selected `GODOT_BIN`, keep the existing Vite process running, ask the user to
+   refresh the viewer, and execute the exact environment and command emitted by
+   `scripts/session-options`. Never let `.env` replace the selected runtime.
+10. Monitor the command and `frontend/public/live-playthrough/session.json`.
+   Report meaningful progress at least once per minute. Treat this file as
+   in-progress UI state, not completed evidence.
+11. On completion, verify the sanitized bundle and frontend view, state the
+    selected Godot runtime, exact provider truth label, and repair eligibility.
+    A one-strategy or one-seed result can validate the agent but cannot prove a
+    repair. Never edit the game or begin repair automatically.
+
+## Core workflow
+
+1. Discover the game adapter, runtime, contracts, source revision, tests,
+   telemetry, and writable report locations. Do not assume Godot or this repo.
+2. Freeze a test contract before interpreting results: exactly one repair
+   difficulty (default `normal`), scenarios, personas, seeds, duration,
+   parameters, outcomes, invariants, designed failures, protected metrics,
+   completeness rules, and provider truth labels. Use the matching
+   `config/matrix.<difficulty>.yaml` lane for deterministic evidence.
+3. Establish a deterministic baseline first. Use automated testing for state
+   coverage, reproducibility, sensitivity, and regression truth.
+4. Add persona/subagent playthroughs when semantic choice quality, exploration,
+   or distinct player intent matters. Keep the action schema and game runtime
+   shared with automation. Label local, live, Replay, partial, and failed runs.
+5. Reject incomplete, stale, schema-invalid, fallback-obscured, or
+   provider-error evidence before diagnosis.
+6. Separate observed facts, interpretation, and hypothesis. Cite the exact
+   run/seed/week/field or row hash behind every repair-driving fact.
+7. Select one failure cluster or protected objective. Prefer cross-persona and
+   cross-seed evidence; preserve intentionally difficult or failing styles.
+8. Map the symptom to the closest controllable mechanic and parameter. State
+   one falsifiable hypothesis and predicted metric direction before editing.
+9. Freeze fixed seeds, unseen holdouts, thresholds, change allowlist, file/line
+   budget, and one mechanism class. Create an isolated game worktree.
+10. Make the smallest change that tests the mechanism. Never modify prompts,
+    personas, tests, gates, evidence, seeds, or target thresholds to manufacture
+    improvement.
+11. Run focused deterministic tests, fixed baseline/patch A/B, unseen holdout
+    baseline/patch A/B, critical invariants, persona preservation, designed
+    failure, and provider-health gates—in that order.
+12. Write `accepted` only when every frozen gate passes. Otherwise preserve the
+    evidence and write `rejected` with the failed causal or safety gates.
+13. Seal each immutable matrix cell's private JSONL immediately after its own
+    schema, provenance, and evidence checks pass; first-party cohort readers
+    must stream the verified Zstandard archive transparently. After the aggregate gates
+    and terminal decision, seal any remaining private JSONL. Never archive a
+    `running` or `finalizing` file. Keep expanded JSONL only for an explicit
+    compatibility/debugging need such as `--keep-jsonl`; treat archive or
+    round-trip failure as a non-success state.
+
+## Evidence-to-edit rules
+
+- Convergence across unlike personas suggests a shared game mechanic before a
+  persona prompt problem.
+- One-persona failure suggests strategy, affordance, or route-specific logic
+  before a global parameter change.
+- Broken invariants outrank balance tuning. Repair correctness first.
+- A symptom metric improving while the target outcome is unchanged is not a
+  successful repair; reject and revisit the causal chain.
+- Fixed improvement without holdout confirmation is overfit.
+- Eliminating designed-failure outcomes is overcorrection.
+- Unreachable content suggests trigger/graph conditions before reward tuning.
+- Floor/ceiling saturation suggests scale, clamp, or update-order analysis.
+- Non-monotonic responses require a sensitivity sweep before a direct patch.
+
+## Boundaries
+
+- Persona workers may choose actions and explain intent; only the main Codex
+  agent may inspect private source, plan edits, change code, and judge release.
+- Local vLLM/SGLang proves a fresh local-model call, not a live OpenAI call. Preserve the exact provider and mode label.
+- Replay proves reproducibility, not a fresh model call. Never relabel it live.
+- Never accept a partial cohort, silently fall back after a provider failure,
+  or merge a patch automatically.
+- Do not build an MCP adapter or wrap argparse `cmd_*` functions. Use typed,
+  transport-independent services and repository scripts.
+- Retain actual provider/model/runtime/source provenance. Never invent a key,
+  token count, cost, session ID, platform result, or live execution.
+
+## Output
+
+End with: test contract → cited facts → interpretation → one hypothesis →
+bounded diff → focused test → fixed proof → holdout proof → protected gates →
+accepted/rejected decision → next experiment. State which results came from
+automation, local persona workers, live persona workers, or Replay.

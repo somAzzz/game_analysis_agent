@@ -9,7 +9,7 @@
 
 ## 1. 已确定的架构决策
 
-1. 不把 `tools/run_gameplay_agent.py` 的 `cmd_*` 直接注册为 MCP Tool。
+1. 不把 `tools/gameplay/run_gameplay_agent.py` 的 `cmd_*` 直接注册为 MCP Tool。
 2. 不允许 MCP Adapter 构造 `argparse.Namespace` 调用 CLI。
 3. 先把业务逻辑抽成与传输协议无关的 Service：
 
@@ -50,7 +50,7 @@ LLM function tools：
 
 `InteractiveProbe.preview_step()` 已实现，但尚未注册成现有 LLM Tool。
 
-[run_gameplay_agent.py](../tools/run_gameplay_agent.py) 还有 14 个 CLI 子命令：
+[run_gameplay_agent.py](../tools/gameplay/run_gameplay_agent.py) 还有 14 个 CLI 子命令：
 `sim`、`analyze`、`probe`、`interactive-probe`、`export`、
 `validate`、`matrix`、`compare-matrix`、`index`、`gates`、
 `eval`、`qa`、`play`、`all`。这些命令不能机械地一一映射成 MCP Tool。
@@ -332,7 +332,7 @@ matrix_service.compare(...)
 rg "argparse|sys\.exit|print\(" src/game_analysis_agent/services
 uv run pytest -q -ra
 uv run ruff check .
-uv run python tools/run_gameplay_agent.py matrix --dry-run --jobs 4
+uv run python tools/gameplay/run_gameplay_agent.py matrix --dry-run --jobs 4
 ```
 
 第一条 `rg` 预期无输出。
@@ -493,7 +493,7 @@ server、scope 和审计。
 Service Layer 和 STDIO MCP 第一版不需要修改现有 Compose：
 
 ```bash
-docker compose up -d vllm godot
+docker compose --profile local-nvidia --profile game-tools up -d sglang godot
 ```
 
 MCP Server 在宿主机运行，通过 wrapper 复用 Godot sidecar。

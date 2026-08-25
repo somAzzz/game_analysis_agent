@@ -1,0 +1,299 @@
+{
+  "campaign": {
+    "cells": 18,
+    "fallback_rate": 0.0,
+    "gate_status": "passed",
+    "max_weeks": 20,
+    "mean_final_money": 0.0,
+    "mean_max_stress": 100.0,
+    "personas": [
+      "newbie",
+      "study",
+      "money",
+      "social",
+      "visa",
+      "slacker"
+    ],
+    "provider_error_rate": 0.0,
+    "request_fingerprint": "8fa65234cb151a16534cfdbad7a2a26b330a9efc0610c701f7e20e87a41b7538",
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "source_fingerprint": "01dbba63744eec8f0c055fe6cc75bc0dd9ddf02a9ea6192238193dd009eee49b",
+    "target_members": 18,
+    "target_personas": 6,
+    "valid_rate": 1.0,
+    "weeks": 342
+  },
+  "campaign_bundle_path": "examples/build_week_2026/campaign-v1",
+  "campaign_id": "build-week-2026-evidence-v1",
+  "codex": {
+    "decision_owned_by_codex": true,
+    "feedback_session_id": "019f6816-fe0d-78a2-9001-1890b32ef820",
+    "hypothesis_owned_by_codex": true,
+    "model": "codex-gpt-5-runtime-exact-revision-undisclosed",
+    "patch_owned_by_codex": true,
+    "skill": "playtest-forge",
+    "task_reference": "019f6816-fe0d-78a2-9001-1890b32ef820"
+  },
+  "cohorts": [
+    {
+      "artifact_path": "baseline/fixed.json",
+      "artifact_sha256": "a2cb9d3024fbf4c6795494cbdc52811845952074ff0b9dea95e637d6e9790cd2",
+      "cells": 18,
+      "cohort": "baseline_fixed",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.502924,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    },
+    {
+      "artifact_path": "patched/fixed.json",
+      "artifact_sha256": "2b6f55cda6dfa37a502c2e24d0a0ab4fca485d02e36e575579aa5a72aa54c832",
+      "cells": 18,
+      "cohort": "patched_fixed",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "c42b1c84630497427d895bf963103f8b40f5976d",
+      "mean_final_money": 17.944444,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.502924,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    },
+    {
+      "artifact_path": "baseline/holdout.json",
+      "artifact_sha256": "0cd4ec4be3ea1f4dd35c4ca9d579ac10016250e9ad34cfae07759f7c6375a6c5",
+      "cells": 18,
+      "cohort": "baseline_holdout",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+      "mean_final_money": 0.0,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.5,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        1042,
+        1043,
+        1044
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    },
+    {
+      "artifact_path": "patched/holdout.json",
+      "artifact_sha256": "d09866309914bf9571320a6231f880d4babbea9e9756ae76eb7dc9f5573fb80c",
+      "cells": 18,
+      "cohort": "patched_holdout",
+      "critical_invariants": {
+        "academic_success_with_failed_courses": 0,
+        "aps_pass_with_low_aps_knowledge": 0,
+        "crisis_success_ending": 0,
+        "ending_id_empty": 0,
+        "pipeline_stalled": 0,
+        "social_success_under_survival_crisis": 0,
+        "stat_overflow": 0,
+        "stat_underflow": 0,
+        "testdaf_pass_with_low_language": 0,
+        "visa_success_without_registration": 0
+      },
+      "decision_policy": "fixture-authoring-policy-v1",
+      "designed_failure_endings": [
+        "cashflow_collapse"
+      ],
+      "ending_counts": {
+        "cashflow_collapse": 18
+      },
+      "fallback_rate": 0.0,
+      "game_commit": "c42b1c84630497427d895bf963103f8b40f5976d",
+      "mean_final_money": 60.666667,
+      "mean_max_stress": 100.0,
+      "persona_alignment_rate": 0.5,
+      "provider_error_rate": 0.0,
+      "seeds": [
+        1042,
+        1043,
+        1044
+      ],
+      "target_members": 18,
+      "target_personas": 6,
+      "valid_rate": 1.0,
+      "weeks": 342
+    }
+  ],
+  "comparison": {
+    "fixed_member_delta": 0,
+    "fixed_persona_alignment_delta": 0.0,
+    "fixed_relative_reduction": 0.0,
+    "holdout_member_delta": 0,
+    "holdout_persona_alignment_delta": 0.0,
+    "holdout_relative_reduction": 0.0
+  },
+  "completed_at": "2026-07-16T16:11:12.705580+00:00",
+  "decision": "rejected",
+  "decision_reason": "Repair rejected because required proof failed: fixed_target, holdout_target",
+  "evidence_fingerprint": "9bd9c67e94c2318e38edeb86b3c06066b719d2f11d4631bc124cfef9908b855f",
+  "experiment_id": "cashflow-drift-repair-v1",
+  "gates": [
+    {
+      "detail": "18 <= 12",
+      "evidence_paths": [],
+      "gate_id": "fixed_target",
+      "status": "failed"
+    },
+    {
+      "detail": "0.000000 >= 0.250000",
+      "evidence_paths": [],
+      "gate_id": "holdout_target",
+      "status": "failed"
+    },
+    {
+      "detail": "patched fixed and holdout critical counters are zero",
+      "evidence_paths": [],
+      "gate_id": "critical_invariants",
+      "status": "passed"
+    },
+    {
+      "detail": "patched fixed and holdout validity meet threshold",
+      "evidence_paths": [],
+      "gate_id": "decision_validity",
+      "status": "passed"
+    },
+    {
+      "detail": "deterministic policy produced no hidden failure",
+      "evidence_paths": [],
+      "gate_id": "provider_health",
+      "status": "passed"
+    },
+    {
+      "detail": "fixed and holdout persona alignment decline is bounded",
+      "evidence_paths": [],
+      "gate_id": "persona_preservation",
+      "status": "passed"
+    },
+    {
+      "detail": "patched cohorts do not add unknown or pipeline-stalled endings",
+      "evidence_paths": [],
+      "gate_id": "no_new_invalid_endings",
+      "status": "passed"
+    },
+    {
+      "detail": "designed failure remains possible and is not reclassified",
+      "evidence_paths": [],
+      "gate_id": "designed_failure_preserved",
+      "status": "passed"
+    }
+  ],
+  "human_review": null,
+  "hypothesis": "Recurring survival-economy drift depletes spendable cash faster than distinct persona strategies can recover, after which the cash-shortfall stress feedback pushes every intent into the same cashflow/stress attractor.",
+  "lifecycle_status": "proof_complete",
+  "mechanism_class": "recurring_living_cost_drift",
+  "mode": "prerecorded",
+  "model": "deterministic-persona-policy-fixture",
+  "patch": {
+    "added_lines": 35,
+    "baseline_commit": "348b9fd5501e71ebc7142e10f9068fc1490b5124",
+    "canonical_source_path": "demo/study-in-germany",
+    "changed_files": 2,
+    "deleted_lines": 5,
+    "diff": "diff --git a/scripts/simulation/SimulationEngine.gd b/scripts/simulation/SimulationEngine.gd\nindex dd4363a8f36e3d0e9c53ccb5ad17291666d59d0a..6d68b0d8317964c5da2b91c84aa92fde402817b0 100644\n--- a/scripts/simulation/SimulationEngine.gd\n+++ b/scripts/simulation/SimulationEngine.gd\n@@ -4,6 +4,7 @@ extends RefCounted\n const ActionResolverScript := preload(\"res://scripts/simulation/ActionResolver.gd\")\n const EventResolverScript := preload(\"res://scripts/simulation/EventResolver.gd\")\n const MAX_ACTION_SLOTS := 4\n+const BLOCKED_ACCOUNT_WEEKLY_ALLOWANCE := 248\n \n var planned_actions: Array = []\n var last_week_summary: Array = []\n@@ -67,11 +68,7 @@ func resolve_week():\n \tfor action in planned_actions:\n \t\tvar action_summary: Array = ActionResolverScript.resolve_action(action, state)\n \t\tweek_summary.append(\"%s\uff1a%s\" % [action.name, \", \".join(action_summary)])\n-\tlast_life_drift_effects = state.get_weekly_drift_effects()\n-\tvar released_amount: int = state.get_blocked_account_release_for_week()\n-\tif released_amount > 0:\n-\t\tlast_life_drift_effects[\"money\"] = int(last_life_drift_effects.get(\"money\", 0)) + released_amount\n-\tvar drift: Array = state.apply_weekly_drift()\n+\tvar drift: Array = apply_smoothed_weekly_drift(state)\n \tweek_summary.append(\"\u751f\u6d3b\u5f00\u9500\u4e0e\u81ea\u7136\u6062\u590d\uff1a%s\" % \", \".join(drift))\n \tplanned_actions.clear()\n \tlast_week_summary = week_summary\n@@ -82,6 +79,25 @@ func resolve_week():\n \t\t_event_bus().event_ready.emit(event)\n \treturn event\n \n+func apply_smoothed_weekly_drift(state: Node) -> Array:\n+\tlast_life_drift_effects = state.get_weekly_drift_effects()\n+\tvar available: int = int(state.blocked_account_balance)\n+\tvar allowance: int = mini(BLOCKED_ACCOUNT_WEEKLY_ALLOWANCE, available)\n+\tvar scheduled_release: int = state.get_blocked_account_release_for_week()\n+\tvar held_balance: int = 0\n+\tif scheduled_release > 0 and available > allowance:\n+\t\theld_balance = available - allowance\n+\t\tstate.blocked_account_balance = allowance\n+\telif scheduled_release == 0 and allowance > 0:\n+\t\tstate.blocked_account_balance -= allowance\n+\t\tstate.money += allowance\n+\tif allowance > 0:\n+\t\tlast_life_drift_effects[\"money\"] = int(last_life_drift_effects.get(\"money\", 0)) + allowance\n+\tvar drift: Array = state.apply_weekly_drift()\n+\tif held_balance > 0:\n+\t\tstate.blocked_account_balance += held_balance\n+\treturn drift\n+\n func finish_week() -> void:\n \tvar state: Node = _state()\n \tif state.week < 20:\ndiff --git a/scripts/tools/ValidateEconomyRules.gd b/scripts/tools/ValidateEconomyRules.gd\nindex 084016a414f7b0fd93c07932a09360896ba04064..fa966ddd84b892ff87798a1af801e4f1f4d42675 100644\n--- a/scripts/tools/ValidateEconomyRules.gd\n+++ b/scripts/tools/ValidateEconomyRules.gd\n@@ -1,6 +1,7 @@\n extends SceneTree\n \n const EventResolverScript := preload(\"res://scripts/simulation/EventResolver.gd\")\n+const SimulationEngineScript := preload(\"res://scripts/simulation/SimulationEngine.gd\")\n \n func _init() -> void:\n \tcall_deferred(\"_run\")\n@@ -25,6 +26,7 @@ func _run() -> void:\n \t_validate_runtime_work_income(game_state, errors)\n \t_validate_cashflow_guardrails(game_state, errors)\n \t_validate_monthly_rent(game_state, errors)\n+\t_validate_weekly_blocked_account_release(game_state, errors)\n \t_validate_social_maintenance(game_state, errors)\n \t_validate_friend_borrowing(game_state, errors)\n \t_validate_content_work_effects(errors)\n@@ -98,6 +100,18 @@ func _validate_monthly_rent(game_state: Node, errors: Array[String]) -> void:\n \tif not game_state.flags.has(\"housing_contract_active\"):\n \t\terrors.append(\"monthly rent should activate housing contract flag\")\n \n+func _validate_weekly_blocked_account_release(game_state: Node, errors: Array[String]) -> void:\n+\tvar engine = SimulationEngineScript.new()\n+\tgame_state.reset()\n+\tgame_state.week = 1\n+\tgame_state.money = 2000\n+\tgame_state.blocked_account_balance = 992\n+\tfor expected_balance in [744, 496, 248, 0]:\n+\t\tengine.apply_smoothed_weekly_drift(game_state)\n+\t\tif game_state.blocked_account_balance != expected_balance:\n+\t\t\terrors.append(\"weekly blocked-account release expected %d remaining, got %d\" % [expected_balance, game_state.blocked_account_balance])\n+\t\tgame_state.advance_week()\n+\n func _validate_social_maintenance(game_state: Node, errors: Array[String]) -> void:\n \tgame_state.reset()\n \tgame_state.week = 1\n",
+    "disposition": "candidate_not_merged",
+    "mechanism_class": "recurring_living_cost_drift",
+    "modified_paths": [
+      "scripts/simulation/SimulationEngine.gd",
+      "scripts/tools/ValidateEconomyRules.gd"
+    ],
+    "patch_path": "patch.diff",
+    "patch_sha256": "bacc310c1a2490af7f5833c526cb5e052c3436a9d60400df6588698f6f8c4d2d",
+    "patched_commit": "c42b1c84630497427d895bf963103f8b40f5976d",
+    "patched_tree": "ce5264c46b900493237acd4a42a65a0f8f884f62"
+  },
+  "playthrough_bundle_path": null,
+  "provider": "replay",
+  "provider_mode": "prerecorded",
+  "repair_bundle_path": "examples/build_week_2026/experiment-v1",
+  "schema_version": "judge-public-experiment-v2",
+  "source_kind": "signed",
+  "source_label": "SIGNED REPLAY",
+  "status": "passed",
+  "title": "Signed cashflow repair replay"
+}

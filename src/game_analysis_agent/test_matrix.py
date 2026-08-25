@@ -34,6 +34,11 @@ from game_analysis_agent.contracts import (
     validate_contract_file,
     validate_trace_catalog_consistency,
 )
+from game_analysis_agent.report_archive import (
+    ReportArchiveError,
+    archive_jsonl_tree,
+    jsonl_artifact_exists,
+)
 from game_analysis_agent.report_manifest import execution_source_fingerprint
 
 MATRIX_MANIFEST_FILE = "matrix_manifest.json"
@@ -41,6 +46,7 @@ MATRIX_SUMMARY_FILE = "matrix_summary.json"
 CELL_MANIFEST_FILE = "cell_manifest.json"
 SCHEMA_VERSION = "test-matrix-v1"
 CELL_STATUSES = ("planned", "running", "completed", "failed", "skipped")
+SUPPORTED_DIFFICULTIES = ("easy", "normal", "hard", "realistic")
 _SHARED_GODOT_OUTPUT_LOCK = threading.Lock()
 
 _SUCCESS_ENDINGS = {
@@ -77,6 +83,8 @@ class BoundaryConfig:
     seed: int
     weeks: int
     policy: str
+    difficulty: str
+    focus_schedule: str
     extremes: tuple[str, ...]
 
 
@@ -114,12 +122,15 @@ class MatrixConfig:
     difficulties: tuple[str, ...]
     policies: tuple[str, ...]
     policy_aliases: Mapping[str, str]
+    focus_schedules: Mapping[str, str]
     scenarios: tuple[str, ...]
+    validation_profile: str
     boundary: BoundaryConfig
     play: PlayConfig
     compare: CompareConfig
     config_hash: str
     raw: Mapping[str, Any]
+    event_scheduler_v2: bool = False
 
 
 @dataclass(frozen=True)
@@ -206,6 +217,7 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
             "play",
             "compare",
         },
+        optional={"focus_schedules", "validation_profile", "event_scheduler_v2"},
     )
 
     version = _string(root["version"], "matrix.version")
@@ -220,8 +232,26 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
                 "matrix.runs_per_cell"
             )
     difficulties = _string_list(root["difficulties"], "matrix.difficulties")
+    unsupported_difficulties = sorted(set(difficulties) - set(SUPPORTED_DIFFICULTIES))
+    if unsupported_difficulties:
+        raise MatrixConfigError(
+            "matrix.difficulties contains unsupported values: "
+            + ", ".join(unsupported_difficulties)
+        )
     policies = _string_list(root["policies"], "matrix.policies")
     scenarios = _string_list(root["scenarios"], "matrix.scenarios")
+    validation_profile = _string(
+        root.get("validation_profile", "full"),
+        "matrix.validation_profile",
+    )
+    if validation_profile not in {"full", *SUPPORTED_DIFFICULTIES}:
+        raise MatrixConfigError(
+            "matrix.validation_profile must be 'full', 'easy', 'normal', 'hard', or 'realistic'"
+        )
+    event_scheduler_v2 = _boolean(
+        root.get("event_scheduler_v2", False),
+        "matrix.event_scheduler_v2",
+    )
 
     aliases_raw = _mapping(root["policy_aliases"], "matrix.policy_aliases")
     aliases: dict[str, str] = {}
@@ -238,11 +268,29 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
             )
         aliases[alias_name] = target_name
 
+    focus_schedules_raw = _mapping(root.get("focus_schedules", {}), "matrix.focus_schedules")
+    focus_schedules: dict[str, str] = {}
+    for policy_name, schedule in focus_schedules_raw.items():
+        canonical_policy = aliases.get(str(policy_name), str(policy_name))
+        if canonical_policy not in policies:
+            raise MatrixConfigError(
+                f"matrix.focus_schedules references unknown policy {policy_name!r}"
+            )
+        if canonical_policy in focus_schedules:
+            raise MatrixConfigError(
+                f"matrix.focus_schedules duplicates canonical policy {canonical_policy!r}"
+            )
+        focus_schedules[canonical_policy] = _string(
+            schedule,
+            f"matrix.focus_schedules.{policy_name}",
+        )
+
     boundary_raw = _mapping(root["boundary"], "matrix.boundary")
     _keys(
         boundary_raw,
         path="matrix.boundary",
         required={"runs", "seed", "weeks", "policy", "extremes"},
+        optional={"difficulty", "focus_schedule"},
     )
     boundary_policy = _string(boundary_raw["policy"], "matrix.boundary.policy")
     canonical_boundary_policy = aliases.get(boundary_policy, boundary_policy)
@@ -250,11 +298,23 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
         raise MatrixConfigError(
             f"matrix.boundary.policy references unknown policy {boundary_policy!r}"
         )
+    boundary_difficulty = _string(
+        boundary_raw.get("difficulty", "realistic"),
+        "matrix.boundary.difficulty",
+    )
+    if boundary_difficulty not in difficulties:
+        raise MatrixConfigError("matrix.boundary.difficulty must be listed in matrix.difficulties")
     boundary = BoundaryConfig(
         runs=_positive_int(boundary_raw["runs"], "matrix.boundary.runs"),
         seed=_positive_int(boundary_raw["seed"], "matrix.boundary.seed"),
         weeks=_positive_int(boundary_raw["weeks"], "matrix.boundary.weeks"),
         policy=canonical_boundary_policy,
+        difficulty=boundary_difficulty,
+        focus_schedule=(
+            _string(boundary_raw["focus_schedule"], "matrix.boundary.focus_schedule")
+            if "focus_schedule" in boundary_raw
+            else ""
+        ),
         extremes=_string_list(boundary_raw["extremes"], "matrix.boundary.extremes"),
     )
 
@@ -338,12 +398,15 @@ def load_matrix_config(path: str | Path) -> MatrixConfig:
         difficulties=difficulties,
         policies=policies,
         policy_aliases=dict(aliases),
+        focus_schedules=focus_schedules,
         scenarios=scenarios,
+        validation_profile=validation_profile,
         boundary=boundary,
         play=play,
         compare=compare,
         config_hash=config_hash,
         raw=dict(root),
+        event_scheduler_v2=event_scheduler_v2,
     )
 
 
@@ -360,8 +423,10 @@ def expand_matrix_cells(config: MatrixConfig) -> tuple[MatrixCell, ...]:
                         "weeks": config.weeks,
                         "difficulty": difficulty,
                         "policy": policy,
+                        "focus_schedule": config.focus_schedules.get(policy, ""),
                         "scenario": scenario,
                         "seed": seed,
+                        "event_scheduler_v2": config.event_scheduler_v2,
                     }
                     cells.append(_cell(config, "simulation", parameters))
 
@@ -370,6 +435,8 @@ def expand_matrix_cells(config: MatrixConfig) -> tuple[MatrixCell, ...]:
             "runs": config.boundary.runs,
             "weeks": config.boundary.weeks,
             "policy": config.boundary.policy,
+            "difficulty": config.boundary.difficulty,
+            "focus_schedule": config.boundary.focus_schedule,
             "seed": config.boundary.seed,
             "extreme": extreme,
         }
@@ -405,8 +472,14 @@ def build_matrix_plan(
     python_executable: str | Path | None = None,
     simulation_command: Literal["all", "sim"] = "all",
     catalog_dir: str | Path | None = None,
+    simulation_only: bool = False,
 ) -> MatrixExecutionPlan:
-    """Build an immutable command plan suitable for CLI or programmatic use."""
+    """Build an immutable command plan suitable for CLI or programmatic use.
+
+    ``simulation_only=True`` selects only the simulation cells before any
+    commands are built, so boundary and persona cells are never planned.
+    The default keeps the full simulation/boundary/persona matrix.
+    """
 
     if simulation_command not in {"all", "sim"}:
         raise ValueError("simulation_command must be 'all' or 'sim'")
@@ -418,13 +491,16 @@ def build_matrix_plan(
         else root / "reports" / "matrix" / matrix_id
     )
     python = str(python_executable or sys.executable)
-    game_root = Path(os.environ.get("GAME_PROJECT_PATH", str(root.parent / "study-in-germany")))
+    game_root = Path(os.environ.get("GAME_PROJECT_PATH", str(root / "demo/study-in-germany")))
     code_fingerprint = execution_source_fingerprint(root, game_root)
-    runner = root / "tools" / "run_gameplay_agent.py"
+    runner = root / "tools" / "gameplay" / "run_gameplay_agent.py"
     reports_root = output_dir / "reports"
     plans: list[CommandPlan] = []
 
-    for cell in expand_matrix_cells(config):
+    cells = expand_matrix_cells(config)
+    if simulation_only:
+        cells = tuple(cell for cell in cells if cell.kind == "simulation")
+    for cell in cells:
         params = cell.parameters
         if cell.kind == "simulation":
             report_dir = reports_root / "balance" / cell.run_id
@@ -449,8 +525,23 @@ def build_matrix_plan(
                 "--report-dir",
                 str(report_dir),
             )
+            if params["focus_schedule"]:
+                simulation_args = (
+                    *simulation_args,
+                    "--focus-schedule",
+                    str(params["focus_schedule"]),
+                )
+            if simulation_command == "all":
+                simulation_args = (
+                    *simulation_args,
+                    "--validation-profile",
+                    config.validation_profile,
+                )
+            if params["event_scheduler_v2"]:
+                simulation_args = (*simulation_args, "--event-scheduler-v2")
             argv = (
                 *simulation_args,
+                "--keep-jsonl",
                 *(("--catalog-dir", str(Path(catalog_dir).resolve())) if catalog_dir else ()),
             )
         elif cell.kind == "boundary":
@@ -469,11 +560,20 @@ def build_matrix_plan(
                 str(params["seed"]),
                 "--weeks",
                 str(params["weeks"]),
+                "--difficulty",
+                str(params["difficulty"]),
                 "--report-dir",
                 str(report_dir),
                 "--extreme",
                 str(params["extreme"]),
+                "--keep-jsonl",
             )
+            if params["focus_schedule"]:
+                argv = (
+                    *argv,
+                    "--focus-schedule",
+                    str(params["focus_schedule"]),
+                )
         else:
             report_dir = reports_root / "play" / cell.run_id
             argv = (
@@ -492,6 +592,7 @@ def build_matrix_plan(
                 str(params["difficulty"]),
                 "--scenario",
                 str(params["scenario"]),
+                "--keep-jsonl",
             )
         plans.append(
             CommandPlan(
@@ -524,8 +625,13 @@ def run_matrix_file(
     simulation_command: Literal["all", "sim"] = "all",
     verify_evidence: bool = True,
     catalog_dir: str | Path | None = None,
+    keep_jsonl: bool = False,
+    simulation_only: bool = False,
 ) -> MatrixRunResult:
-    """Convenience entry point for a CLI: load, plan, execute, and persist."""
+    """Convenience entry point for a CLI: load, plan, execute, and persist.
+
+    ``simulation_only=True`` plans and executes only the simulation cells.
+    """
 
     config = load_matrix_config(config_path)
     plan = build_matrix_plan(
@@ -534,6 +640,7 @@ def run_matrix_file(
         matrix_dir=matrix_dir,
         simulation_command=simulation_command,
         catalog_dir=catalog_dir,
+        simulation_only=simulation_only,
     )
     return execute_matrix(
         plan,
@@ -542,6 +649,7 @@ def run_matrix_file(
         resume=resume,
         executor=executor,
         verify_evidence=verify_evidence,
+        keep_jsonl=keep_jsonl,
     )
 
 
@@ -553,6 +661,7 @@ def execute_matrix(
     resume: bool = False,
     executor: Executor | None = None,
     verify_evidence: bool = True,
+    keep_jsonl: bool = False,
 ) -> MatrixRunResult:
     """Execute a plan with safe per-cell persistence and optional concurrency."""
 
@@ -571,9 +680,11 @@ def execute_matrix(
             verify_evidence=verify_evidence,
         ):
             evidence = _cell_evidence(item, plan.config) if verify_evidence else {}
+            storage = archive_jsonl_tree(item.report_dir, keep_jsonl=keep_jsonl)
             entries[index] = {
                 **entries[index],
                 **evidence,
+                "storage": storage,
                 "status": "skipped",
                 "exit_code": 0,
                 "started_at": previous.get("started_at"),
@@ -605,6 +716,7 @@ def execute_matrix(
                 item,
                 active_executor,
                 verify_evidence=verify_evidence,
+                keep_jsonl=keep_jsonl,
             )
             entries[index_by_cell[item.cell.cell_id]] = outcome
             _write_matrix_state(
@@ -626,6 +738,7 @@ def execute_matrix(
                     item,
                     active_executor,
                     verify_evidence=verify_evidence,
+                    keep_jsonl=keep_jsonl,
                 ): item
                 for item in runnable
             }
@@ -652,7 +765,15 @@ def execute_matrix(
                 )
 
     finished_at = _now()
-    outcome_coverage = _persona_outcome_coverage(plan.config, entries) if verify_evidence else None
+    # Persona outcome coverage only applies when the plan actually contains
+    # persona cells.  Simulation-only or boundary-only plans must not fail
+    # because configured expected categories were never planned to be observed.
+    has_persona_cells = any(entry["kind"] == "persona" for entry in entries)
+    outcome_coverage = (
+        _persona_outcome_coverage(plan.config, entries)
+        if verify_evidence and has_persona_cells
+        else None
+    )
     final_status = (
         "failed"
         if any(row["status"] == "failed" for row in entries)
@@ -735,12 +856,18 @@ def _execute_cell(
     executor: Executor,
     *,
     verify_evidence: bool,
+    keep_jsonl: bool,
 ) -> dict[str, Any]:
     previous = _read_json(command_plan.manifest_path)
     try:
         previous_attempt = int(previous.get("attempt", 0))
     except (TypeError, ValueError):
         previous_attempt = 0
+    if previous_attempt:
+        for pattern in ("*.jsonl.zst", "*.jsonl.zst.manifest.json"):
+            for artifact in command_plan.report_dir.glob(pattern):
+                if artifact.is_file():
+                    artifact.unlink()
     started_at = _now()
     running = {
         **_planned_entry(command_plan),
@@ -765,12 +892,21 @@ def _execute_cell(
         return final
 
     evidence: dict[str, Any] = {}
+    storage: dict[str, int | str] = {}
     evidence_error = ""
     if outcome.returncode == 0 and verify_evidence:
         try:
             evidence = _cell_evidence(command_plan, matrix_plan.config)
         except (OSError, ValueError, ContractValidationError) as exc:
             evidence_error = f"evidence validation failed: {exc}"
+    if outcome.returncode == 0 and not evidence_error:
+        try:
+            storage = archive_jsonl_tree(
+                command_plan.report_dir,
+                keep_jsonl=keep_jsonl,
+            )
+        except (OSError, ReportArchiveError) as exc:
+            evidence_error = f"storage finalization failed: {exc}"
 
     stderr_tail = _tail(outcome.stderr)
     stdout_tail = _tail(outcome.stdout)
@@ -778,6 +914,7 @@ def _execute_cell(
     final = {
         **running,
         **evidence,
+        "storage": storage,
         "status": "completed" if completed else "failed",
         "finished_at": _now(),
         "exit_code": outcome.returncode
@@ -840,7 +977,15 @@ def _cell_evidence(plan: CommandPlan, config: MatrixConfig) -> dict[str, Any]:
             "agent_eval.json",
         ),
     }[plan.cell.kind]
-    missing = [name for name in required if not (plan.report_dir / name).is_file()]
+    missing = [
+        name
+        for name in required
+        if not (
+            jsonl_artifact_exists(plan.report_dir / name)
+            if name.endswith(".jsonl")
+            else (plan.report_dir / name).is_file()
+        )
+    ]
     if missing:
         raise ValueError(f"missing required report artifacts: {missing}")
 
@@ -1185,10 +1330,17 @@ def _mapping(value: Any, path: str) -> dict[str, Any]:
     return value
 
 
-def _keys(value: Mapping[str, Any], *, path: str, required: set[str]) -> None:
+def _keys(
+    value: Mapping[str, Any],
+    *,
+    path: str,
+    required: set[str],
+    optional: set[str] | None = None,
+) -> None:
     actual = set(value)
     missing = sorted(required - actual)
-    unknown = sorted(str(key) for key in actual - required)
+    allowed = required | (optional or set())
+    unknown = sorted(str(key) for key in actual - allowed)
     if missing:
         raise MatrixConfigError(f"{path} is missing required keys: {', '.join(missing)}")
     if unknown:

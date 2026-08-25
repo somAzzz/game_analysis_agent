@@ -1,0 +1,68 @@
+{
+  "campaign_id": "final-six-strategy-no-thinking-2048-2971eb3-v1",
+  "cell_count": 6,
+  "cells": [
+    {
+      "attractor_count": 1,
+      "cell_id": "money-seed-42-7ace6f120bc0",
+      "completed_weeks": 19,
+      "final_ending": "academic_failure",
+      "path": "cells/money-seed-42.json",
+      "persona": "money",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 0,
+      "cell_id": "newbie-seed-42-3bd2d3c9b7fc",
+      "completed_weeks": 19,
+      "final_ending": "stable_start",
+      "path": "cells/newbie-seed-42.json",
+      "persona": "newbie",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 0,
+      "cell_id": "slacker-seed-42-6bfcdc9794a8",
+      "completed_weeks": 19,
+      "final_ending": "forced_departure",
+      "path": "cells/slacker-seed-42.json",
+      "persona": "slacker",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 0,
+      "cell_id": "social-seed-42-decdf6ee0143",
+      "completed_weeks": 19,
+      "final_ending": "stable_start",
+      "path": "cells/social-seed-42.json",
+      "persona": "social",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 0,
+      "cell_id": "study-seed-42-597755ba5658",
+      "completed_weeks": 19,
+      "final_ending": "stable_start",
+      "path": "cells/study-seed-42.json",
+      "persona": "study",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    },
+    {
+      "attractor_count": 0,
+      "cell_id": "visa-seed-42-2c88aa32d8fe",
+      "completed_weeks": 19,
+      "final_ending": "stable_start",
+      "path": "cells/visa-seed-42.json",
+      "persona": "visa",
+      "seed": 42,
+      "stop_reason": "game_finished"
+    }
+  ],
+  "schema_version": "playthrough-cell-index-v1",
+  "truth_label": "local-sglang-real-godot"
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": "figma-interaction-review-matrix-v1",
+  "status": "copy-and-data-locked",
+  "truth_label": "prerecorded-real-godot-replay",
+  "campaign": {
+    "cells": 18,
+    "nodes": 342,
+    "actual_edges": 324,
+    "legal_choices": 1336,
+    "fallbacks": 0,
+    "provider_errors": 0,
+    "final_endings": {
+      "cashflow_collapse": 18
+    }
+  },
+  "demo_cell": {
+    "path": "examples/build_week_2026/playthrough-v1/cells/money-seed-42.json",
+    "persona": "money",
+    "seed": 42,
+    "ending": "cashflow_collapse",
+    "states": [
+      {
+        "week": 1,
+        "event": "arrival",
+        "selected_choice": "arrival.choice_02_立刻去超市和_dm_补生活用品",
+        "selected_actions": [
+          "problem_set",
+          "library_day",
+          "language_school_germany",
+          "language_tandem"
+        ],
+        "state_delta": {
+          "money": -358,
+          "energy": -52,
+          "stress": 12
+        },
+        "source_line": 1,
+        "source_record_sha256": "4d66dd4714fe5c1e1c2b9f552a74b753cee08b513252d4d880f0aebb5584055f"
+      },
+      {
+        "week": 3,
+        "event": "missing_school_registration",
+        "selected_choice": "missing_school_registration.choice_02_先找_international_office",
+        "attractors": [
+          "cashflow-stress-attractor"
+        ],
+        "state_delta": {
+          "stress": 33,
+          "hunger": 34,
+          "arrears_amount": 255,
+          "cash_shortfall_count": 1
+        },
+        "source_line": 3,
+        "source_record_sha256": "4041083497b465f0c0ebbc8d43661754bc59713ad8e0cad7aa0f63834dee8830"
+      },
+      {
+        "week": 19,
+        "event": "after_exam_void",
+        "selected_choice": "after_exam_void.choice_03_稳妥处理",
+        "state_after": {
+          "money": 0,
+          "hunger": 100,
+          "stress": 96,
+          "arrears_amount": 3862,
+          "cash_shortfall_count": 16
+        },
+        "source_line": 19,
+        "source_record_sha256": "e0458a9d636e442c8343fb6958352cb82e02617c87eb8768ee92fdd338409814"
+      }
+    ]
+  },
+  "branch_semantics": {
+    "actual_edge": "observed state transition",
+    "legal_stub": "legal at observed state; future not executed",
+    "projected_counterfactual_states": false
+  }
+}

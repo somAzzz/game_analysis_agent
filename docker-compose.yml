@@ -1,28 +1,113 @@
 # Orchestration for game_analysis_agent.
 #
-# Three services:
-#   - vllm   — local Qwen3.6 27B NVFP4 inference server (OpenAI-compatible).
-#   - godot  — persistent headless Godot tool container used through the wrapper.
-#   - agent  — Python CLI one-off container (use `docker compose run agent ...`).
+# Default startup is the CPU-only static dashboard. Optional profiles provide
+# Replay, Godot tools, the legacy CLI, and NVIDIA local inference.
 #
-# Notes (mirrored from fintext_llm/docker-compose.yml for consistency):
-#   * vLLM v0.25.0 is the latest stable image with NVFP4 + MTP support
-#     validated against Qwen3.6. vLLM_BIND_PORT defaults to 8000 so
-#     this stack does not collide with fintext_llm on 30000.
-#   * NVFP4 requires Blackwell (sm_100 / sm_120). Qwen3.6 ships with
-#     MTP weights; the speculative config is enabled by default and
-#     can be disabled with LLM_ENABLE_MTP=0.
-#   * The agent service does NOT need GPU access — the vLLM endpoint
+# Notes:
+#   * The primary local backend layers the pinned DFlash2 NVFP4 selector patch
+#     over SGLang's Qwen3.8 Day-0 image. DSpark remains an env-file rollback.
+#   * vLLM v0.26.0 remains available as the APC-only baseline/fallback.
+#   * The vLLM fallback remains on the independently configured Qwen3.6
+#     NVFP4 checkpoint; SGLang uses its own model path and served alias.
+#   * The agent service does NOT need GPU access — the inference endpoint
 #     is plain HTTP. It also does not need the GPU driver / CUDA
 #     stack; it's a normal slim Python image.
 
 services:
+  sglang:
+    # DFlash2 bridge by default; rollback profiles select the pinned official
+    # Qwen3.8 Day-0 image. Keep checkpoint path and served alias separate.
+    image: ${SGLANG_IMAGE:-game-analysis-agent/sglang-dflash2:pr35496-28198c8-qwen38-c4271c3f}
+    entrypoint: ["sh", "-c"]
+    ports:
+      - "${SGLANG_BIND_PORT:-30000}:30000"
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    environment:
+      - HF_TOKEN=${HF_TOKEN:-}
+      - HF_HUB_ENABLE_HF_TRANSFER=${HF_HUB_ENABLE_HF_TRANSFER:-0}
+      - CUDA_DEVICE_ORDER=PCI_BUS_ID
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+      - SGLANG_MODEL_PATH=${SGLANG_MODEL_PATH:-RadixArk/Qwen3.8-27B-NVFP4}
+      - SGLANG_MODEL_REVISION=${SGLANG_MODEL_REVISION:-554ebba9b5f1b79dc11246341960360e6ef05ef4}
+      - LLM_MAX_MODEL_LEN=${LLM_MAX_MODEL_LEN:-65536}
+      - LLM_MAX_NUM_SEQS=${LLM_MAX_NUM_SEQS:-4}
+      - SGLANG_MODEL=${SGLANG_MODEL:-qwen3.8-27b}
+      - SGLANG_API_KEY=${SGLANG_API_KEY:-local-dev-token}
+      - SGLANG_MEM_FRACTION_STATIC=${SGLANG_MEM_FRACTION_STATIC:-0.85}
+      - SGLANG_ATTENTION_BACKEND=${SGLANG_ATTENTION_BACKEND:-flashinfer}
+      - SGLANG_CHUNKED_PREFILL_SIZE=${SGLANG_CHUNKED_PREFILL_SIZE:-2048}
+      - SGLANG_ENABLE_APC=${SGLANG_ENABLE_APC:-1}
+      - SGLANG_MAMBA_CACHE_STRATEGY=${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer_lazy}
+      - SGLANG_SPECULATIVE_ALGORITHM=${SGLANG_SPECULATIVE_ALGORITHM:-DFLASH}
+      - SGLANG_DRAFT_MODEL_PATH=${SGLANG_DRAFT_MODEL_PATH:-incoai/Qwen3.8-27B-DFlash2}
+      - SGLANG_DRAFT_MODEL_REVISION=${SGLANG_DRAFT_MODEL_REVISION:-dedf8df68adfb1afeaf7b7480c0a0243108177b4}
+      - SGLANG_NUM_DRAFT_TOKENS=${SGLANG_NUM_DRAFT_TOKENS:-8}
+      - SGLANG_ENABLE_METRICS=${SGLANG_ENABLE_METRICS:-1}
+    ipc: host
+    shm_size: '32gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command:
+      - >-
+        set -eu;
+        set -- sglang serve
+        --model-path "$${SGLANG_MODEL_PATH:-RadixArk/Qwen3.8-27B-NVFP4}"
+        --revision "$${SGLANG_MODEL_REVISION:-554ebba9b5f1b79dc11246341960360e6ef05ef4}"
+        --host 0.0.0.0
+        --port 30000
+        --api-key "$${SGLANG_API_KEY:-local-dev-token}"
+        --served-model-name "$${SGLANG_MODEL:-qwen3.8-27b}"
+        --trust-remote-code
+        --dtype bfloat16
+        --reasoning-parser qwen3
+        --tool-call-parser qwen3_coder
+        --sampling-defaults model
+        --context-length "$${LLM_MAX_MODEL_LEN:-65536}"
+        --max-running-requests "$${LLM_MAX_NUM_SEQS:-4}"
+        --mem-fraction-static "$${SGLANG_MEM_FRACTION_STATIC:-0.85}"
+        --attention-backend "$${SGLANG_ATTENTION_BACKEND:-flashinfer}"
+        --chunked-prefill-size "$${SGLANG_CHUNKED_PREFILL_SIZE:-2048}"
+        --mamba-radix-cache-strategy "$${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer_lazy}";
+        if [ "$${SGLANG_ENABLE_APC:-1}" != "1" ]; then
+        set -- "$$@" --disable-radix-cache;
+        fi;
+        if [ "$${SGLANG_ENABLE_METRICS:-1}" = "1" ]; then
+        set -- "$$@" --enable-metrics;
+        fi;
+        ALGORITHM="$${SGLANG_SPECULATIVE_ALGORITHM:-DFLASH}";
+        if [ "$$ALGORITHM" != "NONE" ]; then
+        set -- "$$@"
+        --speculative-algorithm "$$ALGORITHM"
+        --speculative-draft-model-path "$${SGLANG_DRAFT_MODEL_PATH:-incoai/Qwen3.8-27B-DFlash2}"
+        --speculative-draft-model-revision "$${SGLANG_DRAFT_MODEL_REVISION:-dedf8df68adfb1afeaf7b7480c0a0243108177b4}";
+        if [ -n "$${SGLANG_NUM_DRAFT_TOKENS:-8}" ]; then
+        set -- "$$@" --speculative-num-draft-tokens "$${SGLANG_NUM_DRAFT_TOKENS:-8}";
+        fi;
+        fi;
+        exec "$$@"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os, urllib.request, sys; req=urllib.request.Request('http://127.0.0.1:30000/v1/models', headers={'Authorization': 'Bearer ' + os.environ.get('SGLANG_API_KEY', 'local-dev-token')}); sys.exit(0 if urllib.request.urlopen(req, timeout=5).status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 600s
+    restart: unless-stopped
+    profiles:
+      - local-nvidia
+      - local-sglang
+
   vllm:
-    # Pinned 2026-07-XX: v0.25.0 is the latest stable tag with NVFP4 + MTP
-    # validated against Qwen3.6 27B NVFP4. Bump quarterly. See fintext_llm
-    # for the same pin rationale.
-    image: vllm/vllm-openai:v0.25.0
-    # v0.25.0 image keeps ENTRYPOINT=["vllm","serve"] — a plain
+    # Pinned 2026-07-31: v0.26.0 contains fine-grained prefix matching for
+    # aligned attention/Mamba hybrid caches. Hybrid APC remains experimental,
+    # so it is an optimization only and must not affect correctness gates.
+    image: vllm/vllm-openai:v0.26.0
+    # The image keeps ENTRYPOINT=["vllm","serve"] — a plain
     # ``command`` would prepend ``vllm serve``, which then misreads
     # the next positional argument. Empty entrypoint lets the shell
     # script below run as-is. Verify after upgrade; if upstream changes
@@ -44,8 +129,14 @@ services:
       - CUDA_DEVICE_ORDER=PCI_BUS_ID
       - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
       - LLM_MODEL=${LLM_MODEL:-nvidia/Qwen3.6-27B-NVFP4}
-      - LLM_MAX_MODEL_LEN=${LLM_MAX_MODEL_LEN:-32768}
-      - LLM_ENABLE_MTP=${LLM_ENABLE_MTP:-1}
+      - LLM_MAX_MODEL_LEN=${LLM_MAX_MODEL_LEN:-65536}
+      - LLM_MAX_NUM_SEQS=${LLM_MAX_NUM_SEQS:-4}
+      - LLM_MAX_NUM_BATCHED_TOKENS=${LLM_MAX_NUM_BATCHED_TOKENS:-}
+      - LLM_ENABLE_PREFIX_CACHING=${LLM_ENABLE_PREFIX_CACHING:-1}
+      - LLM_MAMBA_CACHE_MODE=${LLM_MAMBA_CACHE_MODE:-align}
+      - LLM_PREFIX_MATCH_UNIT=${LLM_PREFIX_MATCH_UNIT:-16}
+      - LLM_ENABLE_MTP=${LLM_ENABLE_MTP:-0}
+      - LLM_MTP_NUM_SPECULATIVE_TOKENS=${LLM_MTP_NUM_SPECULATIVE_TOKENS:-3}
       - LLM_GPU_MEMORY_UTILIZATION=${LLM_GPU_MEMORY_UTILIZATION:-0.9}
       - LLM_SERVED_MODEL_NAME=${LLM_SERVED_MODEL_NAME:-qwen3.6-27b-nvfp4}
       - LLM_API_KEY=${VLLM_API_KEY:-local-dev-token}
@@ -60,10 +151,9 @@ services:
               capabilities: [gpu]
     # Default model is NVIDIA's official NVFP4 quant
     # (``nvidia/Qwen3.6-27B-NVFP4``). Override with LLM_MODEL.
-    # MTP speculative decoding is on by default — Qwen3.6 ships
-    # with MTP weights; set ``LLM_ENABLE_MTP=0`` in .env to disable
-    # it for checkpoints that lack MTP tensors (the
-    # ``--speculative-config`` flag will error out otherwise).
+    # APC is on by default with 16-token matching inside the larger physical
+    # hybrid-cache blocks. MTP is intentionally off: enable it only for a
+    # bounded long-output benchmark after correctness and soak gates pass.
     #
     # The sh wrapper does shell-side substitution so the JSON for
     # --speculative-config can be emitted literally. We avoid YAML
@@ -74,9 +164,17 @@ services:
       - -c
       - >-
         MODEL="$${LLM_MODEL:-nvidia/Qwen3.6-27B-NVFP4}";
-        ARGS="$${MODEL} --host 0.0.0.0 --port 8000 --api-key $${LLM_API_KEY:-local-dev-token} --served-model-name $${LLM_SERVED_MODEL_NAME:-qwen3.6-27b-nvfp4} --trust-remote-code --quantization modelopt --reasoning-parser qwen3 --generation-config vllm --dtype bfloat16 --gpu-memory-utilization $${LLM_GPU_MEMORY_UTILIZATION:-0.9} --max-model-len $${LLM_MAX_MODEL_LEN:-32768}";
-        if [ "$${LLM_ENABLE_MTP:-1}" = "1" ]; then
-        ARGS="$${ARGS} --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":3}";
+        ARGS="$${MODEL} --host 0.0.0.0 --port 8000 --api-key $${LLM_API_KEY:-local-dev-token} --served-model-name $${LLM_SERVED_MODEL_NAME:-qwen3.6-27b-nvfp4} --trust-remote-code --quantization modelopt --reasoning-parser qwen3 --generation-config vllm --dtype bfloat16 --gpu-memory-utilization $${LLM_GPU_MEMORY_UTILIZATION:-0.9} --max-model-len $${LLM_MAX_MODEL_LEN:-65536} --max-num-seqs $${LLM_MAX_NUM_SEQS:-4} --language-model-only";
+        if [ -n "$${LLM_MAX_NUM_BATCHED_TOKENS:-}" ]; then
+        ARGS="$${ARGS} --max-num-batched-tokens $${LLM_MAX_NUM_BATCHED_TOKENS}";
+        fi;
+        if [ "$${LLM_ENABLE_PREFIX_CACHING:-1}" = "1" ]; then
+        ARGS="$${ARGS} --enable-prefix-caching --mamba-cache-mode $${LLM_MAMBA_CACHE_MODE:-align} --prefix-match-unit $${LLM_PREFIX_MATCH_UNIT:-16}";
+        else
+        ARGS="$${ARGS} --no-enable-prefix-caching";
+        fi;
+        if [ "$${LLM_ENABLE_MTP:-0}" = "1" ]; then
+        ARGS="$${ARGS} --speculative-config {\"method\":\"mtp\",\"num_speculative_tokens\":$${LLM_MTP_NUM_SPECULATIVE_TOKENS:-3}}";
         fi;
         exec vllm serve $${ARGS}
     healthcheck:
@@ -86,6 +184,8 @@ services:
       retries: 20
       start_period: 600s
     restart: unless-stopped
+    profiles:
+      - local-vllm
 
   godot:
     # Long-running tool sidecar. scripts/godot-docker-wrapper uses
@@ -97,10 +197,10 @@ services:
     environment:
       HOME: /tmp/game-analysis-godot-home
     volumes:
-      # Mount the shared parent of both repositories at the identical path.
+      # Mount the parent of this repository at the identical host path.
       # The runner passes absolute game --path and Agent report --out paths.
       # Set GODOT_DOCKER_MOUNT_ROOT to the parent directory that contains
-      # both game_analysis_agent and study-in-germany before `compose up`.
+      # game_analysis_agent before `compose up`; the game demo is embedded.
       # The fallback below is /tmp so the service can still start on a
       # clean machine, but it is only useful for syntax / healthcheck checks
       # — real game runs need the project tree mounted here.
@@ -115,6 +215,34 @@ services:
       retries: 3
       start_period: 5s
     restart: unless-stopped
+    profiles:
+      - game-tools
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    entrypoint: ["/app/.venv/bin/python", "tools/judge/run_judge_api.py"]
+    command: ["--host", "0.0.0.0", "--port", "8080", "--frontend", "/app/frontend/dist"]
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_PERSONA_MODEL=${OPENAI_PERSONA_MODEL:-gpt-5.6-luna}
+    ports:
+      - "${JUDGE_PORT:-8080}:8080"
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/provider-status', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
 
   agent:
     # Built from the Dockerfile in this repo. This container is intended for
@@ -123,32 +251,28 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - .env
     environment:
-      # The agent inside the container reaches vLLM through the
-      # compose-network DNS name ``vllm`` on port 8000. The host-side
-      # ``VLLM_BASE_URL`` from .env (e.g. http://localhost:8000/v1) is
-      # overridable per-call via ``docker compose run -e``.
-      - VLLM_BASE_URL=${VLLM_BASE_URL:-http://vllm:8000/v1}
+      # Keep host URLs (localhost) separate from compose-network URLs.
+      # The latter must use service DNS names from inside this container.
+      - LLM_PROVIDER=${LLM_PROVIDER:-sglang}
+      - SGLANG_BASE_URL=${AGENT_SGLANG_BASE_URL:-http://sglang:30000/v1}
+      - SGLANG_API_KEY=${SGLANG_API_KEY:-local-dev-token}
+      - SGLANG_MODEL=${SGLANG_MODEL:-qwen3.8-27b}
+      - VLLM_BASE_URL=${AGENT_VLLM_BASE_URL:-http://vllm:8000/v1}
       - VLLM_API_KEY=${VLLM_API_KEY:-local-dev-token}
-      - GAME_PROJECT_PATH=${GAME_PROJECT_PATH:-/data/game_project}
+      - PERSONA_ENABLE_THINKING=${PERSONA_ENABLE_THINKING:-0}
+      - PERSONA_DECISION_MAX_TOKENS=${PERSONA_DECISION_MAX_TOKENS:-2048}
+      - PERSONA_EVENT_MAX_TOKENS=${PERSONA_EVENT_MAX_TOKENS:-64}
+      - GAME_PROJECT_PATH=${GAME_PROJECT_PATH:-/app/demo/study-in-germany}
     volumes:
-      # Read-only game data remains available to analysis commands, but this
-      # Python image intentionally contains no Docker CLI or Godot binary.
-      - ${GAME_PROJECT_PATH:-/data/game_project}:/data/game_project:ro
       # Reports are persisted back onto the host for inspection.
       - ./reports:/app/reports
-    depends_on:
-      vllm:
-        condition: service_healthy
     profiles:
       - cli
     # No long-running process — the CLI exits when it finishes.
-    command: ["python", "tools/run_gameplay_agent.py", "--help"]
+    command: ["python", "tools/gameplay/run_gameplay_agent.py", "--help"]
 
-# NB: the agent is opt-in via ``--profile cli``. A bare
-# ``docker compose up`` starts both vLLM and the Godot tool sidecar; use
-# ``docker compose --profile cli run agent <analysis-subcommand>`` to invoke
-# the containerized Python analysis CLI on demand. Host gameplay commands should
-# use scripts/godot-docker-wrapper so they execute inside the Godot sidecar.
+# A bare ``docker compose up`` starts only the CPU dashboard. Use profile
+# ``game-tools`` for Godot, ``cli`` for the legacy agent,
+# ``local-nvidia``/``local-sglang`` for the primary SGLang backend, and
+# ``local-vllm`` for the retained baseline.

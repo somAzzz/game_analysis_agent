@@ -1,0 +1,96 @@
+# Required acceptance matrix for the Normal difficulty lane.
+#
+# This profile deliberately isolates Normal gameplay. The existing
+# config/matrix.yaml remains the full cross-difficulty regression profile and
+# historical evidence remains immutable.
+
+version: normal-lane-v1
+validation_profile: normal
+weeks: 20
+runs_per_cell: 200
+# RunSimulation expands each base seed across runs_per_cell consecutive seeds.
+seeds: [42, 1042, 2042]
+
+difficulties:
+  - normal
+
+policies:
+  - random
+  - balanced
+  - study
+  - work
+  - social
+  - admin
+  - slacker
+
+policy_aliases:
+  money: work
+  visa: admin
+
+# Current game automation requires an explicit Focus at weeks 1/5/9/13/17.
+# Strategy policies repeat their matching Focus; balanced/random cover all
+# five windows deterministically so fixed and holdout runs remain comparable.
+focus_schedules:
+  random: study_sprint,work_recovery,admin_stability,social_integration,mental_recovery
+  balanced: study_sprint,work_recovery,admin_stability,social_integration,mental_recovery
+  study: study_sprint
+  work: work_recovery
+  social: social_integration
+  admin: admin_stability
+  slacker: escape_buffer
+
+scenarios:
+  - default_first_semester
+  - low_money_start
+  - high_stress_start
+
+boundary:
+  runs: 30
+  seed: 42
+  weeks: 20
+  policy: balanced
+  difficulty: normal
+  focus_schedule: study_sprint,work_recovery,admin_stability,social_integration,mental_recovery
+  extremes:
+    - zero_money
+    - deep_debt
+    - no_energy
+    - all_negative
+    - no_language
+    - flag_chaos
+    - week_zero
+    - already_registered
+
+play:
+  default_persona: newbie
+  personas:
+    - newbie
+    - study
+    - money
+    - social
+    - visa
+    - slacker
+  weeks: 20
+  difficulty: normal
+  seeds: [42]
+  outcome_coverage:
+    success_is_not_required_per_persona: true
+    designed_failure_is_valid: true
+    expected_categories:
+      - success
+      - recovery_or_mixed
+      - designed_failure
+    invalid_endings:
+      - unknown
+      - pipeline_stalled
+
+compare:
+  output_dir: reports/compare/normal
+  include:
+    - ending_distribution.csv
+    - action_pick_rates.csv
+    - weekly_stats.csv
+    - anomalies.jsonl
+    - value_report.json
+    - route_report.json
+    - coverage_report.json

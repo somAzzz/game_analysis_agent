@@ -16,7 +16,7 @@ Files:
 
 - `src/game_analysis_agent/agents/event_graph.py`
 - `prompts/event_graph_agent_user.md`
-- `tests/test_agents_registry.py`
+- `tests/agents/test_agents_registry.py`
 
 Implementation:
 
@@ -30,7 +30,7 @@ Validation:
 
 - Unit test prompt rendering with a tiny `event_graph.json` and `raw_runs.jsonl`.
 - Assert the rendered prompt contains `## Untriggered Events` and the missing event id.
-- Done in `tests/test_agents_registry.py`.
+- Done in `tests/agents/test_agents_registry.py`.
 
 ## P1-B: Content QA Choice-Structure Findings
 
@@ -38,7 +38,7 @@ Files:
 
 - `src/game_analysis_agent/agents/content_qa.py`
 - `prompts/content_qa_agent_user.md`
-- `tests/test_agents_registry.py`
+- `tests/agents/test_agents_registry.py`
 
 Implementation:
 
@@ -56,14 +56,14 @@ Validation:
 
 - Unit test prompt rendering with a tiny event graph fixture.
 - Assert the rendered prompt contains `## Choice Structure Findings` and at least one issue id.
-- Done in `tests/test_agents_registry.py`.
+- Done in `tests/agents/test_agents_registry.py`.
 
 ## P0-Fix: Hunger Threshold Drift
 
 Files:
 
 - `src/game_analysis_agent/anomaly_semantics.py`
-- `tests/test_anomaly_semantics.py`
+- `tests/agents/test_anomaly_semantics.py`
 
 Implementation:
 
@@ -73,6 +73,6 @@ Implementation:
 
 Validation:
 
-- `pytest tests/test_anomaly_semantics.py tests/test_agents_registry.py -q`
+- `pytest tests/agents/test_anomaly_semantics.py tests/agents/test_agents_registry.py -q`
 - If time allows, run the full suite or the existing documented partial suite.
 - Done with `uv run pytest tests/ -q` -> 106 passed.

@@ -1,0 +1,131 @@
+"""Tests for ``game_analysis_agent.settings``."""
+
+from __future__ import annotations
+
+import os
+
+import pytest
+
+from game_analysis_agent.settings import Settings, get_settings, reset_settings_cache
+
+
+@pytest.fixture(autouse=True)
+def _reset_cache() -> None:
+    reset_settings_cache()
+    yield
+    reset_settings_cache()
+
+
+def _clear_env() -> None:
+    for key in (
+        "LLM_PROVIDER",
+        "VLLM_BASE_URL",
+        "VLLM_API_KEY",
+        "LLM_MODEL",
+        "LLM_SERVED_MODEL_NAME",
+        "SGLANG_BASE_URL",
+        "SGLANG_API_KEY",
+        "SGLANG_MODEL",
+        "DEEPSEEK_BASE_URL",
+        "DEEPSEEK_MODEL",
+        "DEEPSEEK_API_KEY",
+        "AGENT_TEMPERATURE",
+        "AGENT_MAX_TOKENS",
+        "TOOL_MAX_ROUNDS",
+        "PERSONA_ENABLE_THINKING",
+        "PERSONA_DECISION_MAX_TOKENS",
+        "PERSONA_EVENT_MAX_TOKENS",
+        "GODOT_BIN",
+        "GAME_PROJECT_PATH",
+        "SIM_RUNS",
+        "SIM_POLICY",
+        "SIM_WEEKS",
+        "SIM_SEED",
+        "SIM_DIFFICULTY",
+        "SIM_SCENARIO",
+    ):
+        os.environ.pop(key, None)
+
+
+class TestDefaults:
+    def test_default_provider_is_sglang(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        _clear_env()
+        s = Settings()
+        assert s.llm_provider == "sglang"
+        assert s.provider() == "sglang"
+        assert s.base_url().startswith("http://localhost:")
+        assert s.model() == s.sglang_model
+        assert s.model() == "qwen3.8-27b"
+        assert s.persona_enable_thinking is False
+        assert s.persona_decision_max_tokens == 2048
+        assert s.persona_event_max_tokens == 64
+
+    def test_default_sim_difficulty_is_normal(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        _clear_env()
+        s = Settings()
+        assert s.sim_difficulty == "normal"
+        assert s.sim_scenario == "default_first_semester"
+        assert s.sim_runs == 100
+        assert s.sim_weeks == 20
+
+    def test_unknown_provider_falls_back_to_sglang(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        _clear_env()
+        os.environ["LLM_PROVIDER"] = "oss-117"
+        s = Settings()
+        assert s.provider() == "sglang"
+
+    def test_persona_reasoning_settings_are_overridable(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        _clear_env()
+        monkeypatch.setenv("PERSONA_ENABLE_THINKING", "false")
+        monkeypatch.setenv("PERSONA_DECISION_MAX_TOKENS", "1536")
+        monkeypatch.setenv("PERSONA_EVENT_MAX_TOKENS", "512")
+
+        settings = Settings()
+
+        assert settings.persona_enable_thinking is False
+        assert settings.persona_decision_max_tokens == 1536
+        assert settings.persona_event_max_tokens == 512
+
+
+class TestSelectors:
+    def test_vllm_uses_shared_served_model_name(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        _clear_env()
+        monkeypatch.setenv("LLM_PROVIDER", "vllm")
+        monkeypatch.setenv("LLM_SERVED_MODEL_NAME", "local-model-alias")
+
+        assert Settings().model() == "local-model-alias"
+
+    def test_provider_selects_correct_endpoint(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        _clear_env()
+        monkeypatch.setenv("LLM_PROVIDER", "deepseek")
+        monkeypatch.setenv("DEEPSEEK_API_KEY", "real-key")
+        s = Settings()
+        assert s.provider() == "deepseek"
+        assert s.base_url() == s.deepseek_base_url
+        assert s.model() == s.deepseek_model
+        assert s.deepseek_configured() is True
+
+    def test_deepseek_rejects_placeholder_key(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        _clear_env()
+        monkeypatch.setenv("LLM_PROVIDER", "deepseek")
+        monkeypatch.setenv("DEEPSEEK_API_KEY", "REPLACE_ME")
+        s = Settings()
+        assert s.provider() == "deepseek"
+        assert s.deepseek_configured() is False
+
+
+class TestCache:
+    def test_get_settings_is_cached(self) -> None:
+        first = get_settings()
+        second = get_settings()
+        assert first is second
+
+    def test_reset_clears_cache(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        s1 = get_settings()
+        monkeypatch.setenv("LLM_PROVIDER", "sglang")
+        reset_settings_cache()
+        s2 = get_settings()
+        assert s1 is not s2
+        assert s2.provider() == "sglang"

@@ -1,0 +1,133 @@
+{
+  "schema_version": "localization-choice-identity-proof-v1",
+  "completed_at": "2026-07-18T08:31:30.823867+00:00",
+  "decision": "accepted",
+  "provider_calls": 0,
+  "mechanism": "Stable Chinese source text is the runtime choice identity; English is display-only localized copy.",
+  "affected_events": {
+    "desperate_illegal_work_offer": {
+      "source_choice_count": 5,
+      "localized_choice_count": 5,
+      "repaired_choices": [
+        {
+          "zh": "找朋友临时借钱",
+          "en": "Ask a friend for a short-term loan"
+        },
+        {
+          "zh": "向同学或父母借钱",
+          "en": "Borrow from classmates or your parents"
+        },
+        {
+          "zh": "接下现金黑工",
+          "en": "Take the cash-in-hand job"
+        }
+      ]
+    },
+    "semester_fee_due": {
+      "source_choice_count": 5,
+      "localized_choice_count": 5,
+      "repaired_choices": [
+        {
+          "zh": "找朋友周转学期费",
+          "en": "Ask a friend to cover the semester contribution"
+        },
+        {
+          "zh": "稳妥处理",
+          "en": "Handle the situation carefully"
+        }
+      ]
+    }
+  },
+  "focused_economy": {
+    "baseline_identity_errors": 2,
+    "patched_identity_errors": 0,
+    "status": "passed",
+    "baseline_failure_categories": [
+      "The semester-fee friend-borrowing choice was absent from the localized runtime event.",
+      "A borrowing choice inherited the display label Take the cash job and was misclassified as work income."
+    ]
+  },
+  "fixed": {
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "runs_per_revision": 3,
+    "weeks_per_run": 20,
+    "semantic_trajectory_equal": true,
+    "final_states_equal": true,
+    "endings_equal": true
+  },
+  "holdout": {
+    "seeds": [
+      1042,
+      1043,
+      1044
+    ],
+    "runs_per_revision": 3,
+    "weeks_per_run": 20,
+    "semantic_trajectory_equal": true,
+    "final_states_equal": true,
+    "endings_equal": true
+  },
+  "godot": {
+    "version": "4.4.stable.official.4c311cbee",
+    "passing_validators": [
+      "content",
+      "json-content",
+      "economy",
+      "risk",
+      "route"
+    ],
+    "demo_gate": {
+      "status": "expected_failure",
+      "expected_failure_count": 3,
+      "findings": [
+        "normal top action take_a_real_break share 0.199 exceeds 0.150",
+        "realistic top action take_a_real_break share 0.217 exceeds 0.150",
+        "normal scenario has 2 ending types, expected at least 4"
+      ]
+    }
+  },
+  "repository_gates": {
+    "inspect": "passed",
+    "replay": "passed",
+    "pytest": {
+      "passed": 492,
+      "skipped": 3
+    },
+    "ruff": "passed"
+  },
+  "source_artifacts": [
+    {
+      "path": "reports/localization-repair-decision.json",
+      "sha256": "2a2daa65d49d8146d12a3aa4590afdf0c0e5fbfe006db8f4aec13e29a43a5f16"
+    },
+    {
+      "path": "reports/localization-final-validation/validation_summary.json",
+      "sha256": "4d4cd21b9fd76e7143f43e336524ee14ba471e2ba34e9673241750bfb64d95dc"
+    },
+    {
+      "path": "reports/localization-final-validation/expected-findings-verification.json",
+      "sha256": "4da1b3b9f72332d59e1d600c8755f592228231da77d0a647158955ab78a70305"
+    },
+    {
+      "path": "reports/localization-baseline-fixed-final/raw_runs.jsonl",
+      "sha256": "8b4d08d24a6dec4aa7a5671daccba9f838e919f798a8be5bc13c920b00059ef7"
+    },
+    {
+      "path": "reports/localization-candidate-fixed-final/raw_runs.jsonl",
+      "sha256": "6d81374e46802769a1ac0f34b53f29c67b98763fdd9758d06c95d9e0e5649cad"
+    },
+    {
+      "path": "reports/localization-baseline-holdout-final/raw_runs.jsonl",
+      "sha256": "93df50e140d2d6987324432c2e55bd4f0a63bb100c4dad4e06416269bb937c60"
+    },
+    {
+      "path": "reports/localization-candidate-holdout-final/raw_runs.jsonl",
+      "sha256": "8a59b74933fbc04a31c20932755ac86bcec65dd867a6e198b57dc9812c18a1f7"
+    }
+  ]
+}
+

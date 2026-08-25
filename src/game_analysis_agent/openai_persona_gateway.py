@@ -1,0 +1,431 @@
+"""OpenAI Responses API adapter for provider-neutral persona decisions."""
+
+from __future__ import annotations
+
+import json
+import time
+from dataclasses import dataclass
+from typing import Any
+
+from openai import (
+    APIConnectionError,
+    AuthenticationError,
+    OpenAI,
+    RateLimitError,
+)
+from openai import APITimeoutError as OpenAITimeoutError
+from openai.types.responses.response import Response
+from pydantic import ValidationError
+
+from .persona_gateway import (
+    PersonaCallMetadata,
+    PersonaDecisionRequest,
+    PersonaDecisionResult,
+    PersonaDecisionValidator,
+    PersonaErrorCategory,
+    PersonaEventChoice,
+    PersonaEventChoiceRequest,
+    PersonaEventChoiceResult,
+    PersonaParseStatus,
+    PersonaProvider,
+    PersonaProviderError,
+    PersonaProviderMode,
+    PersonaResultStatus,
+    PersonaUsage,
+    validate_event_choice,
+    validate_player_decision,
+)
+from .persona_runtime import redact_sensitive_text
+from .schemas import PlayerDecision
+
+DEFAULT_OPENAI_PERSONA_MODEL = "gpt-5.6-luna"
+DEFAULT_OPENAI_MAX_OUTPUT_TOKENS = 1200
+
+
+@dataclass
+class _Outcome:
+    value: Any | None
+    metadata: PersonaCallMetadata
+    error: PersonaProviderError | None
+
+
+class OpenAIResponsesPersonaGateway:
+    """Use Responses Structured Outputs without leaking SDK objects downstream."""
+
+    provider = PersonaProvider.OPENAI
+    mode = PersonaProviderMode.LIVE
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        model: str = DEFAULT_OPENAI_PERSONA_MODEL,
+        client: Any | None = None,
+        timeout_s: float = 30.0,
+        max_output_tokens: int = DEFAULT_OPENAI_MAX_OUTPUT_TOKENS,
+    ) -> None:
+        if not api_key.strip():
+            raise ValueError("OpenAI API key is required for the live persona gateway")
+        self.model = model
+        self.max_output_tokens = max_output_tokens
+        self._client = client or OpenAI(
+            api_key=api_key,
+            timeout=timeout_s,
+            max_retries=0,
+        )
+
+    def decide(
+        self,
+        request: PersonaDecisionRequest,
+        *,
+        validator: PersonaDecisionValidator | None = None,
+    ) -> PersonaDecisionResult:
+        def validate_decision(decision: PlayerDecision) -> list[str]:
+            errors = validate_player_decision(decision, request.context)
+            if errors or validator is None:
+                return errors
+            return validator(decision)
+
+        outcome = self._structured_request(
+            schema=PlayerDecision,
+            system=_decision_system_prompt(),
+            initial_prompt=_decision_prompt(request),
+            repair_prompt=lambda errors: _decision_repair_prompt(request, errors),
+            validate=validate_decision,
+        )
+        if outcome.error is not None:
+            return PersonaDecisionResult(
+                status=PersonaResultStatus.FAILED,
+                request_fingerprint=request.fingerprint(),
+                metadata=outcome.metadata,
+                error=outcome.error,
+            )
+        return PersonaDecisionResult(
+            status=PersonaResultStatus.COMPLETED,
+            request_fingerprint=request.fingerprint(),
+            decision=outcome.value,
+            metadata=outcome.metadata,
+        )
+
+    def choose_event(self, request: PersonaEventChoiceRequest) -> PersonaEventChoiceResult:
+        outcome = self._structured_request(
+            schema=PersonaEventChoice,
+            system=_event_system_prompt(),
+            initial_prompt=_event_prompt(request),
+            repair_prompt=lambda errors: _event_repair_prompt(request, errors),
+            validate=lambda value: validate_event_choice(value, request),
+        )
+        if outcome.error is not None:
+            return PersonaEventChoiceResult(
+                status=PersonaResultStatus.FAILED,
+                request_fingerprint=request.fingerprint(),
+                metadata=outcome.metadata,
+                error=outcome.error,
+            )
+        return PersonaEventChoiceResult(
+            status=PersonaResultStatus.COMPLETED,
+            request_fingerprint=request.fingerprint(),
+            choice=outcome.value,
+            metadata=outcome.metadata,
+        )
+
+    def _structured_request(
+        self,
+        *,
+        schema: type,
+        system: str,
+        initial_prompt: str,
+        repair_prompt,
+        validate,
+    ) -> _Outcome:
+        total_usage = PersonaUsage(input_tokens=0, output_tokens=0, total_tokens=0)
+        total_latency_ms = 0
+        last_metadata = self._metadata(attempt=1, usage=total_usage)
+        last_errors = ["structured output missing"]
+        saw_parsed = False
+        for attempt in (1, 2):
+            prompt = initial_prompt if attempt == 1 else repair_prompt(last_errors)
+            started = time.perf_counter()
+            try:
+                response = _request_response(
+                    self._client.responses,
+                    model=self.model,
+                    system=system,
+                    prompt=prompt,
+                    schema=schema,
+                    max_output_tokens=self.max_output_tokens,
+                )
+            except Exception as exc:
+                total_latency_ms += int((time.perf_counter() - started) * 1000)
+                metadata = self._metadata(
+                    attempt=attempt,
+                    latency_ms=total_latency_ms,
+                    usage=total_usage,
+                    parse_status=PersonaParseStatus.FAILED,
+                )
+                return _Outcome(None, metadata, _provider_error(exc))
+            parsed, output_text, refusal = _response_content(response)
+            total_latency_ms += int((time.perf_counter() - started) * 1000)
+            usage = _response_usage(response)
+            total_usage = _sum_usage(total_usage, usage)
+            last_metadata = self._metadata(
+                attempt=attempt,
+                response=response,
+                latency_ms=total_latency_ms,
+                usage=total_usage,
+                parse_status=PersonaParseStatus.FAILED,
+                refusal=refusal,
+            )
+            if refusal:
+                return _Outcome(
+                    None,
+                    last_metadata,
+                    PersonaProviderError(
+                        category=PersonaErrorCategory.REFUSAL,
+                        message=_sanitize_message(refusal),
+                        retryable=False,
+                    ),
+                )
+            incomplete_reason = _incomplete_reason(response)
+            if incomplete_reason:
+                last_errors = [f"response incomplete: {incomplete_reason}"]
+                continue
+            if parsed is None and not output_text:
+                last_errors = ["structured output missing"]
+                continue
+            try:
+                value = (
+                    parsed
+                    if isinstance(parsed, schema)
+                    else schema.model_validate(parsed)
+                    if parsed is not None
+                    else schema.model_validate_json(output_text)
+                )
+            except ValidationError as exc:
+                last_errors = _validation_errors(exc)
+                continue
+            saw_parsed = True
+            last_errors = validate(value)
+            if last_errors:
+                continue
+            last_metadata.parse_status = (
+                PersonaParseStatus.PARSED if attempt == 1 else PersonaParseStatus.REPAIRED
+            )
+            return _Outcome(value, last_metadata, None)
+        category = (
+            PersonaErrorCategory.INVALID_DECISION
+            if saw_parsed
+            else PersonaErrorCategory.MALFORMED_RESPONSE
+        )
+        return _Outcome(
+            None,
+            last_metadata,
+            PersonaProviderError(
+                category=category,
+                message=_sanitize_message("; ".join(last_errors)),
+                retryable=False,
+            ),
+        )
+
+    def _metadata(
+        self,
+        *,
+        attempt: int,
+        usage: PersonaUsage,
+        response: Any | None = None,
+        latency_ms: int = 0,
+        parse_status: PersonaParseStatus = PersonaParseStatus.NOT_APPLICABLE,
+        refusal: str = "",
+    ) -> PersonaCallMetadata:
+        return PersonaCallMetadata(
+            provider=self.provider,
+            mode=self.mode,
+            model=str(getattr(response, "model", None) or self.model),
+            response_id=str(getattr(response, "id", "")),
+            latency_ms=latency_ms,
+            attempt_count=attempt,
+            parse_status=parse_status,
+            refusal=_sanitize_message(refusal) if refusal else "",
+            usage=usage,
+        )
+
+
+def _request_response(
+    responses: Any,
+    *,
+    model: str,
+    system: str,
+    prompt: str,
+    schema: type,
+    max_output_tokens: int,
+) -> Any:
+    """Retain the response envelope before validating structured output."""
+
+    request = {
+        "model": model,
+        "input": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": prompt},
+        ],
+        "text_format": schema,
+        "max_output_tokens": max_output_tokens,
+        "store": False,
+    }
+    raw_responses = getattr(responses, "with_raw_response", None)
+    if raw_responses is None:
+        return responses.parse(**request)
+    raw_response = raw_responses.parse(**request)
+    return Response.model_validate(_raw_response_json(raw_response))
+
+
+def _raw_response_json(raw_response: Any) -> object:
+    json_method = getattr(raw_response, "json", None)
+    if callable(json_method):
+        return json_method()
+    http_response = getattr(raw_response, "http_response", None)
+    http_json = getattr(http_response, "json", None)
+    if callable(http_json):
+        return http_json()
+    raise TypeError("OpenAI raw response does not expose JSON content")
+
+
+def _response_content(response: Any) -> tuple[Any | None, str, str]:
+    parsed = getattr(response, "output_parsed", None)
+    output_text: list[str] = []
+    refusal = ""
+    for output in getattr(response, "output", []) or []:
+        if getattr(output, "type", "") != "message":
+            continue
+        for item in getattr(output, "content", []) or []:
+            if getattr(item, "type", "") == "refusal":
+                refusal = str(getattr(item, "refusal", "") or "")
+            if getattr(item, "type", "") == "output_text":
+                text = getattr(item, "text", "")
+                if isinstance(text, str) and text:
+                    output_text.append(text)
+            candidate = getattr(item, "parsed", None)
+            if candidate is not None:
+                parsed = candidate
+    return parsed, "".join(output_text), refusal
+
+
+def _incomplete_reason(response: Any) -> str:
+    if getattr(response, "status", "") != "incomplete":
+        return ""
+    details = getattr(response, "incomplete_details", None)
+    return _sanitize_message(str(getattr(details, "reason", "") or "unknown reason"))
+
+
+def _validation_errors(exc: ValidationError) -> list[str]:
+    errors: list[str] = []
+    for detail in exc.errors(include_url=False, include_input=False)[:6]:
+        location = ".".join(str(part) for part in detail.get("loc", ())) or "output"
+        message = str(detail.get("msg") or "invalid value")
+        errors.append(_sanitize_message(f"{location}: {message}"))
+    return errors or ["structured output failed Pydantic validation"]
+
+
+def _response_usage(response: Any) -> PersonaUsage:
+    usage = getattr(response, "usage", None)
+    return PersonaUsage(
+        input_tokens=_nonnegative(getattr(usage, "input_tokens", None)),
+        output_tokens=_nonnegative(getattr(usage, "output_tokens", None)),
+        total_tokens=_nonnegative(getattr(usage, "total_tokens", None)),
+    )
+
+
+def _sum_usage(left: PersonaUsage, right: PersonaUsage) -> PersonaUsage:
+    return PersonaUsage(
+        input_tokens=(left.input_tokens or 0) + (right.input_tokens or 0),
+        output_tokens=(left.output_tokens or 0) + (right.output_tokens or 0),
+        total_tokens=(left.total_tokens or 0) + (right.total_tokens or 0),
+    )
+
+
+def _provider_error(exc: Exception) -> PersonaProviderError:
+    if isinstance(exc, AuthenticationError):
+        category = PersonaErrorCategory.AUTHENTICATION
+        message = "OpenAI authentication failed"
+        retryable = False
+    elif isinstance(exc, RateLimitError):
+        category = PersonaErrorCategory.RATE_LIMIT
+        message = "OpenAI rate limit exceeded"
+        retryable = True
+    elif isinstance(exc, OpenAITimeoutError):
+        category = PersonaErrorCategory.TIMEOUT
+        message = "OpenAI request timed out"
+        retryable = True
+    elif isinstance(exc, APIConnectionError):
+        category = PersonaErrorCategory.TRANSPORT
+        message = "OpenAI connection failed"
+        retryable = True
+    elif isinstance(exc, ValidationError):
+        category = PersonaErrorCategory.MALFORMED_RESPONSE
+        message = "; ".join(_validation_errors(exc))
+        retryable = False
+    else:
+        category = PersonaErrorCategory.TRANSPORT
+        message = f"OpenAI request failed: {exc.__class__.__name__}"
+        retryable = False
+    return PersonaProviderError(category=category, message=message, retryable=retryable)
+
+
+def _decision_system_prompt() -> str:
+    return (
+        "Act only as the supplied game-testing persona. Choose legal weekly actions "
+        "from WeekContext and return the PlayerDecision schema. Do not inspect code, "
+        "suggest patches, use tools, or reveal hidden reasoning."
+    )
+
+
+def _event_system_prompt() -> str:
+    return (
+        "Act only as the supplied game-testing persona. Choose exactly one legal "
+        "event choice and return the PersonaEventChoice schema."
+    )
+
+
+def _decision_prompt(request: PersonaDecisionRequest) -> str:
+    return "Choose this week's actions from this JSON context:\n" + _context_json(request.context)
+
+
+def _decision_repair_prompt(request: PersonaDecisionRequest, errors: list[str]) -> str:
+    return (
+        "Repair the prior structured decision once. Errors: "
+        + json.dumps(errors, ensure_ascii=False)
+        + "\nUse only legal ids in this context:\n"
+        + _context_json(request.context)
+    )
+
+
+def _event_prompt(request: PersonaEventChoiceRequest) -> str:
+    payload = {
+        "context": request.context.model_dump(mode="json"),
+        "selected_actions": request.selected_actions,
+    }
+    return "Choose one event choice from this JSON context:\n" + _compact_json(payload)
+
+
+def _event_repair_prompt(request: PersonaEventChoiceRequest, errors: list[str]) -> str:
+    return (
+        "Repair the prior event choice once. Errors: "
+        + json.dumps(errors, ensure_ascii=False)
+        + "\n"
+        + _event_prompt(request)
+    )
+
+
+def _context_json(context) -> str:
+    return _compact_json(context.model_dump(mode="json"))
+
+
+def _compact_json(payload: object) -> str:
+    return json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _sanitize_message(value: str) -> str:
+    return redact_sensitive_text(value) or "provider error"
+
+
+def _nonnegative(value: Any) -> int | None:
+    return value if isinstance(value, int) and value >= 0 else None

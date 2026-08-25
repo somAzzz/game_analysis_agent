@@ -1,0 +1,77 @@
+{
+  "artifacts": [
+    {
+      "bytes": 10389,
+      "path": "campaign_manifest.json",
+      "records": null,
+      "sha256": "987838755504593d677d53bd9c57ffb022934573ddd37160068b13b7e4bd8437"
+    },
+    {
+      "bytes": 48461,
+      "path": "campaign_summary.json",
+      "records": null,
+      "sha256": "ab8f6b7389cf3631fbfad03dd24cc0d48ceb901bda6c3cab6dbdb47b1d698674"
+    },
+    {
+      "bytes": 128871,
+      "path": "persona_runs.jsonl",
+      "records": 342,
+      "sha256": "a8f9dba727ae5b70f3608839b1316584933a5eb7d7b68efcfe6ac69d6e50af11"
+    },
+    {
+      "bytes": 7403,
+      "path": "agent_eval.jsonl",
+      "records": 18,
+      "sha256": "aaaf03c0724a9e1faae63fcc20c321bfc04640c516377d4e60a74fdf15992e99"
+    },
+    {
+      "bytes": 352296,
+      "path": "llm_calls.jsonl",
+      "records": 684,
+      "sha256": "aeddc2f9f885403f06bb36b1214bce8c5c52640df2fca42eca03fcbf419d31dd"
+    },
+    {
+      "bytes": 17601,
+      "path": "failure_clusters.json",
+      "records": null,
+      "sha256": "8722e4300372f79fb249b0f8897a27f5cbaec95379fcc11ff78502926d9589c7"
+    }
+  ],
+  "campaign_id": "build-week-2026-evidence-v1",
+  "checks": [
+    {
+      "detail": "18/18 ordered cells",
+      "id": "expected_cells",
+      "status": "passed"
+    },
+    {
+      "detail": "18/18 completed",
+      "id": "completed_cells",
+      "status": "passed"
+    },
+    {
+      "detail": "manifest and aggregation fingerprints",
+      "id": "identity",
+      "status": "passed"
+    },
+    {
+      "detail": "all artifacts reparsed",
+      "id": "schemas",
+      "status": "passed"
+    },
+    {
+      "detail": "6 artifacts hashed",
+      "id": "hashes",
+      "status": "passed"
+    },
+    {
+      "detail": "no forbidden fields or secrets",
+      "id": "public_safety",
+      "status": "passed"
+    }
+  ],
+  "request_fingerprint": "8fa65234cb151a16534cfdbad7a2a26b330a9efc0610c701f7e20e87a41b7538",
+  "schema_version": "campaign-bundle-gate-v1",
+  "source_fingerprint": "01dbba63744eec8f0c055fe6cc75bc0dd9ddf02a9ea6192238193dd009eee49b",
+  "status": "passed"
+}

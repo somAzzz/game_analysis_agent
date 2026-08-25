@@ -19,7 +19,7 @@ running_id="$(
     --file "$REPO_ROOT/docker-compose.yml" \
     ps --quiet --status running "$COMPOSE_SERVICE" 2>/dev/null || true
 )"
-if [[ -n "$running_id" ]]; then
+if [[ -n "$running_id" ]] && docker exec "$running_id" test -d "$PWD" 2>/dev/null; then
   exec docker compose \
     --project-directory "$REPO_ROOT" \
     --file "$REPO_ROOT/docker-compose.yml" \
@@ -28,6 +28,10 @@ if [[ -n "$running_id" ]]; then
     --env "HOME=$CONTAINER_HOME" \
     "$COMPOSE_SERVICE" godot "$@"
 fi
+
+# A sidecar started without GODOT_DOCKER_MOUNT_ROOT can be healthy while the
+# requested worktree is invisible inside it. Fall back to the one-shot path,
+# which mounts PROJECTS_ROOT explicitly, instead of failing every game cell.
 
 exec docker run --rm \
   --user "$(id -u):$(id -g)" \

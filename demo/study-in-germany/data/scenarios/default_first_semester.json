@@ -1,0 +1,22 @@
+{
+  "id": "default_first_semester",
+  "name": "默认第一学期",
+  "initial_state": {
+    "week": 1,
+    "semester": 1,
+    "money": 500,
+    "blocked_account_balance": 11904,
+    "energy": 100,
+    "stress": 20,
+    "loneliness": 30,
+    "hunger": 25,
+    "academic_progress": 10,
+    "language": 20,
+    "social": 15,
+    "visa_progress": 15,
+    "career_progress": 0
+  },
+  "city": "Berlin",
+  "background": "ordinary",
+  "flags": {}
+}

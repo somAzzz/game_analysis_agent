@@ -4,6 +4,8 @@ import { HashRouter } from "react-router-dom";
 import { ReactFlowProvider } from "@xyflow/react";
 import App from "./App";
 import "./styles/global.css";
+import "./styles/competition.css";
+import "./styles/workspace.css";
 import "@xyflow/react/dist/style.css";
 
 const rootElement = document.getElementById("root");
@@ -13,7 +15,7 @@ if (!rootElement) {
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <HashRouter>
+    <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ReactFlowProvider>
         <App />
       </ReactFlowProvider>

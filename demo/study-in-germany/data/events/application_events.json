@@ -1,0 +1,1139 @@
+{
+	"items": [
+		{
+			"body": "你还没有真正出发。APS 会核查学历材料真实性和入学资格，并通过面谈或 TestAS 检查你是否真的学过成绩单上的课程。",
+			"choices": [
+				{
+					"failure_effects": {
+						"aps_knowledge": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"aps_knowledge": 5.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"aps_knowledge": 0.003,
+						"energy": 0.001,
+						"language": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先看清 APS 要求"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "aps_checklist",
+					"success_effects": {
+						"stress": 3.0,
+						"visa_progress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "列材料清单"
+				},
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 80.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "估算申请预算"
+				},
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"aps_knowledge": 1.0,
+						"language": 2.0
+					},
+					"success_modifiers": {
+						"aps_knowledge": 0.003,
+						"energy": 0.001,
+						"language": 0.004,
+						"stress": -0.003
+					},
+					"success_rate": 0.45,
+					"text": "先背面谈模板"
+				}
+			],
+			"event_type": "fixed",
+			"id": "aps_start",
+			"repeatable": false,
+			"source_order": 0,
+			"title": "申请季开始：APS",
+			"trigger": {
+				"week": -8.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "德语授课项目通常要看 TestDaF 四项小分。你的目标不是平均分，而是阅读、听力、写作、口语都达到 TDN 4。",
+			"choices": [
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 6.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "制定四项备考计划"
+				},
+				{
+					"failure_effects": {
+						"aps_knowledge": -1.0,
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"aps_knowledge": 1.0,
+						"language": 5.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"aps_knowledge": 0.003,
+						"energy": 0.001,
+						"language": 0.004,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "重点补口语和写作"
+				},
+				{
+					"failure_effects": {
+						"money": -215.0,
+						"stress": 6.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": -215.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "先报名考试占考位"
+				},
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "language_track_risk",
+					"success_effects": {
+						"money": 40.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.62,
+					"text": "觉得可以到德国再考"
+				}
+			],
+			"event_type": "fixed",
+			"id": "testdaf_requirement_notice",
+			"repeatable": false,
+			"source_order": 1,
+			"title": "TestDaF 4x4 要求",
+			"trigger": {
+				"missing_flag": "testdaf_passed",
+				"week": -7.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "距离申请季结束越来越近。要参加 APS，至少需要材料齐、钱够、语言能说明课程、专业课复习到位。",
+			"choices": [
+				{
+					"failure_effects": {
+						"aps_knowledge": -1.0,
+						"energy": -8.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"aps_knowledge": 10.0,
+						"energy": -8.0,
+						"stress": 6.0
+					},
+					"success_modifiers": {
+						"aps_knowledge": 0.003,
+						"energy": 0.001,
+						"language": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "继续复习专业课"
+				},
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"money": -40.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 7.0,
+						"money": -40.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "补语言表达"
+				},
+				{
+					"failure_effects": {
+						"energy": -20.0,
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -20.0,
+						"stress": 7.0,
+						"work_hours": 19.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "临时打工补费用"
+				},
+				{
+					"failure_effects": {
+						"aps_knowledge": -1.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "aps_documents_ready",
+					"success_effects": {
+						"aps_knowledge": 3.0,
+						"stress": 4.0,
+						"visa_progress": 5.0
+					},
+					"success_modifiers": {
+						"aps_knowledge": 0.003,
+						"energy": 0.001,
+						"language": 0.004,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "重新整理材料"
+				}
+			],
+			"event_type": "conditional",
+			"id": "aps_not_ready",
+			"repeatable": true,
+			"source_order": 2,
+			"title": "APS 还没达标",
+			"trigger": {
+				"missing_flag": "aps_passed",
+				"week": 0.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你的 APS 结果和成绩背景足以冲刺更强的研究型大学或 TU9 项目，但申请材料也要更精细。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -160.0,
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "applied_elite",
+					"success_effects": {
+						"career_progress": 8.0,
+						"money": -120.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.62,
+					"text": "冲刺 TU9/精英项目"
+				},
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"money": -80.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "applied_research",
+					"success_effects": {
+						"career_progress": 6.0,
+						"money": -80.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.78,
+					"text": "研究型大学为主"
+				},
+				{
+					"failure_effects": {
+						"money": -60.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "applied_balanced",
+					"success_effects": {
+						"money": -60.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "保留应用科学大学兜底"
+				},
+				{
+					"failure_effects": {
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": -2.0,
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先等更完美材料"
+				}
+			],
+			"event_type": "fixed",
+			"id": "aps_elite_university_options",
+			"repeatable": false,
+			"source_order": 3,
+			"title": "APS 高分定位",
+			"trigger": {
+				"flag": "aps_passed",
+				"min_aps_score": 84.0,
+				"week": 0.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你的 APS 分数可以申请不少综合大学和应用科学大学。选校策略比盲目冲名校更重要。",
+			"choices": [
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"money": -90.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "applied_balanced",
+					"success_effects": {
+						"career_progress": 5.0,
+						"money": -90.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.8,
+					"text": "综合大学 + 应用科学混申"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"career_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "applied_matched",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"career_progress": 4.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.82,
+					"text": "优先看课程匹配"
+				},
+				{
+					"failure_effects": {
+						"career_progress": -3.0,
+						"stress": 14.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "applied_risky",
+					"success_effects": {
+						"money": -120.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.42,
+					"text": "只冲排名"
+				},
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"money": -50.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 5.0,
+						"money": -50.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先补语言再申请"
+				}
+			],
+			"event_type": "fixed",
+			"id": "aps_mid_university_options",
+			"repeatable": false,
+			"source_order": 4,
+			"title": "APS 稳妥定位",
+			"trigger": {
+				"flag": "aps_passed",
+				"max_aps_score": 83.0,
+				"min_aps_score": 60.0,
+				"week": 0.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "APS 通过了，但分数和背景比较紧。你仍能申请，但需要更多保底、预科或受限专业策略。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -70.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "applied_safe",
+					"success_effects": {
+						"money": -70.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "主打保底项目"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"language": -1.0,
+						"money": -100.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "applied_foundation",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"language": 3.0,
+						"money": -100.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.78,
+					"text": "考虑预科或桥梁课程"
+				},
+				{
+					"failure_effects": {
+						"aps_knowledge": -1.0,
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"aps_knowledge": 5.0,
+						"language": 3.0,
+						"stress": 4.0
+					},
+					"success_modifiers": {
+						"aps_knowledge": 0.003,
+						"energy": 0.001,
+						"language": 0.004,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "继续补背景再申请"
+				},
+				{
+					"failure_effects": {
+						"money": -180.0,
+						"stress": 16.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "applied_risky",
+					"success_effects": {
+						"money": -130.0,
+						"stress": 10.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.28,
+					"text": "硬冲高排名"
+				}
+			],
+			"event_type": "fixed",
+			"id": "aps_low_university_options",
+			"repeatable": false,
+			"source_order": 5,
+			"title": "APS 低空通过",
+			"trigger": {
+				"flag": "aps_passed",
+				"max_aps_score": 59.0,
+				"min_aps_score": 50.0,
+				"week": 0.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你拖着两个箱子出站。APS、录取、签证、保险证明和冻结账户证明都已经在出发前完成，现在要把德国本地手续接上。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "arrived",
+					"success_effects": {
+						"energy": 10.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先去宿舍放行李"
+				},
+				{
+					"failure_effects": {
+						"energy": -6.0,
+						"hunger": 6.0,
+						"money": -55.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "arrived_supplied",
+					"success_effects": {
+						"energy": -6.0,
+						"hunger": -10.0,
+						"money": -55.0,
+						"stress": -3.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "立刻去超市和 dm 补生活用品"
+				},
+				{
+					"failure_effects": {
+						"stress": 8.0,
+						"visa_progress": -2.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"language": 0.003
+					},
+					"set_flag": "arrived",
+					"success_effects": {
+						"language": 1.0,
+						"stress": 4.0,
+						"visa_progress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.68,
+					"text": "先激活 SIM 卡和银行 App"
+				},
+				{
+					"failure_effects": {
+						"money": -25.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "arrived",
+					"success_effects": {
+						"loneliness": 4.0,
+						"money": -25.0,
+						"stress": -8.0,
+						"visa_progress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "坐在车站缓一缓"
+				}
+			],
+			"event_type": "fixed",
+			"id": "arrival",
+			"repeatable": false,
+			"source_order": 6,
+			"title": "抵达德国",
+			"trigger": {
+				"week": 1.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你已经到德国，但 TestDaF 还没 4x4。语言班、住宿和生活费同时烧钱，正式注册和上课都会被推迟。",
+			"choices": [
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"money": -420.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -3.0,
+						"language": 10.0,
+						"money": -420.0,
+						"stress": 6.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "报名密集语言班"
+				},
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -4.0,
+						"language": 4.0,
+						"money": 40.0,
+						"stress": 5.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先自学一周省钱"
+				},
+				{
+					"failure_effects": {
+						"stress": 8.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": 4.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.45,
+					"text": "问学校能否条件注册"
+				},
+				{
+					"failure_effects": {
+						"language": 2.0,
+						"money": -220.0,
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 6.0,
+						"money": -260.0,
+						"stress": 8.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.55,
+					"text": "找便宜语言学校"
+				}
+			],
+			"event_type": "conditional",
+			"id": "germany_language_track_start",
+			"repeatable": false,
+			"source_order": 7,
+			"title": "德国继续读语言",
+			"trigger": {
+				"max_week": 3.0,
+				"min_week": 1.0,
+				"missing_flag": "testdaf_passed"
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "学校提醒：没有合格语言证明，德语授课项目不能正式注册。每拖一周，都在花生活费和错过课程。",
+			"choices": [
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"money": -360.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -4.0,
+						"language": 9.0,
+						"money": -360.0,
+						"stress": 10.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "集中冲刺重考"
+				},
+				{
+					"failure_effects": {
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": -120.0,
+						"stress": 6.0,
+						"visa_progress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.55,
+					"text": "申请语言班延期"
+				},
+				{
+					"failure_effects": {
+						"career_progress": -2.0,
+						"stress": 14.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "program_switch_considered",
+					"success_effects": {
+						"career_progress": 2.0,
+						"money": -100.0,
+						"stress": 9.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.42,
+					"text": "转英语授课/其他项目"
+				},
+				{
+					"failure_effects": {
+						"money": -180.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -8.0,
+						"money": -180.0,
+						"stress": 10.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "继续拖延"
+				}
+			],
+			"event_type": "conditional",
+			"id": "testdaf_blocks_enrollment",
+			"repeatable": false,
+			"source_order": 8,
+			"title": "TestDaF 卡住注册",
+			"trigger": {
+				"max_week": 8.0,
+				"min_week": 3.0,
+				"missing_flag": "testdaf_passed"
+			},
+			"weight": 1.4
+		},
+		{
+			"body": "Einschreibung 截止日过去了。就算之后 TestDaF 过了，也不能立刻进入本学期正常学习，只能处理延期、语言班或例外申请。生活费还在烧，精神压力开始变成主线。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -650.0,
+						"stress": 2.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "registration_delayed",
+					"success_effects": {
+						"academic_progress": -12.0,
+						"money": -650.0,
+						"stress": 14.0,
+						"visa_progress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "接受下学期再注册"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -10.0,
+						"money": -420.0,
+						"stress": 18.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"flag": "testdaf_passed"
+					},
+					"set_flag": "school_registered",
+					"success_effects": {
+						"academic_progress": -5.0,
+						"money": -360.0,
+						"stress": 12.0,
+						"visa_progress": 5.0
+					},
+					"success_modifiers": {
+						"language": 0.003,
+						"visa_progress": 0.003
+					},
+					"success_rate": 0.46,
+					"text": "带 TestDaF 和材料求例外"
+				},
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"money": -900.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "registration_delayed",
+					"success_effects": {
+						"academic_progress": -9.0,
+						"language": 8.0,
+						"money": -900.0,
+						"stress": 10.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "转入语言班等待下学期"
+				},
+				{
+					"failure_effects": {
+						"money": -420.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "registration_delayed",
+					"success_effects": {
+						"academic_progress": -16.0,
+						"hunger": 8.0,
+						"money": -420.0,
+						"stress": 22.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "逃避邮件和截止日"
+				}
+			],
+			"event_type": "fixed",
+			"id": "registration_window_missed",
+			"repeatable": false,
+			"source_order": 11,
+			"title": "错过学校注册窗口",
+			"trigger": {
+				"missing_flag": "school_registered",
+				"week": 7.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "老师说可以申请一次延期，但需要合理理由。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"stress": -7.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.75,
+					"text": "认真申请"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "不申请"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.002,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "deadline_extension",
+			"repeatable": false,
+			"source_order": 74,
+			"title": "延期机会",
+			"trigger": {
+				"min_stress": 55.0,
+				"min_week": 15.0
+			},
+			"weight": 0.9
+		}
+	]
+}

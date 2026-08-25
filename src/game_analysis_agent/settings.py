@@ -35,6 +35,13 @@ def _env_int(name: str, default: int) -> int:
     return int(raw)
 
 
+def _env_bool(name: str, default: bool) -> bool:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _env_path(name: str, default: Path) -> Path:
     raw = os.environ.get(name)
     return Path(raw) if raw else default
@@ -62,64 +69,53 @@ class Settings:
     """Runtime configuration for game_analysis_agent components."""
 
     # ---- LLM provider selection ----------------------------------------
-    llm_provider: str = field(
-        default_factory=lambda: _env("LLM_PROVIDER", "vllm")
-    )
+    llm_provider: str = field(default_factory=lambda: _env("LLM_PROVIDER", "sglang"))
 
-    # ---- Local vLLM (default local backend) ----------------------------
+    # ---- Local vLLM (retained baseline/fallback) -----------------------
     vllm_base_url: str = field(
         default_factory=lambda: _env("VLLM_BASE_URL", "http://localhost:8000/v1")
     )
-    vllm_api_key: str = field(
-        default_factory=lambda: _env("VLLM_API_KEY", "local-dev-token")
-    )
+    vllm_api_key: str = field(default_factory=lambda: _env("VLLM_API_KEY", "local-dev-token"))
     vllm_model: str = field(
-        default_factory=lambda: _env(
-            "LLM_SERVED_MODEL_NAME", "qwen3.6-27b-nvfp4"
-        )
+        default_factory=lambda: _env("LLM_SERVED_MODEL_NAME", "qwen3.6-27b-nvfp4")
     )
 
-    # ---- Local SGLang (alternative) ------------------------------------
+    # ---- Local SGLang (default local backend) --------------------------
     sglang_base_url: str = field(
         default_factory=lambda: _env("SGLANG_BASE_URL", "http://localhost:30000/v1")
     )
     sglang_api_key: str = field(
-        default_factory=lambda: _env("SGLANG_API_KEY", "dummy")
+        default_factory=lambda: _env("SGLANG_API_KEY", "local-dev-token")
     )
     sglang_model: str = field(
-        default_factory=lambda: _env("SGLANG_MODEL", "Qwen/Qwen3.6-35B-A3B")
+        default_factory=lambda: _env("SGLANG_MODEL", "qwen3.8-27b")
     )
 
     # ---- DeepSeek (cloud fallback) -------------------------------------
     deepseek_base_url: str = field(
         default_factory=lambda: _env("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
     )
-    deepseek_model: str = field(
-        default_factory=lambda: _env("DEEPSEEK_MODEL", "deepseek-v4-flash")
-    )
-    deepseek_api_key: str | None = field(
-        default_factory=lambda: os.environ.get("DEEPSEEK_API_KEY")
-    )
+    deepseek_model: str = field(default_factory=lambda: _env("DEEPSEEK_MODEL", "deepseek-v4-flash"))
+    deepseek_api_key: str | None = field(default_factory=lambda: os.environ.get("DEEPSEEK_API_KEY"))
 
     # ---- Agent generation defaults --------------------------------------
-    agent_temperature: float = field(
-        default_factory=lambda: _env_float("AGENT_TEMPERATURE", 0.2)
+    agent_temperature: float = field(default_factory=lambda: _env_float("AGENT_TEMPERATURE", 0.2))
+    agent_max_tokens: int = field(default_factory=lambda: _env_int("AGENT_MAX_TOKENS", 4096))
+    tool_max_rounds: int = field(default_factory=lambda: _env_int("TOOL_MAX_ROUNDS", 8))
+    persona_enable_thinking: bool = field(
+        default_factory=lambda: _env_bool("PERSONA_ENABLE_THINKING", False)
     )
-    agent_max_tokens: int = field(
-        default_factory=lambda: _env_int("AGENT_MAX_TOKENS", 4096)
+    persona_decision_max_tokens: int = field(
+        default_factory=lambda: _env_int("PERSONA_DECISION_MAX_TOKENS", 2048)
     )
-    tool_max_rounds: int = field(
-        default_factory=lambda: _env_int("TOOL_MAX_ROUNDS", 8)
+    persona_event_max_tokens: int = field(
+        default_factory=lambda: _env_int("PERSONA_EVENT_MAX_TOKENS", 64)
     )
 
     # ---- Godot CLI + target game project -------------------------------
-    godot_bin: str = field(
-        default_factory=lambda: _env("GODOT_BIN", "godot4")
-    )
+    godot_bin: str = field(default_factory=lambda: _env("GODOT_BIN", "godot4"))
     game_project_path: Path = field(
-        default_factory=lambda: _env_path(
-            "GAME_PROJECT_PATH", _default_game_project_path()
-        )
+        default_factory=lambda: _env_path("GAME_PROJECT_PATH", _default_game_project_path())
     )
 
     # ---- Default Monte Carlo knobs -------------------------------------
@@ -127,17 +123,15 @@ class Settings:
     sim_policy: str = field(default_factory=lambda: _env("SIM_POLICY", "balanced"))
     sim_weeks: int = field(default_factory=lambda: _env_int("SIM_WEEKS", 20))
     sim_seed: int = field(default_factory=lambda: _env_int("SIM_SEED", 42))
-    sim_difficulty: str = field(
-        default_factory=lambda: _env("SIM_DIFFICULTY", "normal")
-    )
+    sim_difficulty: str = field(default_factory=lambda: _env("SIM_DIFFICULTY", "normal"))
     sim_scenario: str = field(
         default_factory=lambda: _env("SIM_SCENARIO", "default_first_semester")
     )
 
     # ---- Derived selectors ---------------------------------------------
     def provider(self) -> str:
-        """Return the normalized provider name; defaults to ``vllm``."""
-        return self.llm_provider if self.llm_provider in _SUPPORTED_PROVIDERS else "vllm"
+        """Return the normalized provider name; defaults to ``sglang``."""
+        return self.llm_provider if self.llm_provider in _SUPPORTED_PROVIDERS else "sglang"
 
     def base_url(self) -> str:
         """Return the OpenAI-compatible endpoint for the active provider."""

@@ -1,0 +1,2480 @@
+{
+	"items": [
+		{
+			"body": "作业、阅读和生活琐事开始一起上门。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 5.0,
+						"exam_readiness": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "整理学习计划"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -2.0,
+						"energy": 16.0,
+						"exam_readiness": -2.0,
+						"stress": -6.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先睡一觉"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"money": -139.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 7.0,
+						"exam_readiness": 5.0,
+						"money": -139.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "砍掉一班打工补作业"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"energy": -12.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"energy": -12.0,
+						"exam_readiness": 2.0,
+						"stress": 10.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "靠咖啡硬顶"
+				}
+			],
+			"event_type": "fixed",
+			"id": "midterm_pressure",
+			"repeatable": false,
+			"source_order": 15,
+			"title": "期中压力",
+			"trigger": {
+				"week": 10.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你开始理解德国大学的节奏，也理解了为什么大家都说第一学期是适应期。",
+			"choices": [
+				{
+					"failure_effects": {
+						"career_progress": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"career_progress": 2.0,
+						"exam_readiness": 2.0,
+						"stress": -5.0
+					},
+					"success_modifiers": {
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "复盘这一学期"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -2.0,
+						"visa_progress": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "给下学期列行政清单"
+				},
+				{
+					"failure_effects": {
+						"hunger": 6.0,
+						"loneliness": 2.0,
+						"money": -28.0,
+						"social": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -18.0,
+						"loneliness": -6.0,
+						"money": -28.0,
+						"social": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "约朋友吃饭庆祝"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -2.0,
+						"career_progress": -2.0,
+						"energy": 8.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"career_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "直接躺平刷手机"
+				}
+			],
+			"event_type": "fixed",
+			"id": "semester_wrap",
+			"repeatable": false,
+			"source_order": 18,
+			"title": "学期快结束了",
+			"trigger": {
+				"week": 20.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你不是很困，但也完全不想动。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -3.0,
+						"energy": 18.0,
+						"stress": -15.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "强制休息"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"energy": -12.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 4.0,
+						"energy": -12.0,
+						"stress": 10.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "继续硬撑"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "burnout_warning",
+			"repeatable": false,
+			"source_order": 23,
+			"title": "身体发出警告",
+			"trigger": {
+				"min_stress": 78.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "一张去邻城的票很便宜，便宜到像是在诱惑你逃离作业。",
+			"choices": [
+				{
+					"failure_effects": {
+						"loneliness": 2.0,
+						"money": -55.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": -2.0,
+						"loneliness": -7.0,
+						"money": -55.0,
+						"stress": -12.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "周末短途旅行"
+				},
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "忍住不去"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "cheap_ticket",
+			"repeatable": false,
+			"source_order": 37,
+			"title": "廉价火车票",
+			"trigger": {
+				"max_week": 15.0,
+				"min_week": 6.0
+			},
+			"weight": 1.2
+		},
+		{
+			"body": "你发现一个 App 能省下一些交通或超市钱。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 90.0,
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "立刻研究"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "收藏但不看"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "student_discount",
+			"repeatable": false,
+			"source_order": 39,
+			"title": "学生优惠",
+			"trigger": {
+				"min_week": 3.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "天黑得很早，心情也跟着早退。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 5.0,
+						"stress": -7.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.75,
+					"text": "出门运动"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 8.0,
+						"loneliness": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "宅在宿舍"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "rainy_week",
+			"repeatable": false,
+			"source_order": 51,
+			"title": "连续阴雨",
+			"trigger": {
+				"min_week": 6.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "公告栏上有一个看起来不太尴尬的活动。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"loneliness": -4.0,
+						"social": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.8,
+					"text": "报名参加"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "路过"
+				},
+				{
+					"failure_effects": {
+						"social": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"social": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.0025
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "club_poster",
+			"repeatable": false,
+			"source_order": 55,
+			"title": "社团海报",
+			"trigger": {
+				"min_week": 4.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你站在了正确车站的错误站台。",
+			"choices": [
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 1.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "当作城市探索"
+				},
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": -35.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "打车补救"
+				},
+				{
+					"failure_effects": {
+						"language": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.0025,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "wrong_platform",
+			"repeatable": false,
+			"source_order": 64,
+			"title": "坐错站台",
+			"trigger": {
+				"min_week": 2.0
+			},
+			"weight": 0.7
+		},
+		{
+			"body": "之前多扣的一笔费用退回来了。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 120.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "存起来"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"hunger": 6.0,
+						"money": -35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 8.0,
+						"hunger": -18.0,
+						"money": 60.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "改善伙食"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "refund",
+			"repeatable": false,
+			"source_order": 72,
+			"title": "意外退款",
+			"trigger": {
+				"min_week": 8.0
+			},
+			"weight": 0.7
+		},
+		{
+			"body": "今天公交准点、邮件有人回、作业也写完了一页。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"loneliness": 2.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 5.0,
+						"loneliness": -2.0,
+						"stress": -5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "记住这种感觉"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				},
+				{
+					"failure_effects": {
+						"energy": -9.0,
+						"stress": 7.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -5.0,
+						"stress": -1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"resilience": 0.0,
+						"stress": -0.005
+					},
+					"success_rate": 0.38,
+					"text": "冒险推进"
+				}
+			],
+			"event_type": "random",
+			"id": "quiet_success",
+			"repeatable": false,
+			"source_order": 75,
+			"title": "一个小小的顺利",
+			"trigger": {
+				"min_week": 2.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你发现同样叫 unlimited 的套餐也有很多限制。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 45.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "认真比价"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 4.0,
+						"money": -35.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "随便买一个"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "sim_card_confusion",
+			"repeatable": false,
+			"source_order": 77,
+			"title": "电话卡套餐",
+			"trigger": {
+				"max_week": 6.0,
+				"min_week": 1.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "你以为可以刷卡，店员指了指门口的 ATM。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -5.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": -5.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "去取现金"
+				},
+				{
+					"failure_effects": {
+						"energy": -3.0,
+						"money": -35.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -3.0,
+						"money": 10.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "换一家店"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "cash_only_place",
+			"repeatable": false,
+			"source_order": 78,
+			"title": "只收现金",
+			"trigger": {
+				"min_week": 2.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "楼号、入口和楼层像是三套不同系统。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.8,
+					"text": "问路"
+				},
+				{
+					"failure_effects": {
+						"energy": -5.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -5.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "自己找"
+				},
+				{
+					"failure_effects": {
+						"language": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.0025,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "lost_in_campus",
+			"repeatable": false,
+			"source_order": 82,
+			"title": "校园迷路",
+			"trigger": {
+				"max_week": 7.0,
+				"min_week": 2.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "你在柜台前完整说完一句话，对方也完整听懂了。",
+			"choices": [
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 4.0,
+						"stress": -3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "乘胜追击多说两句"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "见好就收"
+				},
+				{
+					"failure_effects": {
+						"language": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.0025,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "deutsch_phrase_win",
+			"repeatable": false,
+			"source_order": 91,
+			"title": "一句德语说顺了",
+			"trigger": {
+				"min_language": 30.0,
+				"min_week": 5.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "你说了三遍，对方还是听成了另一个词。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.75,
+					"text": "换个说法"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -1.0,
+						"visa_progress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "拿手机打字"
+				},
+				{
+					"failure_effects": {
+						"language": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.0025,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "accent_misunderstood",
+			"repeatable": false,
+			"source_order": 92,
+			"title": "口音误会",
+			"trigger": {
+				"max_stress": 80.0,
+				"min_week": 4.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "翻译结果看起来很正式，正式到不像人话。",
+			"choices": [
+				{
+					"failure_effects": {
+						"academic_progress": -1.0,
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"academic_progress": 2.0,
+						"language": 3.0
+					},
+					"success_modifiers": {
+						"academic_progress": 0.003,
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "自己改一遍"
+				},
+				{
+					"failure_effects": {
+						"stress": 5.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 0.65,
+					"text": "直接发送"
+				},
+				{
+					"failure_effects": {
+						"language": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.0025,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "deep_l_trap",
+			"repeatable": false,
+			"source_order": 93,
+			"title": "翻译器陷阱",
+			"trigger": {
+				"min_week": 6.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "你开始担心退房时押金会不会完整回来。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 60.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "拍照留档"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先不想"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "deposit_worry",
+			"repeatable": false,
+			"source_order": 97,
+			"title": "押金焦虑",
+			"trigger": {
+				"max_money": 1000.0,
+				"min_week": 9.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "你发现自己越来越少发动态，因为不知道该怎么概括这一周。",
+			"choices": [
+				{
+					"failure_effects": {
+						"loneliness": 2.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -5.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "写一段真实记录"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 2.0,
+						"loneliness": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "继续潜水"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "wechat_silence",
+			"repeatable": false,
+			"source_order": 101,
+			"title": "朋友圈沉默",
+			"trigger": {
+				"min_loneliness": 55.0,
+				"min_week": 10.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "朋友说升职了，你真心祝贺，也有一点恍惚。",
+			"choices": [
+				{
+					"failure_effects": {
+						"loneliness": 2.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": -4.0,
+						"stress": 2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "祝贺并聊聊近况"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"loneliness": 3.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "关掉聊天"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "friend_back_home",
+			"repeatable": false,
+			"source_order": 102,
+			"title": "国内朋友升职",
+			"trigger": {
+				"min_week": 12.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "学校发来 Semesterbeitrag 邮件。德国多数公立大学不是传统高学费，但学期费、学生会费和交通票仍要按时缴。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -320.0,
+						"stress": 4.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": -320.0,
+						"stress": -2.0,
+						"visa_progress": 5.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "按时缴费"
+				},
+				{
+					"failure_effects": {
+						"language": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 1.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "先确认截止日期"
+				},
+				{
+					"failure_effects": {
+						"loneliness": 4.0,
+						"social": -5.0,
+						"stress": 12.0
+					},
+					"next_event_id": "",
+					"requirements": {
+						"min_social": 45.0
+					},
+					"set_flag": "",
+					"success_effects": {
+						"money": 320.0,
+						"reciprocity_debt": 2.0,
+						"social": -1.0,
+						"stress": 6.0
+					},
+					"success_modifiers": {
+						"social": 0.009,
+						"stress": -0.002
+					},
+					"success_rate": 0.3,
+					"text": "找朋友周转学期费"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "fixed",
+			"id": "semester_fee_due",
+			"repeatable": false,
+			"source_order": 116,
+			"title": "学期费提醒",
+			"trigger": {
+				"week": 16.0
+			},
+			"weight": 1.0
+		},
+		{
+			"body": "房东说上月杂费多收了一点，给你退回来了。",
+			"choices": [
+				{
+					"failure_effects": {
+						"money": -35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 80.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "存起来"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"hunger": 6.0,
+						"money": -35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 5.0,
+						"hunger": -16.0,
+						"money": 35.0,
+						"stress": -3.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "买点好吃的"
+				},
+				{
+					"failure_effects": {
+						"money": 35.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 105.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"money": 70.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"loneliness": -0.001,
+						"money": 0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "refund_from_landlord",
+			"repeatable": false,
+			"source_order": 117,
+			"title": "房东退小额费用",
+			"trigger": {
+				"flag": "housing_stable",
+				"min_week": 11.0
+			},
+			"weight": 0.7
+		},
+		{
+			"body": "你开始理解为什么大家说先打电话。",
+			"choices": [
+				{
+					"failure_effects": {
+						"stress": 6.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 4.0,
+						"stress": 3.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 0.7,
+					"text": "打电话预约"
+				},
+				{
+					"failure_effects": {
+						"stress": 4.0,
+						"visa_progress": -1.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"stress": -2.0,
+						"visa_progress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "找线上预约"
+				},
+				{
+					"failure_effects": {
+						"language": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.0025,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "conditional",
+			"id": "doctor_appointment",
+			"repeatable": false,
+			"source_order": 121,
+			"title": "预约医生",
+			"trigger": {
+				"min_stress": 55.0,
+				"min_week": 9.0
+			},
+			"weight": 0.9
+		},
+		{
+			"body": "药剂师说得很慢，你第一次觉得慢是一种善意。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"language": -1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 5.0,
+						"language": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "认真听"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"money": -18.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 4.0,
+						"money": -18.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"money": 0.001,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "照着买"
+				},
+				{
+					"failure_effects": {
+						"language": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"language": 2.0,
+						"social": 2.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.0025,
+						"loneliness": -0.001,
+						"social": 0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "pharmacy_advice",
+			"repeatable": false,
+			"source_order": 122,
+			"title": "药房建议",
+			"trigger": {
+				"min_week": 8.0
+			},
+			"weight": 0.7
+		},
+		{
+			"body": "雪把城市变得安静，也把路变得很滑。",
+			"choices": [
+				{
+					"failure_effects": {
+						"energy": -3.0,
+						"loneliness": 2.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": -3.0,
+						"loneliness": -5.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "出去走走"
+				},
+				{
+					"failure_effects": {
+						"energy": -4.0,
+						"loneliness": 2.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 4.0,
+						"loneliness": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "在宿舍看雪"
+				},
+				{
+					"failure_effects": {
+						"energy": 0.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"resilience": 0.0,
+						"stress": -0.004
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"energy": 1.0,
+						"social": 2.0,
+						"stress": -4.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"resilience": 0.0,
+						"social": 0.002,
+						"stress": -0.002
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "snow_day",
+			"repeatable": false,
+			"source_order": 124,
+			"title": "第一场雪",
+			"trigger": {
+				"min_week": 12.0
+			},
+			"weight": 0.8
+		},
+		{
+			"body": "每个人都带了一道菜，也带来一点各自的故事。",
+			"choices": [
+				{
+					"failure_effects": {
+						"hunger": 6.0,
+						"loneliness": 2.0,
+						"money": -25.0,
+						"social": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -24.0,
+						"loneliness": -8.0,
+						"money": -25.0,
+						"social": 7.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "带一道家乡菜"
+				},
+				{
+					"failure_effects": {
+						"hunger": 6.0,
+						"loneliness": 2.0,
+						"social": -1.0,
+						"stress": 2.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"hunger": -12.0,
+						"loneliness": -4.0,
+						"social": 4.0
+					},
+					"success_modifiers": {
+						"energy": 0.002,
+						"money": 0.001,
+						"social": 0.003,
+						"stress": -0.003
+					},
+					"success_rate": 1.0,
+					"text": "只去聊天"
+				},
+				{
+					"failure_effects": {
+						"social": 1.0,
+						"stress": 4.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 3.0,
+						"stress": 1.0
+					},
+					"success_modifiers": {
+						"energy": 0.001,
+						"language": 0.001,
+						"social": 0.0025,
+						"stress": -0.002
+					},
+					"success_rate": 0.58,
+					"text": "稳妥处理"
+				},
+				{
+					"failure_effects": {
+						"social": -1.0,
+						"stress": 3.0
+					},
+					"next_event_id": "",
+					"requirements": {},
+					"set_flag": "",
+					"success_effects": {
+						"social": 4.0,
+						"stress": -2.0
+					},
+					"success_modifiers": {
+						"language": 0.001,
+						"loneliness": -0.001,
+						"social": 0.0025
+					},
+					"success_rate": 0.5,
+					"text": "寻求帮助"
+				}
+			],
+			"event_type": "random",
+			"id": "international_potluck",
+			"repeatable": false,
+			"source_order": 126,
+			"title": "国际学生聚餐",
+			"trigger": {
+				"min_week": 9.0
+			},
+			"weight": 1.0
+		}
+	]
+}

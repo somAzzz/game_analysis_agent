@@ -8,20 +8,10 @@ on:
     - cron: "17 1 * * *"
   workflow_dispatch:
     inputs:
-      game_repository:
-        description: Private game repository used by the contract smoke test
-        required: true
-        default: somAzzz/study-in-germany
-        type: string
-      game_ref:
-        description: Exact study-in-germany commit or ref to test
-        required: true
-        default: 348b9fd5501e71ebc7142e10f9068fc1490b5124
-        type: string
       godot_version:
         description: Official godot-builds release tag
         required: true
-        default: 4.7-dev5
+        default: 4.4-stable
         type: string
 
 permissions:
@@ -64,8 +54,18 @@ jobs:
         env:
           GAME_PROJECT_PATH: ${{ runner.temp }}/game_analysis_agent/project
         run: >-
-          uv run python tools/run_gameplay_agent.py matrix
+          uv run python tools/gameplay/run_gameplay_agent.py matrix
           --dry-run --jobs 4 --out /tmp/game-analysis-matrix-plan
+
+      - name: Validate every isolated difficulty matrix plan
+        env:
+          GAME_PROJECT_PATH: ${{ runner.temp }}/game_analysis_agent/project
+        run: |
+          for difficulty in easy normal hard realistic; do
+            uv run python tools/gameplay/run_gameplay_agent.py matrix \
+              --config "config/matrix.${difficulty}.yaml" --dry-run --jobs 4 \
+              --out "/tmp/game-analysis-${difficulty}-matrix-plan"
+          done
 
       - name: Run Ruff
         run: uv run ruff check .
@@ -102,32 +102,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      GAME_REPOSITORY: ${{ inputs.game_repository || 'somAzzz/study-in-germany' }}
-      GAME_REF: ${{ inputs.game_ref || '348b9fd5501e71ebc7142e10f9068fc1490b5124' }}
-      GODOT_VERSION: ${{ inputs.godot_version || '4.7-dev5' }}
-      GAME_REPO_TOKEN: ${{ secrets.STUDY_IN_GERMANY_TOKEN }}
-      GAME_PROJECT_PATH: ${{ github.workspace }}/study-in-germany
+      GODOT_VERSION: ${{ inputs.godot_version || '4.4-stable' }}
+      GAME_PROJECT_PATH: ${{ github.workspace }}/game-analysis-agent/reports/game-runtime
       GODOT_BIN: godot4
     steps:
-      - name: Require private repository token
-        run: |
-          if [[ -z "$GAME_REPO_TOKEN" ]]; then
-            echo "STUDY_IN_GERMANY_TOKEN is required to checkout the private game repository."
-            exit 1
-          fi
-
       - name: Checkout analysis agent
         uses: actions/checkout@v4
         with:
           path: game-analysis-agent
-
-      - name: Checkout pinned game repository
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.GAME_REPOSITORY }}
-          ref: ${{ env.GAME_REF }}
-          token: ${{ secrets.STUDY_IN_GERMANY_TOKEN }}
-          path: study-in-germany
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -144,17 +126,22 @@ jobs:
         run: uv sync --extra dev --locked
         working-directory: game-analysis-agent
 
+      - name: Verify and prepare the embedded game demo
+        run: >-
+          uv run python tools/build_week/prepare_embedded_demo.py
+          --output "$GAME_PROJECT_PATH" --json
+        working-directory: game-analysis-agent
+
       - name: Install verified official Godot build
         run: |
           archive="Godot_v${GODOT_VERSION}_linux.x86_64.zip"
           release="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}"
+          expected_sha512="$(python3 -c 'import json; print(json.load(open("game-analysis-agent/config/build_week_2026_toolchain.json"))["godot"]["assets"]["linux-amd64"]["sha512"])')"
           mkdir -p "$RUNNER_TEMP/godot"
           curl --fail --location --retry 3 "$release/$archive" \
             --output "$RUNNER_TEMP/godot/$archive"
-          curl --fail --location --retry 3 "$release/SHA512-SUMS.txt" \
-            --output "$RUNNER_TEMP/godot/SHA512-SUMS.txt"
           cd "$RUNNER_TEMP/godot"
-          grep "  $archive$" SHA512-SUMS.txt | sha512sum --check --strict
+          printf '%s  %s\n' "$expected_sha512" "$archive" | sha512sum --check --strict
           unzip -q "$archive"
           install -m 0755 "Godot_v${GODOT_VERSION}_linux.x86_64" "$RUNNER_TEMP/godot4"
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
@@ -162,19 +149,13 @@ jobs:
       - name: Show tested revisions
         run: |
           godot4 --version
-          git -C study-in-germany rev-parse HEAD
           git -C game-analysis-agent rev-parse HEAD
-
-      - name: Install the versioned interactive integration probe
-        run: >-
-          install -m 0644
-          game-analysis-agent/scripts/tools/RunInteractiveProbe.gd
-          study-in-germany/scripts/tools/RunInteractiveProbe.gd
+          python3 -c 'import json, os; print(json.load(open(os.path.join(os.environ["GAME_PROJECT_PATH"], ".playtest-forge-runtime-overlay.json")))["base_commit"])'
 
       - name: Generate and analyze a fresh deterministic trace
         working-directory: game-analysis-agent
         run: |
-          uv run python tools/run_gameplay_agent.py sim \
+          uv run python tools/gameplay/run_gameplay_agent.py sim \
             --run-id ci-smoke --runs 12 --policy balanced \
             --difficulty normal --seed 4242 \
             --scenario default_first_semester --weeks 20
@@ -182,16 +163,23 @@ jobs:
       - name: Export catalogs and run every Godot validator with fresh inputs
         working-directory: game-analysis-agent
         run: |
-          uv run python tools/run_gameplay_agent.py export \
+          uv run python tools/gameplay/run_gameplay_agent.py export \
             --report-dir reports/balance/ci-smoke
-          uv run python tools/run_gameplay_agent.py validate \
+          set +e
+          uv run python tools/gameplay/run_gameplay_agent.py validate \
             --report-dir reports/balance/ci-smoke
+          validate_exit_code=$?
+          set -e
+          uv run python tools/build_week/verify_expected_demo_findings.py \
+            --report-dir reports/balance/ci-smoke \
+            --validate-exit-code "$validate_exit_code" \
+            --output reports/expected-demo-findings.json
 
       - name: Enforce deterministic smoke gates
         if: always()
         working-directory: game-analysis-agent
         run: |
-          uv run python tools/run_gameplay_agent.py gates \
+          uv run python tools/gameplay/run_gameplay_agent.py gates \
             --report-dir reports/balance/ci-smoke \
             --gates config/ci_gates.yaml
 
@@ -199,7 +187,7 @@ jobs:
         if: always()
         working-directory: game-analysis-agent
         run: |
-          uv run python tools/run_gameplay_agent.py interactive-probe \
+          uv run python tools/gameplay/run_gameplay_agent.py interactive-probe \
             --run-id ci-interactive-smoke \
             --seed 4242 --difficulty normal \
             --scenario default_first_semester \
@@ -208,13 +196,12 @@ jobs:
       - name: Validate real cross-repository contracts
         if: always()
         env:
-          GAME_PROJECT_PATH: ${{ github.workspace }}/study-in-germany
           GAME_CONTRACT_TRACE: ${{ github.workspace }}/game-analysis-agent/reports/balance/ci-smoke/raw_runs.jsonl
           GAME_CONTRACT_EVENT_GRAPH: ${{ github.workspace }}/game-analysis-agent/reports/balance/ci-smoke/event_graph.json
           GAME_CONTRACT_ACTION_CATALOG: ${{ github.workspace }}/game-analysis-agent/reports/balance/ci-smoke/action_catalog.json
           GAME_CONTRACT_VALIDATOR: ${{ github.workspace }}/game-analysis-agent/reports/balance/ci-smoke/content_validation.json
           GAME_CONTRACT_INTERACTIVE_PROBE: ${{ github.workspace }}/game-analysis-agent/reports/interactive/ci-smoke/interactive_probe.json
-        run: uv run pytest tests/test_game_contract.py -m game_contract -q -ra
+        run: uv run pytest tests/gameplay/test_game_contract.py -m game_contract -q -ra
         working-directory: game-analysis-agent
 
       - name: Upload generated contract evidence
@@ -225,6 +212,6 @@ jobs:
           path: |
             game-analysis-agent/reports/balance/ci-smoke
             game-analysis-agent/reports/interactive/ci-smoke
-            study-in-germany/reports
+            game-analysis-agent/reports/expected-demo-findings.json
           if-no-files-found: warn
           retention-days: 14

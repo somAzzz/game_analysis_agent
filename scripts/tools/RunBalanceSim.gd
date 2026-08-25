@@ -4,8 +4,8 @@ extends SceneTree
 # `res://scripts/tools/RunBalanceSim.gd` get a clear error.
 #
 # The real runner is `study-in-germany/scripts/tools/RunSimulation.gd`.
-# The Python CLI in this repo (`tools/run_balance_sim.sh`,
-# `tools/run_gameplay_agent.py`) shells out to it directly via
+# The Python CLI in this repo (`tools/gameplay/run_balance_sim.sh`,
+# `tools/gameplay/run_gameplay_agent.py`) shells out to it directly via
 # `godot4 --path ${GAME_PROJECT_PATH} -s res://scripts/tools/RunSimulation.gd`.
 
 func _init() -> void:
