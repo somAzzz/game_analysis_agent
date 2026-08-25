@@ -149,7 +149,8 @@ Reports and dashboard
 
 The default local LLM backend is an OpenAI-compatible SGLang server. The Docker
 Compose stack is configured for Qwen3.8-27B NVFP4 with Qwen3 reasoning/tool
-parsing, unified hybrid GDN Radix caching, and DSpark speculative decoding.
+parsing, unified hybrid GDN Radix caching, and DFlash2 speculative decoding.
+The pinned DSpark profile remains the immediate rollback.
 vLLM remains the local baseline/fallback; DeepSeek remains a cloud-compatible
 option.
 
@@ -288,8 +289,9 @@ Start the primary local SGLang service and persistent Godot sidecar:
 ```bash
 cp .env.example .env
 # Edit .env: HF_TOKEN, GAME_PROJECT_PATH, CUDA_VISIBLE_DEVICES, etc.
-docker compose pull sglang
-docker compose --profile local-nvidia --profile game-tools up -d sglang godot
+docker compose -f docker-compose.yml -f docker-compose.sglang-dflash2.yml build sglang
+docker compose --env-file .env --env-file config/sglang/dflash2.env \
+  --profile local-sglang --profile game-tools up -d sglang godot
 docker compose logs -f sglang
 docker compose ps
 ```

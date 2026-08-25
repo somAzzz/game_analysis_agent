@@ -4,8 +4,8 @@
 # Replay, Godot tools, the legacy CLI, and NVIDIA local inference.
 #
 # Notes:
-#   * SGLang's Qwen3.8 Day-0 image is the primary local backend. Its unified
-#     radix cache supports hybrid GDN prefix caching and DSpark together.
+#   * The primary local backend layers the pinned DFlash2 NVFP4 selector patch
+#     over SGLang's Qwen3.8 Day-0 image. DSpark remains an env-file rollback.
 #   * vLLM v0.26.0 remains available as the APC-only baseline/fallback.
 #   * The vLLM fallback remains on the independently configured Qwen3.6
 #     NVFP4 checkpoint; SGLang uses its own model path and served alias.
@@ -15,9 +15,9 @@
 
 services:
   sglang:
-    # Official Qwen3.8-27B Day-0 image. The default checkpoint is NVFP4; keep
-    # the checkpoint path separate from the OpenAI-compatible served alias.
-    image: lmsysorg/sglang:qwen38-27b
+    # DFlash2 bridge by default; rollback profiles select the pinned official
+    # Qwen3.8 Day-0 image. Keep checkpoint path and served alias separate.
+    image: ${SGLANG_IMAGE:-game-analysis-agent/sglang-dflash2:pr35496-28198c8-qwen38-c4271c3f}
     entrypoint: ["sh", "-c"]
     ports:
       - "${SGLANG_BIND_PORT:-30000}:30000"
@@ -29,6 +29,7 @@ services:
       - CUDA_DEVICE_ORDER=PCI_BUS_ID
       - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
       - SGLANG_MODEL_PATH=${SGLANG_MODEL_PATH:-RadixArk/Qwen3.8-27B-NVFP4}
+      - SGLANG_MODEL_REVISION=${SGLANG_MODEL_REVISION:-554ebba9b5f1b79dc11246341960360e6ef05ef4}
       - LLM_MAX_MODEL_LEN=${LLM_MAX_MODEL_LEN:-65536}
       - LLM_MAX_NUM_SEQS=${LLM_MAX_NUM_SEQS:-4}
       - SGLANG_MODEL=${SGLANG_MODEL:-qwen3.8-27b}
@@ -38,8 +39,11 @@ services:
       - SGLANG_CHUNKED_PREFILL_SIZE=${SGLANG_CHUNKED_PREFILL_SIZE:-2048}
       - SGLANG_ENABLE_APC=${SGLANG_ENABLE_APC:-1}
       - SGLANG_MAMBA_CACHE_STRATEGY=${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer_lazy}
-      - SGLANG_ENABLE_DSPARK=${SGLANG_ENABLE_DSPARK:-1}
-      - SGLANG_DRAFT_MODEL_PATH=${SGLANG_DRAFT_MODEL_PATH:-RadixArk/Qwen3.8-27B-DSpark}
+      - SGLANG_SPECULATIVE_ALGORITHM=${SGLANG_SPECULATIVE_ALGORITHM:-DFLASH}
+      - SGLANG_DRAFT_MODEL_PATH=${SGLANG_DRAFT_MODEL_PATH:-incoai/Qwen3.8-27B-DFlash2}
+      - SGLANG_DRAFT_MODEL_REVISION=${SGLANG_DRAFT_MODEL_REVISION:-dedf8df68adfb1afeaf7b7480c0a0243108177b4}
+      - SGLANG_NUM_DRAFT_TOKENS=${SGLANG_NUM_DRAFT_TOKENS:-8}
+      - SGLANG_ENABLE_METRICS=${SGLANG_ENABLE_METRICS:-1}
     ipc: host
     shm_size: '32gb'
     deploy:
@@ -54,6 +58,7 @@ services:
         set -eu;
         set -- sglang serve
         --model-path "$${SGLANG_MODEL_PATH:-RadixArk/Qwen3.8-27B-NVFP4}"
+        --revision "$${SGLANG_MODEL_REVISION:-554ebba9b5f1b79dc11246341960360e6ef05ef4}"
         --host 0.0.0.0
         --port 30000
         --api-key "$${SGLANG_API_KEY:-local-dev-token}"
@@ -72,10 +77,18 @@ services:
         if [ "$${SGLANG_ENABLE_APC:-1}" != "1" ]; then
         set -- "$$@" --disable-radix-cache;
         fi;
-        if [ "$${SGLANG_ENABLE_DSPARK:-1}" = "1" ]; then
+        if [ "$${SGLANG_ENABLE_METRICS:-1}" = "1" ]; then
+        set -- "$$@" --enable-metrics;
+        fi;
+        ALGORITHM="$${SGLANG_SPECULATIVE_ALGORITHM:-DFLASH}";
+        if [ "$$ALGORITHM" != "NONE" ]; then
         set -- "$$@"
-        --speculative-algorithm DSPARK
-        --speculative-draft-model-path "$${SGLANG_DRAFT_MODEL_PATH:-RadixArk/Qwen3.8-27B-DSpark}";
+        --speculative-algorithm "$$ALGORITHM"
+        --speculative-draft-model-path "$${SGLANG_DRAFT_MODEL_PATH:-incoai/Qwen3.8-27B-DFlash2}"
+        --speculative-draft-model-revision "$${SGLANG_DRAFT_MODEL_REVISION:-dedf8df68adfb1afeaf7b7480c0a0243108177b4}";
+        if [ -n "$${SGLANG_NUM_DRAFT_TOKENS:-8}" ]; then
+        set -- "$$@" --speculative-num-draft-tokens "$${SGLANG_NUM_DRAFT_TOKENS:-8}";
+        fi;
         fi;
         exec "$$@"
     healthcheck:

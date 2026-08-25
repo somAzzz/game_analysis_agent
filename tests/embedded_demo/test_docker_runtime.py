@@ -52,13 +52,13 @@ def test_vllm_defaults_to_v026_hybrid_apc_without_mtp() -> None:
     assert "--max-num-batched-tokens 65536" not in command
 
 
-def test_sglang_is_primary_qwen38_apc_dspark_backend() -> None:
+def test_sglang_is_primary_qwen38_apc_dflash2_backend() -> None:
     payload = yaml.safe_load((ROOT / "docker-compose.yml").read_text(encoding="utf-8"))
     service = payload["services"]["sglang"]
     command = " ".join(service["command"])
     environment = service["environment"]
 
-    assert service["image"] == "lmsysorg/sglang:qwen38-27b"
+    assert "game-analysis-agent/sglang-dflash2" in service["image"]
     assert service["profiles"] == ["local-nvidia", "local-sglang"]
     assert "$${SGLANG_MODEL_PATH:-RadixArk/Qwen3.8-27B-NVFP4}" in command
     assert "--quantization" not in command
@@ -68,12 +68,20 @@ def test_sglang_is_primary_qwen38_apc_dspark_backend() -> None:
     assert "$${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer_lazy}" in command
     assert 'if [ "$${SGLANG_ENABLE_APC:-1}" != "1" ]' in command
     assert "--disable-radix-cache" in command
-    assert 'if [ "$${SGLANG_ENABLE_DSPARK:-1}" = "1" ]' in command
-    assert "--speculative-algorithm DSPARK" in command
+    assert 'ALGORITHM="$${SGLANG_SPECULATIVE_ALGORITHM:-DFLASH}"' in command
+    assert 'if [ "$$ALGORITHM" != "NONE" ]' in command
+    assert '--speculative-algorithm "$$ALGORITHM"' in command
     assert "--speculative-draft-model-path" in command
-    assert "RadixArk/Qwen3.8-27B-DSpark" in command
+    assert "incoai/Qwen3.8-27B-DFlash2" in command
+    assert "--speculative-draft-model-revision" in command
+    assert "--speculative-num-draft-tokens" in command
+    assert "--enable-metrics" in command
+    assert "--revision" in command
     assert "SGLANG_ENABLE_APC=${SGLANG_ENABLE_APC:-1}" in environment
-    assert "SGLANG_ENABLE_DSPARK=${SGLANG_ENABLE_DSPARK:-1}" in environment
+    assert (
+        "SGLANG_SPECULATIVE_ALGORITHM=${SGLANG_SPECULATIVE_ALGORITHM:-DFLASH}"
+        in environment
+    )
 
 
 def test_host_sglang_script_uses_the_same_primary_defaults() -> None:
@@ -82,14 +90,35 @@ def test_host_sglang_script_uses_the_same_primary_defaults() -> None:
 
     assert os.access(script_path, os.X_OK)
     assert 'ENABLE_APC="${SGLANG_ENABLE_APC:-1}"' in script
-    assert 'ENABLE_DSPARK="${SGLANG_ENABLE_DSPARK:-1}"' in script
+    assert 'SPECULATIVE_ALGORITHM="${SGLANG_SPECULATIVE_ALGORITHM:-DFLASH}"' in script
     assert (
         'MAMBA_CACHE_STRATEGY="${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer_lazy}"' in script
     )
     assert "--quantization" not in script
     assert "--mamba-radix-cache-strategy" in script
-    assert "--speculative-algorithm DSPARK" in script
-    assert "RadixArk/Qwen3.8-27B-DSpark" in script
+    assert '--speculative-algorithm "$SPECULATIVE_ALGORITHM"' in script
+    assert "incoai/Qwen3.8-27B-DFlash2" in script
+    assert "--speculative-draft-model-revision" in script
+    assert "--speculative-num-draft-tokens" in script
+    assert "--enable-metrics" in script
+
+
+def test_sglang_profiles_pin_dflash2_and_dspark_rollbacks() -> None:
+    dflash = (ROOT / "config" / "sglang" / "dflash2.env").read_text(encoding="utf-8")
+    dspark = (ROOT / "config" / "sglang" / "dspark.env").read_text(encoding="utf-8")
+    target_only = (ROOT / "config" / "sglang" / "target-only.env").read_text(
+        encoding="utf-8"
+    )
+    build = (ROOT / "docker-compose.sglang-dflash2.yml").read_text(encoding="utf-8")
+
+    assert "SGLANG_SPECULATIVE_ALGORITHM=DFLASH" in dflash
+    assert "sha256:433a632aca8933497290e3ebde2f73b518b239f8ecb6b73c525648c4dc096b12" in dflash
+    assert "SGLANG_NUM_DRAFT_TOKENS=8" in dflash
+    assert "SGLANG_DRAFT_MODEL_REVISION=dedf8df68adfb1afeaf7b7480c0a0243108177b4" in dflash
+    assert "SGLANG_SPECULATIVE_ALGORITHM=DSPARK" in dspark
+    assert "lmsysorg/sglang@sha256:febfb971" in dspark
+    assert "SGLANG_SPECULATIVE_ALGORITHM=NONE" in target_only
+    assert "28198c8289f6ad59775f37d3bd9c9de67732c368" in build
 
 
 def test_host_vllm_script_uses_the_same_apc_only_defaults() -> None:
