@@ -78,6 +78,26 @@ If a client does not expose Skill discovery, read
 `.agents/skills/playtest-forge/SKILL.md` directly. Do not infer that the full
 Skill was loaded merely because this `AGENTS.md` was loaded.
 
+## Retired Judge preflight
+
+The repository-level `./judge` command, `JUDGE.md`, and
+`judge-manifest.json` were retired with the competition-review infrastructure
+in commit `9773024`. They are not prerequisites for current gameplay work.
+
+- Do not invoke, reconstruct, or restore the retired Judge bundle before an
+  ordinary `$playtest-forge` task.
+- Do not treat a missing `./judge` as a gameplay-test failure or as a reason to
+  block focused validators, governed fixed/holdout matrices, comparisons, or
+  repair verification.
+- Current gameplay acceptance uses the task's frozen evidence contract,
+  engine/focused validators, `tools/gameplay/run_gameplay_agent.py matrix` (or
+  the governed persona campaign entry point when persona evidence is actually
+  required), fixed and unseen-holdout gates, and archive/manifest verification.
+- If a user explicitly requests an audit of the historical competition or
+  submission bundle, use an explicitly pinned historical revision in an
+  isolated worktree and label the result historical. That audit never replaces
+  current gameplay evidence and is never a release gate for a new repair.
+
 ## Godot execution
 
 The host may not expose a `godot` or `godot4` binary. Before declaring real
