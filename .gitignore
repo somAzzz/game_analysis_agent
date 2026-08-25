@@ -64,3 +64,6 @@ reports/**
 
 # Editor workspace files.
 *.code-workspace
+
+# One-off local analysis scripts with machine-specific report layouts.
+/tools/gameplay/h2_fixed_analysis.py
