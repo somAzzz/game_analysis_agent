@@ -169,6 +169,8 @@ class EventChoiceRecord(ContractModel):
     """One choice in an exported event."""
 
     text: str = Field(min_length=1)
+    text_en: str | None = None
+    text_zh: str | None = None
     success_rate: float = Field(ge=0.0, le=1.0)
     success_effects: dict[str, float]
     failure_effects: dict[str, float]
@@ -442,7 +444,12 @@ def validate_trace_catalog_consistency(
     action_ids = {action.id for action in catalog.actions}
     event_choices = {
         event.id: {
-            canonical_event_choice_id(event.id, choice.choice_id, index, choice.text)
+            canonical_event_choice_id(
+                event.id,
+                choice.choice_id,
+                index,
+                choice.text_zh or choice.text,
+            )
             for index, choice in enumerate(event.choices, start=1)
         }
         for event in graph.events

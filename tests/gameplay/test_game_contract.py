@@ -250,6 +250,23 @@ def test_trace_catalog_consistency_legacy_choice_identity_unchanged(tmp_path: Pa
     assert summary["observed_choices"] == 1
 
 
+def test_trace_catalog_consistency_uses_legacy_identity_language(tmp_path: Path) -> None:
+    trace, graph, catalog = _load_consistency_fixtures()
+    event = graph["events"][0]
+    choice = event["choices"][0]
+    choice["text_en"] = choice["text"]
+    choice["text_zh"] = "历史选择文本"
+    legacy_id = f"{event['id']}.choice_01_历史选择文本"
+    _pin_week_to_catalog(trace, catalog, event, legacy_id)
+    trace_path, graph_path, catalog_path = _write_consistency_fixtures(
+        tmp_path, trace, graph, catalog
+    )
+
+    summary = validate_trace_catalog_consistency(trace_path, graph_path, catalog_path)
+
+    assert summary["observed_choices"] == 1
+
+
 def test_trace_catalog_consistency_rejects_unknown_choice_id(tmp_path: Path) -> None:
     trace, graph, catalog = _load_consistency_fixtures()
     event = graph["events"][0]

@@ -328,7 +328,7 @@ def _event_catalog_ids(
                     event_id,
                     str(raw_id) if raw_id else None,
                     index,
-                    str(choice.get("text") or ""),
+                    str(choice.get("text_zh") or choice.get("text") or ""),
                 )
             )
     return events, choices

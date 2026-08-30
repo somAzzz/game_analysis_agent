@@ -27,15 +27,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v10.0.1
         with:
           enable-cache: true
 
@@ -75,10 +75,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 20
           cache: npm
@@ -107,17 +107,17 @@ jobs:
       GODOT_BIN: godot4
     steps:
       - name: Checkout analysis agent
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: game-analysis-agent
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v10.0.1
         with:
           enable-cache: true
           cache-dependency-glob: game-analysis-agent/uv.lock
@@ -206,7 +206,7 @@ jobs:
 
       - name: Upload generated contract evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: game-contract-${{ github.run_id }}
           path: |
