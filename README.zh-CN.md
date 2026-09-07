@@ -4,6 +4,18 @@ Playtest Forge 是一个由 Codex 驱动的游戏质量分析系统。它把确�
 玩家人格试玩、证据诊断和有边界的修复实验组合起来；只有固定种子与未见
 holdout 证据都支持时，候选修改才会被接受。
 
+## 在线 Dashboard
+
+**[打开 Playtest Forge 交互式前端](https://somazzz.github.io/game_analysis_agent/)**
+
+[![Playtest Forge 前端：Judge Mission 与玩家人格证据](frontend/qa-judge-mission-final-1536x1024.png)](https://somazzz.github.io/game_analysis_agent/)
+
+[Judge Mission](https://somazzz.github.io/game_analysis_agent/#/) ·
+[Playthrough Inspector](https://somazzz.github.io/game_analysis_agent/#/playthrough-inspector) ·
+[Mission Archive](https://somazzz.github.io/game_analysis_agent/#/reports)
+
+公开部署提供经过脱敏的只读证据，无需本地安装、Godot 运行时、模型服务或 API Key。
+
 [开发指南](docs/DEVELOPER_GUIDE.md) ·
 [架构](docs/architecture/ARCHITECTURE.md) ·
 [Docker 指南](docs/operations/DOCKER.md) ·

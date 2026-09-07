@@ -5,6 +5,19 @@ simulation, persona playthroughs, evidence-backed diagnosis, and bounded repair
 experiments. A candidate change is accepted only when fixed and unseen-holdout
 evidence supports it.
 
+## Live dashboard
+
+**[Open the interactive Playtest Forge dashboard](https://somazzz.github.io/game_analysis_agent/)**
+
+[![Playtest Forge dashboard showing the Judge Mission and persona evidence](frontend/qa-judge-mission-final-1536x1024.png)](https://somazzz.github.io/game_analysis_agent/)
+
+[Judge Mission](https://somazzz.github.io/game_analysis_agent/#/) ·
+[Playthrough Inspector](https://somazzz.github.io/game_analysis_agent/#/playthrough-inspector) ·
+[Mission Archive](https://somazzz.github.io/game_analysis_agent/#/reports)
+
+The public deployment contains sanitized, read-only evidence and requires no
+local installation, Godot runtime, model endpoint, or API key.
+
 [Developer guide](docs/DEVELOPER_GUIDE.md) ·
 [Architecture](docs/architecture/ARCHITECTURE.md) ·
 [Docker guide](docs/operations/DOCKER.md) ·
