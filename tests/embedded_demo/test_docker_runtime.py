@@ -7,6 +7,10 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
+OFFICIAL_DFLASH2_IMAGE = (
+    "lmsysorg/sglang@"
+    "sha256:d6e7288627be8b02be88e4bba38e73f6d50e2826869f753c13a4c4385ab3eda9"
+)
 
 
 def test_compose_defines_persistent_godot_sidecar_with_shared_mount() -> None:
@@ -58,12 +62,13 @@ def test_sglang_is_primary_qwen38_apc_dflash2_backend() -> None:
     command = " ".join(service["command"])
     environment = service["environment"]
 
-    assert "game-analysis-agent/sglang-dflash2" in service["image"]
+    assert OFFICIAL_DFLASH2_IMAGE in service["image"]
     assert service["profiles"] == ["local-nvidia", "local-sglang"]
     assert "$${SGLANG_MODEL_PATH:-RadixArk/Qwen3.8-27B-NVFP4}" in command
     assert "--quantization" not in command
     assert '--attention-backend "$${SGLANG_ATTENTION_BACKEND:-flashinfer}"' in command
     assert '--chunked-prefill-size "$${SGLANG_CHUNKED_PREFILL_SIZE:-2048}"' in command
+    assert '--mem-fraction-static "$${SGLANG_MEM_FRACTION_STATIC:-0.80}"' in command
     assert "--mamba-radix-cache-strategy" in command
     assert "$${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer_lazy}" in command
     assert 'if [ "$${SGLANG_ENABLE_APC:-1}" != "1" ]' in command
@@ -78,6 +83,7 @@ def test_sglang_is_primary_qwen38_apc_dflash2_backend() -> None:
     assert "--enable-metrics" in command
     assert "--revision" in command
     assert "SGLANG_ENABLE_APC=${SGLANG_ENABLE_APC:-1}" in environment
+    assert "SGLANG_MEM_FRACTION_STATIC=${SGLANG_MEM_FRACTION_STATIC:-0.80}" in environment
     assert (
         "SGLANG_SPECULATIVE_ALGORITHM=${SGLANG_SPECULATIVE_ALGORITHM:-DFLASH}"
         in environment
@@ -90,6 +96,7 @@ def test_host_sglang_script_uses_the_same_primary_defaults() -> None:
 
     assert os.access(script_path, os.X_OK)
     assert 'ENABLE_APC="${SGLANG_ENABLE_APC:-1}"' in script
+    assert 'MEM_FRACTION_STATIC="${SGLANG_MEM_FRACTION_STATIC:-0.80}"' in script
     assert 'SPECULATIVE_ALGORITHM="${SGLANG_SPECULATIVE_ALGORITHM:-DFLASH}"' in script
     assert (
         'MAMBA_CACHE_STRATEGY="${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer_lazy}"' in script
@@ -109,16 +116,21 @@ def test_sglang_profiles_pin_dflash2_and_dspark_rollbacks() -> None:
     target_only = (ROOT / "config" / "sglang" / "target-only.env").read_text(
         encoding="utf-8"
     )
-    build = (ROOT / "docker-compose.sglang-dflash2.yml").read_text(encoding="utf-8")
+    override = (ROOT / "docker-compose.sglang-dflash2.yml").read_text(
+        encoding="utf-8"
+    )
 
     assert "SGLANG_SPECULATIVE_ALGORITHM=DFLASH" in dflash
-    assert "sha256:433a632aca8933497290e3ebde2f73b518b239f8ecb6b73c525648c4dc096b12" in dflash
+    assert OFFICIAL_DFLASH2_IMAGE in dflash
+    assert "SGLANG_MEM_FRACTION_STATIC=0.80" in dflash
     assert "SGLANG_NUM_DRAFT_TOKENS=8" in dflash
     assert "SGLANG_DRAFT_MODEL_REVISION=dedf8df68adfb1afeaf7b7480c0a0243108177b4" in dflash
     assert "SGLANG_SPECULATIVE_ALGORITHM=DSPARK" in dspark
-    assert "lmsysorg/sglang@sha256:febfb971" in dspark
+    assert OFFICIAL_DFLASH2_IMAGE in dspark
+    assert OFFICIAL_DFLASH2_IMAGE in target_only
     assert "SGLANG_SPECULATIVE_ALGORITHM=NONE" in target_only
-    assert "28198c8289f6ad59775f37d3bd9c9de67732c368" in build
+    assert OFFICIAL_DFLASH2_IMAGE in override
+    assert "build:" not in override
 
 
 def test_host_vllm_script_uses_the_same_apc_only_defaults() -> None:

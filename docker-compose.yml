@@ -4,8 +4,8 @@
 # Replay, Godot tools, the legacy CLI, and NVIDIA local inference.
 #
 # Notes:
-#   * The primary local backend layers the pinned DFlash2 NVFP4 selector patch
-#     over SGLang's Qwen3.8 Day-0 image. DSpark remains an env-file rollback.
+#   * The primary local backend uses SGLang's official, digest-pinned
+#     Qwen3.8-27B DFlash2 image. DSpark remains an env-file rollback.
 #   * vLLM v0.26.0 remains available as the APC-only baseline/fallback.
 #   * The vLLM fallback remains on the independently configured Qwen3.6
 #     NVFP4 checkpoint; SGLang uses its own model path and served alias.
@@ -15,9 +15,9 @@
 
 services:
   sglang:
-    # DFlash2 bridge by default; rollback profiles select the pinned official
-    # Qwen3.8 Day-0 image. Keep checkpoint path and served alias separate.
-    image: ${SGLANG_IMAGE:-game-analysis-agent/sglang-dflash2:pr35496-28198c8-qwen38-c4271c3f}
+    # Official multi-architecture DFlash2 image. Keep checkpoint path and
+    # served alias separate; env profiles provide explicit rollback images.
+    image: ${SGLANG_IMAGE:-lmsysorg/sglang@sha256:d6e7288627be8b02be88e4bba38e73f6d50e2826869f753c13a4c4385ab3eda9}
     entrypoint: ["sh", "-c"]
     ports:
       - "${SGLANG_BIND_PORT:-30000}:30000"
@@ -34,7 +34,7 @@ services:
       - LLM_MAX_NUM_SEQS=${LLM_MAX_NUM_SEQS:-4}
       - SGLANG_MODEL=${SGLANG_MODEL:-qwen3.8-27b}
       - SGLANG_API_KEY=${SGLANG_API_KEY:-local-dev-token}
-      - SGLANG_MEM_FRACTION_STATIC=${SGLANG_MEM_FRACTION_STATIC:-0.85}
+      - SGLANG_MEM_FRACTION_STATIC=${SGLANG_MEM_FRACTION_STATIC:-0.80}
       - SGLANG_ATTENTION_BACKEND=${SGLANG_ATTENTION_BACKEND:-flashinfer}
       - SGLANG_CHUNKED_PREFILL_SIZE=${SGLANG_CHUNKED_PREFILL_SIZE:-2048}
       - SGLANG_ENABLE_APC=${SGLANG_ENABLE_APC:-1}
@@ -70,7 +70,7 @@ services:
         --sampling-defaults model
         --context-length "$${LLM_MAX_MODEL_LEN:-65536}"
         --max-running-requests "$${LLM_MAX_NUM_SEQS:-4}"
-        --mem-fraction-static "$${SGLANG_MEM_FRACTION_STATIC:-0.85}"
+        --mem-fraction-static "$${SGLANG_MEM_FRACTION_STATIC:-0.80}"
         --attention-backend "$${SGLANG_ATTENTION_BACKEND:-flashinfer}"
         --chunked-prefill-size "$${SGLANG_CHUNKED_PREFILL_SIZE:-2048}"
         --mamba-radix-cache-strategy "$${SGLANG_MAMBA_CACHE_STRATEGY:-extra_buffer_lazy}";

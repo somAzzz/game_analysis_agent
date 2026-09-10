@@ -259,7 +259,7 @@ Start the primary local SGLang service and persistent Godot sidecar:
 ```bash
 cp .env.example .env
 # Edit .env: HF_TOKEN, GAME_PROJECT_PATH, CUDA_VISIBLE_DEVICES, etc.
-docker compose -f docker-compose.yml -f docker-compose.sglang-dflash2.yml build sglang
+docker pull lmsysorg/sglang@sha256:d6e7288627be8b02be88e4bba38e73f6d50e2826869f753c13a4c4385ab3eda9
 docker compose --env-file .env --env-file config/sglang/dflash2.env \
   --profile local-sglang --profile game-tools up -d sglang godot
 docker compose logs -f sglang

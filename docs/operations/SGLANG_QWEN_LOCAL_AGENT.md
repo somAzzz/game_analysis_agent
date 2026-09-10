@@ -10,7 +10,7 @@ the model identity.
 
 ```bash
 cp .env.example .env
-docker compose -f docker-compose.yml -f docker-compose.sglang-dflash2.yml build sglang
+docker pull lmsysorg/sglang@sha256:d6e7288627be8b02be88e4bba38e73f6d50e2826869f753c13a4c4385ab3eda9
 docker compose --env-file .env --env-file config/sglang/dflash2.env \
   --profile local-sglang up -d sglang
 docker compose logs -f sglang
@@ -22,14 +22,11 @@ in addition to the existing `RadixArk/Qwen3.8-27B-NVFP4` target. They are
 persisted in the host's `~/.cache/huggingface` bind mount, so normal container
 recreation does not download them again. Pre-downloading is optional.
 
-The custom image is an explicit temporary bridge while SGLang PR #35496 is
-open. It pins the existing Qwen3.8 Day-0 image digest and PR commit
-`28198c8289f6ad59775f37d3bd9c9de67732c368`; the Docker build fails if the
-named PR branch no longer resolves to that commit. Replace it with an official
-immutable image after the patch merges and passes the same acceptance suite.
-The accepted local build is pinned by
-`sha256:433a632aca8933497290e3ebde2f73b518b239f8ecb6b73c525648c4dc096b12`
-in `config/sglang/dflash2.env`.
+SGLang PRs #35371 and #35496 are merged. The primary profile uses the official
+multi-architecture DFlash2 image pinned by
+`sha256:d6e7288627be8b02be88e4bba38e73f6d50e2826869f753c13a4c4385ab3eda9`
+in `config/sglang/dflash2.env`. The retired local bridge remains documented in
+the dated migration record only; normal startup no longer builds it.
 
 The host endpoint is `http://localhost:30000/v1`. The `agent` container uses
 `http://sglang:30000/v1`; keep these addresses separate because `localhost`
@@ -52,7 +49,7 @@ SGLANG_MODEL=qwen3.8-27b
 SGLANG_BASE_URL=http://localhost:30000/v1
 SGLANG_API_KEY=local-dev-token
 
-SGLANG_MEM_FRACTION_STATIC=0.85
+SGLANG_MEM_FRACTION_STATIC=0.80
 SGLANG_ATTENTION_BACKEND=flashinfer
 SGLANG_CHUNKED_PREFILL_SIZE=2048
 SGLANG_ENABLE_APC=1
@@ -67,8 +64,9 @@ SGLANG_ENABLE_METRICS=1
 APC is implemented by SGLang's Unified Radix Cache and is enabled unless
 `SGLANG_ENABLE_APC=0` adds `--disable-radix-cache`. The
 `extra_buffer_lazy` strategy reduces the hybrid GDN state cost while preserving
-branching-point caching. DFlash2 uses block size 8 and the pinned selector
-implementation required by the quantized NVFP4 target `lm_head`.
+branching-point caching. DFlash2 uses block size 8 and the upstream selector
+implementation required by the quantized NVFP4 target `lm_head`. The 0.80
+static-memory fraction leaves the host headroom required on a 128GB DGX Spark.
 
 The application keeps one provider-independent prompt/context contract. Local
 Qwen thinking uses the same `chat_template_kwargs`, and event-choice

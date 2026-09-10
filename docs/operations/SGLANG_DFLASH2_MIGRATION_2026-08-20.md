@@ -1,5 +1,11 @@
 # SGLang DFlash2 migration record — 2026-08-20
 
+> **2026-09-10 follow-up:** SGLang v0.5.19 includes merged PRs #35371 and #35496. Active
+> configuration now uses the official multi-architecture image pinned at
+> `lmsysorg/sglang@sha256:d6e7288627be8b02be88e4bba38e73f6d50e2826869f753c13a4c4385ab3eda9`
+> with a DGX Spark-safe static memory fraction of `0.80`. The local bridge and
+> the `0.85` measurements below are retained as historical acceptance evidence.
+
 ## Decision
 
 DFlash2 is accepted as the primary local speculative-decoding backend for
@@ -98,11 +104,10 @@ accepted image digest.
 
 ## Operations
 
-Build the temporary bridge:
+Pull the official replacement:
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.sglang-dflash2.yml \
-  build sglang
+docker pull lmsysorg/sglang@sha256:d6e7288627be8b02be88e4bba38e73f6d50e2826869f753c13a4c4385ab3eda9
 ```
 
 Start or restore DFlash2:
@@ -129,10 +134,10 @@ docker compose --env-file .env --env-file config/sglang/target-only.env \
 Do not use `docker compose down` for these transitions. Recreate only the
 `sglang` service so unrelated project services remain untouched.
 
-## Follow-up gate
+## Official-image acceptance gate
 
-PR #35496 was still open at acceptance time. When its selector support appears
-in an official immutable SGLang image, replace the bridge only after rerunning:
+The source and image replacement is complete. Before treating new performance
+evidence as equivalent to the historical local-bridge benchmark, rerun:
 
 1. the focused upstream DFlash2 selector tests;
 2. the repository Docker-runtime and LLM-client tests;

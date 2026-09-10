@@ -160,8 +160,9 @@ All knobs live in `.env`:
 
 ## 9. Version pinning
 
-`lmsysorg/sglang:v0.5.16-cu130-runtime` is the primary pin. Qwen3.6 uses
-ModelOpt FP4, Radix cache with `extra_buffer`, and optional NEXTN/MTP. The
+`lmsysorg/sglang@sha256:d6e7288627be8b02be88e4bba38e73f6d50e2826869f753c13a4c4385ab3eda9`
+(`v0.5.19`) is the primary SGLang pin. Qwen3.8 uses the ModelOpt NVFP4
+target, DFlash2, and the unified Radix/Mamba cache with `extra_buffer_lazy`. The
 fallback `vllm/vllm-openai:v0.26.0` remains pinned as of 2026-07-31 and adds fine-grained
 prefix-cache hits for aligned attention/Mamba hybrid models. Hybrid APC is
 still experimental: treat it only as a prefill optimization, never as a
